@@ -3,15 +3,29 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Resend } = require('resend');
 const path = require('path');
 const crypto = require('crypto');
+const SibApiV3Sdk = require('@getbrevo/brevo');
 
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// ==================== BREVO ====================
+
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+apiInstance.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+
+async function enviarEmail(para, assunto, html) {
+  const email = new SibApiV3Sdk.SendSmtpEmail();
+  email.to = [{ email: para }];
+  email.sender = { name: 'HOC System', email: 'kalimacomplex@gmail.com' };
+  email.subject = assunto;
+  email.htmlContent = html;
+  return apiInstance.sendTransacEmail(email);
+}
+
+// ==================== MONGODB ====================
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB conectado!'))
@@ -204,11 +218,10 @@ app.post('/api/convites', authMiddleware, async (req, res) => {
       permissoes: permissoes || {}
     });
     const linkConvite = `${process.env.APP_URL}/aceitar-convite?token=${token}`;
-    await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: email,
-      subject: 'Você foi convidado para o HOC System',
-      html: `
+    await enviarEmail(
+      email,
+      'Você foi convidado para o HOC System',
+      `
         <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
           <h2 style="color:#1e2a4a">Você recebeu um convite!</h2>
           <p style="color:#718096">Você foi convidado para colaborar no <strong>HOC System</strong>.</p>
@@ -219,7 +232,7 @@ app.post('/api/convites', authMiddleware, async (req, res) => {
           <p style="color:#a0aec0;font-size:13px">Este link expira em 48 horas.</p>
         </div>
       `
-    });
+    );
     res.json({ mensagem: 'Convite enviado com sucesso!' });
   } catch (err) {
     res.status(500).json({ erro: err.message });

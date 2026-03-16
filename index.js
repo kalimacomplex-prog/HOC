@@ -75,6 +75,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.ht
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cadastro.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/aceitar-convite', (req, res) => res.sendFile(path.join(__dirname, 'public', 'aceitar-convite.html')));
+app.get('/plano-usuarios', (req, res) => res.sendFile(path.join(__dirname, 'public', 'plano-usuarios.html')));
 
 // ==================== AUTH ====================
 
@@ -91,7 +92,7 @@ app.post('/api/cadastro', async (req, res) => {
     if (!empresa) empresa = await Empresa.create({ nome: nomeEmpresa });
 
     const hash = await bcrypt.hash(senha, 10);
-    const usuario = await Usuario.create({
+    await Usuario.create({
       nome, email, senha: hash,
       perfil: 'Admin',
       usuarioMestre: true,
@@ -120,11 +121,26 @@ app.post('/api/login', async (req, res) => {
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
     if (!senhaCorreta) return res.status(400).json({ erro: 'Email ou senha incorretos' });
     const token = jwt.sign(
-      { id: usuario._id, nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresa: usuario.empresa._id, empresaNome: usuario.empresa.nome },
+      {
+        id: usuario._id,
+        nome: usuario.nome,
+        email: usuario.email,
+        perfil: usuario.perfil,
+        empresa: usuario.empresa._id,
+        empresaNome: usuario.empresa.nome
+      },
       process.env.JWT_SECRET || 'segredo123',
       { expiresIn: '8h' }
     );
-    res.json({ token, usuario: { nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresaNome: usuario.empresa.nome } });
+    res.json({
+      token,
+      usuario: {
+        nome: usuario.nome,
+        email: usuario.email,
+        perfil: usuario.perfil,
+        empresaNome: usuario.empresa.nome
+      }
+    });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }
@@ -136,6 +152,36 @@ app.get('/api/usuarios', authMiddleware, async (req, res) => {
   try {
     const usuarios = await Usuario.find({ empresa: req.usuario.empresa }).select('-senha');
     res.json(usuarios);
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+});
+
+app.put('/api/usuarios/:id', authMiddleware, async (req, res) => {
+  try {
+    const { nome, perfil, status } = req.body;
+    const usuario = await Usuario.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { nome, perfil, status },
+      { new: true }
+    ).select('-senha');
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    res.json(usuario);
+  } catch (err) {
+    res.status(400).json({ erro: err.message });
+  }
+});
+
+app.delete('/api/usuarios/:id', authMiddleware, async (req, res) => {
+  try {
+    if (req.params.id === req.usuario.id)
+      return res.status(400).json({ erro: 'Você não pode deletar sua própria conta' });
+    const usuario = await Usuario.findOneAndDelete({
+      _id: req.params.id,
+      empresa: req.usuario.empresa
+    });
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    res.json({ mensagem: 'Usuário deletado com sucesso!' });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }

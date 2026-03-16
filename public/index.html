@@ -3,30 +3,264 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projeto HOC</title>
-  <link rel="stylesheet" href="style.css">
+  <title>HOC - Login</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .left-panel {
+      width: 420px;
+      background: #1e2a4a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: white;
+    }
+
+    .left-panel h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .left-panel p {
+      font-size: 14px;
+      color: #a0aec0;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: #3b5bdb;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 24px;
+    }
+
+    .right-panel {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .card h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e2a4a;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #718096;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e2a4a;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #1e2a4a;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus { border-color: #3b5bdb; }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #3b5bdb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: #2f4ac0; }
+
+    .btn:disabled { background: #a0aec0; cursor: not-allowed; }
+
+    .link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: #718096;
+    }
+
+    .link a {
+      color: #3b5bdb;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .link a:hover { text-decoration: underline; }
+
+    .erro {
+      background: #fff5f5;
+      border: 1px solid #feb2b2;
+      color: #c53030;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .sucesso {
+      background: #f0fff4;
+      border: 1px solid #9ae6b4;
+      color: #276749;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .left-panel { display: none; }
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Cadastro de Usuários</h1>
-
-    <form id="form">
-      <input type="text" id="nome" placeholder="Nome" required>
-      <input type="email" id="email" placeholder="Email" required>
-      <button type="submit">Cadastrar</button>
-    </form>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Email</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody id="lista"></tbody>
-    </table>
+  <div class="left-panel">
+    <div class="logo">H</div>
+    <h1>HOC System</h1>
+    <p>Gerencie seu negócio com eficiência e simplicidade.</p>
   </div>
-  <script src="script.js"></script>
+
+  <div class="right-panel">
+    <div class="card">
+      <h2>Bem-vindo de volta!</h2>
+      <p>Entre com suas credenciais para acessar o sistema.</p>
+
+      <div class="erro" id="erro"></div>
+      <div class="sucesso" id="sucesso"></div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="seu@email.com">
+      </div>
+
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="senha" placeholder="••••••••">
+      </div>
+
+      <button class="btn" id="btnLogin" onclick="login()">Entrar</button>
+
+      <div class="link">
+        Não tem conta? <a href="/cadastro">Criar conta</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function login() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      const btn = document.getElementById('btnLogin');
+      const erro = document.getElementById('erro');
+      const sucesso = document.getElementById('sucesso');
+
+      erro.style.display = 'none';
+      sucesso.style.display = 'none';
+
+      if (!email || !senha) {
+        erro.textContent = 'Preencha todos os campos.';
+        erro.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, senha })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          erro.textContent = data.erro || 'Erro ao fazer login.';
+          erro.style.display = 'block';
+          return;
+        }
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+        sucesso.textContent = 'Login realizado! Redirecionando...';
+        sucesso.style.display = 'block';
+
+        setTimeout(() => window.location.href = '/dashboard', 1000);
+
+      } catch (err) {
+        erro.textContent = 'Erro de conexão. Tente novamente.';
+        erro.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    }
+
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') login();
+    });
+
+    // Se já estiver logado, redireciona
+    if (localStorage.getItem('token')) {
+      window.location.href = '/dashboard';
+    }
+  </script>
 </body>
 </html>

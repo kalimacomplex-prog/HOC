@@ -24,7 +24,6 @@ apiInstance.setApiKey(
 );
 
 async function enviarEmail(para, assunto, html) {
-
   const email = new SibApiV3Sdk.SendSmtpEmail();
 
   email.to = [{ email: para }];
@@ -346,18 +345,14 @@ app.post('/api/convites', authMiddleware, async (req, res) => {
     const link = `${process.env.APP_URL}/aceitar-convite?token=${token}`;
 
     await enviarEmail(
-
       email,
-
       "Convite para HOC System",
-
       `
       <h2>Você foi convidado</h2>
       <p>Clique no link abaixo para entrar:</p>
       <a href="${link}">Aceitar convite</a>
       <p>Este link expira em 48 horas</p>
       `
-
     );
 
     res.json({ mensagem: "Convite enviado com sucesso!" });

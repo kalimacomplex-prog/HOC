@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Plano e Usuários</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 240px; background: #1e2a4a; display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh; }
+    .sidebar-logo { display: flex; align-items: center; gap: 12px; padding: 0 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .logo-icon { width: 36px; height: 36px; background: #3b5bdb; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; }
+    .logo-text { font-size: 18px; font-weight: 700; color: white; }
+    .sidebar-menu { padding: 16px 12px; flex: 1; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; color: #a0aec0; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; margin-bottom: 4px; text-decoration: none; }
+    .menu-item:hover { background: rgba(255,255,255,0.06); color: white; }
+    .menu-item.active { background: #3b5bdb; color: white; }
+    .menu-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .btn-sair { width: 100%; padding: 10px; background: rgba(255,255,255,0.06); color: #a0aec0; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .btn-sair:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    /* Main */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; }
+    .header { background: white; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .header h1 { font-size: 20px; font-weight: 700; color: #1e2a4a; }
+    .header-user { display: flex; align-items: center; gap: 12px; }
+    .user-avatar { width: 36px; height: 36px; background: #3b5bdb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; }
+    .user-info { text-align: right; }
+    .user-nome { font-size: 14px; font-weight: 600; color: #1e2a4a; }
+    .user-perfil { font-size: 12px; color: #718096; }
+
+    /* Content */
+    .content { padding: 32px; flex: 1; }
+    .page-title { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
+    .breadcrumb { font-size: 13px; color: #718096; margin-bottom: 32px; }
+
+    /* Planos */
+    .planos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
+    .plano-card { background: white; border-radius: 16px; padding: 28px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 2px solid transparent; position: relative; transition: all 0.2s; }
+    .plano-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .plano-card.popular { border-color: #3b5bdb; }
+    .plano-card.ativo { border-color: #38a169; background: #f0fff4; }
+    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3b5bdb; color: white; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 20px; white-space: nowrap; }
+    .ativo-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #38a169; color: white; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 20px; white-space: nowrap; }
+    .plano-nome { font-size: 18px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
+    .plano-preco { font-size: 28px; font-weight: 700; color: #3b5bdb; margin-bottom: 4px; }
+    .plano-preco span { font-size: 14px; font-weight: 400; color: #718096; }
+    .plano-preco.enterprise { font-size: 18px; color: #1e2a4a; }
+    .plano-divider { height: 1px; background: #f0f2f5; margin: 16px 0; }
+    .plano-features { list-style: none; margin-bottom: 24px; }
+    .plano-features li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4a5568; margin-bottom: 10px; }
+    .plano-features li::before { content: '✓'; color: #38a169; font-weight: 700; font-size: 14px; }
+    .btn-plano { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-plano.primario { background: #3b5bdb; color: white; }
+    .btn-plano.primario:hover { background: #2f4ac0; }
+    .btn-plano.secundario { background: #f0f2f5; color: #4a5568; }
+    .btn-plano.secundario:hover { background: #e2e8f0; }
+    .btn-plano.ativo-btn { background: #f0fff4; color: #38a169; border: 1.5px solid #38a169; cursor: default; }
+    .btn-plano.comercial { background: #1e2a4a; color: white; }
+    .btn-plano.comercial:hover { background: #2d3e6a; }
+
+    /* Tabela Usuários */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .section-title { font-size: 18px; font-weight: 700; color: #1e2a4a; }
+    .btn-convidar { padding: 10px 18px; background: #3b5bdb; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-convidar:hover { background: #2f4ac0; }
+    .table-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 12px 24px; text-align: left; font-size: 12px; font-weight: 600; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #f0f2f5; }
+    td { padding: 16px 24px; font-size: 14px; color: #1e2a4a; border-bottom: 1px solid #f8fafc; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8fafc; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge.ativo { background: #f0fff4; color: #276749; }
+    .badge.pendente { background: #fffaf0; color: #c05621; }
+    .badge.inativo { background: #fff5f5; color: #c53030; }
+    .acoes { display: flex; gap: 8px; }
+    .btn-acao { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .btn-editar { background: #ebf0ff; color: #3b5bdb; }
+    .btn-editar:hover { background: #dbe4ff; }
+    .btn-deletar { background: #fff5f5; color: #c53030; }
+    .btn-deletar:hover { background: #fed7d7; }
+    .empty { text-align: center; padding: 40px; color: #718096; font-size: 14px; }
+
+    /* Modal Convidar */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-overlay.aberto { display: flex; }
+    .modal { background: white; border-radius: 16px; padding: 32px; width: 100%; max-width: 500px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); max-height: 90vh; overflow-y: auto; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .modal-titulo { font-size: 20px; font-weight: 700; color: #1e2a4a; }
+    .btn-fechar { background: none; border: none; font-size: 20px; cursor: pointer; color: #718096; }
+    .btn-fechar:hover { color: #1e2a4a; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #1e2a4a; margin-bottom: 8px; }
+    input[type="text"], input[type="email"] { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; color: #1e2a4a; outline: none; transition: border-color 0.2s; }
+    input[type="text"]:focus, input[type="email"]:focus { border-color: #3b5bdb; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f2f5; }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-label { font-size: 14px; color: #1e2a4a; }
+    .toggle-desc { font-size: 12px; color: #718096; margin-top: 2px; }
+    .toggle { position: relative; width: 40px; height: 22px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: #e2e8f0; border-radius: 22px; cursor: pointer; transition: background 0.2s; }
+    .toggle-slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; }
+    .toggle input:checked + .toggle-slider { background: #3b5bdb; }
+    .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
+    .permissoes-titulo { font-size: 13px; font-weight: 600; color: #1e2a4a; margin: 16px 0 8px; }
+    .modal-footer { display: flex; gap: 12px; margin-top: 24px; }
+    .btn-cancelar { flex: 1; padding: 12px; background: #f0f2f5; color: #718096; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn-cancelar:hover { background: #e2e8f0; }
+    .btn-enviar { flex: 2; padding: 12px; background: #3b5bdb; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn-enviar:hover { background: #2f4ac0; }
+    .btn-enviar:disabled { background: #a0aec0; cursor: not-allowed; }
+
+    /* Modal Editar */
+    .modal-editar { background: white; border-radius: 16px; padding: 32px; width: 100%; max-width: 440px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    select { width: 100%; padding: 11px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; color: #1e2a4a; outline: none; background: white; }
+    select:focus { border-color: #3b5bdb; }
+
+    .erro { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+    .sucesso { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+
+    /* Acesso negado */
+    .acesso-negado { text-align: center; padding: 80px 40px; }
+    .acesso-negado h2 { font-size: 24px; color: #1e2a4a; margin-bottom: 12px; }
+    .acesso-negado p { color: #718096; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">H</div>
+      <span class="logo-text">HOC System</span>
+    </div>
+    <nav class="sidebar-menu">
+      <a class="menu-item" href="/dashboard"><span class="menu-icon">📊</span> Overview</a>
+      <a class="menu-item" href="#"><span class="menu-icon">⚙️</span> Operações</a>
+      <a class="menu-item" href="#"><span class="menu-icon">🎯</span> Gestão de Metas</a>
+      <a class="menu-item" href="#"><span class="menu-icon">💡</span> Ideias Livres</a>
+      <a class="menu-item" href="#"><span class="menu-icon">👥</span> Permissionamentos</a>
+      <a class="menu-item" href="#"><span class="menu-icon">📁</span> Gestão de Projetos</a>
+      <a class="menu-item" href="#"><span class="menu-icon">📋</span> Gestão de Licenças</a>
+      <a class="menu-item active" href="/plano-usuarios"><span class="menu-icon">💳</span> Plano e Usuários</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn-sair" onclick="sair()">🚪 Sair</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="header">
+      <h1>HOC System</h1>
+      <div class="header-user">
+        <div class="user-info">
+          <div class="user-nome" id="userNome">Carregando...</div>
+          <div class="user-perfil" id="userEmpresa">-</div>
+        </div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
+    </div>
+
+    <div class="content" id="conteudo">
+      <div class="page-title">Plano e Usuários</div>
+      <div class="breadcrumb">Home > Plano e Usuários</div>
+
+      <!-- Planos -->
+      <div class="planos-grid" id="planosGrid"></div>
+
+      <!-- Usuários -->
+      <div class="section-header">
+        <span class="section-title">Usuários</span>
+        <button class="btn-convidar" onclick="abrirModalConvite()">+ Convidar Usuário</button>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Perfil</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaUsuarios">
+            <tr><td colspan="5" class="empty">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Convidar -->
+  <div class="modal-overlay" id="modalConvite" onclick="fecharModalFora(event, 'modalConvite')">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-titulo">Convidar Usuário</span>
+        <button class="btn-fechar" onclick="fecharModal('modalConvite')">×</button>
+      </div>
+      <div class="erro" id="conviteErro"></div>
+      <div class="sucesso" id="conviteSucesso"></div>
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" id="conviteNome" placeholder="Nome completo">
+      </div>
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="conviteEmail" placeholder="email@empresa.com">
+      </div>
+      <div class="toggle-row" style="margin-bottom:8px">
+        <div>
+          <div class="toggle-label" style="font-weight:600">Usuário Mestre</div>
+          <div class="toggle-desc">Permissões completas no sistema</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="usuarioMestre" onchange="toggleMestre()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div id="permissoesSection">
+        <div class="permissoes-titulo">Permissões</div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Acesso independente a módulos</div></div>
+          <label class="toggle"><input type="checkbox" id="perm_acessoIndependente"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Aprovação de Wikis</div></div>
+          <label class="toggle"><input type="checkbox" id="perm_aprovacaoWikis"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Aprovação de Ideias</div></div>
+          <label class="toggle"><input type="checkbox" id="perm_aprovacaoIdeias"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Gerenciamento de Projetos</div>
+            <div class="toggle-desc">Inclui aprovação TAP, orçamento, prazo, mudanças, encerramento</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="perm_gerenciamentoProjetos"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Edição do Fluxo de Valor</div></div>
+          <label class="toggle"><input type="checkbox" id="perm_edicaoFluxoValor"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-label">Permissão global de segurança (cofre)</div></div>
+          <label class="toggle"><input type="checkbox" id="perm_permissaoSeguranca"><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancelar" onclick="fecharModal('modalConvite')">✕ Cancelar</button>
+        <button class="btn-enviar" id="btnEnviar" onclick="enviarConvite()">✓ Enviar Convite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Usuário -->
+  <div class="modal-overlay" id="modalEditar" onclick="fecharModalFora(event, 'modalEditar')">
+    <div class="modal-editar">
+      <div class="modal-header">
+        <span class="modal-titulo">Editar Usuário</span>
+        <button class="btn-fechar" onclick="fecharModal('modalEditar')">×</button>
+      </div>
+      <div class="erro" id="editarErro"></div>
+      <div class="sucesso" id="editarSucesso"></div>
+      <input type="hidden" id="editarId">
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" id="editarNome" placeholder="Nome completo">
+      </div>
+      <div class="form-group">
+        <label>Perfil</label>
+        <select id="editarPerfil">
+          <option value="Usuário">Usuário</option>
+          <option value="Gerente">Gerente</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="editarStatus">
+          <option value="Ativo">Ativo</option>
+          <option value="Pendente">Pendente</option>
+          <option value="Inativo">Inativo</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancelar" onclick="fecharModal('modalEditar')">Cancelar</button>
+        <button class="btn-enviar" id="btnSalvar" onclick="salvarEdicao()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    if (!token) window.location.href = '/';
+
+    document.getElementById('userNome').textContent = usuario.nome || '-';
+    document.getElementById('userEmpresa').textContent = usuario.empresaNome || '-';
+    document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+
+    // Verificar se é admin
+    if (usuario.perfil !== 'Admin') {
+      document.getElementById('conteudo').innerHTML = `
+        <div class="acesso-negado">
+          <h2>🔒 Acesso Restrito</h2>
+          <p>Apenas administradores podem acessar esta página.</p>
+        </div>
+      `;
+    }
+
+    const planos = [
+      {
+        id: 'basico',
+        nome: 'Plano Básico',
+        preco: 'R$ 49',
+        periodo: '/mês',
+        features: ['Até 10 usuários', '1 agente incluso', '3 slots simultâneos', '5 GB armazenamento', '100 créditos IA/mês'],
+        popular: false,
+        enterprise: false
+      },
+      {
+        id: 'intermediario',
+        nome: 'Plano Intermediário',
+        preco: 'R$ 149',
+        periodo: '/mês',
+        features: ['Até 40 usuários', '3 agentes inclusos', '5 slots simultâneos', '20 GB armazenamento', '500 créditos IA/mês'],
+        popular: true,
+        enterprise: false
+      },
+      {
+        id: 'avancado',
+        nome: 'Plano Avançado',
+        preco: 'R$ 349',
+        periodo: '/mês',
+        features: ['Até 100 usuários', '5 agentes inclusos', '5 slots simultâneos', '50 GB armazenamento', '2000 créditos IA/mês'],
+        popular: false,
+        enterprise: false
+      },
+      {
+        id: 'enterprise',
+        nome: 'Enterprise',
+        preco: 'Consultar',
+        periodo: '',
+        features: ['Usuários ilimitados', 'Agentes customizados', 'Slots ilimitados', 'Armazenamento ilimitado', 'Créditos IA personalizados'],
+        popular: false,
+        enterprise: true
+      }
+    ];
+
+    let planoAtual = localStorage.getItem('planoAtual') || null;
+
+    function renderizarPlanos() {
+      const grid = document.getElementById('planosGrid');
+      grid.innerHTML = planos.map(p => {
+        const isAtivo = planoAtual === p.id;
+        let cardClass = 'plano-card';
+        if (p.popular) cardClass += ' popular';
+        if (isAtivo) cardClass += ' ativo';
+
+        let badge = '';
+        if (isAtivo) badge = '<div class="ativo-badge">✓ Plano Atual</div>';
+        else if (p.popular) badge = '<div class="popular-badge">Mais Popular</div>';
+
+        let btnClass = 'btn-plano';
+        let btnTexto = 'Selecionar Plano';
+        if (isAtivo) { btnClass += ' ativo-btn'; btnTexto = '✓ Plano Atual'; }
+        else if (p.enterprise) { btnClass += ' comercial'; btnTexto = 'Falar com Comercial'; }
+        else if (p.popular) { btnClass += ' primario'; }
+        else { btnClass += ' secundario'; }
+
+        const onclick = isAtivo ? '' : p.enterprise ? `onclick="falarComercial()"` : `onclick="selecionarPlano('${p.id}')"`;
+
+        return `
+          <div class="${cardClass}">
+            ${badge}
+            <div class="plano-nome">${p.nome}</div>
+            <div class="plano-preco ${p.enterprise ? 'enterprise' : ''}">${p.preco}<span>${p.periodo}</span></div>
+            <div class="plano-divider"></div>
+            <ul class="plano-features">
+              ${p.features.map(f => `<li>${f}</li>`).join('')}
+            </ul>
+            <button class="${btnClass}" ${onclick} ${isAtivo ? 'disabled' : ''}>${btnTexto}</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selecionarPlano(id) {
+      if (confirm(`Deseja selecionar este plano?`)) {
+        planoAtual = id;
+        localStorage.setItem('planoAtual', id);
+        renderizarPlanos();
+      }
+    }
+
+    function falarComercial() {
+      alert('Em breve nossa equipe entrará em contato!');
+    }
+
+    async function carregarUsuarios() {
+      try {
+        const res = await fetch('/api/usuarios', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (res.status === 401) { window.location.href = '/'; return; }
+        const usuarios = await res.json();
+        const tbody = document.getElementById('tabelaUsuarios');
+        if (usuarios.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum usuário cadastrado ainda.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = usuarios.map(u => `
+          <tr>
+            <td><strong>${u.nome}</strong></td>
+            <td>${u.email}</td>
+            <td>${u.perfil}</td>
+            <td><span class="badge ${u.status.toLowerCase()}">${u.status}</span></td>
+            <td>
+              <div class="acoes">
+                <button class="btn-acao btn-editar" onclick="abrirModalEditar('${u._id}', '${u.nome}', '${u.perfil}', '${u.status}')">✏️ Editar</button>
+                <button class="btn-acao btn-deletar" onclick="deletarUsuario('${u._id}', '${u.nome}')">🗑️ Deletar</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Erro:', err);
+      }
+    }
+
+    function abrirModalConvite() {
+      document.getElementById('modalConvite').classList.add('aberto');
+      document.getElementById('conviteErro').style.display = 'none';
+      document.getElementById('conviteSucesso').style.display = 'none';
+    }
+
+    function abrirModalEditar(id, nome, perfil, status) {
+      document.getElementById('editarId').value = id;
+      document.getElementById('editarNome').value = nome;
+      document.getElementById('editarPerfil').value = perfil;
+      document.getElementById('editarStatus').value = status;
+      document.getElementById('editarErro').style.display = 'none';
+      document.getElementById('editarSucesso').style.display = 'none';
+      document.getElementById('modalEditar').classList.add('aberto');
+    }
+
+    function fecharModal(id) {
+      document.getElementById(id).classList.remove('aberto');
+      if (id === 'modalConvite') {
+        document.getElementById('conviteNome').value = '';
+        document.getElementById('conviteEmail').value = '';
+        document.getElementById('usuarioMestre').checked = false;
+        document.querySelectorAll('[id^="perm_"]').forEach(el => el.checked = false);
+        document.getElementById('permissoesSection').style.opacity = '1';
+        document.getElementById('permissoesSection').style.pointerEvents = 'auto';
+      }
+    }
+
+    function fecharModalFora(e, id) {
+      if (e.target === document.getElementById(id)) fecharModal(id);
+    }
+
+    function toggleMestre() {
+      const mestre = document.getElementById('usuarioMestre').checked;
+      const section = document.getElementById('permissoesSection');
+      section.style.opacity = mestre ? '0.4' : '1';
+      section.style.pointerEvents = mestre ? 'none' : 'auto';
+      if (mestre) document.querySelectorAll('[id^="perm_"]').forEach(el => el.checked = true);
+    }
+
+    async function enviarConvite() {
+      const email = document.getElementById('conviteEmail').value.trim();
+      const nome = document.getElementById('conviteNome').value.trim();
+      const usuarioMestre = document.getElementById('usuarioMestre').checked;
+      const btn = document.getElementById('btnEnviar');
+      const erro = document.getElementById('conviteErro');
+      const sucesso = document.getElementById('conviteSucesso');
+
+      erro.style.display = 'none';
+      sucesso.style.display = 'none';
+
+      if (!email) { erro.textContent = 'Email é obrigatório.'; erro.style.display = 'block'; return; }
+
+      const permissoes = {
+        acessoIndependente: document.getElementById('perm_acessoIndependente').checked,
+        aprovacaoWikis: document.getElementById('perm_aprovacaoWikis').checked,
+        aprovacaoIdeias: document.getElementById('perm_aprovacaoIdeias').checked,
+        gerenciamentoProjetos: document.getElementById('perm_gerenciamentoProjetos').checked,
+        edicaoFluxoValor: document.getElementById('perm_edicaoFluxoValor').checked,
+        permissaoSeguranca: document.getElementById('perm_permissaoSeguranca').checked
+      };
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch('/api/convites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ nome, email, usuarioMestre, permissoes })
+        });
+        const data = await res.json();
+        if (!res.ok) { erro.textContent = data.erro || 'Erro ao enviar convite.'; erro.style.display = 'block'; return; }
+        sucesso.textContent = `Convite enviado para ${email} com sucesso!`;
+        sucesso.style.display = 'block';
+        setTimeout(() => { fecharModal('modalConvite'); carregarUsuarios(); }, 2000);
+      } catch (err) {
+        erro.textContent = 'Erro de conexão.';
+        erro.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '✓ Enviar Convite';
+      }
+    }
+
+    async function salvarEdicao() {
+      const id = document.getElementById('editarId').value;
+      const nome = document.getElementById('editarNome').value.trim();
+      const perfil = document.getElementById('editarPerfil').value;
+      const status = document.getElementById('editarStatus').value;
+      const btn = document.getElementById('btnSalvar');
+      const erro = document.getElementById('editarErro');
+      const sucesso = document.getElementById('editarSucesso');
+
+      erro.style.display = 'none';
+      sucesso.style.display = 'none';
+
+      if (!nome) { erro.textContent = 'Nome é obrigatório.'; erro.style.display = 'block'; return; }
+
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
+      try {
+        const res = await fetch(`/api/usuarios/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ nome, perfil, status })
+        });
+        const data = await res.json();
+        if (!res.ok) { erro.textContent = data.erro || 'Erro ao salvar.'; erro.style.display = 'block'; return; }
+        sucesso.textContent = 'Usuário atualizado com sucesso!';
+        sucesso.style.display = 'block';
+        setTimeout(() => { fecharModal('modalEditar'); carregarUsuarios(); }, 1500);
+      } catch (err) {
+        erro.textContent = 'Erro de conexão.';
+        erro.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar';
+      }
+    }
+
+    async function deletarUsuario(id, nome) {
+      if (!confirm(`Deseja realmente deletar o usuário "${nome}"?`)) return;
+      try {
+        const res = await fetch(`/api/usuarios/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) { alert('Erro ao deletar usuário.'); return; }
+        carregarUsuarios();
+      } catch (err) {
+        alert('Erro de conexão.');
+      }
+    }
+
+    function sair() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      window.location.href = '/';
+    }
+
+    renderizarPlanos();
+    carregarUsuarios();
+  </script>
+</body>
+</html>

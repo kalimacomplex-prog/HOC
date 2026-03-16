@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Ideias Livres</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { width: 240px; background: #1e2a4a; display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh; z-index: 100; }
+    .sidebar-logo { display: flex; align-items: center; gap: 12px; padding: 0 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .logo-icon { width: 36px; height: 36px; background: #3b5bdb; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; }
+    .logo-text { font-size: 18px; font-weight: 700; color: white; }
+    .sidebar-menu { padding: 16px 12px; flex: 1; overflow-y: auto; }
+    .menu-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; color: #a0aec0; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; margin-bottom: 4px; text-decoration: none; }
+    .menu-item:hover { background: rgba(255,255,255,0.06); color: white; }
+    .menu-item.active { background: #3b5bdb; color: white; }
+    .menu-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .btn-sair { width: 100%; padding: 10px; background: rgba(255,255,255,0.06); color: #a0aec0; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; }
+    .btn-sair:hover { background: rgba(255,255,255,0.1); color: white; }
+
+    /* Main */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .header { background: white; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 50; }
+    .header-left h1 { font-size: 18px; font-weight: 700; color: #1e2a4a; }
+    .header-left p { font-size: 12px; color: #718096; margin-top: 2px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .user-avatar { width: 36px; height: 36px; background: #3b5bdb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; }
+    .user-info { text-align: right; }
+    .user-nome { font-size: 14px; font-weight: 600; color: #1e2a4a; }
+    .user-empresa { font-size: 12px; color: #718096; }
+    .btn-nova-ideia { padding: 10px 20px; background: #3b5bdb; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-nova-ideia:hover { background: #2f4ac0; }
+
+    /* Content */
+    .content { padding: 24px 32px; flex: 1; }
+    .breadcrumb { font-size: 13px; color: #718096; margin-bottom: 20px; }
+
+    /* Painel Rankings */
+    .painel { background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; overflow: hidden; }
+    .painel-header { padding: 16px 20px; border-bottom: 1px solid #f0f2f5; }
+    .painel-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; }
+    .painel-tabs { display: flex; gap: 4px; padding: 12px 16px; border-bottom: 1px solid #f0f2f5; overflow-x: auto; }
+    .painel-tab { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; color: #718096; border: none; background: none; white-space: nowrap; transition: all 0.2s; }
+    .painel-tab:hover { background: #f0f2f5; color: #1e2a4a; }
+    .painel-tab.active { background: #3b5bdb; color: white; }
+    .painel-content { padding: 20px; }
+    .painel-tab-content { display: none; }
+    .painel-tab-content.active { display: block; }
+
+    /* Rankings layout */
+    .rankings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+    .ranking-lista { }
+    .ranking-titulo { font-size: 13px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .ranking-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f8fafc; }
+    .ranking-pos { font-size: 13px; font-weight: 700; color: #a0aec0; width: 20px; }
+    .ranking-avatar { width: 32px; height: 32px; border-radius: 50%; background: #3b5bdb; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+    .ranking-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; }
+    .ranking-sub { font-size: 11px; color: #718096; }
+    .ranking-valor { font-size: 13px; font-weight: 700; color: #3b5bdb; margin-left: auto; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .stat-card { background: #f8fafc; border-radius: 12px; padding: 16px; text-align: center; }
+    .stat-valor { font-size: 28px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
+    .stat-label { font-size: 12px; color: #718096; }
+    .stat-saving { color: #38a169; }
+
+    /* Impacto alto */
+    .impacto-lista { display: flex; flex-direction: column; gap: 10px; }
+    .impacto-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #f8fafc; border-radius: 8px; }
+    .impacto-titulo { font-size: 13px; font-weight: 600; color: #1e2a4a; flex: 1; }
+    .impacto-info { font-size: 11px; color: #718096; }
+    .impacto-saving { font-size: 13px; font-weight: 700; color: #38a169; }
+
+    /* Categoria ranking */
+    .cat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .cat-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 8px; }
+    .cat-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: #ebf0ff; color: #3b5bdb; white-space: nowrap; }
+    .cat-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; flex: 1; }
+    .cat-count { font-size: 13px; font-weight: 700; color: #3b5bdb; }
+
+    /* Repositório */
+    .repositorio-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; padding: 10px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
+    .search-input:focus { border-color: #3b5bdb; }
+    .btn-filtros { padding: 10px 16px; background: white; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; color: #4a5568; }
+    .btn-filtros:hover { border-color: #3b5bdb; color: #3b5bdb; }
+
+    /* Filtros avançados */
+    .filtros-panel { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px; display: none; }
+    .filtros-panel.aberto { display: block; }
+    .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+    .filtro-group label { display: block; font-size: 12px; font-weight: 600; color: #718096; margin-bottom: 4px; }
+    .filtro-select { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; background: white; }
+    .filtro-select:focus { border-color: #3b5bdb; }
+    .filtros-acoes { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-aplicar { padding: 8px 16px; background: #3b5bdb; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-limpar { padding: 8px 16px; background: #f0f2f5; color: #718096; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    /* Ideias grid */
+    .ideias-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+    .ideia-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1.5px solid transparent; transition: all 0.2s; cursor: pointer; }
+    .ideia-card:hover { border-color: #3b5bdb; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .ideia-card.rascunho { background: #f8fafc; border-color: #e2e8f0; opacity: 0.8; }
+    .ideia-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .ideia-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge-tipo { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+    .badge-aprovacao { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; }
+    .badge-aprovado { background: #f0fff4; color: #276749; }
+    .badge-pendente { background: #fffaf0; color: #c05621; }
+    .badge-dispensado { background: #fff5f5; color: #c53030; }
+    .badge-rascunho { background: #f0f2f5; color: #718096; }
+    .ideia-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; line-height: 1.4; }
+    .ideia-desc { font-size: 13px; color: #718096; line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .ideia-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .ideia-meta-item { font-size: 12px; color: #718096; display: flex; align-items: center; gap: 4px; }
+    .ideia-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid #f0f2f5; flex-wrap: wrap; gap: 8px; }
+    .ideia-area { font-size: 12px; font-weight: 600; padding: 3px 8px; background: #f0f2f5; color: #4a5568; border-radius: 4px; }
+    .ideia-status { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 4px; }
+    .status-nao-iniciada { background: #f0f2f5; color: #718096; }
+    .status-em-implementacao { background: #ebf0ff; color: #3b5bdb; }
+    .status-concluida { background: #f0fff4; color: #276749; }
+    .ideia-acoes { display: flex; gap: 6px; }
+    .btn-aprovar { padding: 5px 10px; background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-aprovar:hover { background: #c6f6d5; }
+    .btn-dispensar { padding: 5px 10px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-editar-card { padding: 5px 10px; background: #ebf0ff; color: #3b5bdb; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-deletar-card { padding: 5px 10px; background: #fff5f5; color: #c53030; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .tags-lista { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+    .tag { font-size: 11px; padding: 2px 8px; background: #f0f2f5; color: #718096; border-radius: 10px; }
+    .progress-bar { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 8px; }
+    .progress-fill { height: 4px; border-radius: 2px; background: #3b5bdb; }
+    .empty-state { text-align: center; padding: 60px; color: #a0aec0; grid-column: 1/-1; }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* Tipos de ideia cores */
+    .tipo-inovacao { background: #ebf0ff; color: #3b5bdb; }
+    .tipo-sustentabilidade { background: #f0fff4; color: #276749; }
+    .tipo-resolucao { background: #fff5f5; color: #c53030; }
+    .tipo-seguranca { background: #fffaf0; color: #c05621; }
+    .tipo-pokayoke-prev { background: #faf5ff; color: #6b46c1; }
+    .tipo-pokayoke-det { background: #fff0f6; color: #97266d; }
+    .tipo-riscos { background: #f0fff4; color: #276749; }
+    .tipo-melhoria { background: #f0f2f5; color: #718096; }
+    .tipo-outros { background: #f0f2f5; color: #718096; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: flex-start; justify-content: flex-end; z-index: 1000; }
+    .modal-overlay.aberto { display: flex; }
+    .modal-drawer { background: white; width: 560px; height: 100vh; overflow-y: auto; padding: 28px; box-shadow: -8px 0 32px rgba(0,0,0,0.15); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .modal-titulo { font-size: 18px; font-weight: 700; color: #1e2a4a; }
+    .modal-subtitulo { font-size: 13px; color: #718096; margin-top: 2px; }
+    .btn-fechar { background: none; border: none; font-size: 20px; cursor: pointer; color: #718096; }
+    .form-section { margin-bottom: 20px; }
+    .form-section-titulo { font-size: 13px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f0f2f5; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group.full { grid-column: 1/-1; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #1e2a4a; margin-bottom: 6px; }
+    input[type="text"], input[type="date"], select, textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; color: #1e2a4a; outline: none; font-family: inherit; background: white; }
+    input:focus, select:focus, textarea:focus { border-color: #3b5bdb; }
+    textarea { resize: vertical; min-height: 100px; }
+    .tipos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tipo-option { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 13px; color: #4a5568; transition: all 0.2s; }
+    .tipo-option:hover { border-color: #3b5bdb; background: #f8fafc; }
+    .tipo-option input[type="radio"] { accent-color: #3b5bdb; }
+    .tipo-option.selecionado { border-color: #3b5bdb; background: #ebf0ff; color: #3b5bdb; font-weight: 600; }
+    .ganho-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+    .rascunho-aviso { font-size: 12px; color: #718096; padding: 8px 12px; background: #f8fafc; border-radius: 8px; display: none; }
+    .rascunho-aviso.visivel { display: flex; align-items: center; gap: 6px; }
+    .modal-footer { display: flex; gap: 10px; margin-top: 24px; padding-top: 16px; border-top: 1px solid #f0f2f5; flex-wrap: wrap; }
+    .btn-rascunho { flex: 1; padding: 12px; background: #f0f2f5; color: #718096; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn-rascunho:hover { background: #e2e8f0; }
+    .btn-enviar { flex: 2; padding: 12px; background: #3b5bdb; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .btn-enviar:hover { background: #2f4ac0; }
+    .btn-cancelar-modal { padding: 12px 20px; background: #f0f2f5; color: #718096; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+
+    /* Editor toolbar */
+    .editor-toolbar { display: flex; gap: 4px; padding: 6px; background: #f8fafc; border-radius: 8px 8px 0 0; border: 1.5px solid #e2e8f0; border-bottom: none; flex-wrap: wrap; }
+    .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 4px; cursor: pointer; font-size: 13px; color: #4a5568; }
+    .toolbar-btn:hover { background: #e2e8f0; }
+    .editor-area { min-height: 120px; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 0 0 8px 8px; outline: none; font-size: 14px; line-height: 1.6; color: #1e2a4a; }
+    .editor-area:focus { border-color: #3b5bdb; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">H</div>
+    <span class="logo-text">HOC System</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><span class="menu-icon">🏠</span> Overview</a>
+    <a class="menu-item" href="/dashboard"><span class="menu-icon">📊</span> Dashboard</a>
+    <a class="menu-item" href="#"><span class="menu-icon">⚙️</span> Operações</a>
+    <a class="menu-item" href="/gestao-metas"><span class="menu-icon">🎯</span> Gestão de Metas</a>
+    <a class="menu-item active" href="/ideias-livres"><span class="menu-icon">💡</span> Ideias Livres</a>
+    <a class="menu-item" href="#"><span class="menu-icon">👥</span> Permissionamentos</a>
+    <a class="menu-item" href="#"><span class="menu-icon">📁</span> Gestão de Projetos</a>
+    <a class="menu-item" href="#"><span class="menu-icon">📋</span> Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><span class="menu-icon">💳</span> Plano e Usuários</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-sair" onclick="sair()">🚪 Sair</button>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="header">
+    <div class="header-left">
+      <h1>Ideias Livres — Kaizen</h1>
+      <p>Lab. de Melhorias — Capture e desenvolva ideias de melhoria contínua</p>
+    </div>
+    <div class="header-right">
+      <div class="user-info">
+        <div class="user-nome" id="userNome">-</div>
+        <div class="user-empresa" id="userEmpresa">-</div>
+      </div>
+      <div class="user-avatar" id="userAvatar">?</div>
+      <button class="btn-nova-ideia" onclick="abrirModal()">+ Nova Ideia</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="breadcrumb">Home > Ideias Livres</div>
+
+    <!-- Painel Rankings -->
+    <div class="painel">
+      <div class="painel-header">
+        <div class="painel-titulo">📊 Painel de Insights e Rankings</div>
+      </div>
+      <div class="painel-tabs">
+        <button class="painel-tab active" onclick="mudarPainelTab('propositores', this)">💡 Top 5 Propositores</button>
+        <button class="painel-tab" onclick="mudarPainelTab('implementadores', this)">✅ Top 5 Implementadores</button>
+        <button class="painel-tab" onclick="mudarPainelTab('impacto', this)">🎯 Impacto Alto Recentes</button>
+        <button class="painel-tab" onclick="mudarPainelTab('categoria', this)">📊 Top 5 por Categoria</button>
+        <button class="painel-tab" onclick="mudarPainelTab('stats', this)">📈 Estatísticas Gerais</button>
+      </div>
+      <div class="painel-content">
+
+        <!-- Top 5 Propositores -->
+        <div class="painel-tab-content active" id="painel-propositores">
+          <div id="listaPropositores" class="ranking-lista"></div>
+        </div>
+
+        <!-- Top 5 Implementadores -->
+        <div class="painel-tab-content" id="painel-implementadores">
+          <div id="listaImplementadores" class="ranking-lista"></div>
+        </div>
+
+        <!-- Impacto Alto -->
+        <div class="painel-tab-content" id="painel-impacto">
+          <div id="listaImpacto" class="impacto-lista"></div>
+        </div>
+
+        <!-- Top 5 por Categoria -->
+        <div class="painel-tab-content" id="painel-categoria">
+          <div id="listaCategorias" class="cat-grid"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="painel-tab-content" id="painel-stats">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-valor" id="statTotal">0</div>
+              <div class="stat-label">Total de Ideias</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-valor" id="statImplementadas">0</div>
+              <div class="stat-label">Implementadas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-valor" id="statProgresso">0</div>
+              <div class="stat-label">Em Progresso</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-valor stat-saving" id="statSaving">—</div>
+              <div class="stat-label">Saving Total/ano</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Repositório -->
+    <div class="repositorio-header">
+      <input class="search-input" type="text" id="searchIdeia" placeholder="Buscar ideias por título ou descrição..." oninput="filtrarIdeias()">
+      <button class="btn-filtros" onclick="toggleFiltros()">⚙️ Filtros Avançados</button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-panel" id="filtrosPanel">
+      <div class="filtros-grid">
+        <div class="filtro-group">
+          <label>Categoria</label>
+          <select class="filtro-select" id="filtroCategoria">
+            <option value="">Todas</option>
+            <option>Inovação</option>
+            <option>Sustentabilidade</option>
+            <option>Resolução de Problema</option>
+            <option>Segurança e Saúde</option>
+            <option>Poka Yoke - Prevenção</option>
+            <option>Poka Yoke - Detecção</option>
+            <option>Gestão de Riscos</option>
+            <option>Melhoria no HOC</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <div class="filtro-group">
+          <label>Status de Aprovação</label>
+          <select class="filtro-select" id="filtroAprovacao">
+            <option value="">Todos</option>
+            <option>Pendente</option>
+            <option>Aprovada</option>
+            <option>Dispensada</option>
+            <option>Rascunho</option>
+          </select>
+        </div>
+        <div class="filtro-group">
+          <label>Status de Execução</label>
+          <select class="filtro-select" id="filtroStatus">
+            <option value="">Todos</option>
+            <option>Não Iniciada</option>
+            <option>Em Implementação</option>
+            <option>Concluída</option>
+          </select>
+        </div>
+        <div class="filtro-group">
+          <label>Complexidade</label>
+          <select class="filtro-select" id="filtroComplexidade">
+            <option value="">Todas</option>
+            <option>Baixa</option>
+            <option>Média</option>
+            <option>Alta</option>
+          </select>
+        </div>
+        <div class="filtro-group">
+          <label>Área</label>
+          <input type="text" id="filtroArea" placeholder="Ex: Comercial, RH..." style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;width:100%">
+        </div>
+      </div>
+      <div class="filtros-acoes">
+        <button class="btn-aplicar" onclick="filtrarIdeias()">Aplicar</button>
+        <button class="btn-limpar" onclick="limparFiltros()">Limpar</button>
+      </div>
+    </div>
+
+    <!-- Grid de Ideias -->
+    <div class="ideias-grid" id="ideiasGrid"></div>
+
+  </div>
+</div>
+
+<!-- Modal Nova/Editar Ideia -->
+<div class="modal-overlay" id="modalIdeia" onclick="fecharModalFora(event)">
+  <div class="modal-drawer">
+    <div class="modal-header">
+      <div>
+        <div class="modal-titulo" id="modalTitulo">Nova Ideia de Melhoria</div>
+        <div class="modal-subtitulo">Compartilhe sua ideia para melhorar nossos processos</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal()">×</button>
+    </div>
+
+    <div class="rascunho-aviso" id="rascunhoAviso">✓ Rascunho salvo</div>
+
+    <div class="form-section">
+      <div class="form-section-titulo">Informações Básicas</div>
+      <div class="form-group">
+        <label>Título da Ideia *</label>
+        <input type="text" id="ideaTitulo" placeholder="Ex: Automação de Relatórios Mensais">
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Responsável pela Ideia</label>
+          <input type="text" id="ideaResponsavel" placeholder="Nome ou departamento">
+        </div>
+        <div class="form-group">
+          <label>Área Beneficiada</label>
+          <input type="text" id="ideaArea" placeholder="Ex: Comercial, RH, TI">
+        </div>
+        <div class="form-group">
+          <label>Data da Proposta</label>
+          <input type="date" id="ideaData">
+        </div>
+        <div class="form-group">
+          <label>Complexidade</label>
+          <select id="ideaComplexidade">
+            <option value="">Selecione...</option>
+            <option>Baixa</option>
+            <option>Média</option>
+            <option>Alta</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-titulo">Tipo da Ideia</div>
+      <div class="tipos-grid" id="tiposGrid">
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Inovação')">
+          <input type="radio" name="tipo" value="Inovação"> 🚀 Inovação
+        </label>
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Sustentabilidade')">
+          <input type="radio" name="tipo" value="Sustentabilidade"> 🌱 Sustentabilidade
+        </label>
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Resolução de Problema')">
+          <input type="radio" name="tipo" value="Resolução de Problema"> 🔧 Resolução de Problema
+        </label>
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Segurança e Saúde')">
+          <input type="radio" name="tipo" value="Segurança e Saúde"> 🛡️ Segurança e Saúde
+        </label>
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Poka Yoke - Prevenção')">
+          <input type="radio" name="tipo" value="Poka Yoke - Prevenção"> ⚡ Poka Yoke Prevenção
+        </label>
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Poka Yoke - Detecção')">
+          <input type="radio" name="tipo" value="Poka Yoke - Detecção"> 🔍 Poka Yoke Detecção
+        </label>
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Gestão de Riscos')">
+          <input type="radio" name="tipo" value="Gestão de Riscos"> ⚠️ Gestão de Riscos
+        </label>
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Melhoria no HOC')">
+          <input type="radio" name="tipo" value="Melhoria no HOC"> 🏢 Melhoria no HOC
+        </label>
+        <label class="tipo-option" onclick="selecionarTipo(this, 'Outros')">
+          <input type="radio" name="tipo" value="Outros"> 📌 Outros
+        </label>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-titulo">Descrição</div>
+      <div class="editor-toolbar">
+        <button class="toolbar-btn" onclick="fmt('bold')"><b>B</b></button>
+        <button class="toolbar-btn" onclick="fmt('italic')"><i>I</i></button>
+        <button class="toolbar-btn" onclick="fmt('underline')"><u>U</u></button>
+        <button class="toolbar-btn" onclick="fmt('insertUnorderedList')">• Lista</button>
+        <button class="toolbar-btn" onclick="fmt('formatBlock','h3')">H3</button>
+        <button class="toolbar-btn" onclick="fmt('formatBlock','p')">P</button>
+      </div>
+      <div class="editor-area" id="ideaDescricao" contenteditable="true"></div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-titulo">Classificação</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Ganho Estimado</label>
+          <input type="text" id="ideaGanho" placeholder="Ex: R$ 5.000/mês ou 2h/dia">
+        </div>
+        <div class="form-group">
+          <label>Período do Ganho</label>
+          <select id="ideaPeriodo">
+            <option value="">Selecione...</option>
+            <option>Dia</option>
+            <option>Mês</option>
+            <option>Semestre</option>
+            <option>Ano</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Tags (separadas por vírgula)</label>
+          <input type="text" id="ideaTags" placeholder="Ex: automação, eficiência, custo">
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" id="ideaEditId">
+
+    <div class="modal-footer">
+      <button class="btn-cancelar-modal" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-rascunho" onclick="salvarIdeia('rascunho')">💾 Salvar Rascunho</button>
+      <button class="btn-enviar" onclick="salvarIdeia('pendente')">✓ Enviar para Aprovação</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ==================== AUTH ====================
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = '/';
+  document.getElementById('userNome').textContent = usuario.nome || '-';
+  document.getElementById('userEmpresa').textContent = usuario.empresaNome || '-';
+  document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+
+  const isAdmin = usuario.perfil === 'Admin';
+  const CHAVE = `ideias_${usuario.empresaNome}`;
+
+  // ==================== DADOS ====================
+  let ideias = JSON.parse(localStorage.getItem(CHAVE) || '[]');
+
+  function salvarDados() {
+    localStorage.setItem(CHAVE, JSON.stringify(ideias));
+  }
+
+  // ==================== TIPOS ====================
+  const TIPOS_CLASSE = {
+    'Inovação': 'tipo-inovacao',
+    'Sustentabilidade': 'tipo-sustentabilidade',
+    'Resolução de Problema': 'tipo-resolucao',
+    'Segurança e Saúde': 'tipo-seguranca',
+    'Poka Yoke - Prevenção': 'tipo-pokayoke-prev',
+    'Poka Yoke - Detecção': 'tipo-pokayoke-det',
+    'Gestão de Riscos': 'tipo-riscos',
+    'Melhoria no HOC': 'tipo-melhoria',
+    'Outros': 'tipo-outros'
+  };
+
+  function tipoClasse(tipo) {
+    return TIPOS_CLASSE[tipo] || 'tipo-outros';
+  }
+
+  // ==================== TABS PAINEL ====================
+  function mudarPainelTab(id, btn) {
+    document.querySelectorAll('.painel-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.painel-tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('painel-' + id).classList.add('active');
+  }
+
+  // ==================== RANKINGS ====================
+  function renderRankings() {
+    const visiveis = ideias.filter(i => i.aprovacao !== 'rascunho' || i.autor === usuario.nome);
+
+    // Stats
+    document.getElementById('statTotal').textContent = visiveis.filter(i => i.aprovacao !== 'rascunho').length;
+    document.getElementById('statImplementadas').textContent = visiveis.filter(i => i.status === 'Concluída').length;
+    document.getElementById('statProgresso').textContent = visiveis.filter(i => i.status === 'Em Implementação').length;
+
+    // Propositores
+    const porPropositor = {};
+    visiveis.forEach(i => {
+      if (!i.responsavel) return;
+      porPropositor[i.responsavel] = (porPropositor[i.responsavel] || 0) + 1;
+    });
+    const topProp = Object.entries(porPropositor).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    document.getElementById('listaPropositores').innerHTML = topProp.length ? topProp.map(([nome, count], i) => `
+      <div class="ranking-item">
+        <span class="ranking-pos">#${i+1}</span>
+        <div class="ranking-avatar">${nome[0].toUpperCase()}</div>
+        <div><div class="ranking-nome">${nome}</div><div class="ranking-sub">${count} ideia${count > 1 ? 's' : ''}</div></div>
+        <span class="ranking-valor">${count}</span>
+      </div>
+    `).join('') : '<div style="color:#a0aec0;font-size:13px">Sem dados ainda.</div>';
+
+    // Implementadores
+    const porImpl = {};
+    visiveis.filter(i => i.status === 'Concluída').forEach(i => {
+      if (!i.responsavel) return;
+      porImpl[i.responsavel] = (porImpl[i.responsavel] || 0) + 1;
+    });
+    const topImpl = Object.entries(porImpl).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    document.getElementById('listaImplementadores').innerHTML = topImpl.length ? topImpl.map(([nome, count], i) => `
+      <div class="ranking-item">
+        <span class="ranking-pos">#${i+1}</span>
+        <div class="ranking-avatar" style="background:#38a169">${nome[0].toUpperCase()}</div>
+        <div><div class="ranking-nome">${nome}</div><div class="ranking-sub">${count} concluída${count > 1 ? 's' : ''}</div></div>
+        <span class="ranking-valor" style="color:#38a169">${count}</span>
+      </div>
+    `).join('') : '<div style="color:#a0aec0;font-size:13px">Sem dados ainda.</div>';
+
+    // Impacto alto recentes
+    const impactoAlto = visiveis.filter(i => i.complexidade === 'Alta' && i.aprovacao !== 'rascunho')
+      .sort((a, b) => new Date(b.data) - new Date(a.data)).slice(0, 5);
+    document.getElementById('listaImpacto').innerHTML = impactoAlto.length ? impactoAlto.map(i => `
+      <div class="impacto-item">
+        <div style="flex:1">
+          <div class="impacto-titulo">${i.titulo}</div>
+          <div class="impacto-info">por ${i.responsavel || '—'} • ${i.area || '—'}</div>
+        </div>
+        ${i.ganho ? `<span class="impacto-saving">${i.ganho}</span>` : ''}
+      </div>
+    `).join('') : '<div style="color:#a0aec0;font-size:13px">Nenhuma ideia de alto impacto ainda.</div>';
+
+    // Top por categoria
+    const porCat = {};
+    visiveis.filter(i => i.tipo && i.tipo !== 'Melhoria no HOC' && i.tipo !== 'Outros').forEach(i => {
+      if (!porCat[i.tipo]) porCat[i.tipo] = {};
+      const resp = i.responsavel || 'Anônimo';
+      porCat[i.tipo][resp] = (porCat[i.tipo][resp] || 0) + 1;
+    });
+    const catTop = Object.entries(porCat).map(([cat, pessoas]) => {
+      const top = Object.entries(pessoas).sort((a, b) => b[1] - a[1])[0];
+      return { cat, nome: top[0], count: top[1] };
+    }).sort((a, b) => b.count - a.count).slice(0, 5);
+    document.getElementById('listaCategorias').innerHTML = catTop.length ? catTop.map(item => `
+      <div class="cat-item">
+        <span class="cat-badge">${item.cat}</span>
+        <span class="cat-nome">${item.nome}</span>
+        <span class="cat-count">${item.count}</span>
+      </div>
+    `).join('') : '<div style="color:#a0aec0;font-size:13px">Sem dados ainda.</div>';
+  }
+
+  // ==================== RENDER IDEIAS ====================
+  function tempoRelativo(dataStr) {
+    if (!dataStr) return '';
+    const diff = Math.floor((new Date() - new Date(dataStr)) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return 'hoje';
+    if (diff === 1) return 'há 1 dia';
+    return `há ${diff} dias`;
+  }
+
+  function renderIdeias(lista) {
+    const grid = document.getElementById('ideiasGrid');
+    const filtradas = lista || getIdeiasFiltradas();
+    if (filtradas.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">💡</div><div>Nenhuma ideia encontrada.</div><div style="font-size:13px;margin-top:8px">Clique em "+ Nova Ideia" para começar!</div></div>`;
+      return;
+    }
+    grid.innerHTML = filtradas.map(ideia => {
+      const isRascunho = ideia.aprovacao === 'rascunho';
+      const meuRascunho = isRascunho && ideia.autor === usuario.nome;
+      if (isRascunho && !meuRascunho) return '';
+
+      const badgeAprovacao = {
+        'pendente': '<span class="badge-aprovacao badge-pendente">Pendente</span>',
+        'aprovada': '<span class="badge-aprovacao badge-aprovado">Aprovada</span>',
+        'dispensada': '<span class="badge-aprovacao badge-dispensado">Dispensada</span>',
+        'rascunho': '<span class="badge-aprovacao badge-rascunho">Rascunho</span>'
+      }[ideia.aprovacao] || '';
+
+      const badgeStatus = {
+        'Não Iniciada': 'status-nao-iniciada',
+        'Em Implementação': 'status-em-implementacao',
+        'Concluída': 'status-concluida'
+      }[ideia.status] || 'status-nao-iniciada';
+
+      const tags = ideia.tags ? ideia.tags.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : '';
+
+      const btnAprovar = (isAdmin && ideia.aprovacao === 'pendente') ?
+        `<button class="btn-aprovar" onclick="aprovar(${ideia.id}, event)">✓ Aprovar</button>
+         <button class="btn-dispensar" onclick="dispensar(${ideia.id}, event)">✕ Dispensar</button>` : '';
+
+      return `
+        <div class="ideia-card ${isRascunho ? 'rascunho' : ''}" onclick="editarIdeia(${ideia.id})">
+          <div class="ideia-card-top">
+            <div class="ideia-badges">
+              ${ideia.tipo ? `<span class="badge-tipo ${tipoClasse(ideia.tipo)}">${ideia.tipo}</span>` : ''}
+              ${badgeAprovacao}
+            </div>
+          </div>
+          <div class="ideia-titulo">${ideia.titulo}</div>
+          <div class="ideia-desc">${ideia.descricao ? ideia.descricao.replace(/<[^>]*>/g, '') : '—'}</div>
+          <div class="ideia-meta">
+            ${ideia.responsavel ? `<span class="ideia-meta-item">👤 por ${ideia.responsavel}</span>` : ''}
+            ${ideia.data ? `<span class="ideia-meta-item">📅 ${tempoRelativo(ideia.data)}</span>` : ''}
+            ${ideia.ganho ? `<span class="ideia-meta-item">💰 ${ideia.ganho}${ideia.periodo ? '/' + ideia.periodo.toLowerCase() : ''}</span>` : ''}
+            ${ideia.complexidade ? `<span class="ideia-meta-item">🎯 ${ideia.complexidade}</span>` : ''}
+          </div>
+          ${tags ? `<div class="tags-lista">${tags}</div>` : ''}
+          <div class="ideia-footer">
+            ${ideia.area ? `<span class="ideia-area">${ideia.area}</span>` : '<span></span>'}
+            <div style="display:flex;align-items:center;gap:6px">
+              <select class="ideia-status ${badgeStatus}" onchange="mudarStatus(${ideia.id}, this.value, event)" onclick="event.stopPropagation()" style="border:none;font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;cursor:pointer;outline:none">
+                <option ${ideia.status === 'Não Iniciada' ? 'selected' : ''}>Não Iniciada</option>
+                <option ${ideia.status === 'Em Implementação' ? 'selected' : ''}>Em Implementação</option>
+                <option ${ideia.status === 'Concluída' ? 'selected' : ''}>Concluída</option>
+              </select>
+              <button class="btn-editar-card" onclick="editarIdeia(${ideia.id}, event)">✏️</button>
+              <button class="btn-deletar-card" onclick="deletarIdeia(${ideia.id}, event)">🗑️</button>
+              ${btnAprovar}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+    renderRankings();
+  }
+
+  function getIdeiasFiltradas() {
+    const q = document.getElementById('searchIdeia').value.toLowerCase();
+    const cat = document.getElementById('filtroCategoria').value;
+    const aprov = document.getElementById('filtroAprovacao').value.toLowerCase();
+    const status = document.getElementById('filtroStatus').value;
+    const complex = document.getElementById('filtroComplexidade').value;
+    const area = document.getElementById('filtroArea').value.toLowerCase();
+
+    return ideias.filter(i => {
+      if (i.aprovacao === 'rascunho' && i.autor !== usuario.nome) return false;
+      if (q && !i.titulo.toLowerCase().includes(q) && !(i.descricao || '').toLowerCase().includes(q)) return false;
+      if (cat && i.tipo !== cat) return false;
+      if (aprov && i.aprovacao !== aprov) return false;
+      if (status && i.status !== status) return false;
+      if (complex && i.complexidade !== complex) return false;
+      if (area && !(i.area || '').toLowerCase().includes(area)) return false;
+      return true;
+    });
+  }
+
+  function filtrarIdeias() { renderIdeias(); }
+
+  function limparFiltros() {
+    document.getElementById('filtroCategoria').value = '';
+    document.getElementById('filtroAprovacao').value = '';
+    document.getElementById('filtroStatus').value = '';
+    document.getElementById('filtroComplexidade').value = '';
+    document.getElementById('filtroArea').value = '';
+    document.getElementById('searchIdeia').value = '';
+    renderIdeias();
+  }
+
+  function toggleFiltros() {
+    document.getElementById('filtrosPanel').classList.toggle('aberto');
+  }
+
+  // ==================== MODAL ====================
+  function abrirModal(id) {
+    document.getElementById('ideaEditId').value = id || '';
+    document.getElementById('modalTitulo').textContent = id ? 'Editar Ideia' : 'Nova Ideia de Melhoria';
+    document.getElementById('rascunhoAviso').classList.remove('visivel');
+
+    if (id) {
+      const ideia = ideias.find(i => i.id === id);
+      if (ideia) {
+        document.getElementById('ideaTitulo').value = ideia.titulo;
+        document.getElementById('ideaResponsavel').value = ideia.responsavel || '';
+        document.getElementById('ideaArea').value = ideia.area || '';
+        document.getElementById('ideaData').value = ideia.data || '';
+        document.getElementById('ideaComplexidade').value = ideia.complexidade || '';
+        document.getElementById('ideaDescricao').innerHTML = ideia.descricao || '';
+        document.getElementById('ideaGanho').value = ideia.ganho || '';
+        document.getElementById('ideaPeriodo').value = ideia.periodo || '';
+        document.getElementById('ideaTags').value = ideia.tags || '';
+        document.querySelectorAll('.tipo-option').forEach(el => {
+          el.classList.remove('selecionado');
+          if (el.querySelector('input').value === ideia.tipo) el.classList.add('selecionado');
+        });
+      }
+    } else {
+      document.getElementById('ideaTitulo').value = '';
+      document.getElementById('ideaResponsavel').value = usuario.nome || '';
+      document.getElementById('ideaArea').value = '';
+      document.getElementById('ideaData').value = new Date().toISOString().split('T')[0];
+      document.getElementById('ideaComplexidade').value = '';
+      document.getElementById('ideaDescricao').innerHTML = '';
+      document.getElementById('ideaGanho').value = '';
+      document.getElementById('ideaPeriodo').value = '';
+      document.getElementById('ideaTags').value = '';
+      document.querySelectorAll('.tipo-option').forEach(el => el.classList.remove('selecionado'));
+    }
+    document.getElementById('modalIdeia').classList.add('aberto');
+  }
+
+  function fecharModal() {
+    document.getElementById('modalIdeia').classList.remove('aberto');
+  }
+
+  function fecharModalFora(e) {
+    if (e.target === document.getElementById('modalIdeia')) fecharModal();
+  }
+
+  function selecionarTipo(el, valor) {
+    document.querySelectorAll('.tipo-option').forEach(o => o.classList.remove('selecionado'));
+    el.classList.add('selecionado');
+  }
+
+  function salvarIdeia(modo) {
+    const titulo = document.getElementById('ideaTitulo').value.trim();
+    if (!titulo) { alert('Título é obrigatório.'); return; }
+
+    const tipoSel = document.querySelector('.tipo-option.selecionado input');
+    const id = document.getElementById('ideaEditId').value;
+
+    const dados = {
+      id: id ? parseInt(id) : Date.now(),
+      titulo,
+      tipo: tipoSel ? tipoSel.value : '',
+      responsavel: document.getElementById('ideaResponsavel').value.trim(),
+      area: document.getElementById('ideaArea').value.trim(),
+      data: document.getElementById('ideaData').value,
+      complexidade: document.getElementById('ideaComplexidade').value,
+      descricao: document.getElementById('ideaDescricao').innerHTML,
+      ganho: document.getElementById('ideaGanho').value.trim(),
+      periodo: document.getElementById('ideaPeriodo').value,
+      tags: document.getElementById('ideaTags').value.trim(),
+      aprovacao: modo === 'rascunho' ? 'rascunho' : 'pendente',
+      status: 'Não Iniciada',
+      autor: usuario.nome
+    };
+
+    if (id) {
+      const idx = ideias.findIndex(i => i.id === parseInt(id));
+      if (idx !== -1) {
+        dados.status = ideias[idx].status;
+        dados.aprovacao = modo === 'rascunho' ? 'rascunho' : ideias[idx].aprovacao === 'rascunho' ? 'pendente' : ideias[idx].aprovacao;
+        ideias[idx] = dados;
+      }
+    } else {
+      ideias.unshift(dados);
+    }
+
+    salvarDados();
+
+    if (modo === 'rascunho') {
+      document.getElementById('rascunhoAviso').classList.add('visivel');
+      setTimeout(() => document.getElementById('rascunhoAviso').classList.remove('visivel'), 2000);
+    } else {
+      fecharModal();
+    }
+
+    renderIdeias();
+  }
+
+  function editarIdeia(id, e) {
+    if (e) e.stopPropagation();
+    abrirModal(id);
+  }
+
+  function deletarIdeia(id, e) {
+    if (e) e.stopPropagation();
+    if (!confirm('Deseja deletar esta ideia?')) return;
+    ideias = ideias.filter(i => i.id !== id);
+    salvarDados();
+    renderIdeias();
+  }
+
+  function aprovar(id, e) {
+    if (e) e.stopPropagation();
+    const ideia = ideias.find(i => i.id === id);
+    if (ideia) { ideia.aprovacao = 'aprovada'; salvarDados(); renderIdeias(); }
+  }
+
+  function dispensar(id, e) {
+    if (e) e.stopPropagation();
+    const ideia = ideias.find(i => i.id === id);
+    if (ideia) { ideia.aprovacao = 'dispensada'; salvarDados(); renderIdeias(); }
+  }
+
+  function mudarStatus(id, status, e) {
+    if (e) e.stopPropagation();
+    const ideia = ideias.find(i => i.id === id);
+    if (ideia) { ideia.status = status; salvarDados(); renderIdeias(); }
+  }
+
+  // ==================== EDITOR ====================
+  function fmt(cmd, val) {
+    document.execCommand(cmd, false, val || null);
+    document.getElementById('ideaDescricao').focus();
+  }
+
+  // ==================== SAIR ====================
+  function sair() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    window.location.href = '/';
+  }
+
+  // ==================== INIT ====================
+  renderIdeias();
+  renderRankings();
+</script>
+</body>
+</html>

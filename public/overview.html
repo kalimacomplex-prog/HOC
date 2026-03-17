@@ -6,7 +6,6 @@
   <title>HOC - Overview</title>
   <link rel="stylesheet" href="style-global.css">
   <style>
-    /* ===== VISÃO GERAL ===== */
     .sobre-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; }
     .sobre-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .sobre-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; }
@@ -18,13 +17,11 @@
     .info-input:focus { border-color: #2d1b69; }
     .info-textarea { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e2a4a; outline: none; font-family: inherit; resize: vertical; min-height: 70px; }
     .info-textarea:focus { border-color: #2d1b69; }
-
     .mvv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
     .mvv-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-top: 3px solid #2d1b69; }
     .mvv-titulo { font-size: 11px; font-weight: 700; color: #2d1b69; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     .mvv-texto { font-size: 13px; color: #4a5568; line-height: 1.5; }
     .mvv-textarea { width: 100%; border: none; outline: none; font-size: 13px; color: #4a5568; line-height: 1.5; font-family: inherit; resize: none; min-height: 60px; background: transparent; }
-
     .timeline { position: relative; padding-left: 20px; }
     .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 1.5px; background: #e2e8f0; }
     .timeline-item { position: relative; margin-bottom: 16px; }
@@ -33,7 +30,6 @@
     .timeline-desc { font-size: 13px; color: #4a5568; line-height: 1.4; }
     .btn-add-timeline { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 8px; display: none; }
     .btn-add-timeline:hover { background: #e2e8f0; }
-
     .esg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .esg-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .esg-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 10px; }
@@ -42,15 +38,12 @@
     .esg-g { background: #faf5ff; color: #6b46c1; }
     .esg-texto { font-size: 13px; color: #4a5568; line-height: 1.5; }
     .esg-textarea { width: 100%; border: none; outline: none; font-size: 13px; color: #4a5568; line-height: 1.5; font-family: inherit; resize: none; min-height: 50px; background: transparent; }
-
-    /* ===== NOSSO TIME ===== */
     .time-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
     .deps-lista { display: flex; gap: 8px; flex-wrap: wrap; }
     .dep-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; transition: all 0.2s; }
     .dep-btn:hover { border-color: #2d1b69; color: #2d1b69; }
     .dep-btn.active { background: #2d1b69; color: white; border-color: #2d1b69; }
     .time-acoes { display: flex; gap: 8px; }
-
     .org-container { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 24px; min-height: 480px; position: relative; overflow: hidden; }
     .org-canvas { position: relative; width: 100%; height: 480px; }
     .org-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
@@ -70,35 +63,21 @@
     .org-node-area { font-size: 11px; color: #718096; margin-bottom: 3px; }
     .org-node-email { font-size: 10px; color: #a0aec0; }
     .org-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: #a0aec0; gap: 12px; }
-
-    /* Cores dos departamentos */
     .dep-cor-0 { background: #2d1b69; border-color: #2d1b69; }
     .dep-cor-1 { background: #38a169; border-color: #38a169; }
     .dep-cor-2 { background: #3b5bdb; border-color: #3b5bdb; }
     .dep-cor-3 { background: #e53e3e; border-color: #e53e3e; }
     .dep-cor-4 { background: #d69e2e; border-color: #d69e2e; }
     .dep-cor-5 { background: #00b5d8; border-color: #00b5d8; }
-    .dep-borda-0 { border-color: #2d1b69; }
-    .dep-borda-1 { border-color: #38a169; }
-    .dep-borda-2 { border-color: #3b5bdb; }
-    .dep-borda-3 { border-color: #e53e3e; }
-    .dep-borda-4 { border-color: #d69e2e; }
-    .dep-borda-5 { border-color: #00b5d8; }
-
-    /* Modo conexão */
     .modo-conexao-aviso { padding: 8px 14px; background: #f0fff4; border-radius: 6px; font-size: 12px; color: #276749; display: none; margin-bottom: 12px; }
     .modo-conexao-aviso.ativo { display: block; }
     .org-node.selecionado-conexao { border-color: #38a169; box-shadow: 0 0 0 3px rgba(56,161,105,0.3); }
-
-    /* ===== BIBLIOTECA ===== */
     .bib-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
     .bib-search { flex: 1; min-width: 200px; padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
     .bib-search:focus { border-color: #2d1b69; }
     .wiki-table { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
     .wiki-tag { display: inline-block; padding: 2px 7px; background: #f0f2f5; color: #4a5568; border-radius: 4px; font-size: 11px; margin-right: 3px; }
     .versao-badge { display: inline-block; padding: 2px 7px; background: #f0f2f5; color: #4a5568; border-radius: 4px; font-size: 11px; font-weight: 600; }
-
-    /* Editor Wiki */
     .wiki-editor { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: none; }
     .wiki-editor.active { display: block; }
     .editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f2f5; }
@@ -109,8 +88,6 @@
     .editor-area { min-height: 250px; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 0 0 6px 6px; outline: none; font-size: 13px; line-height: 1.7; color: #1e2a4a; }
     .editor-area:focus { border-color: #2d1b69; }
     .editor-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
-
-    /* ===== ORÁCULO ===== */
     .oraculo-wrap { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .oraculo-hero { text-align: center; margin-bottom: 28px; }
     .oraculo-icon { font-size: 40px; margin-bottom: 10px; }
@@ -136,55 +113,26 @@
 </head>
 <body>
 
-<!-- Sidebar -->
 <div class="sidebar">
   <div class="sidebar-logo">
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
     <span class="logo-text">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item active" href="/overview">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-      Overview
-    </a>
-    <a class="menu-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-      Operações
-    </a>
-    <a class="menu-item" href="/gestao-metas">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-      Gestão de Metas
-    </a>
-    <a class="menu-item" href="/ideias-livres">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>
-      Ideias Livres
-    </a>
-    <a class="menu-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-      Permissionamentos
-    </a>
-    <a class="menu-item" href="/gestao-projetos">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      Gestão de Projetos
-    </a>
-    <a class="menu-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Gestão de Licenças
-    </a>
-    <a class="menu-item" href="/plano-usuarios">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      Plano e Usuários
-    </a>
+    <a class="menu-item active" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
+    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="btn-sair" onclick="sair()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-      Sair
-    </button>
+    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
   </div>
 </div>
 
-<!-- Main -->
 <div class="main">
   <div class="header">
     <div class="header-search">
@@ -192,14 +140,9 @@
       <input type="text" placeholder="Buscar...">
     </div>
     <div class="header-right">
-      <div class="header-notif">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
-      </div>
+      <div class="header-notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div>
       <div class="header-user">
-        <div class="user-info">
-          <div class="user-nome" id="userNome">-</div>
-          <div class="user-perfil" id="userPerfil">-</div>
-        </div>
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
         <div class="user-avatar" id="userAvatar">?</div>
       </div>
     </div>
@@ -227,26 +170,10 @@
           </div>
         </div>
         <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">Definição</div>
-            <div class="info-value" id="val-definicao">Clique em Editar para adicionar.</div>
-            <textarea class="info-textarea" id="inp-definicao" style="display:none" placeholder="Descreva sua empresa..."></textarea>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Data de Fundação</div>
-            <div class="info-value" id="val-fundacao">—</div>
-            <input type="text" class="info-input" id="inp-fundacao" style="display:none" placeholder="Ex: 12/03/2020">
-          </div>
-          <div class="info-item">
-            <div class="info-label">Setor de Atuação</div>
-            <div class="info-value" id="val-setor">—</div>
-            <input type="text" class="info-input" id="inp-setor" style="display:none" placeholder="Ex: Tecnologia da Informação">
-          </div>
-          <div class="info-item">
-            <div class="info-label">Site / Contato</div>
-            <div class="info-value" id="val-site">—</div>
-            <input type="text" class="info-input" id="inp-site" style="display:none" placeholder="Ex: www.empresa.com.br">
-          </div>
+          <div class="info-item"><div class="info-label">Definição</div><div class="info-value" id="val-definicao">Clique em Editar para adicionar.</div><textarea class="info-textarea" id="inp-definicao" style="display:none" placeholder="Descreva sua empresa..."></textarea></div>
+          <div class="info-item"><div class="info-label">Data de Fundação</div><div class="info-value" id="val-fundacao">—</div><input type="text" class="info-input" id="inp-fundacao" style="display:none" placeholder="Ex: 12/03/2020"></div>
+          <div class="info-item"><div class="info-label">Setor de Atuação</div><div class="info-value" id="val-setor">—</div><input type="text" class="info-input" id="inp-setor" style="display:none" placeholder="Ex: Tecnologia da Informação"></div>
+          <div class="info-item"><div class="info-label">Site / Contato</div><div class="info-value" id="val-site">—</div><input type="text" class="info-input" id="inp-site" style="display:none" placeholder="Ex: www.empresa.com.br"></div>
         </div>
       </div>
 
@@ -277,21 +204,9 @@
       <div class="sobre-card">
         <div class="sobre-header"><span class="sobre-titulo">🌱 Highlights ESG</span></div>
         <div class="esg-grid">
-          <div class="esg-card">
-            <div class="esg-badge esg-e">E — Ambiental</div>
-            <div class="esg-texto" id="val-esg-e">Clique em Editar para adicionar.</div>
-            <textarea class="esg-textarea" id="inp-esg-e" style="display:none" placeholder="Iniciativas ambientais..."></textarea>
-          </div>
-          <div class="esg-card">
-            <div class="esg-badge esg-s">S — Social</div>
-            <div class="esg-texto" id="val-esg-s">Clique em Editar para adicionar.</div>
-            <textarea class="esg-textarea" id="inp-esg-s" style="display:none" placeholder="Iniciativas sociais..."></textarea>
-          </div>
-          <div class="esg-card">
-            <div class="esg-badge esg-g">G — Governança</div>
-            <div class="esg-texto" id="val-esg-g">Clique em Editar para adicionar.</div>
-            <textarea class="esg-textarea" id="inp-esg-g" style="display:none" placeholder="Práticas de governança..."></textarea>
-          </div>
+          <div class="esg-card"><div class="esg-badge esg-e">E — Ambiental</div><div class="esg-texto" id="val-esg-e">Clique em Editar para adicionar.</div><textarea class="esg-textarea" id="inp-esg-e" style="display:none" placeholder="Iniciativas ambientais..."></textarea></div>
+          <div class="esg-card"><div class="esg-badge esg-s">S — Social</div><div class="esg-texto" id="val-esg-s">Clique em Editar para adicionar.</div><textarea class="esg-textarea" id="inp-esg-s" style="display:none" placeholder="Iniciativas sociais..."></textarea></div>
+          <div class="esg-card"><div class="esg-badge esg-g">G — Governança</div><div class="esg-texto" id="val-esg-g">Clique em Editar para adicionar.</div><textarea class="esg-textarea" id="inp-esg-g" style="display:none" placeholder="Práticas de governança..."></textarea></div>
         </div>
       </div>
     </div>
@@ -299,9 +214,7 @@
     <!-- NOSSO TIME -->
     <div class="tab-content" id="tab-nosso-time">
       <div class="time-toolbar">
-        <div class="deps-lista" id="listaDeps">
-          <button class="dep-btn active" onclick="selecionarDep(this,'todos')">Todos os Departamentos</button>
-        </div>
+        <div class="deps-lista" id="listaDeps"><button class="dep-btn active" onclick="selecionarDep(this,'todos')">Todos os Departamentos</button></div>
         <div class="time-acoes">
           <button class="btn-secondary" onclick="toggleModoConexao()" id="btnConexao" style="font-size:12px;padding:6px 12px">🔗 Conectar</button>
           <button class="btn-secondary" onclick="abrirModalDep()" style="font-size:12px;padding:6px 12px">+ Novo</button>
@@ -333,24 +246,11 @@
         </div>
         <div class="wiki-table">
           <table>
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Tags</th>
-                <th>Responsável</th>
-                <th>Status</th>
-                <th>Versão</th>
-                <th>Atualizado em</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="wikisBody">
-              <tr><td colspan="7" style="text-align:center;padding:40px;color:#a0aec0">Nenhum wiki criado ainda.</td></tr>
-            </tbody>
+            <thead><tr><th>Nome</th><th>Tags</th><th>Responsável</th><th>Status</th><th>Versão</th><th>Atualizado em</th><th>Ações</th></tr></thead>
+            <tbody id="wikisBody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#a0aec0">Carregando wikis...</td></tr></tbody>
           </table>
         </div>
       </div>
-
       <div class="wiki-editor" id="wikiEditor">
         <div class="editor-header">
           <input class="editor-titulo-input" id="editorTitulo" type="text" placeholder="Título do Wiki...">
@@ -396,9 +296,7 @@
         </div>
         <div class="chat-box">
           <div class="chat-msgs" id="chatMsgs">
-            <div class="chat-msg bot">
-              <div class="chat-bubble">Olá! Sou o Oráculo do HOC System. Em breve poderei responder perguntas sobre os dados internos da sua empresa!</div>
-            </div>
+            <div class="chat-msg bot"><div class="chat-bubble">Olá! Sou o Oráculo do HOC System. Em breve poderei responder perguntas sobre os dados internos da sua empresa!</div></div>
           </div>
           <div class="chat-input-row">
             <input class="chat-input" type="text" placeholder="Digite sua pergunta... (em breve)" disabled>
@@ -408,62 +306,42 @@
         <div class="oraculo-aviso">⚙️ O Oráculo estará disponível em breve.</div>
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- Modal Timeline -->
 <div class="modal-overlay" id="modalTimeline">
   <div class="modal">
-    <div class="modal-header">
-      <span class="modal-titulo">Adicionar Marco Histórico</span>
-      <button class="btn-fechar" onclick="fecharModal('modalTimeline')">×</button>
-    </div>
+    <div class="modal-header"><span class="modal-titulo">Adicionar Marco Histórico</span><button class="btn-fechar" onclick="fecharModal('modalTimeline')">×</button></div>
     <div class="form-group"><label>Ano</label><input type="text" id="timelineAno" placeholder="Ex: 2020"></div>
     <div class="form-group"><label>Descrição</label><textarea id="timelineDesc" rows="3" placeholder="Descreva o marco..."></textarea></div>
-    <div class="modal-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalTimeline')">Cancelar</button>
-      <button class="btn-confirmar" onclick="adicionarTimeline()">Adicionar</button>
-    </div>
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalTimeline')">Cancelar</button><button class="btn-confirmar" onclick="adicionarTimeline()">Adicionar</button></div>
   </div>
 </div>
 
 <!-- Modal Departamento -->
 <div class="modal-overlay" id="modalDep">
   <div class="modal">
-    <div class="modal-header">
-      <span class="modal-titulo">Novo Departamento</span>
-      <button class="btn-fechar" onclick="fecharModal('modalDep')">×</button>
-    </div>
+    <div class="modal-header"><span class="modal-titulo">Novo Departamento</span><button class="btn-fechar" onclick="fecharModal('modalDep')">×</button></div>
     <div class="form-group"><label>Nome do Departamento</label><input type="text" id="depNome" placeholder="Ex: Tecnologia, RH..."></div>
-    <div class="modal-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalDep')">Cancelar</button>
-      <button class="btn-confirmar" onclick="adicionarDep()">Criar</button>
-    </div>
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalDep')">Cancelar</button><button class="btn-confirmar" onclick="adicionarDep()">Criar</button></div>
   </div>
 </div>
 
 <!-- Modal Membro -->
 <div class="modal-overlay" id="modalMembro">
   <div class="modal">
-    <div class="modal-header">
-      <span class="modal-titulo" id="modalMembroTitulo">Novo Membro</span>
-      <button class="btn-fechar" onclick="fecharModal('modalMembro')">×</button>
-    </div>
+    <div class="modal-header"><span class="modal-titulo" id="modalMembroTitulo">Novo Membro</span><button class="btn-fechar" onclick="fecharModal('modalMembro')">×</button></div>
     <div class="form-group"><label>Nome *</label><input type="text" id="membroNome" placeholder="Nome completo"></div>
     <div class="form-group"><label>Cargo / Função *</label><input type="text" id="membroCargo" placeholder="Ex: Desenvolvedor Sênior"></div>
     <div class="form-group"><label>Departamento</label><select id="membroDep"><option value="">Selecione...</option></select></div>
     <div class="form-group"><label>Email</label><input type="email" id="membroEmail" placeholder="email@empresa.com"></div>
     <input type="hidden" id="membroEditId">
-    <div class="modal-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalMembro')">Cancelar</button>
-      <button class="btn-confirmar" onclick="salvarMembro()">Salvar</button>
-    </div>
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalMembro')">Cancelar</button><button class="btn-confirmar" onclick="salvarMembro()">Salvar</button></div>
   </div>
 </div>
 
 <script>
-  // AUTH
   const token = localStorage.getItem('token');
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
   if (!token) window.location.href = '/';
@@ -471,68 +349,131 @@
   document.getElementById('userPerfil').textContent = usuario.perfil || '-';
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
 
-  // TABS
+  const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
+  // ===== TABS =====
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  document.getElementById('tab-visao-geral').style.display = 'block';
   function mudarTab(id, btn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + id).classList.add('active');
+    document.getElementById('tab-' + id).style.display = 'block';
     btn.classList.add('active');
+    if (id === 'biblioteca') carregarWikis();
   }
 
-  // VISÃO GERAL
+  // ===== VISÃO GERAL — API =====
   let modoEdicao = false;
   const campos = ['definicao','fundacao','setor','site','missao','visao','valores','esg-e','esg-s','esg-g'];
   let timelineData = [];
 
+  async function carregarInfo() {
+    try {
+      const res = await fetch('/api/overview', { headers: HEADERS });
+      if (res.status === 401) { window.location.href = '/'; return; }
+      const data = await res.json();
+      if (!data) return;
+      const info = data.info || {};
+      const mvv = data.mvv || {};
+      const esg = data.esg || {};
+      // info
+      if (info.definicao) { document.getElementById('val-definicao').textContent = info.definicao; }
+      if (info.fundacao) { document.getElementById('val-fundacao').textContent = info.fundacao; }
+      if (info.setor) { document.getElementById('val-setor').textContent = info.setor; }
+      if (info.site) { document.getElementById('val-site').textContent = info.site; }
+      // mvv
+      if (mvv.missao) { document.getElementById('val-missao').textContent = mvv.missao; }
+      if (mvv.visao) { document.getElementById('val-visao').textContent = mvv.visao; }
+      if (mvv.valores) { document.getElementById('val-valores').textContent = mvv.valores; }
+      // esg
+      if (esg.e) { document.getElementById('val-esg-e').textContent = esg.e; }
+      if (esg.s) { document.getElementById('val-esg-s').textContent = esg.s; }
+      if (esg.g) { document.getElementById('val-esg-g').textContent = esg.g; }
+      // timeline
+      if (data.timeline) { timelineData = data.timeline; renderTimeline(); }
+    } catch(err) { console.error(err); }
+  }
+
   function toggleEdicao() {
     modoEdicao = !modoEdicao;
-    campos.forEach(c => {
+    // campos info
+    ['definicao','fundacao','setor','site'].forEach(c => {
       const val = document.getElementById('val-' + c);
       const inp = document.getElementById('inp-' + c);
       if (!val || !inp) return;
-      if (modoEdicao) {
-        inp.value = val.textContent === 'Clique em Editar para adicionar.' || val.textContent === '—' ? '' : val.textContent;
-        val.style.display = 'none'; inp.style.display = 'block';
-      } else {
-        val.style.display = 'block'; inp.style.display = 'none';
-      }
+      if (modoEdicao) { inp.value = val.textContent === 'Clique em Editar para adicionar.' || val.textContent === '—' ? '' : val.textContent; val.style.display='none'; inp.style.display='block'; }
+      else { val.style.display='block'; inp.style.display='none'; }
+    });
+    // mvv
+    ['missao','visao','valores'].forEach(c => {
+      const val = document.getElementById('val-' + c);
+      const inp = document.getElementById('inp-' + c);
+      if (!val || !inp) return;
+      if (modoEdicao) { inp.value = val.textContent === 'Clique em Editar para adicionar.' ? '' : val.textContent; val.style.display='none'; inp.style.display='block'; }
+      else { val.style.display='block'; inp.style.display='none'; }
+    });
+    // esg
+    ['esg-e','esg-s','esg-g'].forEach(c => {
+      const val = document.getElementById('val-' + c);
+      const inp = document.getElementById('inp-' + c);
+      if (!val || !inp) return;
+      if (modoEdicao) { inp.value = val.textContent === 'Clique em Editar para adicionar.' ? '' : val.textContent; val.style.display='none'; inp.style.display='block'; }
+      else { val.style.display='block'; inp.style.display='none'; }
     });
     document.getElementById('btnEditar').style.display = modoEdicao ? 'none' : 'inline-block';
     document.getElementById('btnSalvar').style.display = modoEdicao ? 'inline-block' : 'none';
     document.getElementById('btnAddTimeline').style.display = modoEdicao ? 'flex' : 'none';
-    if (modoEdicao) {
-      document.querySelectorAll('.mvv-textarea,.esg-textarea').forEach(el => el.style.display = 'block');
-      document.querySelectorAll('.mvv-texto,.esg-texto').forEach(el => el.style.display = 'none');
-    } else {
-      document.querySelectorAll('.mvv-textarea,.esg-textarea').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.mvv-texto,.esg-texto').forEach(el => el.style.display = 'block');
-    }
+    document.querySelectorAll('.mvv-textarea,.esg-textarea').forEach(el => el.style.display = modoEdicao ? 'block' : 'none');
+    document.querySelectorAll('.mvv-texto,.esg-texto').forEach(el => el.style.display = modoEdicao ? 'none' : 'block');
   }
 
-  function salvarInfo() {
-    campos.forEach(c => {
+  async function salvarInfo() {
+    // atualizar views
+    ['definicao','fundacao','setor','site'].forEach(c => {
       const val = document.getElementById('val-' + c);
       const inp = document.getElementById('inp-' + c);
-      if (val && inp) val.textContent = inp.value || (c === 'fundacao'||c==='setor'||c==='site' ? '—' : 'Clique em Editar para adicionar.');
+      if (val && inp) val.textContent = inp.value || (c==='fundacao'||c==='setor'||c==='site' ? '—' : 'Clique em Editar para adicionar.');
     });
-    const dados = {};
-    campos.forEach(c => { dados[c] = document.getElementById('inp-' + c)?.value || ''; });
-    dados.timeline = timelineData;
-    localStorage.setItem('overview_' + usuario.empresaNome, JSON.stringify(dados));
-    toggleEdicao();
-  }
+    ['missao','visao','valores'].forEach(c => {
+      const val = document.getElementById('val-' + c);
+      const inp = document.getElementById('inp-' + c);
+      if (val && inp) val.textContent = inp.value || 'Clique em Editar para adicionar.';
+    });
+    ['esg-e','esg-s','esg-g'].forEach(c => {
+      const val = document.getElementById('val-' + c);
+      const inp = document.getElementById('inp-' + c);
+      if (val && inp) val.textContent = inp.value || 'Clique em Editar para adicionar.';
+    });
 
-  function carregarInfo() {
-    const saved = localStorage.getItem('overview_' + usuario.empresaNome);
-    if (!saved) return;
-    const dados = JSON.parse(saved);
-    campos.forEach(c => { const val = document.getElementById('val-' + c); if (val && dados[c]) val.textContent = dados[c]; });
-    if (dados.timeline) { timelineData = dados.timeline; renderTimeline(); }
+    const payload = {
+      info: {
+        definicao: document.getElementById('inp-definicao').value,
+        fundacao: document.getElementById('inp-fundacao').value,
+        setor: document.getElementById('inp-setor').value,
+        site: document.getElementById('inp-site').value,
+      },
+      mvv: {
+        missao: document.getElementById('inp-missao').value,
+        visao: document.getElementById('inp-visao').value,
+        valores: document.getElementById('inp-valores').value,
+      },
+      esg: {
+        e: document.getElementById('inp-esg-e').value,
+        s: document.getElementById('inp-esg-s').value,
+        g: document.getElementById('inp-esg-g').value,
+      },
+      timeline: timelineData
+    };
+
+    try {
+      await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify(payload) });
+    } catch(err) { console.error(err); }
+    toggleEdicao();
   }
 
   function abrirModalTimeline() { document.getElementById('modalTimeline').classList.add('aberto'); }
 
-  function adicionarTimeline() {
+  async function adicionarTimeline() {
     const ano = document.getElementById('timelineAno').value.trim();
     const desc = document.getElementById('timelineDesc').value.trim();
     if (!ano || !desc) return;
@@ -542,6 +483,10 @@
     document.getElementById('timelineAno').value = '';
     document.getElementById('timelineDesc').value = '';
     fecharModal('modalTimeline');
+    // salvar no banco
+    try {
+      await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ timeline: timelineData }) });
+    } catch(err) { console.error(err); }
   }
 
   function renderTimeline() {
@@ -552,48 +497,45 @@
         <div class="timeline-dot"></div>
         <div class="timeline-ano">${item.ano}</div>
         <div class="timeline-desc">${item.desc}</div>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 
-  // NOSSO TIME
+  // ===== NOSSO TIME — API =====
   const DEP_CORES = ['#2d1b69','#38a169','#3b5bdb','#e53e3e','#d69e2e','#00b5d8'];
-  let departamentos = [];
-  let membros = [];
-  let conexoes = [];
-  let depAtivo = 'todos';
-  let dragging = null;
-  let dragOffset = { x:0, y:0 };
-  let modoConexao = false;
-  let conexaoSelecionado = null;
+  let departamentos = [], membros = [], conexoes = [], depAtivo = 'todos';
+  let dragging = null, dragOffset = { x:0, y:0 }, modoConexao = false, conexaoSelecionado = null;
 
   function getDepIdx(depId) { return departamentos.findIndex(d => d.id == depId); }
   function getDepCor(depId) { const idx = getDepIdx(depId); return DEP_CORES[idx % DEP_CORES.length] || '#2d1b69'; }
 
-  function selecionarDep(btn, dep) {
-    document.querySelectorAll('.dep-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    depAtivo = dep;
-    renderOrganograma();
+  async function carregarOrg() {
+    try {
+      const res = await fetch('/api/overview', { headers: HEADERS });
+      const data = await res.json();
+      if (data && data.organograma) {
+        departamentos = data.organograma.departamentos || [];
+        membros = data.organograma.membros || [];
+        conexoes = data.organograma.conexoes || [];
+        renderDepButtons();
+        renderOrganograma();
+      }
+    } catch(err) { console.error(err); }
   }
 
-  function abrirModalDep() { document.getElementById('depNome').value = ''; document.getElementById('modalDep').classList.add('aberto'); }
-
-  function adicionarDep() {
-    const nome = document.getElementById('depNome').value.trim();
-    if (!nome) return;
-    departamentos.push({ id: Date.now(), nome });
-    renderDepButtons();
-    fecharModal('modalDep');
-    salvarOrg();
+  async function salvarOrg() {
+    try {
+      await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ organograma: { departamentos, membros, conexoes } }) });
+    } catch(err) { console.error(err); }
   }
+
+  function selecionarDep(btn, dep) { document.querySelectorAll('.dep-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); depAtivo=dep; renderOrganograma(); }
+  function abrirModalDep() { document.getElementById('depNome').value=''; document.getElementById('modalDep').classList.add('aberto'); }
+  async function adicionarDep() { const nome=document.getElementById('depNome').value.trim(); if(!nome)return; departamentos.push({id:Date.now(),nome}); renderDepButtons(); fecharModal('modalDep'); await salvarOrg(); }
 
   function renderDepButtons() {
     const lista = document.getElementById('listaDeps');
     lista.innerHTML = '<button class="dep-btn active" onclick="selecionarDep(this,\'todos\')">Todos os Departamentos</button>';
-    departamentos.forEach((dep, i) => {
-      lista.innerHTML += `<button class="dep-btn" onclick="selecionarDep(this,'${dep.id}')" style="border-color:${DEP_CORES[i%DEP_CORES.length]};color:${DEP_CORES[i%DEP_CORES.length]}">${dep.nome}</button>`;
-    });
+    departamentos.forEach((dep,i) => { lista.innerHTML += `<button class="dep-btn" onclick="selecionarDep(this,'${dep.id}')" style="border-color:${DEP_CORES[i%DEP_CORES.length]};color:${DEP_CORES[i%DEP_CORES.length]}">${dep.nome}</button>`; });
     const sel = document.getElementById('membroDep');
     sel.innerHTML = '<option value="">Selecione...</option>';
     departamentos.forEach(dep => { sel.innerHTML += `<option value="${dep.id}">${dep.nome}</option>`; });
@@ -601,303 +543,195 @@
 
   function abrirModalMembro(id) {
     document.getElementById('modalMembroTitulo').textContent = id ? 'Editar Membro' : 'Novo Membro';
-    document.getElementById('membroEditId').value = id || '';
-    if (id) {
-      const m = membros.find(m => m.id == id);
-      if (m) { document.getElementById('membroNome').value = m.nome; document.getElementById('membroCargo').value = m.cargo; document.getElementById('membroDep').value = m.depId||''; document.getElementById('membroEmail').value = m.email||''; }
-    } else {
-      document.getElementById('membroNome').value = '';
-      document.getElementById('membroCargo').value = '';
-      document.getElementById('membroDep').value = '';
-      document.getElementById('membroEmail').value = '';
-    }
+    document.getElementById('membroEditId').value = id||'';
+    if (id) { const m=membros.find(m=>m.id==id); if(m){document.getElementById('membroNome').value=m.nome;document.getElementById('membroCargo').value=m.cargo;document.getElementById('membroDep').value=m.depId||'';document.getElementById('membroEmail').value=m.email||'';} }
+    else { document.getElementById('membroNome').value='';document.getElementById('membroCargo').value='';document.getElementById('membroDep').value='';document.getElementById('membroEmail').value=''; }
     document.getElementById('modalMembro').classList.add('aberto');
   }
 
-  function salvarMembro() {
+  async function salvarMembro() {
     const id = document.getElementById('membroEditId').value;
-    const membro = {
-      id: id ? parseInt(id) : Date.now(),
-      nome: document.getElementById('membroNome').value.trim(),
-      cargo: document.getElementById('membroCargo').value.trim(),
-      depId: document.getElementById('membroDep').value,
-      email: document.getElementById('membroEmail').value.trim(),
-      x: Math.random() * 400 + 50,
-      y: Math.random() * 200 + 50
-    };
+    const membro = { id:id?parseInt(id):Date.now(), nome:document.getElementById('membroNome').value.trim(), cargo:document.getElementById('membroCargo').value.trim(), depId:document.getElementById('membroDep').value, email:document.getElementById('membroEmail').value.trim(), x:Math.random()*400+50, y:Math.random()*200+50 };
     if (!membro.nome) return;
-    if (id) { const idx = membros.findIndex(m => m.id == id); if (idx !== -1) { membro.x = membros[idx].x; membro.y = membros[idx].y; membros[idx] = membro; } }
+    if (id) { const idx=membros.findIndex(m=>m.id==id); if(idx!==-1){membro.x=membros[idx].x;membro.y=membros[idx].y;membros[idx]=membro;} }
     else membros.push(membro);
-    salvarOrg();
+    await salvarOrg();
     renderOrganograma();
     fecharModal('modalMembro');
   }
 
-  function deletarMembro(id) {
+  async function deletarMembro(id) {
     if (!confirm('Remover este membro?')) return;
-    membros = membros.filter(m => m.id != id);
-    conexoes = conexoes.filter(c => c.de != id && c.para != id);
-    salvarOrg();
+    membros = membros.filter(m=>m.id!=id);
+    conexoes = conexoes.filter(c=>c.de!=id&&c.para!=id);
+    await salvarOrg();
     renderOrganograma();
   }
 
-  function toggleModoConexao() {
-    modoConexao = !modoConexao;
-    conexaoSelecionado = null;
-    document.getElementById('modoConexaoAviso').classList.toggle('ativo', modoConexao);
-    document.getElementById('btnConexao').style.background = modoConexao ? '#f0fff4' : '';
-    document.getElementById('btnConexao').style.color = modoConexao ? '#276749' : '';
-    document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
-  }
+  function toggleModoConexao() { modoConexao=!modoConexao; conexaoSelecionado=null; document.getElementById('modoConexaoAviso').classList.toggle('ativo',modoConexao); document.getElementById('btnConexao').style.background=modoConexao?'#f0fff4':''; document.getElementById('btnConexao').style.color=modoConexao?'#276749':''; document.querySelectorAll('.org-node').forEach(n=>n.classList.remove('selecionado-conexao')); }
 
-  function clicarMembro(id) {
+  async function clicarMembro(id) {
     if (!modoConexao) return;
-    if (!conexaoSelecionado) {
-      conexaoSelecionado = id;
-      document.getElementById('node-' + id)?.classList.add('selecionado-conexao');
-    } else {
-      if (conexaoSelecionado !== id) {
-        const jaExiste = conexoes.find(c => (c.de == conexaoSelecionado && c.para == id) || (c.de == id && c.para == conexaoSelecionado));
-        if (jaExiste) {
-          conexoes = conexoes.filter(c => !((c.de == conexaoSelecionado && c.para == id) || (c.de == id && c.para == conexaoSelecionado)));
-        } else {
-          conexoes.push({ de: conexaoSelecionado, para: id });
-        }
-        salvarOrg();
+    if (!conexaoSelecionado) { conexaoSelecionado=id; document.getElementById('node-'+id)?.classList.add('selecionado-conexao'); }
+    else {
+      if (conexaoSelecionado!==id) {
+        const jaExiste=conexoes.find(c=>(c.de==conexaoSelecionado&&c.para==id)||(c.de==id&&c.para==conexaoSelecionado));
+        if (jaExiste) conexoes=conexoes.filter(c=>!((c.de==conexaoSelecionado&&c.para==id)||(c.de==id&&c.para==conexaoSelecionado)));
+        else conexoes.push({de:conexaoSelecionado,para:id});
+        await salvarOrg();
         renderOrganograma();
       }
-      conexaoSelecionado = null;
-      document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+      conexaoSelecionado=null;
+      document.querySelectorAll('.org-node').forEach(n=>n.classList.remove('selecionado-conexao'));
     }
   }
 
   function renderConexoes() {
-    const svg = document.getElementById('orgSvg');
-    svg.innerHTML = '';
-    conexoes.forEach(c => {
-      const de = membros.find(m => m.id == c.de);
-      const para = membros.find(m => m.id == c.para);
-      if (!de || !para) return;
-      const x1 = de.x + 90, y1 = de.y + 70;
-      const x2 = para.x + 90, y2 = para.y;
-      const my = (y1 + y2) / 2;
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`);
-      path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', '#cbd5e0');
-      path.setAttribute('stroke-width', '1.5');
-      path.setAttribute('stroke-dasharray', '4,3');
+    const svg=document.getElementById('orgSvg'); svg.innerHTML='';
+    conexoes.forEach(c=>{
+      const de=membros.find(m=>m.id==c.de),para=membros.find(m=>m.id==c.para);
+      if(!de||!para)return;
+      const x1=de.x+90,y1=de.y+70,x2=para.x+90,y2=para.y,my=(y1+y2)/2;
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d',`M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`);
+      path.setAttribute('fill','none');path.setAttribute('stroke','#cbd5e0');path.setAttribute('stroke-width','1.5');path.setAttribute('stroke-dasharray','4,3');
       svg.appendChild(path);
-      const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      arrow.setAttribute('points', `${x2-4},${y2-8} ${x2+4},${y2-8} ${x2},${y2}`);
-      arrow.setAttribute('fill', '#cbd5e0');
+      const arrow=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+      arrow.setAttribute('points',`${x2-4},${y2-8} ${x2+4},${y2-8} ${x2},${y2}`);arrow.setAttribute('fill','#cbd5e0');
       svg.appendChild(arrow);
     });
   }
 
   function renderOrganograma() {
-    const canvas = document.getElementById('orgCanvas');
-    const empty = document.getElementById('orgEmpty');
-    const filtrados = depAtivo === 'todos' ? membros : membros.filter(m => m.depId == depAtivo);
-    document.querySelectorAll('.org-node').forEach(n => n.remove());
-    if (filtrados.length === 0) { empty.style.display = 'flex'; renderConexoes(); return; }
-    empty.style.display = 'none';
-    filtrados.forEach(m => {
-      const cor = getDepCor(m.depId);
-      const dep = departamentos.find(d => d.id == m.depId);
-      const node = document.createElement('div');
-      node.className = 'org-node';
-      node.id = 'node-' + m.id;
-      node.style.left = m.x + 'px';
-      node.style.top = m.y + 'px';
-      node.style.borderColor = cor;
-      node.innerHTML = `
-        <div class="org-node-top">
-          <div class="org-node-avatar" style="background:${cor}">${m.nome[0].toUpperCase()}</div>
-          <div class="org-node-actions">
-            <button class="org-node-btn edit" onclick="abrirModalMembro(${m.id});event.stopPropagation()">✏️</button>
-            <button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()">🗑️</button>
-          </div>
-        </div>
-        <div class="org-node-nome">${m.nome}</div>
-        <div class="org-node-cargo" style="color:${cor}">${m.cargo}</div>
-        ${dep ? `<div class="org-node-area">${dep.nome}</div>` : ''}
-        ${m.email ? `<div class="org-node-email">${m.email}</div>` : ''}
-      `;
-      node.addEventListener('click', () => clicarMembro(m.id));
+    const canvas=document.getElementById('orgCanvas'),empty=document.getElementById('orgEmpty');
+    const filtrados=depAtivo==='todos'?membros:membros.filter(m=>m.depId==depAtivo);
+    document.querySelectorAll('.org-node').forEach(n=>n.remove());
+    if(filtrados.length===0){empty.style.display='flex';renderConexoes();return;}
+    empty.style.display='none';
+    filtrados.forEach(m=>{
+      const cor=getDepCor(m.depId),dep=departamentos.find(d=>d.id==m.depId);
+      const node=document.createElement('div');node.className='org-node';node.id='node-'+m.id;node.style.left=m.x+'px';node.style.top=m.y+'px';node.style.borderColor=cor;
+      node.innerHTML=`<div class="org-node-top"><div class="org-node-avatar" style="background:${cor}">${m.nome[0].toUpperCase()}</div><div class="org-node-actions"><button class="org-node-btn edit" onclick="abrirModalMembro(${m.id});event.stopPropagation()">✏️</button><button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()">🗑️</button></div></div><div class="org-node-nome">${m.nome}</div><div class="org-node-cargo" style="color:${cor}">${m.cargo}</div>${dep?`<div class="org-node-area">${dep.nome}</div>`:''} ${m.email?`<div class="org-node-email">${m.email}</div>`:''}`;
+      node.addEventListener('click',()=>clicarMembro(m.id));
       canvas.appendChild(node);
-      iniciaDrag(node, m);
+      node.addEventListener('mousedown',e=>{if(e.target.tagName==='BUTTON'||modoConexao)return;dragging={node,membro:m};const rect=node.getBoundingClientRect();dragOffset.x=e.clientX-rect.left;dragOffset.y=e.clientY-rect.top;node.classList.add('dragging');e.preventDefault();});
     });
     renderConexoes();
   }
 
-  function iniciaDrag(node, membro) {
-    node.addEventListener('mousedown', e => {
-      if (e.target.tagName === 'BUTTON' || modoConexao) return;
-      dragging = { node, membro };
-      const rect = node.getBoundingClientRect();
-      dragOffset.x = e.clientX - rect.left;
-      dragOffset.y = e.clientY - rect.top;
-      node.classList.add('dragging');
-      e.preventDefault();
-    });
+  document.addEventListener('mousemove',e=>{if(!dragging)return;const r=document.getElementById('orgCanvas').getBoundingClientRect();const x=Math.max(0,e.clientX-r.left-dragOffset.x),y=Math.max(0,e.clientY-r.top-dragOffset.y);dragging.node.style.left=x+'px';dragging.node.style.top=y+'px';dragging.membro.x=x;dragging.membro.y=y;renderConexoes();});
+  document.addEventListener('mouseup',async()=>{if(dragging){dragging.node.classList.remove('dragging');await salvarOrg();dragging=null;}});
+
+  // ===== WIKIS — API =====
+  let wikis = [], wikiEditando = null;
+
+  async function carregarWikis() {
+    try {
+      const res = await fetch('/api/wikis', { headers: HEADERS });
+      wikis = await res.json();
+      renderWikis();
+    } catch(err) { console.error(err); }
   }
-
-  document.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const canvasRect = document.getElementById('orgCanvas').getBoundingClientRect();
-    const x = Math.max(0, e.clientX - canvasRect.left - dragOffset.x);
-    const y = Math.max(0, e.clientY - canvasRect.top - dragOffset.y);
-    dragging.node.style.left = x + 'px';
-    dragging.node.style.top = y + 'px';
-    dragging.membro.x = x;
-    dragging.membro.y = y;
-    renderConexoes();
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (dragging) { dragging.node.classList.remove('dragging'); salvarOrg(); dragging = null; }
-  });
-
-  function salvarOrg() {
-    localStorage.setItem('org_' + usuario.empresaNome, JSON.stringify({ departamentos, membros, conexoes }));
-  }
-
-  function carregarOrg() {
-    const saved = localStorage.getItem('org_' + usuario.empresaNome);
-    if (!saved) return;
-    const dados = JSON.parse(saved);
-    departamentos = dados.departamentos || [];
-    membros = dados.membros || [];
-    conexoes = dados.conexoes || [];
-    renderDepButtons();
-    renderOrganograma();
-  }
-
-  // BIBLIOTECA
-  let wikis = [];
-  let wikiEditando = null;
 
   function novoWiki() {
     wikiEditando = null;
-    document.getElementById('editorTitulo').value = '';
-    document.getElementById('editorTags').value = '';
-    document.getElementById('editorResponsavel').value = '';
-    document.getElementById('editorArea').innerHTML = '';
-    document.getElementById('versoesList').innerHTML = '';
-    document.getElementById('bibLista').style.display = 'none';
+    document.getElementById('editorTitulo').value='';
+    document.getElementById('editorTags').value='';
+    document.getElementById('editorResponsavel').value='';
+    document.getElementById('editorArea').innerHTML='';
+    document.getElementById('versoesList').innerHTML='';
+    document.getElementById('bibLista').style.display='none';
     document.getElementById('wikiEditor').classList.add('active');
   }
 
-  function fecharEditor() {
-    document.getElementById('wikiEditor').classList.remove('active');
-    document.getElementById('bibLista').style.display = 'block';
-    wikiEditando = null;
-  }
+  function fecharEditor() { document.getElementById('wikiEditor').classList.remove('active'); document.getElementById('bibLista').style.display='block'; wikiEditando=null; }
 
-  function salvarWiki() {
+  async function salvarWiki() {
     const titulo = document.getElementById('editorTitulo').value.trim();
     if (!titulo) { alert('Título obrigatório'); return; }
     const dados = {
-      id: wikiEditando || Date.now(),
       titulo,
       conteudo: document.getElementById('editorArea').innerHTML,
       tags: document.getElementById('editorTags').value.trim(),
       responsavel: document.getElementById('editorResponsavel').value.trim(),
       status: 'Rascunho',
       versao: 'v1.0',
-      versoes: [],
-      dataAtualizacao: new Date().toLocaleDateString('pt-BR')
     };
-    if (wikiEditando) {
-      const idx = wikis.findIndex(w => w.id === wikiEditando);
-      if (idx !== -1) {
-        dados.versoes = wikis[idx].versoes || [];
-        dados.versoes.push({ versao: wikis[idx].versao, data: wikis[idx].dataAtualizacao });
-        dados.versao = 'v' + (parseInt(wikis[idx].versao.replace('v','')) + 1) + '.0';
-        dados.status = wikis[idx].status;
-        wikis[idx] = dados;
+    try {
+      if (wikiEditando) {
+        const wiki = wikis.find(w=>w._id===wikiEditando);
+        if (wiki) {
+          dados.versao = 'v'+(parseInt(wiki.versao.replace('v',''))+1)+'.0';
+          dados.status = wiki.status;
+          await fetch(`/api/wikis/${wikiEditando}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+        }
+      } else {
+        await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
       }
-    } else { wikis.unshift(dados); }
-    localStorage.setItem('wikis_' + usuario.empresaNome, JSON.stringify(wikis));
-    renderWikis();
-    fecharEditor();
+      await carregarWikis();
+      fecharEditor();
+    } catch(err) { console.error(err); }
   }
 
-  function aprovarWiki() {
+  async function aprovarWiki() {
     if (!wikiEditando) { alert('Salve primeiro.'); return; }
-    const wiki = wikis.find(w => w.id === wikiEditando);
-    if (wiki) { wiki.status = 'Aprovado'; localStorage.setItem('wikis_' + usuario.empresaNome, JSON.stringify(wikis)); renderWikis(); alert('Wiki aprovado!'); }
+    await fetch(`/api/wikis/${wikiEditando}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({status:'Aprovado'}) });
+    await carregarWikis();
+    alert('Wiki aprovado!');
   }
 
   function editarWiki(id) {
-    const wiki = wikis.find(w => w.id === id);
+    const wiki = wikis.find(w=>w._id===id);
     if (!wiki) return;
     wikiEditando = id;
-    document.getElementById('editorTitulo').value = wiki.titulo;
-    document.getElementById('editorTags').value = wiki.tags || '';
-    document.getElementById('editorResponsavel').value = wiki.responsavel || '';
-    document.getElementById('editorArea').innerHTML = wiki.conteudo || '';
-    document.getElementById('bibLista').style.display = 'none';
+    document.getElementById('editorTitulo').value=wiki.titulo;
+    document.getElementById('editorTags').value=wiki.tags||'';
+    document.getElementById('editorResponsavel').value=wiki.responsavel||'';
+    document.getElementById('editorArea').innerHTML=wiki.conteudo||'';
+    document.getElementById('bibLista').style.display='none';
     document.getElementById('wikiEditor').classList.add('active');
   }
 
-  function deletarWiki(id) {
+  async function deletarWiki(id) {
     if (!confirm('Deletar este wiki?')) return;
-    wikis = wikis.filter(w => w.id !== id);
-    localStorage.setItem('wikis_' + usuario.empresaNome, JSON.stringify(wikis));
-    renderWikis();
+    await fetch(`/api/wikis/${id}`, { method:'DELETE', headers:HEADERS });
+    await carregarWikis();
   }
 
   function renderWikis(lista) {
-    const tbody = document.getElementById('wikisBody');
-    const filtro = lista || wikis;
-    if (filtro.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#a0aec0">Nenhum wiki criado ainda.</td></tr>'; return; }
-    const statusCor = { 'Aprovado': 'badge-verde', 'Rascunho': 'badge-cinza', 'Pendente': 'badge-amarelo' };
-    tbody.innerHTML = filtro.map(w => `
+    const tbody=document.getElementById('wikisBody'),filtro=lista||wikis;
+    if(filtro.length===0){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:#a0aec0">Nenhum wiki criado ainda.</td></tr>';return;}
+    const statusCor={'Aprovado':'badge-verde','Rascunho':'badge-cinza','Pendente':'badge-amarelo'};
+    tbody.innerHTML=filtro.map(w=>`
       <tr>
         <td><strong>${w.titulo}</strong></td>
-        <td>${w.tags ? w.tags.split(',').map(t => `<span class="wiki-tag">${t.trim()}</span>`).join('') : '—'}</td>
-        <td>${w.responsavel || '—'}</td>
-        <td><span class="badge ${statusCor[w.status] || 'badge-cinza'}">${w.status}</span></td>
+        <td>${w.tags?w.tags.split(',').map(t=>`<span class="wiki-tag">${t.trim()}</span>`).join(''):'—'}</td>
+        <td>${w.responsavel||'—'}</td>
+        <td><span class="badge ${statusCor[w.status]||'badge-cinza'}">${w.status}</span></td>
         <td><span class="versao-badge">${w.versao}</span></td>
-        <td>${w.dataAtualizacao}</td>
+        <td>${new Date(w.atualizadoEm||w.criadoEm).toLocaleDateString('pt-BR')}</td>
         <td>
-          <button onclick="editarWiki(${w.id})" style="padding:4px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️ Editar</button>
-          <button onclick="deletarWiki(${w.id})" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:4px">🗑️</button>
+          <button onclick="editarWiki('${w._id}')" style="padding:4px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️ Editar</button>
+          <button onclick="deletarWiki('${w._id}')" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:4px">🗑️</button>
         </td>
-      </tr>
-    `).join('');
+      </tr>`).join('');
   }
 
   function filtrarWikis() {
-    const q = document.getElementById('searchWiki').value.toLowerCase();
-    renderWikis(wikis.filter(w => w.titulo.toLowerCase().includes(q) || (w.tags||'').toLowerCase().includes(q) || (w.responsavel||'').toLowerCase().includes(q)));
+    const q=document.getElementById('searchWiki').value.toLowerCase();
+    renderWikis(wikis.filter(w=>w.titulo.toLowerCase().includes(q)||(w.tags||'').toLowerCase().includes(q)||(w.responsavel||'').toLowerCase().includes(q)));
   }
 
-  function fmt(cmd, val) { document.execCommand(cmd, false, val||null); document.getElementById('editorArea').focus(); }
-
-  function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
-  document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
-
-  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
+  function fmt(cmd,val){document.execCommand(cmd,false,val||null);document.getElementById('editorArea').focus();}
+  function fecharModal(id){document.getElementById(id).classList.remove('aberto');}
+  document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('aberto');});});
+  function sair(){localStorage.removeItem('token');localStorage.removeItem('usuario');window.location.href='/';}
 
   // INIT
   carregarInfo();
   renderTimeline();
   carregarOrg();
-  wikis = JSON.parse(localStorage.getItem('wikis_' + usuario.empresaNome) || '[]');
-  renderWikis();
-
-  // Tab content show/hide
-  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-  document.getElementById('tab-visao-geral').style.display = 'block';
-  function mudarTab(id, btn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('tab-' + id).style.display = 'block';
-    btn.classList.add('active');
-  }
+  carregarWikis();
 </script>
 </body>
 </html>

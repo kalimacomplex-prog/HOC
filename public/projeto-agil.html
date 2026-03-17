@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Projeto Ágil</title>
+  <link rel="stylesheet" href="style-global.css">
+  <style>
+    .proj-header { background: white; padding: 14px 28px; border-bottom: 1px solid #f0f2f5; }
+    .proj-breadcrumb { font-size: 11px; color: #a0aec0; margin-bottom: 6px; }
+    .proj-breadcrumb a { color: #2d1b69; text-decoration: none; }
+    .proj-title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .proj-nome { font-size: 20px; font-weight: 700; color: #1e2a4a; }
+    .proj-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 3px; }
+    .proj-meta-row { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+    .proj-meta-item { font-size: 11px; color: #a0aec0; }
+    .proj-acoes { margin-left: auto; display: flex; gap: 8px; }
+    .proj-tabs { background: white; padding: 0 28px; border-bottom: 2px solid #e2e8f0; display: flex; gap: 2px; overflow-x: auto; }
+    .proj-tab { padding: 12px 16px; font-size: 12px; font-weight: 500; cursor: pointer; color: #718096; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all 0.2s; }
+    .proj-tab:hover { color: #2d1b69; }
+    .proj-tab.active { color: #2d1b69; border-bottom-color: #2d1b69; font-weight: 600; }
+    .proj-content { padding: 24px 28px; }
+
+    /* Estudo de Caso */
+    .template-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(160px,1fr)); gap: 12px; margin-bottom: 20px; }
+    .template-card { border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .template-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .template-card.kaizen { background: linear-gradient(135deg,#667eea,#764ba2); color: white; }
+    .template-card.pdca { background: linear-gradient(135deg,#f093fb,#f5576c); color: white; }
+    .template-card.masp { background: linear-gradient(135deg,#4facfe,#00f2fe); color: white; }
+    .template-card.a3 { background: linear-gradient(135deg,#43e97b,#38f9d7); color: white; }
+    .template-card.ishikawa { background: linear-gradient(135deg,#fa709a,#fee140); color: white; }
+    .template-card.dmaic { background: linear-gradient(135deg,#a18cd1,#fbc2eb); color: white; }
+    .template-card.swot { background: linear-gradient(135deg,#ffecd2,#fcb69f); color: #1e2a4a; }
+    .template-card.custom { background: #f5f0ff; color: #2d1b69; border: 2px dashed #2d1b69; }
+    .template-nome { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .template-desc { font-size: 10px; opacity: 0.85; }
+    .estudo-item { background: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+
+    /* Sprints */
+    .sprint-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 10px; border-left: 3px solid #2d1b69; }
+    .sprint-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .sprint-nome { font-size: 14px; font-weight: 700; color: #1e2a4a; }
+    .sprint-status { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; }
+    .sprint-ativa { background: #f0fff4; color: #276749; }
+    .sprint-pendente { background: #fffaf0; color: #c05621; }
+    .sprint-concluida { background: #ebf0ff; color: #3b5bdb; }
+    .sprint-meta { font-size: 11px; color: #718096; }
+    .sprint-prog { height: 4px; background: #f0f2f5; border-radius: 2px; margin-top: 8px; }
+    .sprint-prog-fill { height: 4px; background: #2d1b69; border-radius: 2px; }
+
+    /* Planejamento Sprint */
+    .plan-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .plan-box { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .plan-box-title { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 12px; }
+    .backlog-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #f8fafc; border-radius: 6px; margin-bottom: 6px; font-size: 12px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+    .backlog-item:hover { border-color: #2d1b69; background: #f5f0ff; }
+    .backlog-item.selecionado { border-color: #2d1b69; background: #f5f0ff; }
+    .backlog-drag { font-size: 11px; color: #a0aec0; }
+    .backlog-nome { flex: 1; color: #1e2a4a; font-weight: 500; }
+    .backlog-pts { font-size: 10px; font-weight: 700; padding: 1px 5px; background: #e2e8f0; border-radius: 3px; color: #4a5568; }
+
+    /* Kanban */
+    .kanban { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .kanban-col { background: #f8fafc; border-radius: 10px; padding: 14px; min-height: 400px; }
+    .kanban-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .kanban-col-title { font-size: 12px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kanban-count { background: #e2e8f0; color: #718096; padding: 1px 7px; border-radius: 10px; font-size: 11px; }
+    .kanban-card { background: white; border-radius: 8px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 8px; border: 1.5px solid transparent; transition: all 0.2s; cursor: pointer; }
+    .kanban-card:hover { border-color: #2d1b69; }
+    .kanban-card-titulo { font-size: 12px; font-weight: 600; color: #1e2a4a; margin-bottom: 4px; }
+    .kanban-card-meta { font-size: 11px; color: #a0aec0; }
+    .kanban-add { width: 100%; padding: 7px; background: none; border: 1.5px dashed #e2e8f0; border-radius: 6px; color: #a0aec0; font-size: 12px; cursor: pointer; margin-top: 4px; }
+    .kanban-add:hover { border-color: #2d1b69; color: #2d1b69; }
+
+    /* Retrospectiva */
+    .retro-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+    .retro-form { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .retro-sidebar { display: flex; flex-direction: column; gap: 12px; }
+    .retro-box { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .retro-box-title { font-size: 12px; font-weight: 700; color: #1e2a4a; margin-bottom: 10px; }
+    .retro-section { margin-bottom: 16px; }
+    .retro-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+    .retro-textarea { width: 100%; padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; resize: vertical; font-family: inherit; min-height: 70px; }
+    .retro-textarea:focus { border-color: #2d1b69; }
+    .retro-input { width: 100%; padding: 9px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; }
+    .retro-input:focus { border-color: #2d1b69; }
+    .nps-grid { display: flex; gap: 4px; flex-wrap: wrap; }
+    .nps-btn { width: 36px; height: 36px; border-radius: 6px; border: 1.5px solid #e2e8f0; background: white; cursor: pointer; font-size: 12px; font-weight: 600; color: #4a5568; transition: all 0.2s; }
+    .nps-btn:hover { border-color: #2d1b69; }
+    .nps-btn.ativo { background: #2d1b69; color: white; border-color: #2d1b69; }
+    .metricas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .metrica-box { background: #f8fafc; border-radius: 8px; padding: 12px; text-align: center; }
+    .metrica-val { font-size: 22px; font-weight: 700; color: #2d1b69; }
+    .metrica-lbl { font-size: 11px; color: #718096; }
+
+    /* Agente IA */
+    .agente-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+    .agente-chat { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .agente-msgs { height: 360px; overflow-y: auto; padding: 16px; background: #f8fafc; }
+    .agente-msg { margin-bottom: 10px; display: flex; gap: 8px; }
+    .agente-msg.user { flex-direction: row-reverse; }
+    .agente-bubble { padding: 10px 14px; border-radius: 10px; font-size: 13px; max-width: 75%; line-height: 1.5; }
+    .agente-msg.bot .agente-bubble { background: white; color: #1e2a4a; border: 1px solid #e2e8f0; }
+    .agente-msg.user .agente-bubble { background: #2d1b69; color: white; }
+    .agente-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #e2e8f0; }
+    .agente-input { flex: 1; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
+    .agente-send { padding: 8px 16px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; opacity: 0.5; }
+    .agente-sidebar { display: flex; flex-direction: column; gap: 12px; }
+    .agente-box { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .agente-box-titulo { font-size: 12px; font-weight: 700; color: #1e2a4a; margin-bottom: 10px; }
+    .agente-item { font-size: 12px; color: #4a5568; padding: 6px 8px; background: #f8fafc; border-radius: 6px; margin-bottom: 4px; cursor: pointer; }
+    .agente-item:hover { background: #f0f2f5; }
+
+    .btn-export { padding: 7px 14px; background: #1e2a4a; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .tap-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .tap-table th { padding: 8px 12px; background: #f5f0ff; color: #2d1b69; font-weight: 600; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .tap-table td { padding: 8px 12px; border-bottom: 1px solid #f8fafc; color: #1e2a4a; }
+    .tap-table tr:last-child td { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
+    <span class="logo-text">Business Manager</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
+    <a class="menu-item active" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="proj-header">
+    <div class="proj-breadcrumb"><a href="/gestao-projetos">← Gestão de Projetos</a> / Projeto Ágil</div>
+    <div class="proj-title-row">
+      <div class="proj-nome" id="projNome">Carregando...</div>
+      <div style="display:flex;gap:6px">
+        <span class="proj-badge" style="background:#f0fff4;color:#276749">Ágil</span>
+        <span class="proj-badge" id="projStatusBadge" style="background:#f0fff4;color:#276749">Ativo</span>
+      </div>
+      <div class="proj-acoes">
+        <button class="btn-export" onclick="exportarPDF()">📄 Exportar PDF</button>
+        <button class="btn-primary" onclick="salvarProjeto()" style="font-size:12px;padding:7px 14px">💾 Salvar</button>
+      </div>
+    </div>
+    <div class="proj-meta-row">
+      <span class="proj-meta-item" id="projResp">👤 —</span>
+      <span class="proj-meta-item" id="projArea">📁 —</span>
+      <span class="proj-meta-item" id="projDatas">📅 —</span>
+    </div>
+  </div>
+
+  <div class="proj-tabs">
+    <button class="proj-tab active" onclick="mudarTab('estudo',this)">Estudo de Caso</button>
+    <button class="proj-tab" onclick="mudarTab('sprints',this)">Gestão de Sprints</button>
+    <button class="proj-tab" onclick="mudarTab('planejamento',this)">Planejamento da Sprint</button>
+    <button class="proj-tab" onclick="mudarTab('execucao',this)">Execução da Sprint</button>
+    <button class="proj-tab" onclick="mudarTab('retrospectiva',this)">Revisão e Retrospectiva</button>
+    <button class="proj-tab" onclick="mudarTab('agente',this)">🤖 Agente de IA</button>
+  </div>
+
+  <div class="proj-content">
+
+    <!-- ESTUDO DE CASO -->
+    <div id="tab-estudo">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Estudo de Caso</div><div style="font-size:12px;color:#718096">Selecione um template para análise antes de iniciar</div></div>
+        <button class="btn-primary" onclick="abrirModalEstudo()" style="font-size:12px;padding:7px 14px">+ Novo Estudo de Caso</button>
+      </div>
+      <div class="template-grid">
+        <div class="template-card kaizen" onclick="usarTemplate('Kaizen')"><div class="template-nome">Kaizen Charter</div><div class="template-desc">Melhoria contínua</div></div>
+        <div class="template-card pdca" onclick="usarTemplate('PDCA')"><div class="template-nome">PDCA</div><div class="template-desc">Plan, Do, Check, Act</div></div>
+        <div class="template-card masp" onclick="usarTemplate('MASP')"><div class="template-nome">MASP</div><div class="template-desc">Análise e solução</div></div>
+        <div class="template-card a3" onclick="usarTemplate('A3 Thinking')"><div class="template-nome">A3 Thinking</div><div class="template-desc">Relatório A3 Toyota</div></div>
+        <div class="template-card ishikawa" onclick="usarTemplate('Ishikawa')"><div class="template-nome">Ishikawa</div><div class="template-desc">Espinha de peixe</div></div>
+        <div class="template-card dmaic" onclick="usarTemplate('DMAIC')"><div class="template-nome">DMAIC</div><div class="template-desc">Define, Measure...</div></div>
+        <div class="template-card swot" onclick="usarTemplate('SWOT')"><div class="template-nome">SWOT</div><div class="template-desc">Análise estratégica</div></div>
+        <div class="template-card custom" onclick="abrirModalEstudo()"><div style="font-size:24px;margin-bottom:6px">+</div><div class="template-nome">Novo Template</div><div class="template-desc">Criar do zero</div></div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:10px">Estudos Salvos</div>
+      <div id="estudosLista"><div style="color:#a0aec0;font-size:13px;padding:20px;text-align:center">Nenhum estudo criado ainda.</div></div>
+    </div>
+
+    <!-- SPRINTS -->
+    <div id="tab-sprints" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Gestão de Sprints</div><div style="font-size:12px;color:#718096">Repositório de todas as sprints do projeto</div></div>
+        <button class="btn-primary" onclick="abrirModalSprint()" style="font-size:12px;padding:7px 14px">+ Nova Sprint</button>
+      </div>
+      <div id="sprintsLista"><div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma sprint criada ainda.</div></div>
+    </div>
+
+    <!-- PLANEJAMENTO SPRINT -->
+    <div id="tab-planejamento" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#1e2a4a">Planejamento da Sprint</div>
+          <div style="font-size:12px;color:#718096">Sprint ativa: <span id="sprintAtivaNome" style="color:#2d1b69;font-weight:600">Nenhuma sprint ativa</span></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="abrirModalBacklog()" style="font-size:12px;padding:7px 12px">+ Item no Backlog</button>
+          <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
+        </div>
+      </div>
+
+      <div class="plan-layout">
+        <div class="plan-box">
+          <div class="plan-box-title">📋 Product Backlog</div>
+          <div id="backlogLista"><div style="text-align:center;padding:20px;color:#a0aec0;font-size:12px">Nenhum item no backlog.</div></div>
+        </div>
+        <div class="plan-box">
+          <div class="plan-box-title">🎯 Sprint Backlog</div>
+          <div id="sprintBacklogLista"><div style="text-align:center;padding:20px;color:#a0aec0;font-size:12px">Selecione itens do backlog.</div></div>
+        </div>
+      </div>
+
+      <div style="background:white;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+        <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:12px">👥 Alocação de Recursos</div>
+        <table class="tap-table">
+          <thead><tr><th>Tarefa</th><th>Responsável</th><th>Data Início</th><th>Data Entrega</th><th>Complexidade</th><th>Dependências</th><th>Status</th><th></th></tr></thead>
+          <tbody id="alocacaoTbody"></tbody>
+        </table>
+        <button onclick="adicionarAlocacao()" style="display:flex;align-items:center;gap:5px;padding:6px 12px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;margin-top:8px">+ Adicionar Tarefa</button>
+      </div>
+    </div>
+
+    <!-- EXECUÇÃO -->
+    <div id="tab-execucao" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Execução da Sprint</div><div style="font-size:12px;color:#718096">Sprint ativa: <span id="execSprintNome" style="color:#2d1b69;font-weight:600">—</span></div></div>
+        <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:12px;background:white;padding:10px 16px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+            <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#2d1b69" id="kanbanAFazer">0</div><div style="font-size:10px;color:#718096">A Fazer</div></div>
+            <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#c05621" id="kanbanEmProg">0</div><div style="font-size:10px;color:#718096">Em Progresso</div></div>
+            <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:#276749" id="kanbanConcluido">0</div><div style="font-size:10px;color:#718096">Concluído</div></div>
+          </div>
+          <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
+        </div>
+      </div>
+      <div class="kanban">
+        <div class="kanban-col">
+          <div class="kanban-col-header"><span class="kanban-col-title">A Fazer</span><span class="kanban-count" id="cntFazer">0</span></div>
+          <div id="colFazer"></div>
+          <button class="kanban-add" onclick="adicionarKanban('a_fazer')">+ Adicionar</button>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header"><span class="kanban-col-title">Em Progresso</span><span class="kanban-count" id="cntProg">0</span></div>
+          <div id="colProgresso"></div>
+          <button class="kanban-add" onclick="adicionarKanban('em_progresso')">+ Adicionar</button>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header"><span class="kanban-col-title">Concluído</span><span class="kanban-count" id="cntConcl">0</span></div>
+          <div id="colConcluido"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RETROSPECTIVA -->
+    <div id="tab-retrospectiva" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Revisão e Retrospectiva</div></div>
+        <button class="btn-export" onclick="salvarProjeto()">💾 Salvar Retrospectiva</button>
+      </div>
+      <div class="retro-layout">
+        <div class="retro-form">
+          <div style="font-size:14px;font-weight:700;color:#1e2a4a;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #f0f2f5">Revisão do Sprint</div>
+          <div class="metricas-grid">
+            <div class="metrica-box"><div class="metrica-val" id="metricaVelocidade">0</div><div class="metrica-lbl">Velocidade (pts)</div></div>
+            <div class="metrica-box"><div class="metrica-val" id="metricaEntregas">0%</div><div class="metrica-lbl">% Entregues</div></div>
+            <div class="metrica-box"><div class="metrica-val" id="metricaConcl">0</div><div class="metrica-lbl">Tarefas Concluídas</div></div>
+            <div class="metrica-box"><div class="metrica-val" id="metricaPend">0</div><div class="metrica-lbl">Tarefas Pendentes</div></div>
+          </div>
+          <div class="retro-section">
+            <div class="retro-label">✅ O que funcionou bem?</div>
+            <textarea class="retro-textarea" id="retroBem" placeholder="Pontos positivos da sprint..."></textarea>
+          </div>
+          <div class="retro-section">
+            <div class="retro-label">⚠️ O que pode ser melhorado?</div>
+            <textarea class="retro-textarea" id="retroMelhorar" placeholder="Pontos de melhoria..."></textarea>
+          </div>
+          <div class="retro-section">
+            <div class="retro-label">🎯 Ações para próxima sprint</div>
+            <textarea class="retro-textarea" id="retroAcoes" placeholder="Liste as ações de melhoria..."></textarea>
+          </div>
+          <div class="retro-section">
+            <div class="retro-label">📊 Avaliação do cliente (NPS)</div>
+            <div class="nps-grid" id="npsGrid"></div>
+          </div>
+          <div class="retro-section">
+            <div class="retro-label">💬 Comentários gerais</div>
+            <textarea class="retro-textarea" id="retroComentarios" placeholder="Observações gerais..."></textarea>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:8px">
+            <div style="flex:1"><div class="retro-label">Satisfação Interna (1-5)</div><input class="retro-input" type="number" id="retroSatInterna" min="1" max="5" placeholder="—"></div>
+            <div style="flex:1"><div class="retro-label">Satisfação do Cliente (1-5)</div><input class="retro-input" type="number" id="retroSatCliente" min="1" max="5" placeholder="—"></div>
+          </div>
+        </div>
+        <div class="retro-sidebar">
+          <div class="retro-box">
+            <div class="retro-box-title">📋 Histórico de Retrospectivas</div>
+            <div id="retroHistorico"><div style="color:#a0aec0;font-size:12px">Nenhuma retrospectiva salva.</div></div>
+          </div>
+          <div class="retro-box">
+            <div class="retro-box-title">📈 Evolução da Velocidade</div>
+            <div id="retroEvolucao"><div style="color:#a0aec0;font-size:12px">Sem dados ainda.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENTE IA -->
+    <div id="tab-agente" style="display:none">
+      <div style="margin-bottom:16px"><div style="font-size:15px;font-weight:700;color:#1e2a4a">🤖 Agente de IA — Consultor de Processos</div><div style="font-size:12px;color:#718096">Especialista em metodologias ágeis, Scrum, Kanban e muito mais</div></div>
+      <div class="agente-layout">
+        <div class="agente-chat">
+          <div class="agente-msgs" id="agenteMsgs">
+            <div class="agente-msg bot"><div class="agente-bubble">Olá! Sou o Agente de IA especialista em projetos ágeis. Em breve poderei analisar suas sprints e ajudar com retrospectivas! 🚀</div></div>
+          </div>
+          <div class="agente-input-row">
+            <input class="agente-input" type="text" placeholder="Digite sua pergunta... (em breve)" disabled>
+            <button class="agente-send" disabled>Enviar</button>
+          </div>
+        </div>
+        <div class="agente-sidebar">
+          <div class="agente-box">
+            <div class="agente-box-titulo">📋 Contexto do Projeto</div>
+            <div class="agente-item" id="agenteCtxNome">—</div>
+            <div class="agente-item">Projeto Ágil</div>
+            <div class="agente-item" id="agenteCtxStatus">—</div>
+          </div>
+          <div class="agente-box">
+            <div class="agente-box-titulo">⚡ Ações Rápidas</div>
+            <div class="agente-item">📊 Analisar velocidade do time</div>
+            <div class="agente-item">🎯 Sugerir refinamento do backlog</div>
+            <div class="agente-item">💡 Identificar impedimentos</div>
+            <div class="agente-item">📝 Gerar resumo da sprint</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Estudo -->
+<div class="modal-overlay" id="modalEstudo">
+  <div class="modal" style="max-width:500px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header"><span class="modal-titulo">Novo Estudo de Caso</span><button class="btn-fechar" onclick="fecharModal('modalEstudo')">×</button></div>
+    <div class="form-group"><label>Título *</label><input type="text" id="estudoTitulo" placeholder="Título do estudo"></div>
+    <div class="form-group"><label>Método</label><input type="text" id="estudoMetodo" placeholder="Ex: PDCA, Kaizen..."></div>
+    <div class="form-group"><label>Responsável</label><input type="text" id="estudoResp" placeholder="Nome"></div>
+    <div class="form-group"><label>Data</label><input type="date" id="estudoData"></div>
+    <div class="form-group"><label>Descrição</label><textarea id="estudoConteudo" rows="4" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit"></textarea></div>
+    <input type="hidden" id="estudoEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalEstudo')">Cancelar</button><button class="btn-confirmar" onclick="salvarEstudo()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Sprint -->
+<div class="modal-overlay" id="modalSprint">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><span class="modal-titulo" id="modalSprintTitulo">Nova Sprint</span><button class="btn-fechar" onclick="fecharModal('modalSprint')">×</button></div>
+    <div class="form-group"><label>Nome da Sprint *</label><input type="text" id="sprintNome" placeholder="Ex: Sprint 1 — Setup Inicial"></div>
+    <div class="form-group"><label>Objetivo</label><input type="text" id="sprintObjetivo" placeholder="Objetivo principal da sprint"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Data de Início</label><input type="date" id="sprintInicio"></div>
+      <div class="form-group"><label>Data de Término</label><input type="date" id="sprintFim"></div>
+    </div>
+    <div class="form-group"><label>Status</label><select id="sprintStatus"><option>Pendente</option><option>Ativa</option><option>Concluída</option></select></div>
+    <input type="hidden" id="sprintEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalSprint')">Cancelar</button><button class="btn-confirmar" onclick="salvarSprint()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Backlog -->
+<div class="modal-overlay" id="modalBacklog">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><span class="modal-titulo">Novo Item no Backlog</span><button class="btn-fechar" onclick="fecharModal('modalBacklog')">×</button></div>
+    <div class="form-group"><label>Título *</label><input type="text" id="backlogTitulo" placeholder="Ex: Implementar login com Google"></div>
+    <div class="form-group"><label>Descrição</label><textarea id="backlogDesc" rows="3" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit" placeholder="Descreva o item..."></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Pontos</label><input type="number" id="backlogPts" placeholder="Story points" min="0"></div>
+      <div class="form-group"><label>Prioridade</label><select id="backlogPrioridade"><option>Alta</option><option>Média</option><option>Baixa</option></select></div>
+    </div>
+    <input type="hidden" id="backlogEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalBacklog')">Cancelar</button><button class="btn-confirmar" onclick="salvarBacklog()">Salvar</button></div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = '/';
+  const projetoId = localStorage.getItem('projetoAtual');
+  if (!projetoId) window.location.href = '/gestao-projetos';
+
+  let projeto = null;
+  let estudos = [];
+  let sprints = [];
+  let backlog = [];
+  let sprintBacklog = [];
+  let alocacao = [];
+  let kanbanCards = [];
+  let npsValue = null;
+  let retrospectivas = [];
+
+  async function carregarProjeto() {
+    try {
+      const res = await fetch(`/api/projetos/${projetoId}`, { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!res.ok) { window.location.href = '/gestao-projetos'; return; }
+      projeto = await res.json();
+      document.getElementById('projNome').textContent = projeto.nome;
+      document.getElementById('projResp').textContent = '👤 ' + (projeto.responsavel||'—');
+      document.getElementById('projArea').textContent = '📁 ' + (projeto.area||'—');
+      document.getElementById('projDatas').textContent = '📅 ' + (projeto.dataInicio ? new Date(projeto.dataInicio).toLocaleDateString('pt-BR') : '—') + ' → ' + (projeto.dataFim ? new Date(projeto.dataFim).toLocaleDateString('pt-BR') : '—');
+      document.getElementById('agenteCtxNome').textContent = projeto.nome;
+      document.getElementById('agenteCtxStatus').textContent = projeto.status;
+      const sb = document.getElementById('projStatusBadge');
+      const cores = { 'Ativo':'background:#f0fff4;color:#276749','Concluído':'background:#ebf0ff;color:#3b5bdb','Atrasado':'background:#fff5f5;color:#c53030','Pausado':'background:#fffaf0;color:#c05621' };
+      sb.textContent = projeto.status; sb.style.cssText = cores[projeto.status]||cores['Ativo'];
+      estudos = projeto.estudosCaso || [];
+      sprints = projeto.sprints || [];
+      backlog = (projeto.execucao||{}).backlog || [];
+      kanbanCards = (projeto.execucao||{}).kanban || [];
+      alocacao = (projeto.execucao||{}).alocacao || [];
+      retrospectivas = projeto.retrospectivas || [];
+      renderEstudos(); renderSprints(); renderBacklog(); renderKanban(); renderAlocacao(); renderNPS();
+      const sprintAtiva = sprints.find(s=>s.status==='Ativa');
+      if (sprintAtiva) {
+        document.getElementById('sprintAtivaNome').textContent = sprintAtiva.nome;
+        document.getElementById('execSprintNome').textContent = sprintAtiva.nome;
+      }
+      atualizarMetricas();
+    } catch(err) { console.error(err); }
+  }
+
+  function mudarTab(id, btn) {
+    document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
+    document.querySelectorAll('.proj-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-'+id).style.display='block';
+    btn.classList.add('active');
+  }
+
+  // Estudos
+  function usarTemplate(tipo) { document.getElementById('estudoMetodo').value=tipo; document.getElementById('estudoTitulo').value=''; document.getElementById('estudoConteudo').value=''; document.getElementById('estudoResp').value=''; document.getElementById('estudoData').value=new Date().toISOString().split('T')[0]; document.getElementById('estudoEditId').value=''; document.getElementById('modalEstudo').classList.add('aberto'); }
+  function abrirModalEstudo() { document.getElementById('estudoTitulo').value=''; document.getElementById('estudoMetodo').value=''; document.getElementById('estudoConteudo').value=''; document.getElementById('estudoResp').value=''; document.getElementById('estudoData').value=new Date().toISOString().split('T')[0]; document.getElementById('estudoEditId').value=''; document.getElementById('modalEstudo').classList.add('aberto'); }
+  function salvarEstudo() {
+    const titulo=document.getElementById('estudoTitulo').value.trim();
+    if(!titulo){alert('Título obrigatório');return;}
+    const id=document.getElementById('estudoEditId').value;
+    const dados={id:id||Date.now(),titulo,metodo:document.getElementById('estudoMetodo').value,responsavel:document.getElementById('estudoResp').value,data:document.getElementById('estudoData').value,conteudo:document.getElementById('estudoConteudo').value};
+    if(id){const idx=estudos.findIndex(e=>e.id==id);if(idx!==-1)estudos[idx]=dados;}else estudos.unshift(dados);
+    projeto.estudosCaso=estudos; salvarProjeto(); renderEstudos(); fecharModal('modalEstudo');
+  }
+  function renderEstudos() {
+    const lista=document.getElementById('estudosLista');
+    if(estudos.length===0){lista.innerHTML='<div style="text-align:center;padding:20px;color:#a0aec0;font-size:13px">Nenhum estudo criado ainda.</div>';return;}
+    lista.innerHTML=estudos.map(e=>`<div class="estudo-item"><div><div style="font-size:13px;font-weight:600;color:#1e2a4a">${e.titulo}</div><div style="font-size:11px;color:#a0aec0">${e.metodo||'—'} • ${e.responsavel||'—'}</div></div><div style="display:flex;gap:6px"><button onclick="editarEstudo(${e.id})" style="padding:4px 8px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px">✏️</button><button onclick="deletarEstudo(${e.id})" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:11px">🗑️</button></div></div>`).join('');
+  }
+  function editarEstudo(id){const e=estudos.find(e=>e.id===id);if(!e)return;document.getElementById('estudoTitulo').value=e.titulo;document.getElementById('estudoMetodo').value=e.metodo||'';document.getElementById('estudoResp').value=e.responsavel||'';document.getElementById('estudoData').value=e.data||'';document.getElementById('estudoConteudo').value=e.conteudo||'';document.getElementById('estudoEditId').value=e.id;document.getElementById('modalEstudo').classList.add('aberto');}
+  function deletarEstudo(id){if(!confirm('Deletar?'))return;estudos=estudos.filter(e=>e.id!==id);projeto.estudosCaso=estudos;salvarProjeto();renderEstudos();}
+
+  // Sprints
+  function abrirModalSprint(id) {
+    document.getElementById('modalSprintTitulo').textContent=id?'Editar Sprint':'Nova Sprint';
+    document.getElementById('sprintEditId').value=id||'';
+    if(id){const s=sprints.find(s=>s.id==id);if(s){document.getElementById('sprintNome').value=s.nome;document.getElementById('sprintObjetivo').value=s.objetivo||'';document.getElementById('sprintInicio').value=s.inicio||'';document.getElementById('sprintFim').value=s.fim||'';document.getElementById('sprintStatus').value=s.status;}}
+    else{document.getElementById('sprintNome').value='';document.getElementById('sprintObjetivo').value='';document.getElementById('sprintInicio').value='';document.getElementById('sprintFim').value='';document.getElementById('sprintStatus').value='Pendente';}
+    document.getElementById('modalSprint').classList.add('aberto');
+  }
+  function salvarSprint() {
+    const nome=document.getElementById('sprintNome').value.trim();
+    if(!nome){alert('Nome obrigatório');return;}
+    const id=document.getElementById('sprintEditId').value;
+    const dados={id:id||Date.now(),nome,objetivo:document.getElementById('sprintObjetivo').value,inicio:document.getElementById('sprintInicio').value,fim:document.getElementById('sprintFim').value,status:document.getElementById('sprintStatus').value};
+    if(id){const idx=sprints.findIndex(s=>s.id==id);if(idx!==-1)sprints[idx]=dados;}else sprints.push(dados);
+    projeto.sprints=sprints; salvarProjeto(); renderSprints(); fecharModal('modalSprint');
+    const sprintAtiva=sprints.find(s=>s.status==='Ativa');
+    if(sprintAtiva){document.getElementById('sprintAtivaNome').textContent=sprintAtiva.nome;document.getElementById('execSprintNome').textContent=sprintAtiva.nome;}
+  }
+  function renderSprints() {
+    const lista=document.getElementById('sprintsLista');
+    if(sprints.length===0){lista.innerHTML='<div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma sprint criada.</div>';return;}
+    const stCls={'Ativa':'sprint-ativa','Pendente':'sprint-pendente','Concluída':'sprint-concluida'};
+    lista.innerHTML=sprints.map(s=>`
+      <div class="sprint-card">
+        <div class="sprint-header">
+          <div><div class="sprint-nome">${s.nome}</div><div class="sprint-meta">${s.objetivo||'—'} • ${s.inicio?new Date(s.inicio).toLocaleDateString('pt-BR'):'—'} → ${s.fim?new Date(s.fim).toLocaleDateString('pt-BR'):'—'}</div></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="sprint-status ${stCls[s.status]||'sprint-pendente'}">${s.status}</span>
+            <button onclick="abrirModalSprint(${s.id})" style="padding:3px 8px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px">✏️</button>
+            <button onclick="deletarSprint(${s.id})" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:11px">🗑️</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+  function deletarSprint(id){if(!confirm('Deletar sprint?'))return;sprints=sprints.filter(s=>s.id!==id);projeto.sprints=sprints;salvarProjeto();renderSprints();}
+
+  // Backlog
+  function abrirModalBacklog(){document.getElementById('backlogTitulo').value='';document.getElementById('backlogDesc').value='';document.getElementById('backlogPts').value='';document.getElementById('backlogPrioridade').value='Alta';document.getElementById('backlogEditId').value='';document.getElementById('modalBacklog').classList.add('aberto');}
+  function salvarBacklog(){
+    const titulo=document.getElementById('backlogTitulo').value.trim();
+    if(!titulo){alert('Título obrigatório');return;}
+    const id=document.getElementById('backlogEditId').value;
+    const dados={id:id||Date.now(),titulo,desc:document.getElementById('backlogDesc').value,pts:document.getElementById('backlogPts').value,prioridade:document.getElementById('backlogPrioridade').value,sprint:false};
+    if(id){const idx=backlog.findIndex(b=>b.id==id);if(idx!==-1)backlog[idx]=dados;}else backlog.push(dados);
+    salvarExecucao();renderBacklog();fecharModal('modalBacklog');
+  }
+  function renderBacklog(){
+    const lista=document.getElementById('backlogLista');
+    const itens=backlog.filter(b=>!b.sprint);
+    if(itens.length===0){lista.innerHTML='<div style="text-align:center;padding:20px;color:#a0aec0;font-size:12px">Nenhum item no backlog.</div>';return;}
+    lista.innerHTML=itens.map(b=>`<div class="backlog-item" onclick="moverParaSprint(${b.id})"><span class="backlog-drag">☰</span><span class="backlog-nome">${b.titulo}</span>${b.pts?`<span class="backlog-pts">${b.pts}pts</span>`:''}</div>`).join('');
+    const lista2=document.getElementById('sprintBacklogLista');
+    const sprint=backlog.filter(b=>b.sprint);
+    if(sprint.length===0){lista2.innerHTML='<div style="text-align:center;padding:20px;color:#a0aec0;font-size:12px">Clique nos itens do backlog para adicionar.</div>';return;}
+    lista2.innerHTML=sprint.map(b=>`<div class="backlog-item selecionado" onclick="removerDaSprint(${b.id})"><span class="backlog-nome">${b.titulo}</span>${b.pts?`<span class="backlog-pts">${b.pts}pts</span>`:''}<span style="color:#c53030;font-size:11px">✕</span></div>`).join('');
+  }
+  function moverParaSprint(id){const b=backlog.find(b=>b.id===id);if(b){b.sprint=true;salvarExecucao();renderBacklog();}}
+  function removerDaSprint(id){const b=backlog.find(b=>b.id===id);if(b){b.sprint=false;salvarExecucao();renderBacklog();}}
+
+  // Alocação
+  function adicionarAlocacao(){alocacao.push({id:Date.now(),tarefa:'',responsavel:'',inicio:'',fim:'',complexidade:'Média',deps:'',status:'Pendente'});renderAlocacao();}
+  function renderAlocacao(){
+    const tbody=document.getElementById('alocacaoTbody');
+    tbody.innerHTML=alocacao.map((a,i)=>`
+      <tr>
+        <td><input value="${a.tarefa}" onchange="alocacao[${i}].tarefa=this.value" style="border:none;font-size:12px;background:none;outline:none;min-width:120px"></td>
+        <td><input value="${a.responsavel}" onchange="alocacao[${i}].responsavel=this.value" style="border:none;font-size:11px;background:none;outline:none;width:80px"></td>
+        <td><input type="date" value="${a.inicio}" onchange="alocacao[${i}].inicio=this.value" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:2px 4px"></td>
+        <td><input type="date" value="${a.fim}" onchange="alocacao[${i}].fim=this.value" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:2px 4px"></td>
+        <td><select onchange="alocacao[${i}].complexidade=this.value" style="padding:2px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${a.complexidade==='Baixa'?'selected':''}>Baixa</option><option ${a.complexidade==='Média'?'selected':''}>Média</option><option ${a.complexidade==='Alta'?'selected':''}>Alta</option></select></td>
+        <td><input value="${a.deps}" onchange="alocacao[${i}].deps=this.value" placeholder="—" style="border:none;font-size:11px;background:none;outline:none;width:80px"></td>
+        <td><select onchange="alocacao[${i}].status=this.value;renderAlocacao()" style="padding:2px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${a.status==='Pendente'?'selected':''}>Pendente</option><option ${a.status==='Em Andamento'?'selected':''}>Em Andamento</option><option ${a.status==='Concluída'?'selected':''}>Concluída</option></select></td>
+        <td><button onclick="alocacao.splice(${i},1);renderAlocacao()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:2px 6px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+  }
+
+  // Kanban
+  function adicionarKanban(coluna){
+    const titulo=prompt('Título da tarefa:');
+    if(!titulo)return;
+    kanbanCards.push({id:Date.now(),titulo,responsavel:'',coluna});
+    salvarExecucao();renderKanban();
+  }
+  function moverCard(id,novaColuna){
+    const card=kanbanCards.find(c=>c.id===id);
+    if(card){card.coluna=novaColuna;salvarExecucao();renderKanban();}
+  }
+  function renderKanban(){
+    const cols={a_fazer:[],em_progresso:[],concluido:[]};
+    kanbanCards.forEach(c=>{if(cols[c.coluna])cols[c.coluna].push(c);});
+    document.getElementById('cntFazer').textContent=cols.a_fazer.length;
+    document.getElementById('cntProg').textContent=cols.em_progresso.length;
+    document.getElementById('cntConcl').textContent=cols.concluido.length;
+    document.getElementById('kanbanAFazer').textContent=cols.a_fazer.length;
+    document.getElementById('kanbanEmProg').textContent=cols.em_progresso.length;
+    document.getElementById('kanbanConcluido').textContent=cols.concluido.length;
+    const renderCol=(cards,coluna)=>cards.map(c=>`
+      <div class="kanban-card">
+        <div class="kanban-card-titulo">${c.titulo}</div>
+        <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">
+          ${coluna!=='a_fazer'?`<button onclick="moverCard(${c.id},'a_fazer')" style="padding:2px 6px;background:#f0f2f5;border:none;border-radius:3px;cursor:pointer;font-size:10px">← A Fazer</button>`:''}
+          ${coluna!=='em_progresso'?`<button onclick="moverCard(${c.id},'em_progresso')" style="padding:2px 6px;background:#fffaf0;border:none;border-radius:3px;cursor:pointer;font-size:10px">Em Prog.</button>`:''}
+          ${coluna!=='concluido'?`<button onclick="moverCard(${c.id},'concluido')" style="padding:2px 6px;background:#f0fff4;border:none;border-radius:3px;cursor:pointer;font-size:10px">Concluído →</button>`:''}
+          <button onclick="deletarCard(${c.id})" style="padding:2px 6px;background:#fff5f5;border:none;border-radius:3px;cursor:pointer;font-size:10px;color:#c53030">✕</button>
+        </div>
+      </div>`).join('');
+    document.getElementById('colFazer').innerHTML=renderCol(cols.a_fazer,'a_fazer');
+    document.getElementById('colProgresso').innerHTML=renderCol(cols.em_progresso,'em_progresso');
+    document.getElementById('colConcluido').innerHTML=renderCol(cols.concluido,'concluido');
+    atualizarMetricas();
+  }
+  function deletarCard(id){if(!confirm('Remover?'))return;kanbanCards=kanbanCards.filter(c=>c.id!==id);salvarExecucao();renderKanban();}
+
+  function atualizarMetricas(){
+    const total=kanbanCards.length;
+    const concl=kanbanCards.filter(c=>c.coluna==='concluido').length;
+    const pend=kanbanCards.filter(c=>c.coluna!=='concluido').length;
+    document.getElementById('metricaEntregas').textContent=total?Math.round(concl/total*100)+'%':'0%';
+    document.getElementById('metricaConcl').textContent=concl;
+    document.getElementById('metricaPend').textContent=pend;
+    const pts=backlog.filter(b=>b.sprint).reduce((s,b)=>s+(parseInt(b.pts)||0),0);
+    document.getElementById('metricaVelocidade').textContent=pts;
+  }
+
+  // NPS
+  function renderNPS(){
+    const grid=document.getElementById('npsGrid');
+    grid.innerHTML=[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="nps-btn ${npsValue===n?'ativo':''}" onclick="selecionarNPS(${n})">${n}</button>`).join('');
+  }
+  function selecionarNPS(n){npsValue=n;renderNPS();}
+
+  function salvarExecucao(){
+    projeto.execucao = { backlog, kanban:kanbanCards, alocacao };
+    salvarProjeto();
+  }
+
+  async function salvarProjeto(){
+    try {
+      projeto.sprints=sprints;
+      projeto.estudosCaso=estudos;
+      projeto.execucao={backlog,kanban:kanbanCards,alocacao};
+      await fetch(`/api/projetos/${projetoId}`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(projeto)});
+    } catch(err){console.error(err);}
+  }
+
+  function exportarPDF(){window.print();}
+  function fecharModal(id){document.getElementById(id).classList.remove('aberto');}
+  document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('aberto');});});
+  function sair(){localStorage.removeItem('token');localStorage.removeItem('usuario');window.location.href='/';}
+
+  carregarProjeto();
+</script>
+</body>
+</html>

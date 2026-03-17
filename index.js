@@ -1,424 +1,287 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const express = require('express');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const path = require('path');
-const crypto = require('crypto');
-const SibApiV3Sdk = require('@getbrevo/brevo');
+const express = require("express");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const path = require("path");
+const crypto = require("crypto");
+
+const { TransactionalEmailsApi, SendSmtpEmail } = require("@getbrevo/brevo");
 
 const app = express();
 
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static("public"));
 
+/* ==========================
+   VERIFICA VARIÁVEIS
+========================== */
 
-// ==================== BREVO ====================
+const requiredEnv = ["MONGO_URI", "BREVO_API_KEY", "JWT_SECRET", "APP_URL"];
 
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+requiredEnv.forEach((env) => {
+  if (!process.env[env]) {
+    console.error(`ERRO: variável ${env} não definida`);
+    process.exit(1);
+  }
+});
 
-apiInstance.setApiKey(
-  SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY
-);
+/* ==========================
+   BREVO EMAIL
+========================== */
 
-async function enviarEmail(para, assunto, html) {
-  const email = new SibApiV3Sdk.SendSmtpEmail();
+const emailAPI = new TransactionalEmailsApi();
+emailAPI.authentications.apiKey.apiKey = process.env.BREVO_API_KEY;
 
-  email.to = [{ email: para }];
+async function enviarEmail(destino, assunto, html) {
+  try {
+    const email = new SendSmtpEmail();
 
-  email.sender = {
-    name: "HOC System",
-    email: "kalimacomplex@gmail.com"
-  };
+    email.subject = assunto;
+    email.htmlContent = html;
 
-  email.subject = assunto;
-  email.htmlContent = html;
+    email.sender = {
+      name: "HOC System",
+      email: "kalimacomplex@gmail.com",
+    };
 
-  return await apiInstance.sendTransacEmail(email);
+    email.to = [{ email: destino }];
+
+    const response = await emailAPI.sendTransacEmail(email);
+
+    console.log("Email enviado:", response.body);
+  } catch (err) {
+    console.error("Erro ao enviar email:", err.message);
+  }
 }
 
+/* ==========================
+   MONGODB
+========================== */
 
-// ==================== MONGODB ====================
-
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB conectado"))
-  .catch(err => console.log("Erro MongoDB:", err));
+  .catch((err) => {
+    console.error("Erro MongoDB:", err);
+    process.exit(1);
+  });
 
-
-// ==================== MODELS ====================
+/* ==========================
+   MODELS
+========================== */
 
 const empresaSchema = new mongoose.Schema({
   nome: { type: String, required: true, unique: true },
-  criadoEm: { type: Date, default: Date.now }
+  criadoEm: { type: Date, default: Date.now },
 });
 
-const Empresa = mongoose.model('Empresa', empresaSchema);
-
+const Empresa = mongoose.model("Empresa", empresaSchema);
 
 const usuarioSchema = new mongoose.Schema({
+  nome: String,
+  email: { type: String, unique: true },
+  senha: String,
 
-  nome: { type: String, required: true },
-
-  email: { type: String, required: true, unique: true },
-
-  senha: { type: String },
-
-  perfil: { type: String, default: 'Usuário' },
+  perfil: { type: String, default: "Usuário" },
 
   usuarioMestre: { type: Boolean, default: false },
 
-  status: { type: String, default: 'Ativo' },
+  status: { type: String, default: "Ativo" },
 
   empresa: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Empresa',
-    required: true
+    ref: "Empresa",
   },
 
   permissoes: {
-
-    acessoIndependente: { type: Boolean, default: false },
-
-    aprovacaoWikis: { type: Boolean, default: false },
-
-    aprovacaoIdeias: { type: Boolean, default: false },
-
-    gerenciamentoProjetos: { type: Boolean, default: false },
-
-    edicaoFluxoValor: { type: Boolean, default: false },
-
-    permissaoSeguranca: { type: Boolean, default: false }
-
+    acessoIndependente: Boolean,
+    aprovacaoWikis: Boolean,
+    aprovacaoIdeias: Boolean,
+    gerenciamentoProjetos: Boolean,
+    edicaoFluxoValor: Boolean,
+    permissaoSeguranca: Boolean,
   },
 
-  criadoEm: { type: Date, default: Date.now }
-
+  criadoEm: { type: Date, default: Date.now },
 });
 
-const Usuario = mongoose.model('Usuario', usuarioSchema);
-
+const Usuario = mongoose.model("Usuario", usuarioSchema);
 
 const conviteSchema = new mongoose.Schema({
-
-  email: { type: String, required: true },
+  email: String,
 
   empresa: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Empresa',
-    required: true
+    ref: "Empresa",
   },
 
-  token: { type: String, required: true },
+  token: String,
 
-  permissoes: { type: Object, default: {} },
+  permissoes: Object,
 
-  usuarioMestre: { type: Boolean, default: false },
+  usuarioMestre: Boolean,
 
   usado: { type: Boolean, default: false },
 
   expiraEm: {
     type: Date,
-    default: () => new Date(+new Date() + 48 * 60 * 60 * 1000)
-  }
-
+    default: () => new Date(Date.now() + 48 * 60 * 60 * 1000),
+  },
 });
 
-const Convite = mongoose.model('Convite', conviteSchema);
+const Convite = mongoose.model("Convite", conviteSchema);
 
+/* ==========================
+   AUTH MIDDLEWARE
+========================== */
 
-// ==================== MIDDLEWARE ====================
+function auth(req, res, next) {
+  const token = req.headers.authorization?.split(" ")[1];
 
-function authMiddleware(req, res, next) {
-
-  const token = req.headers.authorization?.split(' ')[1];
-
-  if (!token)
-    return res.status(401).json({ erro: 'Token não fornecido' });
+  if (!token) {
+    return res.status(401).json({ erro: "Token não fornecido" });
+  }
 
   try {
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'segredo123'
-    );
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.usuario = decoded;
 
     next();
-
   } catch {
-
-    res.status(401).json({ erro: 'Token inválido' });
-
+    res.status(401).json({ erro: "Token inválido" });
   }
-
 }
 
+/* ==========================
+   ROTAS HTML
+========================== */
 
-// ==================== PÁGINAS ====================
-
-app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'login.html'))
+app.get("/", (req, res) =>
+  res.sendFile(path.join(__dirname, "public/login.html"))
 );
 
-app.get('/cadastro', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'cadastro.html'))
+app.get("/cadastro", (req, res) =>
+  res.sendFile(path.join(__dirname, "public/cadastro.html"))
 );
 
-app.get('/dashboard', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'))
+app.get("/dashboard", (req, res) =>
+  res.sendFile(path.join(__dirname, "public/dashboard.html"))
 );
 
-app.get('/overview', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'overview.html'))
+app.get("/aceitar-convite", (req, res) =>
+  res.sendFile(path.join(__dirname, "public/aceitar-convite.html"))
 );
 
-app.get('/gestao-metas', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'gestao-metas.html'))
-);
+/* ==========================
+   CADASTRO
+========================== */
 
-app.get('/ideias-livres', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'ideias-livres.html'))
-);
-
-app.get('/aceitar-convite', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'aceitar-convite.html'))
-);
-
-app.get('/plano-usuarios', (req, res) =>
-  res.sendFile(path.join(__dirname, 'public', 'plano-usuarios.html'))
-);
-
-
-// ==================== CADASTRO ====================
-
-app.post('/api/cadastro', async (req, res) => {
-
+app.post("/api/cadastro", async (req, res) => {
   try {
-
     const { nome, email, senha, nomeEmpresa } = req.body;
 
     if (!nome || !email || !senha || !nomeEmpresa)
-      return res.status(400).json({ erro: "Preencha todos os campos" });
+      return res.status(400).json({ erro: "Campos obrigatórios" });
 
-    const emailExiste = await Usuario.findOne({ email });
+    const existe = await Usuario.findOne({ email });
 
-    if (emailExiste)
-      return res.status(400).json({ erro: "Email já cadastrado" });
+    if (existe) return res.status(400).json({ erro: "Email já cadastrado" });
 
     let empresa = await Empresa.findOne({ nome: nomeEmpresa });
 
-    if (!empresa)
-      empresa = await Empresa.create({ nome: nomeEmpresa });
+    if (!empresa) empresa = await Empresa.create({ nome: nomeEmpresa });
 
     const hash = await bcrypt.hash(senha, 10);
 
     await Usuario.create({
-
       nome,
       email,
       senha: hash,
-
       perfil: "Admin",
-
       usuarioMestre: true,
-
       empresa: empresa._id,
-
-      permissoes: {
-
-        acessoIndependente: true,
-        aprovacaoWikis: true,
-        aprovacaoIdeias: true,
-        gerenciamentoProjetos: true,
-        edicaoFluxoValor: true,
-        permissaoSeguranca: true
-
-      }
-
     });
 
-    res.status(201).json({ mensagem: "Conta criada com sucesso!" });
-
+    res.json({ mensagem: "Conta criada com sucesso" });
   } catch (err) {
-
-    res.status(400).json({ erro: err.message });
-
+    res.status(500).json({ erro: err.message });
   }
-
 });
 
+/* ==========================
+   LOGIN
+========================== */
 
-// ==================== LOGIN ====================
-
-app.post('/api/login', async (req, res) => {
-
+app.post("/api/login", async (req, res) => {
   try {
-
     const { email, senha } = req.body;
 
-    const usuario = await Usuario
-      .findOne({ email })
-      .populate("empresa");
+    const usuario = await Usuario.findOne({ email }).populate("empresa");
 
     if (!usuario)
       return res.status(400).json({ erro: "Email ou senha incorretos" });
 
-    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+    const ok = await bcrypt.compare(senha, usuario.senha);
 
-    if (!senhaCorreta)
+    if (!ok)
       return res.status(400).json({ erro: "Email ou senha incorretos" });
 
-    const token = jwt.sign({
-
-      id: usuario._id,
-
-      nome: usuario.nome,
-
-      email: usuario.email,
-
-      perfil: usuario.perfil,
-
-      empresa: usuario.empresa._id,
-
-      empresaNome: usuario.empresa.nome
-
-    },
-      process.env.JWT_SECRET || "segredo123",
+    const token = jwt.sign(
+      {
+        id: usuario._id,
+        empresa: usuario.empresa._id,
+        nome: usuario.nome,
+      },
+      process.env.JWT_SECRET,
       { expiresIn: "8h" }
     );
 
-    res.json({
-
-      token,
-
-      usuario: {
-
-        nome: usuario.nome,
-        email: usuario.email,
-        perfil: usuario.perfil,
-        empresaNome: usuario.empresa.nome
-
-      }
-
-    });
-
+    res.json({ token, usuario });
   } catch (err) {
-
     res.status(500).json({ erro: err.message });
-
   }
-
 });
 
+/* ==========================
+   CONVITES
+========================== */
 
-// ==================== CONVITES ====================
-
-app.post('/api/convites', authMiddleware, async (req, res) => {
-
+app.post("/api/convites", auth, async (req, res) => {
   try {
-
-    const { email, usuarioMestre, permissoes } = req.body;
-
-    if (!email)
-      return res.status(400).json({ erro: "Email obrigatório" });
-
-    const usuarioExiste = await Usuario.findOne({ email });
-
-    if (usuarioExiste)
-      return res.status(400).json({ erro: "Este email já possui conta" });
+    const { email } = req.body;
 
     const token = crypto.randomBytes(32).toString("hex");
 
     await Convite.create({
-
       email,
       empresa: req.usuario.empresa,
       token,
-      usuarioMestre: usuarioMestre || false,
-      permissoes: permissoes || {}
-
     });
 
     const link = `${process.env.APP_URL}/aceitar-convite?token=${token}`;
 
     await enviarEmail(
       email,
-      "Convite para HOC System",
-      `
-      <h2>Você foi convidado</h2>
-      <p>Clique no link abaixo para entrar:</p>
-      <a href="${link}">Aceitar convite</a>
-      <p>Este link expira em 48 horas</p>
-      `
+      "Convite HOC System",
+      `<h2>Você foi convidado</h2>
+       <a href="${link}">Aceitar convite</a>`
     );
 
-    res.json({ mensagem: "Convite enviado com sucesso!" });
-
+    res.json({ mensagem: "Convite enviado" });
   } catch (err) {
-
     res.status(500).json({ erro: err.message });
-
   }
-
 });
 
-
-// ==================== ACEITAR CONVITE ====================
-
-app.post('/api/convites/:token/aceitar', async (req, res) => {
-
-  try {
-
-    const { nome, senha } = req.body;
-
-    const convite = await Convite
-      .findOne({ token: req.params.token, usado: false })
-      .populate("empresa");
-
-    if (!convite)
-      return res.status(404).json({ erro: "Convite inválido" });
-
-    if (new Date() > convite.expiraEm)
-      return res.status(400).json({ erro: "Convite expirado" });
-
-    const hash = await bcrypt.hash(senha, 10);
-
-    await Usuario.create({
-
-      nome,
-      email: convite.email,
-      senha: hash,
-      empresa: convite.empresa._id,
-
-      usuarioMestre: convite.usuarioMestre,
-
-      perfil: convite.usuarioMestre ? "Admin" : "Usuário",
-
-      permissoes: convite.permissoes
-
-    });
-
-    convite.usado = true;
-    await convite.save();
-
-    res.json({ mensagem: "Conta criada com sucesso!" });
-
-  } catch (err) {
-
-    res.status(400).json({ erro: err.message });
-
-  }
-
-});
-
-
-// ==================== SERVIDOR ====================
+/* ==========================
+   SERVIDOR
+========================== */
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+  console.log("Servidor rodando na porta", PORT);
 });

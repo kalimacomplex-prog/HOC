@@ -11,6 +11,6 @@
     "dotenv": "^16.0.0",
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.0",
-    "@getbrevo/brevo": "^2.0.0"
+    "node-fetch": "^2.7.0"
   }
 }

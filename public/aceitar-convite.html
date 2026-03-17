@@ -6,255 +6,80 @@
   <title>HOC - Aceitar Convite</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
-      display: flex;
-      min-height: 100vh;
-    }
-
-    .left-panel {
-      width: 420px;
-      background: #1e2a4a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: white;
-    }
-
-    .logo {
-      width: 80px;
-      height: 80px;
-      background: #3b5bdb;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 24px;
-    }
-
-    .left-panel h1 {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    .left-panel p {
-      font-size: 14px;
-      color: #a0aec0;
-      text-align: center;
-      line-height: 1.6;
-    }
-
-    .right-panel {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 48px 40px;
-      width: 100%;
-      max-width: 440px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    }
-
-    .card h2 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1e2a4a;
-      margin-bottom: 8px;
-    }
-
-    .card p {
-      font-size: 14px;
-      color: #718096;
-      margin-bottom: 32px;
-    }
-
-    .empresa-badge {
-      display: inline-block;
-      background: #ebf0ff;
-      color: #3b5bdb;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 24px;
-    }
-
-    .form-group { margin-bottom: 20px; }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #1e2a4a;
-      margin-bottom: 8px;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #1e2a4a;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input:focus { border-color: #3b5bdb; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+    .left-panel { width: 400px; background: #2d1b69; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: white; }
+    .left-panel h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+    .left-panel p { font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; line-height: 1.6; }
+    .logo { width: 72px; height: 72px; background: rgba(255,255,255,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px; }
+    .right-panel { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+    .card { background: white; border-radius: 12px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+    .card h2 { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: #718096; margin-bottom: 24px; }
+    .empresa-badge { display: inline-block; background: #f5f0ff; color: #2d1b69; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 5px; }
+    input { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e2a4a; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #2d1b69; }
     input:disabled { background: #f8fafc; color: #a0aec0; }
-
-    .btn {
-      width: 100%;
-      padding: 14px;
-      background: #3b5bdb;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background 0.2s;
-    }
-
-    .btn:hover { background: #2f4ac0; }
+    .senha-forca { height: 3px; border-radius: 2px; margin-top: 6px; background: #e2e8f0; transition: all 0.3s; }
+    .btn { width: 100%; padding: 12px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 4px; }
+    .btn:hover { background: #3d2b89; }
     .btn:disabled { background: #a0aec0; cursor: not-allowed; }
-
-    .erro {
-      background: #fff5f5;
-      border: 1px solid #feb2b2;
-      color: #c53030;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .sucesso {
-      background: #f0fff4;
-      border: 1px solid #9ae6b4;
-      color: #276749;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: #718096;
-    }
-
-    .senha-forca {
-      height: 4px;
-      border-radius: 2px;
-      margin-top: 8px;
-      background: #e2e8f0;
-      transition: all 0.3s;
-    }
-
-    @media (max-width: 768px) {
-      .left-panel { display: none; }
-    }
+    .link { text-align: center; margin-top: 18px; font-size: 13px; }
+    .link a { color: #2d1b69; font-weight: 600; text-decoration: none; }
+    .erro { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 14px; display: none; }
+    .sucesso { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 14px; display: none; }
+    .loading { text-align: center; padding: 32px; color: #718096; font-size: 13px; }
+    @media (max-width: 768px) { .left-panel { display: none; } }
   </style>
 </head>
 <body>
   <div class="left-panel">
     <div class="logo">H</div>
-    <h1>HOC System</h1>
+    <h1>Business Manager</h1>
     <p>Você foi convidado para colaborar em um projeto incrível!</p>
   </div>
-
   <div class="right-panel">
     <div class="card" id="cardConvite">
       <div class="loading">Verificando convite...</div>
     </div>
   </div>
-
   <script>
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
     async function carregarConvite() {
       const card = document.getElementById('cardConvite');
-
       if (!token) {
-        card.innerHTML = `
-          <h2>Convite inválido</h2>
-          <p>Este link de convite não é válido.</p>
-          <a href="/" style="color:#3b5bdb">Voltar ao login</a>
-        `;
+        card.innerHTML = `<h2>Convite inválido</h2><p>Este link não é válido.</p><div class="link"><a href="/">Voltar ao login</a></div>`;
         return;
       }
-
       try {
         const res = await fetch(`/api/convites/${token}`);
         const data = await res.json();
-
         if (!res.ok) {
-          card.innerHTML = `
-            <h2>Convite inválido</h2>
-            <p>${data.erro}</p>
-            <a href="/" style="color:#3b5bdb">Voltar ao login</a>
-          `;
+          card.innerHTML = `<h2>Convite inválido</h2><p>${data.erro}</p><div class="link"><a href="/">Voltar ao login</a></div>`;
           return;
         }
-
         card.innerHTML = `
           <h2>Aceitar convite</h2>
           <p>Complete seu cadastro para começar.</p>
           <div class="empresa-badge">🏢 ${data.empresa}</div>
-
           <div class="erro" id="erro"></div>
           <div class="sucesso" id="sucesso"></div>
-
+          <div class="form-group"><label>Nome completo *</label><input type="text" id="nome" placeholder="Seu nome completo"></div>
+          <div class="form-group"><label>Email</label><input type="email" id="email" value="${data.email}" disabled></div>
           <div class="form-group">
-            <label>Nome completo</label>
-            <input type="text" id="nome" placeholder="Seu nome completo">
-          </div>
-
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="email" value="${data.email}" disabled>
-          </div>
-
-          <div class="form-group">
-            <label>Senha</label>
+            <label>Senha *</label>
             <input type="password" id="senha" placeholder="Mínimo 6 caracteres" oninput="verificarSenha()">
             <div class="senha-forca" id="forcaBarra"></div>
           </div>
-
-          <div class="form-group">
-            <label>Confirmar senha</label>
-            <input type="password" id="confirmarSenha" placeholder="Repita a senha">
-          </div>
-
+          <div class="form-group"><label>Confirmar senha *</label><input type="password" id="confirmarSenha" placeholder="Repita a senha"></div>
           <button class="btn" id="btnAceitar" onclick="aceitar()">Criar minha conta</button>
+          <div class="link"><a href="/">Já tenho conta</a></div>
         `;
-
-      } catch (err) {
-        card.innerHTML = `
-          <h2>Erro</h2>
-          <p>Não foi possível verificar o convite. Tente novamente.</p>
-          <a href="/" style="color:#3b5bdb">Voltar ao login</a>
-        `;
+      } catch(err) {
+        card.innerHTML = `<h2>Erro</h2><p>Não foi possível verificar o convite.</p><div class="link"><a href="/">Voltar ao login</a></div>`;
       }
     }
 
@@ -274,58 +99,18 @@
       const btn = document.getElementById('btnAceitar');
       const erro = document.getElementById('erro');
       const sucesso = document.getElementById('sucesso');
-
-      erro.style.display = 'none';
-      sucesso.style.display = 'none';
-
-      if (!nome || !senha || !confirmarSenha) {
-        erro.textContent = 'Preencha todos os campos.';
-        erro.style.display = 'block';
-        return;
-      }
-
-      if (senha.length < 6) {
-        erro.textContent = 'A senha deve ter no mínimo 6 caracteres.';
-        erro.style.display = 'block';
-        return;
-      }
-
-      if (senha !== confirmarSenha) {
-        erro.textContent = 'As senhas não coincidem.';
-        erro.style.display = 'block';
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = 'Criando conta...';
-
+      erro.style.display = 'none'; sucesso.style.display = 'none';
+      if (!nome || !senha || !confirmarSenha) { erro.textContent = 'Preencha todos os campos.'; erro.style.display = 'block'; return; }
+      if (senha.length < 6) { erro.textContent = 'A senha deve ter no mínimo 6 caracteres.'; erro.style.display = 'block'; return; }
+      if (senha !== confirmarSenha) { erro.textContent = 'As senhas não coincidem.'; erro.style.display = 'block'; return; }
+      btn.disabled = true; btn.textContent = 'Criando conta...';
       try {
-        const res = await fetch(`/api/convites/${token}/aceitar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome, senha })
-        });
-
+        const res = await fetch(`/api/convites/${token}/aceitar`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nome, senha }) });
         const data = await res.json();
-
-        if (!res.ok) {
-          erro.textContent = data.erro || 'Erro ao criar conta.';
-          erro.style.display = 'block';
-          btn.disabled = false;
-          btn.textContent = 'Criar minha conta';
-          return;
-        }
-
-        sucesso.textContent = 'Conta criada! Redirecionando para o login...';
-        sucesso.style.display = 'block';
+        if (!res.ok) { erro.textContent = data.erro || 'Erro ao criar conta.'; erro.style.display = 'block'; btn.disabled = false; btn.textContent = 'Criar minha conta'; return; }
+        sucesso.textContent = 'Conta criada! Redirecionando para o login...'; sucesso.style.display = 'block';
         setTimeout(() => window.location.href = '/', 2000);
-
-      } catch (err) {
-        erro.textContent = 'Erro de conexão. Tente novamente.';
-        erro.style.display = 'block';
-        btn.disabled = false;
-        btn.textContent = 'Criar minha conta';
-      }
+      } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; btn.disabled = false; btn.textContent = 'Criar minha conta'; }
     }
 
     carregarConvite();

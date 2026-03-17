@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const crypto = require('crypto');
-const SibApiV3Sdk = require('@getbrevo/brevo');
+const fetch = require('node-fetch');
 
 const app = express();
 app.use(express.json());
@@ -13,16 +13,28 @@ app.use(express.static('public'));
 
 // ==================== BREVO ====================
 
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-apiInstance.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
-
 async function enviarEmail(para, assunto, html) {
-  const email = new SibApiV3Sdk.SendSmtpEmail();
-  email.to = [{ email: para }];
-  email.sender = { name: 'HOC System', email: 'kalimacomplex@gmail.com' };
-  email.subject = assunto;
-  email.htmlContent = html;
-  return apiInstance.sendTransacEmail(email);
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        sender: { name: 'HOC System', email: 'kalimacomplex@gmail.com' },
+        to: [{ email: para }],
+        subject: assunto,
+        htmlContent: html
+      })
+    });
+    const data = await response.json();
+    console.log('Email enviado:', data);
+    return data;
+  } catch (err) {
+    console.error('Erro ao enviar email:', err);
+  }
 }
 
 // ==================== MONGODB ====================

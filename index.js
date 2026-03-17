@@ -66,23 +66,16 @@ const projetoSchema = new mongoose.Schema({
   dataFim: { type: String, default: '' },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  // TAP
   tap: { type: Object, default: {} },
-  // Estudos de Caso
   estudosCaso: { type: Array, default: [] },
-  // Planejamento
   escopo: { type: Object, default: {} },
   cronograma: { type: Array, default: [] },
   recursos: { type: Object, default: {} },
   riscos: { type: Array, default: [] },
   qualidade: { type: Object, default: {} },
-  // Change Request
   changeRequests: { type: Array, default: [] },
-  // Execução
   execucao: { type: Object, default: {} },
-  // Encerramento
   encerramento: { type: Object, default: {} },
-  // Ágil
   sprints: { type: Array, default: [] },
   backlog: { type: Array, default: [] },
   retrospectivas: { type: Array, default: [] },
@@ -121,6 +114,8 @@ app.get('/overview', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/gestao-metas', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-metas.html')));
 app.get('/ideias-livres', (req, res) => res.sendFile(path.join(__dirname, 'public', 'ideias-livres.html')));
 app.get('/gestao-projetos', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-projetos.html')));
+app.get('/projeto-tradicional', (req, res) => res.sendFile(path.join(__dirname, 'public', 'projeto-tradicional.html')));
+app.get('/projeto-agil', (req, res) => res.sendFile(path.join(__dirname, 'public', 'projeto-agil.html')));
 app.get('/aceitar-convite', (req, res) => res.sendFile(path.join(__dirname, 'public', 'aceitar-convite.html')));
 app.get('/plano-usuarios', (req, res) => res.sendFile(path.join(__dirname, 'public', 'plano-usuarios.html')));
 
@@ -225,10 +220,8 @@ app.post('/api/convites/:token/aceitar', async (req, res) => {
 // ==================== PROJETOS ====================
 
 app.get('/api/projetos', authMiddleware, async (req, res) => {
-  try {
-    const projetos = await Projeto.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 });
-    res.json(projetos);
-  } catch (err) { res.status(500).json({ erro: err.message }); }
+  try { const projetos = await Projeto.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(projetos); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 app.get('/api/projetos/:id', authMiddleware, async (req, res) => {
@@ -269,10 +262,8 @@ app.delete('/api/projetos/:id', authMiddleware, async (req, res) => {
 // ==================== TEMPLATES ====================
 
 app.get('/api/templates', authMiddleware, async (req, res) => {
-  try {
-    const templates = await Template.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 });
-    res.json(templates);
-  } catch (err) { res.status(500).json({ erro: err.message }); }
+  try { const templates = await Template.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(templates); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 app.post('/api/templates', authMiddleware, async (req, res) => {

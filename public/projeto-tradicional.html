@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Projeto Tradicional</title>
+  <link rel="stylesheet" href="style-global.css">
+  <style>
+    /* Header do projeto */
+    .proj-header { background: white; padding: 14px 28px; border-bottom: 1px solid #f0f2f5; }
+    .proj-breadcrumb { font-size: 11px; color: #a0aec0; margin-bottom: 6px; }
+    .proj-breadcrumb a { color: #2d1b69; text-decoration: none; }
+    .proj-title-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .proj-nome { font-size: 20px; font-weight: 700; color: #1e2a4a; }
+    .proj-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .proj-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 3px; }
+    .proj-meta-row { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+    .proj-meta-item { font-size: 11px; color: #a0aec0; display: flex; align-items: center; gap: 4px; }
+    .proj-acoes { margin-left: auto; display: flex; gap: 8px; }
+
+    /* Tabs do projeto */
+    .proj-tabs { background: white; padding: 0 28px; border-bottom: 2px solid #e2e8f0; display: flex; gap: 2px; overflow-x: auto; }
+    .proj-tab { padding: 12px 16px; font-size: 12px; font-weight: 500; cursor: pointer; color: #718096; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; transition: all 0.2s; }
+    .proj-tab:hover { color: #2d1b69; }
+    .proj-tab.active { color: #2d1b69; border-bottom-color: #2d1b69; font-weight: 600; }
+
+    /* Content */
+    .proj-content { padding: 24px 28px; }
+
+    /* TAP */
+    .tap-section { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; }
+    .tap-section-title { font-size: 14px; font-weight: 700; color: #2d1b69; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #f5f0ff; display: flex; align-items: center; gap: 8px; }
+    .tap-section-num { width: 22px; height: 22px; background: #2d1b69; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .tap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tap-field { margin-bottom: 12px; }
+    .tap-label { font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .tap-value { font-size: 13px; color: #1e2a4a; line-height: 1.5; }
+    .tap-input { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; }
+    .tap-input:focus { border-color: #2d1b69; }
+    .tap-textarea { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 70px; }
+    .tap-textarea:focus { border-color: #2d1b69; }
+    .tap-acoes { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
+
+    /* Tags chips */
+    .chips-container { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; transition: all 0.2s; }
+    .chip.ativo { border-color: #2d1b69; background: #f5f0ff; color: #2d1b69; }
+    .chip-add { padding: 4px 10px; border: 1.5px dashed #e2e8f0; border-radius: 20px; font-size: 11px; color: #a0aec0; cursor: pointer; background: none; }
+    .chip-add:hover { border-color: #2d1b69; color: #2d1b69; }
+
+    /* Tabela TAP */
+    .tap-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .tap-table th { padding: 8px 12px; background: #f5f0ff; color: #2d1b69; font-weight: 600; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .tap-table td { padding: 8px 12px; border-bottom: 1px solid #f8fafc; color: #1e2a4a; }
+    .tap-table tr:last-child td { border-bottom: none; }
+    .tap-table tr:hover td { background: #f8fafc; }
+    .btn-add-row { display: flex; align-items: center; gap: 5px; padding: 6px 12px; background: #f5f0ff; color: #2d1b69; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn-add-row:hover { background: #ede9fe; }
+
+    /* Marco timeline */
+    .marcos-lista { display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 8px 0; }
+    .marco-item { display: flex; flex-direction: column; align-items: center; position: relative; min-width: 120px; }
+    .marco-linha { position: absolute; top: 14px; left: 50%; width: 100%; height: 2px; background: #e2e8f0; z-index: 0; }
+    .marco-circulo { width: 28px; height: 28px; border-radius: 50%; background: #2d1b69; border: 3px solid white; box-shadow: 0 0 0 2px #2d1b69; z-index: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; font-weight: 700; }
+    .marco-data { font-size: 10px; color: #a0aec0; margin-top: 4px; }
+    .marco-nome { font-size: 11px; font-weight: 600; color: #1e2a4a; text-align: center; margin-top: 2px; max-width: 100px; }
+
+    /* Riscos */
+    .risco-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px; }
+    .risco-prob { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 3px; min-width: 50px; text-align: center; }
+    .prob-alto { background: #fff5f5; color: #c53030; }
+    .prob-medio { background: #fffaf0; color: #c05621; }
+    .prob-baixo { background: #f0fff4; color: #276749; }
+
+    /* Kanban execução */
+    .kanban { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .kanban-col { background: #f8fafc; border-radius: 10px; padding: 14px; min-height: 300px; }
+    .kanban-col-header { font-size: 12px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .kanban-count { background: #e2e8f0; color: #718096; padding: 1px 6px; border-radius: 10px; font-size: 11px; }
+    .kanban-card { background: white; border-radius: 8px; padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 8px; cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; }
+    .kanban-card:hover { border-color: #2d1b69; }
+    .kanban-card-titulo { font-size: 12px; font-weight: 600; color: #1e2a4a; margin-bottom: 4px; }
+    .kanban-card-meta { font-size: 11px; color: #a0aec0; }
+
+    /* Change request */
+    .cr-card { background: white; border-radius: 8px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 10px; border-left: 3px solid #2d1b69; }
+    .cr-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .cr-titulo { font-size: 13px; font-weight: 700; color: #1e2a4a; }
+    .cr-meta { font-size: 11px; color: #718096; }
+
+    /* Agente IA */
+    .agente-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+    .agente-chat { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .agente-msgs { height: 360px; overflow-y: auto; padding: 16px; background: #f8fafc; }
+    .agente-msg { margin-bottom: 10px; display: flex; gap: 8px; }
+    .agente-msg.user { flex-direction: row-reverse; }
+    .agente-bubble { padding: 10px 14px; border-radius: 10px; font-size: 13px; max-width: 75%; line-height: 1.5; }
+    .agente-msg.bot .agente-bubble { background: white; color: #1e2a4a; border: 1px solid #e2e8f0; }
+    .agente-msg.user .agente-bubble { background: #2d1b69; color: white; }
+    .agente-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #e2e8f0; }
+    .agente-input { flex: 1; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
+    .agente-input:focus { border-color: #2d1b69; }
+    .agente-send { padding: 8px 16px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; opacity: 0.5; }
+    .agente-sidebar { display: flex; flex-direction: column; gap: 12px; }
+    .agente-box { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .agente-box-titulo { font-size: 12px; font-weight: 700; color: #1e2a4a; margin-bottom: 10px; }
+    .agente-item { font-size: 12px; color: #4a5568; padding: 6px 8px; background: #f8fafc; border-radius: 6px; margin-bottom: 4px; cursor: pointer; }
+    .agente-item:hover { background: #f0f2f5; }
+
+    /* Escopo WBS */
+    .wbs-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .wbs-toolbar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .wbs-canvas { position: relative; min-height: 400px; overflow: auto; }
+    .wbs-node { position: absolute; background: white; border: 2px solid #2d1b69; border-radius: 8px; padding: 10px 14px; font-size: 12px; font-weight: 600; color: #1e2a4a; cursor: move; min-width: 140px; text-align: center; user-select: none; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .wbs-node.nivel-0 { background: #2d1b69; color: white; border-color: #2d1b69; }
+    .wbs-node.nivel-1 { border-color: #6b46c1; color: #6b46c1; }
+    .wbs-node.nivel-2 { border-color: #a0aec0; color: #4a5568; font-weight: 500; }
+    .wbs-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+
+    /* Gantt */
+    .gantt-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow-x: auto; }
+    .gantt-table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 800px; }
+    .gantt-table th { padding: 7px 10px; background: #f5f0ff; color: #2d1b69; font-weight: 600; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+    .gantt-table td { padding: 7px 10px; border-bottom: 1px solid #f8fafc; }
+    .gantt-bar-container { position: relative; height: 20px; background: #f0f2f5; border-radius: 4px; overflow: hidden; }
+    .gantt-bar { height: 100%; background: #2d1b69; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; font-weight: 600; min-width: 20px; transition: width 0.3s; }
+
+    /* Encerramento */
+    .enc-section { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 14px; }
+
+    /* Estudos de caso */
+    .template-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap: 12px; margin-bottom: 20px; }
+    .template-card { border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; text-align: center; }
+    .template-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .template-card.kaizen { background: linear-gradient(135deg,#667eea,#764ba2); color: white; }
+    .template-card.pdca { background: linear-gradient(135deg,#f093fb,#f5576c); color: white; }
+    .template-card.masp { background: linear-gradient(135deg,#4facfe,#00f2fe); color: white; }
+    .template-card.a3 { background: linear-gradient(135deg,#43e97b,#38f9d7); color: white; }
+    .template-card.ishikawa { background: linear-gradient(135deg,#fa709a,#fee140); color: white; }
+    .template-card.dmaic { background: linear-gradient(135deg,#a18cd1,#fbc2eb); color: white; }
+    .template-card.swot { background: linear-gradient(135deg,#ffecd2,#fcb69f); color: #1e2a4a; }
+    .template-card.custom { background: #f5f0ff; color: #2d1b69; border: 2px dashed #2d1b69; }
+    .template-nome { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .template-desc { font-size: 10px; opacity: 0.85; }
+    .estudo-item { background: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+    .estudo-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; }
+    .estudo-meta { font-size: 11px; color: #a0aec0; }
+
+    /* Export */
+    .btn-export { padding: 7px 14px; background: #1e2a4a; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-export:hover { background: #2d3e6a; }
+
+    /* Sub-tabs planejamento */
+    .sub-tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+    .sub-tab { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; color: #718096; border: 1.5px solid #e2e8f0; background: white; transition: all 0.2s; }
+    .sub-tab:hover { border-color: #2d1b69; color: #2d1b69; }
+    .sub-tab.active { background: #2d1b69; color: white; border-color: #2d1b69; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
+    <span class="logo-text">Business Manager</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
+    <a class="menu-item active" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Header fixo do projeto -->
+  <div class="proj-header">
+    <div class="proj-breadcrumb"><a href="/gestao-projetos">← Gestão de Projetos</a> / Projeto Tradicional</div>
+    <div class="proj-title-row">
+      <div class="proj-nome" id="projNome">Carregando...</div>
+      <div class="proj-badges">
+        <span class="proj-badge tipo-tradicional">Tradicional</span>
+        <span class="proj-badge" id="projStatusBadge" style="background:#f0fff4;color:#276749">Ativo</span>
+      </div>
+      <div class="proj-acoes">
+        <button class="btn-export" onclick="exportarPDF()">📄 Exportar PDF</button>
+        <button class="btn-primary" onclick="salvarProjeto()" style="font-size:12px;padding:7px 14px">💾 Salvar</button>
+      </div>
+    </div>
+    <div class="proj-meta-row">
+      <span class="proj-meta-item" id="projResp">👤 —</span>
+      <span class="proj-meta-item" id="projArea">📁 —</span>
+      <span class="proj-meta-item" id="projDatas">📅 —</span>
+    </div>
+  </div>
+
+  <!-- Tabs principais -->
+  <div class="proj-tabs">
+    <button class="proj-tab active" onclick="mudarTab('estudo',this)">Estudo de Caso</button>
+    <button class="proj-tab" onclick="mudarTab('tap',this)">Iniciação / TAP</button>
+    <button class="proj-tab" onclick="mudarTab('planejamento',this)">Planejamento</button>
+    <button class="proj-tab" onclick="mudarTab('change',this)">Change Request</button>
+    <button class="proj-tab" onclick="mudarTab('execucao',this)">Execução</button>
+    <button class="proj-tab" onclick="mudarTab('encerramento',this)">Encerramento</button>
+    <button class="proj-tab" onclick="mudarTab('agente',this)">🤖 Agente de IA</button>
+  </div>
+
+  <div class="proj-content">
+
+    <!-- ESTUDO DE CASO -->
+    <div id="tab-estudo">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#1e2a4a">Estudo de Caso</div>
+          <div style="font-size:12px;color:#718096">Selecione um template para análise de causa raiz antes de iniciar o projeto</div>
+        </div>
+        <button class="btn-primary" onclick="abrirModalEstudo()" style="font-size:12px;padding:7px 14px">+ Novo Estudo de Caso</button>
+      </div>
+      <div class="template-grid">
+        <div class="template-card kaizen" onclick="usarTemplate('Kaizen')">
+          <div class="template-nome">Kaizen Charter</div>
+          <div class="template-desc">Melhoria contínua e rápida</div>
+        </div>
+        <div class="template-card pdca" onclick="usarTemplate('PDCA')">
+          <div class="template-nome">PDCA</div>
+          <div class="template-desc">Plan, Do, Check, Act</div>
+        </div>
+        <div class="template-card masp" onclick="usarTemplate('MASP')">
+          <div class="template-nome">MASP</div>
+          <div class="template-desc">Método de análise e solução</div>
+        </div>
+        <div class="template-card a3" onclick="usarTemplate('A3 Thinking')">
+          <div class="template-nome">A3 Thinking</div>
+          <div class="template-desc">Relatório A3 Toyota</div>
+        </div>
+        <div class="template-card ishikawa" onclick="usarTemplate('Ishikawa')">
+          <div class="template-nome">Ishikawa</div>
+          <div class="template-desc">Diagrama espinha de peixe</div>
+        </div>
+        <div class="template-card dmaic" onclick="usarTemplate('DMAIC')">
+          <div class="template-nome">DMAIC</div>
+          <div class="template-desc">Define, Measure, Analyze...</div>
+        </div>
+        <div class="template-card swot" onclick="usarTemplate('SWOT')">
+          <div class="template-nome">SWOT</div>
+          <div class="template-desc">Forças, Fraquezas, Oport...</div>
+        </div>
+        <div class="template-card custom" onclick="abrirModalEstudo()">
+          <div style="font-size:24px;margin-bottom:6px">+</div>
+          <div class="template-nome">Novo Template</div>
+          <div class="template-desc">Criar do zero</div>
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:10px">Estudos de Caso Salvos</div>
+      <div id="estudosLista"><div style="color:#a0aec0;font-size:13px;padding:20px;text-align:center">Nenhum estudo de caso criado ainda.</div></div>
+    </div>
+
+    <!-- TAP -->
+    <div id="tab-tap" style="display:none">
+      <div class="tap-acoes">
+        <button class="btn-secondary" id="btnEditarTAP" onclick="toggleTAP()" style="font-size:12px;padding:7px 14px">✏️ Editar</button>
+        <button class="btn-primary" id="btnSalvarTAP" onclick="salvarTAP()" style="display:none;font-size:12px;padding:7px 14px">💾 Salvar TAP</button>
+        <button class="btn-export" onclick="exportarPDF()">📄 Exportar PDF</button>
+      </div>
+
+      <!-- 1. Identificação -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">1</div> Identificação</div>
+        <div class="tap-grid">
+          <div class="tap-field"><div class="tap-label">Nome do Projeto</div><div class="tap-value" id="tap-nome-v">—</div><input class="tap-input" id="tap-nome" style="display:none" placeholder="Nome do projeto"></div>
+          <div class="tap-field"><div class="tap-label">Gerente do Projeto</div><div class="tap-value" id="tap-gerente-v">—</div><input class="tap-input" id="tap-gerente" style="display:none" placeholder="Nome do gerente"></div>
+          <div class="tap-field"><div class="tap-label">Patrocinador</div><div class="tap-value" id="tap-patrocinador-v">—</div><input class="tap-input" id="tap-patrocinador" style="display:none" placeholder="Patrocinador"></div>
+          <div class="tap-field"><div class="tap-label">Data de Início</div><div class="tap-value" id="tap-inicio-v">—</div><input class="tap-input" id="tap-inicio" type="date" style="display:none"></div>
+          <div class="tap-field"><div class="tap-label">Data de Término</div><div class="tap-value" id="tap-fim-v">—</div><input class="tap-input" id="tap-fim" type="date" style="display:none"></div>
+          <div class="tap-field"><div class="tap-label">Versão</div><div class="tap-value" id="tap-versao-v">1.0</div><input class="tap-input" id="tap-versao" style="display:none" value="1.0"></div>
+        </div>
+      </div>
+
+      <!-- 2. Justificativa -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">2</div> Justificativa</div>
+        <div class="tap-value" id="tap-justificativa-v">—</div>
+        <textarea class="tap-textarea" id="tap-justificativa" style="display:none" rows="4" placeholder="Descreva por que este projeto é necessário..."></textarea>
+      </div>
+
+      <!-- 3. Objetivos -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">3</div> Objetivos</div>
+        <div class="tap-value" id="tap-objetivos-v">—</div>
+        <textarea class="tap-textarea" id="tap-objetivos" style="display:none" rows="3" placeholder="Liste os objetivos do projeto..."></textarea>
+      </div>
+
+      <!-- 4. Escopo -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">4</div> Escopo</div>
+        <div class="tap-grid">
+          <div>
+            <div class="tap-label" style="margin-bottom:8px">Incluso no Escopo</div>
+            <div id="tap-escopo-in-v"><div style="color:#a0aec0;font-size:12px">Nenhum item</div></div>
+            <div id="tap-escopo-in-edit" style="display:none">
+              <textarea class="tap-textarea" id="tap-escopo-in" rows="4" placeholder="Um item por linha..."></textarea>
+            </div>
+          </div>
+          <div>
+            <div class="tap-label" style="margin-bottom:8px">Fora do Escopo</div>
+            <div id="tap-escopo-out-v"><div style="color:#a0aec0;font-size:12px">Nenhum item</div></div>
+            <div id="tap-escopo-out-edit" style="display:none">
+              <textarea class="tap-textarea" id="tap-escopo-out" rows="4" placeholder="Um item por linha..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Marcos -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">5</div> Marcos Principais</div>
+        <div class="marcos-lista" id="marcosLista"></div>
+        <div id="marcosEdit" style="display:none">
+          <table class="tap-table" style="margin-top:12px">
+            <thead><tr><th>Marco</th><th>Data Prevista</th><th>Responsável</th><th></th></tr></thead>
+            <tbody id="marcosTbody"></tbody>
+          </table>
+          <button class="btn-add-row" onclick="adicionarMarco()">+ Adicionar Marco</button>
+        </div>
+      </div>
+
+      <!-- 6. Premissas -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">6</div> Premissas</div>
+        <div class="tap-value" id="tap-premissas-v">—</div>
+        <textarea class="tap-textarea" id="tap-premissas" style="display:none" rows="3" placeholder="Liste as premissas do projeto..."></textarea>
+      </div>
+
+      <!-- 7. Restrições -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">7</div> Restrições</div>
+        <div class="tap-value" id="tap-restricoes-v">—</div>
+        <textarea class="tap-textarea" id="tap-restricoes" style="display:none" rows="3" placeholder="Liste as restrições do projeto..."></textarea>
+      </div>
+
+      <!-- 8. Riscos -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">8</div> Riscos Iniciais</div>
+        <div id="riscosLista"></div>
+        <div id="riscosEdit" style="display:none">
+          <table class="tap-table">
+            <thead><tr><th>Risco</th><th>Probabilidade</th><th>Impacto</th><th>Resposta</th><th></th></tr></thead>
+            <tbody id="riscosTbody"></tbody>
+          </table>
+          <button class="btn-add-row" onclick="adicionarRisco()">+ Adicionar Risco</button>
+        </div>
+      </div>
+
+      <!-- 9. Orçamento -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">9</div> Orçamento Estimado</div>
+        <table class="tap-table" id="orcamentoTable">
+          <thead><tr><th>Categoria</th><th>Valor Estimado</th><th>Observação</th><th id="orcEdit" style="display:none"></th></tr></thead>
+          <tbody id="orcamentoTbody"></tbody>
+          <tfoot><tr><td style="font-weight:700;color:#2d1b69">Total</td><td style="font-weight:700;color:#2d1b69" id="orcTotal">R$ 0,00</td><td></td></tfoot>
+        </table>
+        <button class="btn-add-row" id="btnAddOrc" style="display:none" onclick="adicionarOrcamento()">+ Adicionar Categoria</button>
+      </div>
+
+      <!-- 10. Equipe -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">10</div> Equipe</div>
+        <div id="equipeEdit" style="display:none">
+          <table class="tap-table">
+            <thead><tr><th>Nome</th><th>Papel</th><th>Dedicação %</th><th>Área</th><th></th></tr></thead>
+            <tbody id="equipeTbody"></tbody>
+          </table>
+          <button class="btn-add-row" onclick="adicionarEquipe()">+ Adicionar Membro</button>
+        </div>
+        <div id="equipeLista"></div>
+      </div>
+
+      <!-- 11. Aprovações -->
+      <div class="tap-section">
+        <div class="tap-section-title"><div class="tap-section-num">11</div> Aprovações</div>
+        <div id="aprovacoesEdit" style="display:none">
+          <table class="tap-table">
+            <thead><tr><th>Papel</th><th>Nome</th><th>Assinatura</th><th>Data</th><th></th></tr></thead>
+            <tbody id="aprovacoesTbody"></tbody>
+          </table>
+          <button class="btn-add-row" onclick="adicionarAprovacao()">+ Adicionar Aprovador</button>
+        </div>
+        <div id="aprovacoesList"></div>
+      </div>
+    </div>
+
+    <!-- PLANEJAMENTO -->
+    <div id="tab-planejamento" style="display:none">
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="mudarSubTab('escopo',this)">Escopo</button>
+        <button class="sub-tab" onclick="mudarSubTab('cronograma',this)">Cronograma</button>
+        <button class="sub-tab" onclick="mudarSubTab('recursos',this)">Recursos e Orçamento</button>
+        <button class="sub-tab" onclick="mudarSubTab('riscos',this)">Riscos</button>
+        <button class="sub-tab" onclick="mudarSubTab('qualidade',this)">Qualidade</button>
+      </div>
+
+      <!-- Escopo WBS -->
+      <div id="subtab-escopo">
+        <div class="wbs-container">
+          <div class="wbs-toolbar">
+            <button class="btn-primary" onclick="adicionarNoWBS(0)" style="font-size:12px;padding:7px 14px">+ Nível 0</button>
+            <button class="btn-secondary" onclick="adicionarNoWBS(1)" style="font-size:12px;padding:7px 14px">+ Nível 1</button>
+            <button class="btn-secondary" onclick="adicionarNoWBS(2)" style="font-size:12px;padding:7px 14px">+ Nível 2</button>
+            <button class="btn-export" onclick="salvarProjeto()" style="margin-left:auto">💾 Salvar</button>
+          </div>
+          <div class="wbs-canvas" id="wbsCanvas" style="min-height:450px;position:relative">
+            <svg class="wbs-svg" id="wbsSvg"></svg>
+            <div style="text-align:center;padding:60px;color:#a0aec0;font-size:13px" id="wbsEmpty">Clique em "+ Nível 0" para adicionar o projeto raiz</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cronograma -->
+      <div id="subtab-cronograma" style="display:none">
+        <div class="gantt-container">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:14px;font-weight:700;color:#1e2a4a">Cronograma do Projeto</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="adicionarTarefaGantt()" style="font-size:12px;padding:7px 12px">+ Nova Tarefa</button>
+              <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
+            </div>
+          </div>
+          <table class="gantt-table">
+            <thead>
+              <tr>
+                <th style="min-width:180px">Tarefa</th>
+                <th>Responsável</th>
+                <th>Início</th>
+                <th>Fim</th>
+                <th>% Completo</th>
+                <th style="min-width:200px">Progresso</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ganttTbody"></tbody>
+          </table>
+          <div id="ganttEmpty" style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma tarefa cadastrada ainda.</div>
+        </div>
+      </div>
+
+      <!-- Recursos -->
+      <div id="subtab-recursos" style="display:none">
+        <div class="tap-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div class="tap-section-title" style="margin-bottom:0;border:none;padding:0">Orçamento e Recursos</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="adicionarRecurso()" style="font-size:12px;padding:7px 12px">+ Recurso</button>
+              <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
+            </div>
+          </div>
+          <table class="tap-table">
+            <thead><tr><th>Recurso</th><th>Categoria</th><th>Quantidade</th><th>Custo Unit.</th><th>Total</th><th>Observação</th><th></th></tr></thead>
+            <tbody id="recursosTbody"></tbody>
+          </table>
+          <div id="recursosEmpty" style="text-align:center;padding:32px;color:#a0aec0;font-size:13px">Nenhum recurso cadastrado.</div>
+          <div style="display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid #f0f2f5">
+            <div style="font-size:14px;font-weight:700;color:#2d1b69">Total: <span id="recursosTotal">R$ 0,00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Riscos detalhados -->
+      <div id="subtab-riscos" style="display:none">
+        <div class="tap-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div class="tap-section-title" style="margin-bottom:0;border:none;padding:0">Matriz de Riscos</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="adicionarRiscoDetalhado()" style="font-size:12px;padding:7px 12px">+ Risco</button>
+              <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
+            </div>
+          </div>
+          <table class="tap-table">
+            <thead><tr><th>Risco</th><th>Categoria</th><th>Probabilidade</th><th>Impacto</th><th>Nível</th><th>Plano de Resposta</th><th>Responsável</th><th></th></tr></thead>
+            <tbody id="riscosDetalhadosTbody"></tbody>
+          </table>
+          <div id="riscosDetEmpty" style="text-align:center;padding:32px;color:#a0aec0;font-size:13px">Nenhum risco cadastrado.</div>
+        </div>
+      </div>
+
+      <!-- Qualidade -->
+      <div id="subtab-qualidade" style="display:none">
+        <div class="tap-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div class="tap-section-title" style="margin-bottom:0;border:none;padding:0">Checklists de Qualidade</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-secondary" onclick="adicionarChecklist()" style="font-size:12px;padding:7px 12px">+ Novo Checklist</button>
+              <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
+            </div>
+          </div>
+          <div id="qualidadeLista"><div style="text-align:center;padding:32px;color:#a0aec0;font-size:13px">Nenhum checklist criado.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHANGE REQUEST -->
+    <div id="tab-change" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Change Request</div><div style="font-size:12px;color:#718096">Solicitações de mudança durante o projeto</div></div>
+        <button class="btn-primary" onclick="abrirModalCR()" style="font-size:12px;padding:7px 14px">+ Nova Solicitação</button>
+      </div>
+      <div style="display:flex;gap:14px;margin-bottom:16px">
+        <div style="background:white;border-radius:8px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex:1;text-align:center"><div style="font-size:22px;font-weight:700;color:#1e2a4a" id="crTotal">0</div><div style="font-size:11px;color:#718096">Total</div></div>
+        <div style="background:white;border-radius:8px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex:1;text-align:center"><div style="font-size:22px;font-weight:700;color:#c05621" id="crPendente">0</div><div style="font-size:11px;color:#718096">Pendentes</div></div>
+        <div style="background:white;border-radius:8px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex:1;text-align:center"><div style="font-size:22px;font-weight:700;color:#276749" id="crAprovado">0</div><div style="font-size:11px;color:#718096">Aprovados</div></div>
+        <div style="background:white;border-radius:8px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex:1;text-align:center"><div style="font-size:22px;font-weight:700;color:#c53030" id="crReprovado">0</div><div style="font-size:11px;color:#718096">Reprovados</div></div>
+      </div>
+      <div id="crLista"><div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma solicitação de mudança.</div></div>
+    </div>
+
+    <!-- EXECUÇÃO -->
+    <div id="tab-execucao" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Execução</div><div style="font-size:12px;color:#718096">Documentos e acompanhamento da execução</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" onclick="adicionarDocumento()" style="font-size:12px;padding:7px 12px">+ Documento</button>
+          <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="tap-section">
+          <div class="tap-section-title" style="margin-bottom:12px;border:none;padding:0">📄 Arquivos e Documentos</div>
+          <div id="docLista"><div style="text-align:center;padding:24px;color:#a0aec0;font-size:12px">Nenhum documento adicionado.</div></div>
+        </div>
+        <div class="tap-section">
+          <div class="tap-section-title" style="margin-bottom:12px;border:none;padding:0">💬 Anotações</div>
+          <textarea id="execAnotacoes" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;min-height:180px;font-family:inherit" placeholder="Registre anotações, decisões e informações importantes..."></textarea>
+          <button class="btn-primary" onclick="salvarAnotacoes()" style="font-size:12px;padding:7px 14px;margin-top:8px">Salvar Anotações</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENCERRAMENTO -->
+    <div id="tab-encerramento" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Encerramento do Projeto</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" id="btnEditEnc" onclick="toggleEnc()" style="font-size:12px;padding:7px 14px">✏️ Editar</button>
+          <button class="btn-export" onclick="exportarPDF()">📄 Exportar PDF</button>
+        </div>
+      </div>
+      <div class="enc-section">
+        <div style="text-align:center;padding:10px 0 16px;border-bottom:1px solid #f0f2f5;margin-bottom:16px">
+          <div style="font-size:16px;font-weight:700;color:#1e2a4a">TERMO DE ENCERRAMENTO DO PROJETO</div>
+        </div>
+        <div class="tap-grid">
+          <div class="tap-field"><div class="tap-label">Nome do Projeto</div><div class="tap-value" id="enc-nome-v">—</div><input class="tap-input" id="enc-nome" style="display:none" placeholder="Nome do projeto"></div>
+          <div class="tap-field"><div class="tap-label">Gerente do Projeto</div><div class="tap-value" id="enc-gerente-v">—</div><input class="tap-input" id="enc-gerente" style="display:none"></div>
+          <div class="tap-field"><div class="tap-label">Data de Início</div><div class="tap-value" id="enc-inicio-v">—</div><input class="tap-input" id="enc-inicio" type="date" style="display:none"></div>
+          <div class="tap-field"><div class="tap-label">Data de Encerramento</div><div class="tap-value" id="enc-fim-v">—</div><input class="tap-input" id="enc-fim" type="date" style="display:none"></div>
+        </div>
+        <div class="tap-field" style="margin-top:12px"><div class="tap-label">Resumo Executivo</div><div class="tap-value" id="enc-resumo-v">—</div><textarea class="tap-textarea" id="enc-resumo" style="display:none" rows="4" placeholder="Descreva o resultado final do projeto..."></textarea></div>
+        <div class="tap-field" style="margin-top:12px"><div class="tap-label">Objetivos Atingidos</div><div class="tap-value" id="enc-objetivos-v">—</div><textarea class="tap-textarea" id="enc-objetivos" style="display:none" rows="3" placeholder="Liste os objetivos que foram atingidos..."></textarea></div>
+        <div class="tap-field" style="margin-top:12px"><div class="tap-label">Lições Aprendidas</div><div class="tap-value" id="enc-licoes-v">—</div><textarea class="tap-textarea" id="enc-licoes" style="display:none" rows="3" placeholder="O que aprendemos com este projeto?"></textarea></div>
+        <div style="margin-top:16px"><div class="tap-label" style="margin-bottom:10px">Aprovações</div>
+          <div id="encAprovEdit" style="display:none">
+            <table class="tap-table"><thead><tr><th>Papel</th><th>Nome</th><th>Assinatura</th><th>Data</th><th></th></tr></thead><tbody id="encAprovTbody"></tbody></table>
+            <button class="btn-add-row" onclick="adicionarEncAprov()">+ Adicionar</button>
+          </div>
+          <div id="encAprovList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENTE IA -->
+    <div id="tab-agente" style="display:none">
+      <div style="margin-bottom:16px"><div style="font-size:15px;font-weight:700;color:#1e2a4a">🤖 Agente de IA — Consultor de Processos</div><div style="font-size:12px;color:#718096">Especialista em metodologias Lean, 5W2H, DFMA e muito mais</div></div>
+      <div class="agente-layout">
+        <div class="agente-chat">
+          <div class="agente-msgs" id="agenteMsgs">
+            <div class="agente-msg bot"><div class="agente-bubble">Olá! Sou o Agente de IA especialista em gestão de projetos. Em breve poderei analisar os dados do seu projeto e responder perguntas! 🚀</div></div>
+          </div>
+          <div class="agente-input-row">
+            <input class="agente-input" type="text" placeholder="Digite sua pergunta... (em breve)" disabled>
+            <button class="agente-send" disabled>Enviar</button>
+          </div>
+        </div>
+        <div class="agente-sidebar">
+          <div class="agente-box">
+            <div class="agente-box-titulo">📋 Contexto do Projeto</div>
+            <div class="agente-item" id="agenteCtxNome">—</div>
+            <div class="agente-item" id="agenteCtxTipo">Tradicional</div>
+            <div class="agente-item" id="agenteCtxStatus">—</div>
+          </div>
+          <div class="agente-box">
+            <div class="agente-box-titulo">⚡ Ações Rápidas</div>
+            <div class="agente-item">📊 Analisar riscos do projeto</div>
+            <div class="agente-item">📝 Sugerir plano de ação</div>
+            <div class="agente-item">🎯 Revisar escopo</div>
+            <div class="agente-item">💡 Identificar melhorias</div>
+          </div>
+          <div class="agente-box">
+            <div class="agente-box-titulo">📚 Fontes de Dados</div>
+            <div class="agente-item">📁 Dados do Projeto</div>
+            <div class="agente-item">📖 Wikis do Oráculo</div>
+            <div class="agente-item">💡 Ideias Relacionadas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Estudo de Caso -->
+<div class="modal-overlay" id="modalEstudo">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <span class="modal-titulo" id="modalEstudoTitulo">Novo Estudo de Caso</span>
+      <button class="btn-fechar" onclick="fecharModal('modalEstudo')">×</button>
+    </div>
+    <div class="form-group"><label>Título *</label><input type="text" id="estudoTitulo" placeholder="Título do estudo"></div>
+    <div class="form-group"><label>Método</label><input type="text" id="estudoMetodo" placeholder="Ex: PDCA, Kaizen, MASP..."></div>
+    <div class="form-group"><label>Responsável</label><input type="text" id="estudoResp" placeholder="Nome do responsável"></div>
+    <div class="form-group"><label>Data</label><input type="date" id="estudoData"></div>
+    <div class="form-group"><label>Descrição / Conteúdo</label><textarea id="estudoConteudo" rows="5" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit" placeholder="Descreva o estudo de caso..."></textarea></div>
+    <input type="hidden" id="estudoEditId">
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalEstudo')">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarEstudo()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Change Request -->
+<div class="modal-overlay" id="modalCR">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <span class="modal-titulo">Nova Solicitação de Mudança</span>
+      <button class="btn-fechar" onclick="fecharModal('modalCR')">×</button>
+    </div>
+    <div class="form-group"><label>Título *</label><input type="text" id="crTitulo" placeholder="Título da solicitação"></div>
+    <div class="form-group"><label>Categoria</label><select id="crCategoria"><option>Escopo</option><option>Cronograma</option><option>Prazo</option><option>Orçamento</option><option>Qualidade</option><option>Recursos</option><option>Legal</option><option>Estratégico</option><option>Dependências</option></select></div>
+    <div class="form-group"><label>Solicitante</label><input type="text" id="crSolicitante" placeholder="Nome do solicitante"></div>
+    <div class="form-group"><label>Data</label><input type="date" id="crData"></div>
+    <div class="form-group"><label>Descrição</label><textarea id="crDesc" rows="4" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit" placeholder="Descreva a mudança solicitada..."></textarea></div>
+    <input type="hidden" id="crEditId">
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalCR')">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarCR()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = '/';
+
+  const projetoId = localStorage.getItem('projetoAtual');
+  if (!projetoId) window.location.href = '/gestao-projetos';
+
+  let projeto = null;
+  let tapEditando = false;
+  let encEditando = false;
+  let marcos = [];
+  let riscos = [];
+  let orcamento = [];
+  let equipe = [];
+  let aprovacoes = [];
+  let estudos = [];
+  let changeRequests = [];
+  let wbsNodes = [];
+  let wbsConexoes = [];
+  let cronograma = [];
+  let recursos = [];
+  let riscosDetalhados = [];
+  let qualidade = [];
+  let execDocumentos = [];
+  let encAprovacoes = [];
+  let draggingWBS = null;
+  let dragOffsetWBS = { x:0, y:0 };
+
+  async function carregarProjeto() {
+    try {
+      const res = await fetch(`/api/projetos/${projetoId}`, { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!res.ok) { window.location.href = '/gestao-projetos'; return; }
+      projeto = await res.json();
+      renderHeaderProjeto();
+      carregarDadosProjeto();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderHeaderProjeto() {
+    document.getElementById('projNome').textContent = projeto.nome;
+    document.getElementById('projResp').textContent = '👤 ' + (projeto.responsavel || '—');
+    document.getElementById('projArea').textContent = '📁 ' + (projeto.area || '—');
+    document.getElementById('projDatas').textContent = '📅 ' + (projeto.dataInicio ? formatarData(projeto.dataInicio) : '—') + ' → ' + (projeto.dataFim ? formatarData(projeto.dataFim) : '—');
+    const sb = document.getElementById('projStatusBadge');
+    const cores = { 'Ativo':'background:#f0fff4;color:#276749', 'Concluído':'background:#ebf0ff;color:#3b5bdb', 'Atrasado':'background:#fff5f5;color:#c53030', 'Pausado':'background:#fffaf0;color:#c05621' };
+    sb.textContent = projeto.status;
+    sb.style.cssText = cores[projeto.status] || cores['Ativo'];
+    // Agente contexto
+    document.getElementById('agenteCtxNome').textContent = projeto.nome;
+    document.getElementById('agenteCtxStatus').textContent = projeto.status;
+  }
+
+  function carregarDadosProjeto() {
+    const tap = projeto.tap || {};
+    // TAP campos simples
+    ['nome','gerente','patrocinador','inicio','fim','versao','justificativa','objetivos','premissas','restricoes'].forEach(c => {
+      const el = document.getElementById('tap-' + c + '-v');
+      const inp = document.getElementById('tap-' + c);
+      if (el && tap[c]) { el.textContent = tap[c]; if (inp) inp.value = tap[c]; }
+    });
+    // Escopo
+    if (tap.escopoIn) renderEscopoView('in', tap.escopoIn);
+    if (tap.escopoOut) renderEscopoView('out', tap.escopoOut);
+    // Marcos, riscos, orçamento, equipe, aprovações
+    marcos = tap.marcos || [];
+    riscos = tap.riscos || [];
+    orcamento = tap.orcamento || [];
+    equipe = tap.equipe || [];
+    aprovacoes = tap.aprovacoes || [];
+    renderMarcos();
+    renderRiscos();
+    renderOrcamento();
+    renderEquipe();
+    renderAprovacoes();
+    // Estudos
+    estudos = projeto.estudosCaso || [];
+    renderEstudos();
+    // Change Requests
+    changeRequests = projeto.changeRequests || [];
+    renderCRs();
+    // WBS
+    const escopo = projeto.escopo || {};
+    wbsNodes = escopo.nodes || [];
+    wbsConexoes = escopo.conexoes || [];
+    renderWBS();
+    // Cronograma
+    cronograma = projeto.cronograma || [];
+    renderGantt();
+    // Recursos
+    recursos = (projeto.recursos || {}).lista || [];
+    renderRecursos();
+    // Riscos detalhados
+    riscosDetalhados = (projeto.riscos || []);
+    renderRiscosDetalhados();
+    // Qualidade
+    qualidade = (projeto.qualidade || {}).checklists || [];
+    renderQualidade();
+    // Execução
+    execDocumentos = (projeto.execucao || {}).documentos || [];
+    document.getElementById('execAnotacoes').value = (projeto.execucao || {}).anotacoes || '';
+    renderDocumentos();
+    // Encerramento
+    const enc = projeto.encerramento || {};
+    ['nome','gerente','inicio','fim','resumo','objetivos','licoes'].forEach(c => {
+      const el = document.getElementById('enc-' + c + '-v');
+      const inp = document.getElementById('enc-' + c);
+      if (el && enc[c]) { el.textContent = enc[c]; if (inp) inp.value = enc[c]; }
+    });
+    encAprovacoes = enc.aprovacoes || [];
+    renderEncAprov();
+  }
+
+  function formatarData(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('pt-BR'); } catch { return d; } }
+
+  // ===== TABS =====
+  function mudarTab(id, btn) {
+    document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.proj-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).style.display = 'block';
+    btn.classList.add('active');
+  }
+
+  function mudarSubTab(id, btn) {
+    document.querySelectorAll('[id^="subtab-"]').forEach(t => t.style.display = 'none');
+    document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('subtab-' + id).style.display = 'block';
+    btn.classList.add('active');
+  }
+
+  // ===== TAP =====
+  function toggleTAP() {
+    tapEditando = !tapEditando;
+    const campos = ['nome','gerente','patrocinador','inicio','fim','versao','justificativa','objetivos','premissas','restricoes'];
+    campos.forEach(c => {
+      const v = document.getElementById('tap-' + c + '-v');
+      const i = document.getElementById('tap-' + c);
+      if (v) v.style.display = tapEditando ? 'none' : 'block';
+      if (i) i.style.display = tapEditando ? 'block' : 'none';
+    });
+    ['in','out'].forEach(t => {
+      document.getElementById('tap-escopo-' + t + '-v').style.display = tapEditando ? 'none' : 'block';
+      document.getElementById('tap-escopo-' + t + '-edit').style.display = tapEditando ? 'block' : 'none';
+    });
+    document.getElementById('marcosEdit').style.display = tapEditando ? 'block' : 'none';
+    document.getElementById('riscosEdit').style.display = tapEditando ? 'block' : 'none';
+    document.getElementById('orcEdit').style.display = tapEditando ? 'table-cell' : 'none';
+    document.getElementById('btnAddOrc').style.display = tapEditando ? 'flex' : 'none';
+    document.getElementById('equipeEdit').style.display = tapEditando ? 'block' : 'none';
+    document.getElementById('equipeLista').style.display = tapEditando ? 'none' : 'block';
+    document.getElementById('aprovacoesEdit').style.display = tapEditando ? 'block' : 'none';
+    document.getElementById('aprovacoesList').style.display = tapEditando ? 'none' : 'block';
+    document.getElementById('btnEditarTAP').style.display = tapEditando ? 'none' : 'inline-block';
+    document.getElementById('btnSalvarTAP').style.display = tapEditando ? 'inline-block' : 'none';
+    if (tapEditando) { renderMarcosTbody(); renderRiscosTbody(); renderOrcamentoTbody(); renderEquipeTbody(); renderAprovacoesTbody(); }
+    else { renderMarcos(); renderRiscos(); renderOrcamento(); renderEquipe(); renderAprovacoes(); }
+  }
+
+  function salvarTAP() {
+    const tap = {
+      nome: document.getElementById('tap-nome').value,
+      gerente: document.getElementById('tap-gerente').value,
+      patrocinador: document.getElementById('tap-patrocinador').value,
+      inicio: document.getElementById('tap-inicio').value,
+      fim: document.getElementById('tap-fim').value,
+      versao: document.getElementById('tap-versao').value,
+      justificativa: document.getElementById('tap-justificativa').value,
+      objetivos: document.getElementById('tap-objetivos').value,
+      premissas: document.getElementById('tap-premissas').value,
+      restricoes: document.getElementById('tap-restricoes').value,
+      escopoIn: document.getElementById('tap-escopo-in').value,
+      escopoOut: document.getElementById('tap-escopo-out').value,
+      marcos, riscos, orcamento, equipe, aprovacoes
+    };
+    projeto.tap = tap;
+    salvarProjeto();
+    toggleTAP();
+    carregarDadosProjeto();
+  }
+
+  function renderEscopoView(tipo, texto) {
+    const el = document.getElementById('tap-escopo-' + tipo + '-v');
+    if (!texto) return;
+    el.innerHTML = texto.split('\n').filter(l=>l.trim()).map(l=>`<div style="display:flex;gap:6px;margin-bottom:4px"><span style="color:${tipo==='in'?'#276749':'#c53030'};font-weight:700">${tipo==='in'?'✓':'✗'}</span><span style="font-size:13px;color:#1e2a4a">${l}</span></div>`).join('');
+  }
+
+  // Marcos
+  function adicionarMarco() { marcos.push({ nome: '', data: '', responsavel: '' }); renderMarcosTbody(); }
+  function renderMarcosTbody() {
+    document.getElementById('marcosTbody').innerHTML = marcos.map((m,i) => `
+      <tr>
+        <td><input class="tap-input" value="${m.nome}" onchange="marcos[${i}].nome=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" type="date" value="${m.data}" onchange="marcos[${i}].data=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${m.responsavel}" onchange="marcos[${i}].responsavel=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><button onclick="marcos.splice(${i},1);renderMarcosTbody()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+  }
+  function renderMarcos() {
+    const lista = document.getElementById('marcosLista');
+    if (marcos.length === 0) { lista.innerHTML = '<div style="color:#a0aec0;font-size:12px">Nenhum marco definido.</div>'; return; }
+    lista.innerHTML = marcos.map((m,i) => `
+      <div class="marco-item">
+        ${i < marcos.length-1 ? '<div class="marco-linha"></div>' : ''}
+        <div class="marco-circulo">${i+1}</div>
+        <div class="marco-data">${formatarData(m.data)}</div>
+        <div class="marco-nome">${m.nome}</div>
+      </div>`).join('');
+  }
+
+  // Riscos TAP
+  function adicionarRisco() { riscos.push({ nome:'', prob:'Médio', impacto:'Médio', resposta:'' }); renderRiscosTbody(); }
+  function renderRiscosTbody() {
+    document.getElementById('riscosTbody').innerHTML = riscos.map((r,i) => `
+      <tr>
+        <td><input class="tap-input" value="${r.nome}" onchange="riscos[${i}].nome=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><select onchange="riscos[${i}].prob=this.value" style="padding:4px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${r.prob==='Alto'?'selected':''}>Alto</option><option ${r.prob==='Médio'?'selected':''}>Médio</option><option ${r.prob==='Baixo'?'selected':''}>Baixo</option></select></td>
+        <td><select onchange="riscos[${i}].impacto=this.value" style="padding:4px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${r.impacto==='Alto'?'selected':''}>Alto</option><option ${r.impacto==='Médio'?'selected':''}>Médio</option><option ${r.impacto==='Baixo'?'selected':''}>Baixo</option></select></td>
+        <td><input class="tap-input" value="${r.resposta}" onchange="riscos[${i}].resposta=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><button onclick="riscos.splice(${i},1);renderRiscosTbody()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+  }
+  function renderRiscos() {
+    const lista = document.getElementById('riscosLista');
+    if (riscos.length === 0) { lista.innerHTML = '<div style="color:#a0aec0;font-size:12px">Nenhum risco definido.</div>'; return; }
+    const probCls = { 'Alto':'prob-alto', 'Médio':'prob-medio', 'Baixo':'prob-baixo' };
+    lista.innerHTML = riscos.map(r => `
+      <div class="risco-item">
+        <span class="risco-prob ${probCls[r.prob]||'prob-medio'}">${r.prob}</span>
+        <div style="flex:1"><div style="font-size:12px;font-weight:600;color:#1e2a4a">${r.nome}</div><div style="font-size:11px;color:#718096">Impacto: ${r.impacto} • ${r.resposta}</div></div>
+      </div>`).join('');
+  }
+
+  // Orçamento
+  function adicionarOrcamento() { orcamento.push({ categoria:'', valor:'', obs:'' }); renderOrcamentoTbody(); }
+  function renderOrcamentoTbody() {
+    document.getElementById('orcamentoTbody').innerHTML = orcamento.map((o,i) => `
+      <tr>
+        <td><input class="tap-input" value="${o.categoria}" onchange="orcamento[${i}].categoria=this.value;atualizarTotalOrc()" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${o.valor}" onchange="orcamento[${i}].valor=this.value;atualizarTotalOrc()" placeholder="R$ 0,00" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${o.obs}" onchange="orcamento[${i}].obs=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><button onclick="orcamento.splice(${i},1);renderOrcamentoTbody();atualizarTotalOrc()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+    atualizarTotalOrc();
+  }
+  function renderOrcamento() {
+    const tbody = document.getElementById('orcamentoTbody');
+    if (orcamento.length === 0) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#a0aec0;padding:20px;font-size:12px">Nenhuma categoria de orçamento definida.</td></tr>'; return; }
+    tbody.innerHTML = orcamento.map(o => `<tr><td>${o.categoria}</td><td>${o.valor}</td><td>${o.obs||'—'}</td></tr>`).join('');
+    atualizarTotalOrc();
+  }
+  function atualizarTotalOrc() {
+    let total = 0;
+    orcamento.forEach(o => { const v = parseFloat((o.valor||'').replace(/[^0-9,.]/g,'').replace(',','.')); if (!isNaN(v)) total += v; });
+    document.getElementById('orcTotal').textContent = total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  }
+
+  // Equipe
+  function adicionarEquipe() { equipe.push({ nome:'', papel:'', dedicacao:'', area:'' }); renderEquipeTbody(); }
+  function renderEquipeTbody() {
+    document.getElementById('equipeTbody').innerHTML = equipe.map((e,i) => `
+      <tr>
+        <td><input class="tap-input" value="${e.nome}" onchange="equipe[${i}].nome=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${e.papel}" onchange="equipe[${i}].papel=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${e.dedicacao}" onchange="equipe[${i}].dedicacao=this.value" placeholder="100%" style="padding:5px 8px;font-size:12px;width:60px"></td>
+        <td><input class="tap-input" value="${e.area}" onchange="equipe[${i}].area=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><button onclick="equipe.splice(${i},1);renderEquipeTbody()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+  }
+  function renderEquipe() {
+    const lista = document.getElementById('equipeLista');
+    if (equipe.length === 0) { lista.innerHTML = '<div style="color:#a0aec0;font-size:12px">Nenhum membro de equipe definido.</div>'; return; }
+    lista.innerHTML = `<table class="tap-table"><thead><tr><th>Nome</th><th>Papel</th><th>Dedicação</th><th>Área</th></tr></thead><tbody>${equipe.map(e=>`<tr><td>${e.nome}</td><td>${e.papel}</td><td>${e.dedicacao}</td><td>${e.area}</td></tr>`).join('')}</tbody></table>`;
+  }
+
+  // Aprovações TAP
+  function adicionarAprovacao() { aprovacoes.push({ papel:'', nome:'', assinatura:'', data:'' }); renderAprovacoesTbody(); }
+  function renderAprovacoesTbody() {
+    document.getElementById('aprovacoesTbody').innerHTML = aprovacoes.map((a,i) => `
+      <tr>
+        <td><input class="tap-input" value="${a.papel}" onchange="aprovacoes[${i}].papel=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${a.nome}" onchange="aprovacoes[${i}].nome=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${a.assinatura}" onchange="aprovacoes[${i}].assinatura=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" type="date" value="${a.data}" onchange="aprovacoes[${i}].data=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><button onclick="aprovacoes.splice(${i},1);renderAprovacoesTbody()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+  }
+  function renderAprovacoes() {
+    const lista = document.getElementById('aprovacoesList');
+    if (aprovacoes.length === 0) { lista.innerHTML = '<div style="color:#a0aec0;font-size:12px">Nenhuma aprovação definida.</div>'; return; }
+    lista.innerHTML = `<table class="tap-table"><thead><tr><th>Papel</th><th>Nome</th><th>Assinatura</th><th>Data</th></tr></thead><tbody>${aprovacoes.map(a=>`<tr><td>${a.papel}</td><td>${a.nome}</td><td>${a.assinatura||'—'}</td><td>${formatarData(a.data)}</td></tr>`).join('')}</tbody></table>`;
+  }
+
+  // ===== ESTUDOS DE CASO =====
+  function usarTemplate(tipo) {
+    document.getElementById('estudoMetodo').value = tipo;
+    document.getElementById('estudoTitulo').value = '';
+    document.getElementById('estudoConteudo').value = '';
+    document.getElementById('estudoResp').value = '';
+    document.getElementById('estudoData').value = new Date().toISOString().split('T')[0];
+    document.getElementById('estudoEditId').value = '';
+    document.getElementById('modalEstudo').classList.add('aberto');
+  }
+  function abrirModalEstudo() {
+    document.getElementById('estudoTitulo').value = '';
+    document.getElementById('estudoMetodo').value = '';
+    document.getElementById('estudoConteudo').value = '';
+    document.getElementById('estudoResp').value = '';
+    document.getElementById('estudoData').value = new Date().toISOString().split('T')[0];
+    document.getElementById('estudoEditId').value = '';
+    document.getElementById('modalEstudo').classList.add('aberto');
+  }
+  function salvarEstudo() {
+    const titulo = document.getElementById('estudoTitulo').value.trim();
+    if (!titulo) { alert('Título obrigatório'); return; }
+    const id = document.getElementById('estudoEditId').value;
+    const dados = { id: id||Date.now(), titulo, metodo: document.getElementById('estudoMetodo').value, responsavel: document.getElementById('estudoResp').value, data: document.getElementById('estudoData').value, conteudo: document.getElementById('estudoConteudo').value };
+    if (id) { const idx = estudos.findIndex(e=>e.id==id); if(idx!==-1) estudos[idx]=dados; }
+    else estudos.unshift(dados);
+    projeto.estudosCaso = estudos;
+    salvarProjeto();
+    renderEstudos();
+    fecharModal('modalEstudo');
+  }
+  function renderEstudos() {
+    const lista = document.getElementById('estudosLista');
+    if (estudos.length === 0) { lista.innerHTML = '<div style="text-align:center;padding:20px;color:#a0aec0;font-size:13px">Nenhum estudo de caso criado ainda.</div>'; return; }
+    lista.innerHTML = estudos.map(e => `
+      <div class="estudo-item">
+        <div><div class="estudo-nome">${e.titulo}</div><div class="estudo-meta">${e.metodo||'—'} • ${e.responsavel||'—'} • ${formatarData(e.data)}</div></div>
+        <div style="display:flex;gap:6px">
+          <button onclick="editarEstudo(${e.id})" style="padding:4px 8px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px">✏️ Editar</button>
+          <button onclick="deletarEstudo(${e.id})" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:11px">🗑️</button>
+        </div>
+      </div>`).join('');
+  }
+  function editarEstudo(id) {
+    const e = estudos.find(e=>e.id===id);
+    if (!e) return;
+    document.getElementById('estudoTitulo').value = e.titulo;
+    document.getElementById('estudoMetodo').value = e.metodo||'';
+    document.getElementById('estudoResp').value = e.responsavel||'';
+    document.getElementById('estudoData').value = e.data||'';
+    document.getElementById('estudoConteudo').value = e.conteudo||'';
+    document.getElementById('estudoEditId').value = e.id;
+    document.getElementById('modalEstudo').classList.add('aberto');
+  }
+  function deletarEstudo(id) {
+    if (!confirm('Deletar este estudo?')) return;
+    estudos = estudos.filter(e=>e.id!==id);
+    projeto.estudosCaso = estudos;
+    salvarProjeto();
+    renderEstudos();
+  }
+
+  // ===== WBS =====
+  function adicionarNoWBS(nivel) {
+    const nome = prompt('Nome do nó:');
+    if (!nome) return;
+    const n = { id: Date.now(), nome, nivel, x: 50 + wbsNodes.filter(n=>n.nivel===nivel).length * 200, y: nivel * 120 + 40 };
+    wbsNodes.push(n);
+    renderWBS();
+  }
+  function renderWBS() {
+    const canvas = document.getElementById('wbsCanvas');
+    const svg = document.getElementById('wbsSvg');
+    const empty = document.getElementById('wbsEmpty');
+    document.querySelectorAll('.wbs-node').forEach(n=>n.remove());
+    svg.innerHTML = '';
+    if (wbsNodes.length === 0) { empty.style.display='block'; return; }
+    empty.style.display = 'none';
+    // Desenhar conexões
+    wbsConexoes.forEach(c => {
+      const de = wbsNodes.find(n=>n.id===c.de);
+      const para = wbsNodes.find(n=>n.id===c.para);
+      if (!de||!para) return;
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', de.x+70); line.setAttribute('y1', de.y+36);
+      line.setAttribute('x2', para.x+70); line.setAttribute('y2', para.y);
+      line.setAttribute('stroke','#cbd5e0'); line.setAttribute('stroke-width','1.5');
+      svg.appendChild(line);
+    });
+    wbsNodes.forEach(n => {
+      const node = document.createElement('div');
+      node.className = `wbs-node nivel-${n.nivel}`;
+      node.id = 'wbs-' + n.id;
+      node.style.left = n.x + 'px';
+      node.style.top = n.y + 'px';
+      node.textContent = n.nome;
+      node.title = 'Arraste para mover • Duplo clique para editar • Del para remover';
+      node.addEventListener('mousedown', e => {
+        draggingWBS = n;
+        const rect = node.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        dragOffsetWBS.x = e.clientX - rect.left;
+        dragOffsetWBS.y = e.clientY - rect.top;
+        e.preventDefault();
+      });
+      node.addEventListener('dblclick', () => {
+        const novo = prompt('Novo nome:', n.nome);
+        if (novo) { n.nome = novo; renderWBS(); }
+      });
+      node.addEventListener('keydown', e => { if (e.key==='Delete') { wbsNodes=wbsNodes.filter(x=>x.id!==n.id); wbsConexoes=wbsConexoes.filter(c=>c.de!==n.id&&c.para!==n.id); renderWBS(); } });
+      canvas.appendChild(node);
+    });
+  }
+  document.addEventListener('mousemove', e => {
+    if (!draggingWBS) return;
+    const canvas = document.getElementById('wbsCanvas');
+    const rect = canvas.getBoundingClientRect();
+    draggingWBS.x = Math.max(0, e.clientX - rect.left - dragOffsetWBS.x);
+    draggingWBS.y = Math.max(0, e.clientY - rect.top - dragOffsetWBS.y);
+    const node = document.getElementById('wbs-' + draggingWBS.id);
+    if (node) { node.style.left = draggingWBS.x+'px'; node.style.top = draggingWBS.y+'px'; }
+    renderWBSSvg();
+  });
+  document.addEventListener('mouseup', () => { if (draggingWBS) { salvarEscopo(); draggingWBS=null; } });
+
+  function renderWBSSvg() {
+    const svg = document.getElementById('wbsSvg');
+    svg.innerHTML = '';
+    wbsConexoes.forEach(c => {
+      const de = wbsNodes.find(n=>n.id===c.de);
+      const para = wbsNodes.find(n=>n.id===c.para);
+      if (!de||!para) return;
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', de.x+70); line.setAttribute('y1', de.y+36);
+      line.setAttribute('x2', para.x+70); line.setAttribute('y2', para.y);
+      line.setAttribute('stroke','#cbd5e0'); line.setAttribute('stroke-width','1.5');
+      svg.appendChild(line);
+    });
+  }
+
+  function salvarEscopo() { projeto.escopo = { nodes: wbsNodes, conexoes: wbsConexoes }; }
+
+  // ===== GANTT =====
+  function adicionarTarefaGantt() {
+    cronograma.push({ id:Date.now(), nome:'Nova Tarefa', responsavel:'', inicio:'', fim:'', pct:0 });
+    renderGantt();
+  }
+  function renderGantt() {
+    const tbody = document.getElementById('ganttTbody');
+    const empty = document.getElementById('ganttEmpty');
+    empty.style.display = cronograma.length===0?'block':'none';
+    tbody.innerHTML = cronograma.map((t,i) => `
+      <tr>
+        <td><input value="${t.nome}" onchange="cronograma[${i}].nome=this.value" style="border:none;font-size:12px;font-weight:600;color:#1e2a4a;background:none;outline:none;width:100%"></td>
+        <td><input value="${t.responsavel}" onchange="cronograma[${i}].responsavel=this.value" placeholder="—" style="border:none;font-size:11px;color:#718096;background:none;outline:none;width:80px"></td>
+        <td><input type="date" value="${t.inicio}" onchange="cronograma[${i}].inicio=this.value" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px"></td>
+        <td><input type="date" value="${t.fim}" onchange="cronograma[${i}].fim=this.value" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px"></td>
+        <td><input type="number" value="${t.pct}" min="0" max="100" onchange="cronograma[${i}].pct=parseInt(this.value)||0;renderGantt()" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px;width:50px">%</td>
+        <td><div class="gantt-bar-container"><div class="gantt-bar" style="width:${t.pct}%">${t.pct>10?t.pct+'%':''}</div></div></td>
+        <td><button onclick="cronograma.splice(${i},1);renderGantt()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+  }
+
+  // ===== RECURSOS =====
+  function adicionarRecurso() {
+    recursos.push({ id:Date.now(), nome:'', categoria:'', qtd:'', custo:'', total:'', obs:'' });
+    renderRecursos();
+  }
+  function renderRecursos() {
+    const tbody = document.getElementById('recursosTbody');
+    const empty = document.getElementById('recursosEmpty');
+    empty.style.display = recursos.length===0?'block':'none';
+    tbody.innerHTML = recursos.map((r,i) => `
+      <tr>
+        <td><input value="${r.nome}" onchange="recursos[${i}].nome=this.value" style="border:none;font-size:12px;background:none;outline:none"></td>
+        <td><input value="${r.categoria}" onchange="recursos[${i}].categoria=this.value" style="border:none;font-size:12px;background:none;outline:none"></td>
+        <td><input type="number" value="${r.qtd}" onchange="recursos[${i}].qtd=this.value;calcRecurso(${i})" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px;width:50px"></td>
+        <td><input value="${r.custo}" onchange="recursos[${i}].custo=this.value;calcRecurso(${i})" placeholder="R$ 0,00" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px;width:80px"></td>
+        <td style="font-weight:600;color:#2d1b69">${r.total||'—'}</td>
+        <td><input value="${r.obs}" onchange="recursos[${i}].obs=this.value" style="border:none;font-size:11px;background:none;outline:none"></td>
+        <td><button onclick="recursos.splice(${i},1);renderRecursos()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+    atualizarTotalRecursos();
+  }
+  function calcRecurso(i) {
+    const r = recursos[i];
+    const q = parseFloat(r.qtd)||0;
+    const c = parseFloat((r.custo||'').replace(/[^0-9,.]/g,'').replace(',','.'))||0;
+    recursos[i].total = (q*c).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    renderRecursos();
+  }
+  function atualizarTotalRecursos() {
+    let total = 0;
+    recursos.forEach(r => { const v = parseFloat((r.total||'').replace(/[^0-9,.]/g,'').replace(',','.')); if(!isNaN(v)) total+=v; });
+    document.getElementById('recursosTotal').textContent = total.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  }
+
+  // ===== RISCOS DETALHADOS =====
+  function adicionarRiscoDetalhado() {
+    riscosDetalhados.push({ id:Date.now(), nome:'', categoria:'', prob:'Médio', impacto:'Médio', nivel:'Médio', resposta:'', responsavel:'' });
+    renderRiscosDetalhados();
+  }
+  function renderRiscosDetalhados() {
+    const tbody = document.getElementById('riscosDetalhadosTbody');
+    const empty = document.getElementById('riscosDetEmpty');
+    empty.style.display = riscosDetalhados.length===0?'block':'none';
+    const cores = { 'Alto':'background:#fff5f5;color:#c53030', 'Médio':'background:#fffaf0;color:#c05621', 'Baixo':'background:#f0fff4;color:#276749' };
+    tbody.innerHTML = riscosDetalhados.map((r,i) => `
+      <tr>
+        <td><input value="${r.nome}" onchange="riscosDetalhados[${i}].nome=this.value" style="border:none;font-size:12px;background:none;outline:none"></td>
+        <td><input value="${r.categoria}" onchange="riscosDetalhados[${i}].categoria=this.value" style="border:none;font-size:12px;background:none;outline:none"></td>
+        <td><select onchange="riscosDetalhados[${i}].prob=this.value" style="padding:3px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${r.prob==='Alto'?'selected':''}>Alto</option><option ${r.prob==='Médio'?'selected':''}>Médio</option><option ${r.prob==='Baixo'?'selected':''}>Baixo</option></select></td>
+        <td><select onchange="riscosDetalhados[${i}].impacto=this.value" style="padding:3px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${r.impacto==='Alto'?'selected':''}>Alto</option><option ${r.impacto==='Médio'?'selected':''}>Médio</option><option ${r.impacto==='Baixo'?'selected':''}>Baixo</option></select></td>
+        <td><span class="badge" style="${cores[r.nivel]||cores['Médio']};padding:3px 8px;border-radius:4px;font-size:11px">${r.nivel}</span></td>
+        <td><input value="${r.resposta}" onchange="riscosDetalhados[${i}].resposta=this.value" style="border:none;font-size:11px;background:none;outline:none"></td>
+        <td><input value="${r.responsavel}" onchange="riscosDetalhados[${i}].responsavel=this.value" style="border:none;font-size:11px;background:none;outline:none"></td>
+        <td><button onclick="riscosDetalhados.splice(${i},1);renderRiscosDetalhados()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+  }
+
+  // ===== QUALIDADE =====
+  function adicionarChecklist() {
+    const nome = prompt('Nome do checklist:');
+    if (!nome) return;
+    qualidade.push({ id:Date.now(), nome, itens:[] });
+    renderQualidade();
+  }
+  function renderQualidade() {
+    const lista = document.getElementById('qualidadeLista');
+    if (qualidade.length===0) { lista.innerHTML='<div style="text-align:center;padding:32px;color:#a0aec0;font-size:13px">Nenhum checklist criado.</div>'; return; }
+    lista.innerHTML = qualidade.map((cl,ci) => `
+      <div style="background:#f8fafc;border-radius:8px;padding:14px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700;color:#1e2a4a">${cl.nome}</div>
+          <div style="display:flex;gap:6px">
+            <button onclick="adicionarItemChecklist(${ci})" style="padding:3px 8px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px">+ Item</button>
+            <button onclick="qualidade.splice(${ci},1);renderQualidade()" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:11px">✕</button>
+          </div>
+        </div>
+        ${cl.itens.map((item,ii) => `
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f2f5">
+            <input type="checkbox" ${item.checked?'checked':''} onchange="qualidade[${ci}].itens[${ii}].checked=this.checked;renderQualidade()" style="accent-color:#2d1b69">
+            <span style="font-size:12px;color:#1e2a4a;${item.checked?'text-decoration:line-through;color:#a0aec0':''}">${item.nome}</span>
+            <button onclick="qualidade[${ci}].itens.splice(${ii},1);renderQualidade()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#c53030;font-size:11px">✕</button>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+  function adicionarItemChecklist(ci) {
+    const nome = prompt('Item do checklist:');
+    if (!nome) return;
+    qualidade[ci].itens.push({ nome, checked:false });
+    renderQualidade();
+  }
+
+  // ===== CHANGE REQUEST =====
+  function abrirModalCR() {
+    document.getElementById('crTitulo').value='';
+    document.getElementById('crSolicitante').value='';
+    document.getElementById('crDesc').value='';
+    document.getElementById('crData').value=new Date().toISOString().split('T')[0];
+    document.getElementById('crEditId').value='';
+    document.getElementById('modalCR').classList.add('aberto');
+  }
+  function salvarCR() {
+    const titulo = document.getElementById('crTitulo').value.trim();
+    if (!titulo) { alert('Título obrigatório'); return; }
+    const id = document.getElementById('crEditId').value;
+    const dados = { id:id||Date.now(), titulo, categoria:document.getElementById('crCategoria').value, solicitante:document.getElementById('crSolicitante').value, data:document.getElementById('crData').value, descricao:document.getElementById('crDesc').value, status:'Pendente' };
+    if (id) { const idx=changeRequests.findIndex(c=>c.id==id); if(idx!==-1) changeRequests[idx]=dados; }
+    else changeRequests.unshift(dados);
+    projeto.changeRequests = changeRequests;
+    salvarProjeto();
+    renderCRs();
+    fecharModal('modalCR');
+  }
+  function renderCRs() {
+    document.getElementById('crTotal').textContent = changeRequests.length;
+    document.getElementById('crPendente').textContent = changeRequests.filter(c=>c.status==='Pendente').length;
+    document.getElementById('crAprovado').textContent = changeRequests.filter(c=>c.status==='Aprovado').length;
+    document.getElementById('crReprovado').textContent = changeRequests.filter(c=>c.status==='Reprovado').length;
+    const lista = document.getElementById('crLista');
+    if (changeRequests.length===0) { lista.innerHTML='<div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma solicitação de mudança.</div>'; return; }
+    const statusCor = { 'Pendente':'background:#fffaf0;color:#c05621', 'Aprovado':'background:#f0fff4;color:#276749', 'Reprovado':'background:#fff5f5;color:#c53030' };
+    lista.innerHTML = changeRequests.map(cr => `
+      <div class="cr-card">
+        <div class="cr-header">
+          <div><div class="cr-titulo">${cr.titulo}</div><div class="cr-meta">${cr.categoria} • ${cr.solicitante||'—'} • ${formatarData(cr.data)}</div></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="badge" style="${statusCor[cr.status]||statusCor['Pendente']};padding:3px 8px;border-radius:4px;font-size:11px">${cr.status}</span>
+            ${cr.status==='Pendente'?`<button onclick="mudarStatusCR(${cr.id},'Aprovado')" style="padding:3px 8px;background:#f0fff4;color:#276749;border:1px solid #9ae6b4;border-radius:4px;font-size:11px;cursor:pointer">✓</button><button onclick="mudarStatusCR(${cr.id},'Reprovado')" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:1px solid #feb2b2;border-radius:4px;font-size:11px;cursor:pointer">✗</button>`:''}
+            <button onclick="deletarCR(${cr.id})" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;font-size:11px;cursor:pointer">🗑️</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#718096">${cr.descricao||''}</div>
+      </div>`).join('');
+  }
+  function mudarStatusCR(id, status) {
+    const cr = changeRequests.find(c=>c.id===id);
+    if (cr) { cr.status=status; projeto.changeRequests=changeRequests; salvarProjeto(); renderCRs(); }
+  }
+  function deletarCR(id) {
+    if (!confirm('Deletar esta solicitação?')) return;
+    changeRequests = changeRequests.filter(c=>c.id!==id);
+    projeto.changeRequests = changeRequests;
+    salvarProjeto();
+    renderCRs();
+  }
+
+  // ===== EXECUÇÃO =====
+  function adicionarDocumento() {
+    const nome = prompt('Nome do documento:');
+    if (!nome) return;
+    execDocumentos.push({ id:Date.now(), nome, tipo:'DOC', data:new Date().toISOString().split('T')[0] });
+    renderDocumentos();
+  }
+  function renderDocumentos() {
+    const lista = document.getElementById('docLista');
+    if (execDocumentos.length===0) { lista.innerHTML='<div style="text-align:center;padding:24px;color:#a0aec0;font-size:12px">Nenhum documento adicionado.</div>'; return; }
+    lista.innerHTML = execDocumentos.map((d,i) => `
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0f2f5">
+        <span style="font-size:18px">📄</span>
+        <div style="flex:1"><div style="font-size:12px;font-weight:600;color:#1e2a4a">${d.nome}</div><div style="font-size:11px;color:#a0aec0">${formatarData(d.data)}</div></div>
+        <button onclick="execDocumentos.splice(${i},1);renderDocumentos()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button>
+      </div>`).join('');
+  }
+  function salvarAnotacoes() {
+    if (!projeto.execucao) projeto.execucao = {};
+    projeto.execucao.anotacoes = document.getElementById('execAnotacoes').value;
+    salvarProjeto();
+  }
+
+  // ===== ENCERRAMENTO =====
+  function toggleEnc() {
+    encEditando = !encEditando;
+    const campos = ['nome','gerente','inicio','fim','resumo','objetivos','licoes'];
+    campos.forEach(c => {
+      const v = document.getElementById('enc-' + c + '-v');
+      const i = document.getElementById('enc-' + c);
+      if (v) v.style.display = encEditando?'none':'block';
+      if (i) i.style.display = encEditando?'block':'none';
+    });
+    document.getElementById('encAprovEdit').style.display = encEditando?'block':'none';
+    document.getElementById('encAprovList').style.display = encEditando?'none':'block';
+    document.getElementById('btnEditEnc').textContent = encEditando?'💾 Salvar':'✏️ Editar';
+    if (!encEditando) {
+      const enc = {};
+      campos.forEach(c => { enc[c] = document.getElementById('enc-' + c)?.value||''; const v=document.getElementById('enc-'+c+'-v'); if(v&&enc[c]) v.textContent=enc[c]; });
+      enc.aprovacoes = encAprovacoes;
+      projeto.encerramento = enc;
+      salvarProjeto();
+      renderEncAprov();
+    } else { renderEncAprovTbody(); }
+  }
+  function adicionarEncAprov() { encAprovacoes.push({ papel:'', nome:'', assinatura:'', data:'' }); renderEncAprovTbody(); }
+  function renderEncAprovTbody() {
+    document.getElementById('encAprovTbody').innerHTML = encAprovacoes.map((a,i) => `
+      <tr>
+        <td><input class="tap-input" value="${a.papel}" onchange="encAprovacoes[${i}].papel=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${a.nome}" onchange="encAprovacoes[${i}].nome=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" value="${a.assinatura}" onchange="encAprovacoes[${i}].assinatura=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><input class="tap-input" type="date" value="${a.data}" onchange="encAprovacoes[${i}].data=this.value" style="padding:5px 8px;font-size:12px"></td>
+        <td><button onclick="encAprovacoes.splice(${i},1);renderEncAprovTbody()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`).join('');
+  }
+  function renderEncAprov() {
+    const lista = document.getElementById('encAprovList');
+    if (encAprovacoes.length===0) { lista.innerHTML='<div style="color:#a0aec0;font-size:12px">Nenhuma aprovação definida.</div>'; return; }
+    lista.innerHTML = `<table class="tap-table"><thead><tr><th>Papel</th><th>Nome</th><th>Assinatura</th><th>Data</th></tr></thead><tbody>${encAprovacoes.map(a=>`<tr><td>${a.papel}</td><td>${a.nome}</td><td>${a.assinatura||'—'}</td><td>${formatarData(a.data)}</td></tr>`).join('')}</tbody></table>`;
+  }
+
+  // ===== SALVAR PROJETO =====
+  async function salvarProjeto() {
+    try {
+      projeto.escopo = { nodes: wbsNodes, conexoes: wbsConexoes };
+      projeto.cronograma = cronograma;
+      projeto.recursos = { lista: recursos };
+      projeto.riscos = riscosDetalhados;
+      projeto.qualidade = { checklists: qualidade };
+      projeto.execucao = { documentos: execDocumentos, anotacoes: document.getElementById('execAnotacoes')?.value||'' };
+      await fetch(`/api/projetos/${projetoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(projeto)
+      });
+    } catch(err) { console.error('Erro ao salvar:', err); }
+  }
+
+  // ===== EXPORT PDF =====
+  function exportarPDF() {
+    window.print();
+  }
+
+  function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target===m) m.classList.remove('aberto'); }); });
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href='/'; }
+
+  carregarProjeto();
+</script>
+</body>
+</html>

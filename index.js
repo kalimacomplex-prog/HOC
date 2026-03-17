@@ -96,6 +96,61 @@ const templateSchema = new mongoose.Schema({
 });
 const Template = mongoose.model('Template', templateSchema);
 
+const ideiaSchema = new mongoose.Schema({
+  titulo: { type: String, required: true },
+  tipo: { type: String, default: '' },
+  responsavel: { type: String, default: '' },
+  area: { type: String, default: '' },
+  data: { type: String, default: '' },
+  complexidade: { type: String, default: '' },
+  descricao: { type: String, default: '' },
+  ganho: { type: String, default: '' },
+  periodo: { type: String, default: '' },
+  tags: { type: String, default: '' },
+  aprovacao: { type: String, default: 'pendente' },
+  status: { type: String, default: 'Não Iniciada' },
+  autor: { type: String, default: '' },
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
+  criadoEm: { type: Date, default: Date.now },
+  atualizadoEm: { type: Date, default: Date.now }
+});
+const Ideia = mongoose.model('Ideia', ideiaSchema);
+
+const bowlerSchema = new mongoose.Schema({
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  ano: { type: Number, required: true },
+  dados: { type: Array, default: [] },
+  atualizadoEm: { type: Date, default: Date.now }
+});
+const Bowler = mongoose.model('Bowler', bowlerSchema);
+
+const overviewSchema = new mongoose.Schema({
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true, unique: true },
+  info: { type: Object, default: {} },
+  mvv: { type: Object, default: {} },
+  timeline: { type: Array, default: [] },
+  esg: { type: Object, default: {} },
+  organograma: { type: Object, default: {} },
+  atualizadoEm: { type: Date, default: Date.now }
+});
+const Overview = mongoose.model('Overview', overviewSchema);
+
+const wikiSchema = new mongoose.Schema({
+  titulo: { type: String, required: true },
+  conteudo: { type: String, default: '' },
+  tags: { type: String, default: '' },
+  responsavel: { type: String, default: '' },
+  status: { type: String, default: 'Rascunho' },
+  versao: { type: String, default: 'v1.0' },
+  versoes: { type: Array, default: [] },
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
+  criadoEm: { type: Date, default: Date.now },
+  atualizadoEm: { type: Date, default: Date.now }
+});
+const Wiki = mongoose.model('Wiki', wikiSchema);
+
 // ==================== MIDDLEWARE ====================
 
 function authMiddleware(req, res, next) {
@@ -286,6 +341,114 @@ app.delete('/api/templates/:id', authMiddleware, async (req, res) => {
   try {
     await Template.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
     res.json({ mensagem: 'Template deletado!' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ==================== IDEIAS ====================
+
+app.get('/api/ideias', authMiddleware, async (req, res) => {
+  try { const ideias = await Ideia.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(ideias); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.post('/api/ideias', authMiddleware, async (req, res) => {
+  try {
+    const ideia = await Ideia.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    res.status(201).json(ideia);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.put('/api/ideias/:id', authMiddleware, async (req, res) => {
+  try {
+    const ideia = await Ideia.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { ...req.body, atualizadoEm: new Date() },
+      { new: true }
+    );
+    if (!ideia) return res.status(404).json({ erro: 'Ideia não encontrada' });
+    res.json(ideia);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.delete('/api/ideias/:id', authMiddleware, async (req, res) => {
+  try {
+    await Ideia.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
+    res.json({ mensagem: 'Ideia deletada!' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ==================== BOWLER ====================
+
+app.get('/api/bowler/:ano', authMiddleware, async (req, res) => {
+  try {
+    const bowler = await Bowler.findOne({ empresa: req.usuario.empresa, ano: req.params.ano });
+    if (!bowler) return res.json(null);
+    res.json(bowler);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/bowler/:ano', authMiddleware, async (req, res) => {
+  try {
+    const bowler = await Bowler.findOneAndUpdate(
+      { empresa: req.usuario.empresa, ano: req.params.ano },
+      { dados: req.body.dados, atualizadoEm: new Date() },
+      { new: true, upsert: true }
+    );
+    res.json(bowler);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// ==================== OVERVIEW ====================
+
+app.get('/api/overview', authMiddleware, async (req, res) => {
+  try {
+    const overview = await Overview.findOne({ empresa: req.usuario.empresa });
+    if (!overview) return res.json(null);
+    res.json(overview);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/overview', authMiddleware, async (req, res) => {
+  try {
+    const overview = await Overview.findOneAndUpdate(
+      { empresa: req.usuario.empresa },
+      { ...req.body, atualizadoEm: new Date() },
+      { new: true, upsert: true }
+    );
+    res.json(overview);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// ==================== WIKIS ====================
+
+app.get('/api/wikis', authMiddleware, async (req, res) => {
+  try { const wikis = await Wiki.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(wikis); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.post('/api/wikis', authMiddleware, async (req, res) => {
+  try {
+    const wiki = await Wiki.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    res.status(201).json(wiki);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.put('/api/wikis/:id', authMiddleware, async (req, res) => {
+  try {
+    const wiki = await Wiki.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { ...req.body, atualizadoEm: new Date() },
+      { new: true }
+    );
+    if (!wiki) return res.status(404).json({ erro: 'Wiki não encontrado' });
+    res.json(wiki);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.delete('/api/wikis/:id', authMiddleware, async (req, res) => {
+  try {
+    await Wiki.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
+    res.json({ mensagem: 'Wiki deletado!' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

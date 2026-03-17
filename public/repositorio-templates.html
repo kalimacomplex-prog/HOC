@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Repositório de Templates</title>
+  <link rel="stylesheet" href="style-global.css">
+  <style>
+    .repo-hero { background: linear-gradient(135deg, #2d1b69 0%, #1e2a4a 100%); padding: 28px 32px; color: white; margin: -24px -28px 24px; }
+    .repo-hero-back { display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.7); cursor: pointer; margin-bottom: 12px; text-decoration: none; }
+    .repo-hero-back:hover { color: white; }
+    .repo-hero-titulo { font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .repo-hero-sub { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 8px; }
+    .repo-hero-breadcrumb { font-size: 11px; color: rgba(255,255,255,0.5); }
+
+    .repo-toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+    .repo-search { flex: 1; min-width: 240px; display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 9px 14px; }
+    .repo-search input { border: none; outline: none; font-size: 13px; color: #1e2a4a; width: 100%; font-family: inherit; }
+    .repo-search svg { width: 15px; height: 15px; color: #a0aec0; flex-shrink: 0; }
+    .repo-stats { display: flex; gap: 20px; }
+    .repo-stat { text-align: center; }
+    .repo-stat-val { font-size: 20px; font-weight: 700; color: #1e2a4a; }
+    .repo-stat-val.verde { color: #38a169; }
+    .repo-stat-lbl { font-size: 11px; color: #718096; }
+
+    .filtros-cats { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+    .cat-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; transition: all 0.2s; }
+    .cat-btn:hover { border-color: #2d1b69; color: #2d1b69; }
+    .cat-btn.active { background: #2d1b69; color: white; border-color: #2d1b69; }
+
+    .templates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .template-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1.5px solid transparent; transition: all 0.2s; position: relative; }
+    .template-card:hover { border-color: #2d1b69; box-shadow: 0 4px 16px rgba(45,27,105,0.1); transform: translateY(-1px); }
+    .template-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+    .template-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .template-fav { background: none; border: none; cursor: pointer; font-size: 16px; color: #a0aec0; transition: all 0.2s; padding: 4px; }
+    .template-fav:hover { color: #f6c90e; }
+    .template-fav.ativo { color: #f6c90e; }
+    .template-nome { font-size: 15px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; line-height: 1.3; }
+    .template-desc { font-size: 12px; color: #718096; line-height: 1.5; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .template-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .template-meta-item { font-size: 11px; color: #a0aec0; display: flex; align-items: center; gap: 3px; }
+    .template-meta-item.estrelas { color: #f6c90e; font-weight: 600; }
+    .template-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 14px; }
+    .template-tag { font-size: 10px; padding: 2px 7px; background: #f5f0ff; color: #2d1b69; border-radius: 10px; font-weight: 600; }
+    .template-acoes { display: flex; gap: 8px; }
+    .btn-baixar { flex: 1; padding: 9px; background: #2d1b69; color: white; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: background 0.2s; }
+    .btn-baixar:hover { background: #3d2b89; }
+    .btn-ver { width: 36px; height: 36px; background: #f0f2f5; border: none; border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: background 0.2s; }
+    .btn-ver:hover { background: #e2e8f0; }
+
+    /* Modal visualizar */
+    .modal-template { max-width: 640px; max-height: 85vh; overflow-y: auto; }
+    .modal-template-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f2f5; }
+    .modal-template-icon { width: 52px; height: 52px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .modal-template-nome { font-size: 18px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
+    .modal-template-sub { font-size: 12px; color: #718096; }
+    .modal-template-secao { margin-bottom: 16px; }
+    .modal-template-secao-titulo { font-size: 11px; font-weight: 700; color: #2d1b69; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .campo-template { background: #f8fafc; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+    .campo-template-label { font-size: 11px; font-weight: 600; color: #a0aec0; margin-bottom: 4px; }
+    .campo-template-input { width: 100%; border: none; background: none; outline: none; font-size: 13px; color: #1e2a4a; font-family: inherit; resize: vertical; min-height: 36px; }
+    .campo-template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    /* Agente IA */
+    .agente-fab { position: fixed; bottom: 28px; right: 28px; z-index: 500; }
+    .agente-fab-btn { width: 52px; height: 52px; background: #2d1b69; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 16px rgba(45,27,105,0.35); transition: all 0.2s; }
+    .agente-fab-btn:hover { background: #3d2b89; transform: scale(1.05); }
+    .agente-panel { position: fixed; bottom: 92px; right: 28px; width: 360px; background: white; border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); z-index: 500; display: none; overflow: hidden; }
+    .agente-panel.aberto { display: flex; flex-direction: column; }
+    .agente-panel-header { background: linear-gradient(135deg, #2d1b69, #1e2a4a); padding: 14px 16px; color: white; display: flex; align-items: center; justify-content: space-between; }
+    .agente-panel-titulo { font-size: 14px; font-weight: 700; }
+    .agente-panel-sub { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+    .agente-panel-fechar { background: none; border: none; color: white; cursor: pointer; font-size: 18px; opacity: 0.7; }
+    .agente-panel-fechar:hover { opacity: 1; }
+    .agente-especialidades { display: flex; gap: 4px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid #f0f2f5; }
+    .agente-esp { font-size: 10px; font-weight: 600; padding: 2px 7px; background: #f5f0ff; color: #2d1b69; border-radius: 10px; }
+    .agente-msgs { height: 220px; overflow-y: auto; padding: 12px 14px; background: #f8fafc; }
+    .agente-msg { margin-bottom: 8px; display: flex; gap: 6px; }
+    .agente-msg.user { flex-direction: row-reverse; }
+    .agente-bubble { padding: 8px 12px; border-radius: 10px; font-size: 12px; max-width: 80%; line-height: 1.5; }
+    .agente-msg.bot .agente-bubble { background: white; color: #1e2a4a; border: 1px solid #e2e8f0; }
+    .agente-msg.user .agente-bubble { background: #2d1b69; color: white; }
+    .agente-atalhos { display: flex; gap: 5px; flex-wrap: wrap; padding: 8px 14px; border-top: 1px solid #f0f2f5; border-bottom: 1px solid #f0f2f5; }
+    .agente-atalho { font-size: 11px; padding: 4px 8px; background: #f0f2f5; color: #4a5568; border-radius: 6px; cursor: pointer; border: none; transition: all 0.2s; }
+    .agente-atalho:hover { background: #f5f0ff; color: #2d1b69; }
+    .agente-input-row { display: flex; gap: 6px; padding: 10px 14px; }
+    .agente-input { flex: 1; padding: 8px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; outline: none; font-family: inherit; }
+    .agente-input:focus { border-color: #2d1b69; }
+    .agente-send { padding: 8px 12px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; opacity: 0.5; }
+    .agente-aviso { text-align: center; padding: 6px 14px 10px; font-size: 11px; color: #a0aec0; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
+    <span class="logo-text">Business Manager</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
+    <a class="menu-item active" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div class="header-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+    <div class="header-right">
+      <div class="header-notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="repo-hero">
+      <a class="repo-hero-back" href="/gestao-projetos">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Voltar para Projetos
+      </a>
+      <div class="repo-hero-titulo">Repositório de Templates</div>
+      <div class="repo-hero-sub">Biblioteca centralizada de templates para projetos e melhorias</div>
+      <div class="repo-hero-breadcrumb">Home > Projetos > Templates</div>
+    </div>
+
+    <div class="repo-toolbar">
+      <div class="repo-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchTemplate" placeholder="Buscar templates..." oninput="filtrarTemplates()">
+      </div>
+      <div class="repo-stats">
+        <div class="repo-stat"><div class="repo-stat-val" id="totalTemplates">0</div><div class="repo-stat-lbl">Templates</div></div>
+        <div class="repo-stat"><div class="repo-stat-val verde" id="totalDownloads">0</div><div class="repo-stat-lbl">Downloads</div></div>
+      </div>
+    </div>
+
+    <div class="filtros-cats" id="filtrosCats"></div>
+    <div class="templates-grid" id="templatesGrid"></div>
+  </div>
+</div>
+
+<!-- Modal Visualizar Template -->
+<div class="modal-overlay" id="modalTemplate">
+  <div class="modal modal-template">
+    <div class="modal-header" style="padding-bottom:0;border:none">
+      <button class="btn-fechar" onclick="fecharModal('modalTemplate')" style="margin-left:auto">×</button>
+    </div>
+    <div style="padding:0 24px 24px">
+      <div class="modal-template-header" id="modalTemplateHeader"></div>
+      <div id="modalTemplateConteudo"></div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn-primary" onclick="usarTemplate()" style="flex:2;padding:11px">📥 Usar este Template</button>
+        <button class="btn-secondary" onclick="fecharModal('modalTemplate')" style="flex:1;padding:11px">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Agente IA FAB -->
+<div class="agente-fab">
+  <div class="agente-panel" id="agentePanel">
+    <div class="agente-panel-header">
+      <div>
+        <div class="agente-panel-titulo">🤖 Agente de IA</div>
+        <div class="agente-panel-sub">Consultor de Processos e Templates</div>
+      </div>
+      <button class="agente-panel-fechar" onclick="toggleAgente()">×</button>
+    </div>
+    <div class="agente-especialidades">
+      <span class="agente-esp">3M</span>
+      <span class="agente-esp">DFMA</span>
+      <span class="agente-esp">7 Desperdícios</span>
+      <span class="agente-esp">Lean</span>
+      <span class="agente-esp">Just in Time</span>
+      <span class="agente-esp">Pull System</span>
+    </div>
+    <div class="agente-msgs" id="agenteMsgs">
+      <div class="agente-msg bot">
+        <div class="agente-bubble">Olá! Sou o Agente de IA especialista em processos e metodologias. Em breve poderei recomendar templates e metodologias baseado nos dados do seu projeto! 🚀</div>
+      </div>
+      <div class="agente-msg bot">
+        <div class="agente-bubble">Minhas especialidades incluem Lean, 5W2H, DFMA, Kaizen, metodologias de produção e muito mais. Aguarde a ativação completa!</div>
+      </div>
+    </div>
+    <div class="agente-atalhos">
+      <button class="agente-atalho">📋 Recomendar template</button>
+      <button class="agente-atalho">💡 Sugerir metodologia</button>
+      <button class="agente-atalho">🔍 Analisar problema</button>
+      <button class="agente-atalho">⚡ Kaizen rápido</button>
+    </div>
+    <div class="agente-input-row">
+      <input class="agente-input" type="text" placeholder="Em breve disponível..." disabled>
+      <button class="agente-send" disabled>Enviar</button>
+    </div>
+    <div class="agente-aviso">⚙️ IA será ativada em breve</div>
+  </div>
+  <button class="agente-fab-btn" onclick="toggleAgente()" title="Agente de IA">🤖</button>
+</div>
+
+<script>
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = '/';
+  document.getElementById('userNome').textContent = usuario.nome || '-';
+  document.getElementById('userPerfil').textContent = usuario.perfil || '-';
+  document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+
+  // ===== TEMPLATES FIXOS =====
+  const TEMPLATES = [
+    {
+      id: 1, nome: 'Kaizen Charter', categoria: 'Kaizen', icon: '📋', cor: '#667eea',
+      desc: 'Template completo para documentação de melhorias Kaizen com campos estruturados para problema, análise, solução e resultados.',
+      tags: ['Melhoria Contínua', 'Lean'], downloads: 342, estrelas: 4.8, dias: '2 dias atrás',
+      campos: [
+        { secao: 'Identificação', itens: [
+          { label: 'Título do Kaizen', tipo: 'text', placeholder: 'Ex: Redução de Setup da Linha 3' },
+          { label: 'Área / Processo', tipo: 'text', placeholder: 'Ex: Produção - Linha 3' },
+          { label: 'Responsável', tipo: 'text', placeholder: 'Nome do responsável' },
+          { label: 'Data', tipo: 'date', placeholder: '' },
+        ]},
+        { secao: 'Problema', itens: [
+          { label: 'Descrição do Problema', tipo: 'textarea', placeholder: 'Descreva o problema atual...' },
+          { label: 'Impacto Atual', tipo: 'textarea', placeholder: 'Qual o impacto deste problema?' },
+        ]},
+        { secao: 'Meta', itens: [
+          { label: 'Situação Atual', tipo: 'text', placeholder: 'Ex: Setup de 45 min' },
+          { label: 'Meta', tipo: 'text', placeholder: 'Ex: Setup de 20 min' },
+          { label: 'Prazo', tipo: 'date', placeholder: '' },
+        ]},
+        { secao: 'Solução', itens: [
+          { label: 'Plano de Ação', tipo: 'textarea', placeholder: 'Descreva as ações planejadas...' },
+          { label: 'Resultados Alcançados', tipo: 'textarea', placeholder: 'Preencha após a implementação...' },
+        ]},
+      ]
+    },
+    {
+      id: 2, nome: 'A3 - Resolução de Problemas', categoria: 'A3', icon: '📄', cor: '#4facfe',
+      desc: 'Formulário A3 padrão para análise e resolução estruturada de problemas, incluindo PDCA e análise de causa raiz.',
+      tags: ['A3', 'PDCA', 'Causa Raiz'], downloads: 289, estrelas: 4.9, dias: '1 semana atrás',
+      campos: [
+        { secao: 'Contexto', itens: [
+          { label: 'Título', tipo: 'text', placeholder: 'Título do problema' },
+          { label: 'Dono do Processo', tipo: 'text', placeholder: 'Nome do responsável' },
+          { label: 'Data', tipo: 'date', placeholder: '' },
+        ]},
+        { secao: 'Situação Atual', itens: [
+          { label: 'Descrição da Situação', tipo: 'textarea', placeholder: 'Descreva a situação atual...' },
+          { label: 'Dados e Métricas', tipo: 'textarea', placeholder: 'Inclua dados quantitativos...' },
+        ]},
+        { secao: 'Análise de Causa Raiz', itens: [
+          { label: '5 Porquês', tipo: 'textarea', placeholder: 'Por quê 1:\nPor quê 2:\nPor quê 3:\nPor quê 4:\nPor quê 5:' },
+        ]},
+        { secao: 'Contramedidas', itens: [
+          { label: 'Ações Propostas', tipo: 'textarea', placeholder: 'Liste as contramedidas...' },
+          { label: 'Indicador de Sucesso', tipo: 'text', placeholder: 'Como medir o sucesso?' },
+        ]},
+      ]
+    },
+    {
+      id: 3, nome: '5W2H - Plano de Ação', categoria: '5W2H', icon: '📊', cor: '#43e97b',
+      desc: 'Template de plano de ação 5W2H para definir o que, quem, quando, onde, por que, como e quanto custa cada ação.',
+      tags: ['5W2H', 'Plano de Ação'], downloads: 456, estrelas: 4.7, dias: '3 dias atrás',
+      campos: [
+        { secao: 'Identificação', itens: [
+          { label: 'Projeto / Iniciativa', tipo: 'text', placeholder: 'Nome do projeto' },
+          { label: 'Responsável Geral', tipo: 'text', placeholder: 'Nome do responsável' },
+        ]},
+        { secao: '5W2H', itens: [
+          { label: 'WHAT — O que será feito?', tipo: 'textarea', placeholder: 'Descreva a ação...' },
+          { label: 'WHO — Quem fará?', tipo: 'text', placeholder: 'Responsável pela execução' },
+          { label: 'WHEN — Quando?', tipo: 'date', placeholder: '' },
+          { label: 'WHERE — Onde?', tipo: 'text', placeholder: 'Local de execução' },
+          { label: 'WHY — Por quê?', tipo: 'textarea', placeholder: 'Justificativa da ação...' },
+          { label: 'HOW — Como?', tipo: 'textarea', placeholder: 'Método de execução...' },
+          { label: 'HOW MUCH — Quanto custa?', tipo: 'text', placeholder: 'Ex: R$ 5.000' },
+        ]},
+      ]
+    },
+    {
+      id: 4, nome: 'PDCA', categoria: 'PDCA', icon: '🔄', cor: '#f093fb',
+      desc: 'Ciclo PDCA completo para melhoria contínua de processos — Plan, Do, Check, Act com campos estruturados.',
+      tags: ['PDCA', 'Melhoria Contínua'], downloads: 198, estrelas: 4.6, dias: '5 dias atrás',
+      campos: [
+        { secao: 'PLAN — Planejar', itens: [
+          { label: 'Problema Identificado', tipo: 'textarea', placeholder: 'Descreva o problema...' },
+          { label: 'Meta', tipo: 'text', placeholder: 'Meta a atingir' },
+          { label: 'Plano de Ação', tipo: 'textarea', placeholder: 'Liste as ações planejadas...' },
+        ]},
+        { secao: 'DO — Executar', itens: [
+          { label: 'Ações Executadas', tipo: 'textarea', placeholder: 'O que foi feito...' },
+          { label: 'Data de Execução', tipo: 'date', placeholder: '' },
+        ]},
+        { secao: 'CHECK — Verificar', itens: [
+          { label: 'Resultados Obtidos', tipo: 'textarea', placeholder: 'Quais foram os resultados...' },
+          { label: 'Meta Atingida?', tipo: 'text', placeholder: 'Sim / Não / Parcialmente' },
+        ]},
+        { secao: 'ACT — Agir', itens: [
+          { label: 'Ações de Padronização', tipo: 'textarea', placeholder: 'Como padronizar o que funcionou...' },
+          { label: 'Próximos Passos', tipo: 'textarea', placeholder: 'O que fazer na próxima iteração...' },
+        ]},
+      ]
+    },
+    {
+      id: 5, nome: 'Ishikawa (Espinha de Peixe)', categoria: 'Outros', icon: '🐟', cor: '#fa709a',
+      desc: 'Diagrama de Ishikawa estruturado para análise de causas raiz por categorias: Método, Máquina, Mão de obra, Material, Meio Ambiente e Medição.',
+      tags: ['Ishikawa', 'Causa Raiz', '6M'], downloads: 167, estrelas: 4.5, dias: '1 semana atrás',
+      campos: [
+        { secao: 'Problema (Efeito)', itens: [
+          { label: 'Descrição do Problema', tipo: 'textarea', placeholder: 'O problema que você está analisando...' },
+        ]},
+        { secao: '6M — Causas', itens: [
+          { label: 'Método', tipo: 'textarea', placeholder: 'Causas relacionadas ao método...' },
+          { label: 'Máquina', tipo: 'textarea', placeholder: 'Causas relacionadas à máquina/equipamento...' },
+          { label: 'Mão de Obra', tipo: 'textarea', placeholder: 'Causas relacionadas às pessoas...' },
+          { label: 'Material', tipo: 'textarea', placeholder: 'Causas relacionadas ao material...' },
+          { label: 'Meio Ambiente', tipo: 'textarea', placeholder: 'Causas relacionadas ao ambiente...' },
+          { label: 'Medição', tipo: 'textarea', placeholder: 'Causas relacionadas à medição...' },
+        ]},
+        { secao: 'Causa Raiz', itens: [
+          { label: 'Causa Raiz Identificada', tipo: 'textarea', placeholder: 'Qual é a causa raiz principal...' },
+          { label: 'Plano de Ação', tipo: 'textarea', placeholder: 'Como resolver a causa raiz...' },
+        ]},
+      ]
+    },
+    {
+      id: 6, nome: 'DMAIC', categoria: 'Outros', icon: '⚡', cor: '#a18cd1',
+      desc: 'Framework DMAIC (Define, Measure, Analyze, Improve, Control) para projetos Six Sigma e melhoria de processos.',
+      tags: ['DMAIC', 'Six Sigma', 'Lean'], downloads: 134, estrelas: 4.7, dias: '2 semanas atrás',
+      campos: [
+        { secao: 'DEFINE — Definir', itens: [
+          { label: 'Project Charter', tipo: 'textarea', placeholder: 'Descrição do projeto...' },
+          { label: 'Escopo', tipo: 'textarea', placeholder: 'O que está dentro e fora do escopo...' },
+        ]},
+        { secao: 'MEASURE — Medir', itens: [
+          { label: 'Métricas Atuais', tipo: 'textarea', placeholder: 'Dados do processo atual...' },
+          { label: 'Baseline', tipo: 'text', placeholder: 'Ex: 15% de defeitos' },
+        ]},
+        { secao: 'ANALYZE — Analisar', itens: [
+          { label: 'Causas Raiz Identificadas', tipo: 'textarea', placeholder: 'Análise das causas...' },
+        ]},
+        { secao: 'IMPROVE — Melhorar', itens: [
+          { label: 'Soluções Implementadas', tipo: 'textarea', placeholder: 'O que foi feito para melhorar...' },
+          { label: 'Resultados', tipo: 'text', placeholder: 'Ex: Redução de 15% para 3%' },
+        ]},
+        { secao: 'CONTROL — Controlar', itens: [
+          { label: 'Plano de Controle', tipo: 'textarea', placeholder: 'Como manter os resultados...' },
+        ]},
+      ]
+    },
+    {
+      id: 7, nome: 'SWOT — Análise Estratégica', categoria: 'Outros', icon: '🎯', cor: '#f6d365',
+      desc: 'Matriz SWOT completa para análise de Forças, Fraquezas, Oportunidades e Ameaças de um projeto ou iniciativa.',
+      tags: ['SWOT', 'Estratégia', 'Análise'], downloads: 223, estrelas: 4.4, dias: '3 dias atrás',
+      campos: [
+        { secao: 'Identificação', itens: [
+          { label: 'Projeto / Empresa / Produto', tipo: 'text', placeholder: 'O que está sendo analisado' },
+          { label: 'Responsável', tipo: 'text', placeholder: 'Nome do responsável' },
+          { label: 'Data', tipo: 'date', placeholder: '' },
+        ]},
+        { secao: 'Análise Interna', itens: [
+          { label: '💪 Forças (Strengths)', tipo: 'textarea', placeholder: 'Liste os pontos fortes...' },
+          { label: '⚠️ Fraquezas (Weaknesses)', tipo: 'textarea', placeholder: 'Liste os pontos fracos...' },
+        ]},
+        { secao: 'Análise Externa', itens: [
+          { label: '🌱 Oportunidades (Opportunities)', tipo: 'textarea', placeholder: 'Liste as oportunidades...' },
+          { label: '🚨 Ameaças (Threats)', tipo: 'textarea', placeholder: 'Liste as ameaças...' },
+        ]},
+        { secao: 'Estratégias', itens: [
+          { label: 'Estratégias SO (Forças + Oportunidades)', tipo: 'textarea', placeholder: 'Como usar forças para aproveitar oportunidades...' },
+          { label: 'Estratégias WO (Fraquezas + Oportunidades)', tipo: 'textarea', placeholder: 'Como superar fraquezas aproveitando oportunidades...' },
+        ]},
+      ]
+    },
+    {
+      id: 8, nome: 'A3 Thinking — Toyota', categoria: 'A3', icon: '🏭', cor: '#1e2a4a',
+      desc: 'Metodologia A3 Thinking no estilo Toyota para resolução estruturada de problemas em uma única folha A3.',
+      tags: ['A3', 'Toyota', 'Lean'], downloads: 178, estrelas: 4.8, dias: '4 dias atrás',
+      campos: [
+        { secao: 'Título e Contexto', itens: [
+          { label: 'Título', tipo: 'text', placeholder: 'Título do A3' },
+          { label: 'Autor', tipo: 'text', placeholder: 'Seu nome' },
+          { label: 'Data', tipo: 'date', placeholder: '' },
+        ]},
+        { secao: 'Situação Atual vs Meta', itens: [
+          { label: 'Situação Atual', tipo: 'textarea', placeholder: 'Descreva onde estamos...' },
+          { label: 'Situação Desejada (Meta)', tipo: 'textarea', placeholder: 'Descreva onde queremos chegar...' },
+        ]},
+        { secao: 'Análise', itens: [
+          { label: 'Análise de Causa Raiz', tipo: 'textarea', placeholder: 'Por que ocorre o problema...' },
+        ]},
+        { secao: 'Contramedidas e Plano', itens: [
+          { label: 'Contramedidas Propostas', tipo: 'textarea', placeholder: 'O que será feito...' },
+          { label: 'Plano de Implementação', tipo: 'textarea', placeholder: 'Quando e como...' },
+        ]},
+        { secao: 'Acompanhamento', itens: [
+          { label: 'Confirmação de Efeito', tipo: 'textarea', placeholder: 'Resultados obtidos...' },
+          { label: 'Padronização e Próximos Passos', tipo: 'textarea', placeholder: 'O que padronizar...' },
+        ]},
+      ]
+    },
+  ];
+
+  let favoritados = JSON.parse(localStorage.getItem('favTemplates_' + usuario.empresaNome) || '[]');
+  let catAtiva = 'Todos';
+  let templateAtual = null;
+
+  function getCategorias() {
+    const cats = ['Todos', ...new Set(TEMPLATES.map(t => t.categoria))];
+    return cats;
+  }
+
+  function renderFiltros() {
+    const cats = getCategorias();
+    const container = document.getElementById('filtrosCats');
+    container.innerHTML = cats.map(cat => {
+      const count = cat === 'Todos' ? TEMPLATES.length : TEMPLATES.filter(t => t.categoria === cat).length;
+      return `<button class="cat-btn ${cat === catAtiva ? 'active' : ''}" onclick="selecionarCat('${cat}')">${cat} (${count})</button>`;
+    }).join('');
+  }
+
+  function selecionarCat(cat) {
+    catAtiva = cat;
+    renderFiltros();
+    renderTemplates();
+  }
+
+  function filtrarTemplates() {
+    renderTemplates();
+  }
+
+  function getTemplatesFiltrados() {
+    const q = document.getElementById('searchTemplate').value.toLowerCase();
+    return TEMPLATES.filter(t => {
+      const matchCat = catAtiva === 'Todos' || t.categoria === catAtiva;
+      const matchQ = !q || t.nome.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q) || t.tags.some(tg => tg.toLowerCase().includes(q));
+      return matchCat && matchQ;
+    });
+  }
+
+  function renderTemplates() {
+    const lista = getTemplatesFiltrados();
+    const grid = document.getElementById('templatesGrid');
+    document.getElementById('totalTemplates').textContent = TEMPLATES.length;
+    document.getElementById('totalDownloads').textContent = formatNum(TEMPLATES.reduce((s,t) => s + t.downloads, 0));
+
+    if (lista.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:#a0aec0">Nenhum template encontrado.</div>';
+      return;
+    }
+
+    grid.innerHTML = lista.map(t => {
+      const isFav = favoritados.includes(t.id);
+      return `
+        <div class="template-card">
+          <div class="template-card-top">
+            <div class="template-icon" style="background:${t.cor}22">${t.icon}</div>
+            <button class="template-fav ${isFav ? 'ativo' : ''}" onclick="toggleFav(${t.id})" title="Favoritar">★</button>
+          </div>
+          <div class="template-nome">${t.nome}</div>
+          <div class="template-desc">${t.desc}</div>
+          <div class="template-tags">${t.tags.map(tg => `<span class="template-tag">${tg}</span>`).join('')}</div>
+          <div class="template-meta">
+            <span class="template-meta-item">⬇️ ${t.downloads}</span>
+            <span class="template-meta-item estrelas">★ ${t.estrelas}</span>
+            <span class="template-meta-item">🕐 ${t.dias}</span>
+          </div>
+          <div class="template-acoes">
+            <button class="btn-baixar" onclick="abrirTemplate(${t.id})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+              Usar Template
+            </button>
+            <button class="btn-ver" onclick="visualizarTemplate(${t.id})" title="Visualizar">👁️</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function toggleFav(id) {
+    if (favoritados.includes(id)) favoritados = favoritados.filter(f => f !== id);
+    else favoritados.push(id);
+    localStorage.setItem('favTemplates_' + usuario.empresaNome, JSON.stringify(favoritados));
+    renderTemplates();
+  }
+
+  function formatNum(n) {
+    if (n >= 1000) return (n/1000).toFixed(1) + 'k+';
+    return n;
+  }
+
+  function visualizarTemplate(id) {
+    const t = TEMPLATES.find(t => t.id === id);
+    if (!t) return;
+    templateAtual = t;
+    document.getElementById('modalTemplateHeader').innerHTML = `
+      <div class="modal-template-icon" style="background:${t.cor}22">${t.icon}</div>
+      <div>
+        <div class="modal-template-nome">${t.nome}</div>
+        <div class="modal-template-sub">${t.desc}</div>
+      </div>`;
+    document.getElementById('modalTemplateConteudo').innerHTML = t.campos.map(secao => `
+      <div class="modal-template-secao">
+        <div class="modal-template-secao-titulo">${secao.secao}</div>
+        ${secao.itens.map(item => `
+          <div class="campo-template">
+            <div class="campo-template-label">${item.label}</div>
+            ${item.tipo === 'textarea'
+              ? `<textarea class="campo-template-input" placeholder="${item.placeholder}" rows="3"></textarea>`
+              : item.tipo === 'date'
+              ? `<input type="date" class="campo-template-input" style="min-height:auto">`
+              : `<input type="text" class="campo-template-input" placeholder="${item.placeholder}">`
+            }
+          </div>`).join('')}
+      </div>`).join('');
+    document.getElementById('modalTemplate').classList.add('aberto');
+  }
+
+  function abrirTemplate(id) {
+    visualizarTemplate(id);
+  }
+
+  function usarTemplate() {
+    if (!templateAtual) return;
+    const projetoId = localStorage.getItem('projetoAtual');
+    if (projetoId) {
+      alert(`Template "${templateAtual.nome}" será aplicado ao seu projeto! Redirecionando...`);
+      fecharModal('modalTemplate');
+      window.location.href = '/gestao-projetos';
+    } else {
+      alert('Selecione um projeto primeiro para usar este template!');
+      fecharModal('modalTemplate');
+      window.location.href = '/gestao-projetos';
+    }
+  }
+
+  function toggleAgente() {
+    const panel = document.getElementById('agentePanel');
+    panel.classList.toggle('aberto');
+  }
+
+  function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
+
+  renderFiltros();
+  renderTemplates();
+</script>
+</body>
+</html>

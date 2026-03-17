@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Gestão de Projetos</title>
+  <link rel="stylesheet" href="style-global.css">
+  <style>
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .header-acoes { display: flex; gap: 8px; }
+
+    /* Cards resumo */
+    .resumo-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+    .resumo-card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .resumo-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .resumo-label { font-size: 12px; color: #718096; font-weight: 500; }
+    .resumo-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .resumo-valor { font-size: 26px; font-weight: 700; color: #1e2a4a; }
+    .resumo-sub { font-size: 11px; color: #a0aec0; margin-top: 3px; }
+
+    /* Filtros */
+    .filtros-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+    .filtro-input { padding: 7px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; outline: none; background: white; }
+    .filtro-input:focus { border-color: #2d1b69; }
+    .search-bar { flex: 1; min-width: 200px; padding: 7px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
+    .search-bar:focus { border-color: #2d1b69; }
+
+    /* Projetos grid */
+    .projetos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 14px; }
+    .projeto-card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1.5px solid transparent; transition: all 0.2s; cursor: pointer; }
+    .projeto-card:hover { border-color: #2d1b69; box-shadow: 0 4px 16px rgba(45,27,105,0.1); transform: translateY(-1px); }
+    .projeto-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .projeto-tipo { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; }
+    .tipo-tradicional { background: #ebf0ff; color: #3b5bdb; }
+    .tipo-agil { background: #f0fff4; color: #276749; }
+    .projeto-status { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 3px; }
+    .status-ativo { background: #f0fff4; color: #276749; }
+    .status-concluido { background: #ebf0ff; color: #3b5bdb; }
+    .status-atrasado { background: #fff5f5; color: #c53030; }
+    .status-pausado { background: #fffaf0; color: #c05621; }
+    .projeto-nome { font-size: 15px; font-weight: 700; color: #1e2a4a; margin-bottom: 5px; line-height: 1.3; }
+    .projeto-desc { font-size: 12px; color: #718096; margin-bottom: 10px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .projeto-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+    .projeto-meta-item { font-size: 11px; color: #a0aec0; display: flex; align-items: center; gap: 3px; }
+    .projeto-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+    .projeto-tag { font-size: 10px; padding: 2px 6px; background: #f0f2f5; color: #718096; border-radius: 10px; }
+    .projeto-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid #f0f2f5; }
+    .projeto-area { font-size: 11px; font-weight: 600; padding: 2px 7px; background: #f5f0ff; color: #2d1b69; border-radius: 3px; }
+    .projeto-acoes { display: flex; gap: 5px; }
+    .btn-acao { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
+    .btn-abrir { background: #2d1b69; color: white; }
+    .btn-abrir:hover { background: #3d2b89; }
+    .btn-del { background: #fff5f5; color: #c53030; }
+    .btn-del:hover { background: #fed7d7; }
+    .empty-state { text-align: center; padding: 60px; color: #a0aec0; grid-column: 1/-1; }
+
+    /* Modal tipo */
+    .tipo-escolha { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+    .tipo-card { border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .tipo-card:hover { border-color: #2d1b69; background: #f5f0ff; }
+    .tipo-card.selecionado { border-color: #2d1b69; background: #f5f0ff; }
+    .tipo-card-icon { font-size: 32px; margin-bottom: 8px; }
+    .tipo-card-nome { font-size: 14px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
+    .tipo-card-desc { font-size: 11px; color: #718096; line-height: 1.4; }
+
+    /* Modal novo projeto */
+    .modal-grande { max-width: 560px; }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
+    <span class="logo-text">Business Manager</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
+    <a class="menu-item active" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div class="header-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+    <div class="header-right">
+      <div class="header-notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Gestão de Projetos</div>
+        <div class="breadcrumb">Gerencie e acompanhe todos os projetos da organização</div>
+      </div>
+      <div class="header-acoes">
+        <button class="btn-secondary" onclick="window.location.href='/repositorio-templates'" style="font-size:12px;padding:8px 14px">📚 Repositório de Templates</button>
+        <button class="btn-primary" onclick="abrirModalTipo()" style="font-size:12px;padding:8px 14px">+ Novo Projeto</button>
+      </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="resumo-grid">
+      <div class="resumo-card">
+        <div class="resumo-card-top"><span class="resumo-label">Projetos Ativos</span><div class="resumo-icon" style="background:#f5f0ff">📁</div></div>
+        <div class="resumo-valor" id="totalAtivos">0</div>
+        <div class="resumo-sub">em andamento</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-card-top"><span class="resumo-label">Projetos Concluídos</span><div class="resumo-icon" style="background:#f0fff4">✅</div></div>
+        <div class="resumo-valor" id="totalConcluidos">0</div>
+        <div class="resumo-sub">finalizados</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-card-top"><span class="resumo-label">Projetos Atrasados</span><div class="resumo-icon" style="background:#fff5f5">⚠️</div></div>
+        <div class="resumo-valor" id="totalAtrasados">0</div>
+        <div class="resumo-sub">requerem atenção</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-card-top"><span class="resumo-label">Total de Projetos</span><div class="resumo-icon" style="background:#ebf0ff">📊</div></div>
+        <div class="resumo-valor" id="totalProjetos">0</div>
+        <div class="resumo-sub">cadastrados</div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-bar">
+      <input class="search-bar" type="text" id="searchProjeto" placeholder="Buscar projetos..." oninput="filtrarProjetos()">
+      <select class="filtro-input" id="filtroTipo" onchange="filtrarProjetos()">
+        <option value="">Todos os Tipos</option>
+        <option value="tradicional">Tradicional</option>
+        <option value="agil">Ágil</option>
+      </select>
+      <select class="filtro-input" id="filtroStatus" onchange="filtrarProjetos()">
+        <option value="">Todos os Status</option>
+        <option value="Ativo">Ativo</option>
+        <option value="Concluído">Concluído</option>
+        <option value="Atrasado">Atrasado</option>
+        <option value="Pausado">Pausado</option>
+      </select>
+      <input class="filtro-input" type="text" id="filtroArea" placeholder="Área..." oninput="filtrarProjetos()" style="width:120px">
+      <button class="btn-secondary" onclick="limparFiltros()" style="font-size:12px;padding:7px 12px">Limpar</button>
+    </div>
+
+    <!-- Grid Projetos -->
+    <div class="projetos-grid" id="projetosGrid">
+      <div class="empty-state"><div style="font-size:40px;margin-bottom:12px">📁</div><div>Nenhum projeto cadastrado ainda.</div><div style="font-size:12px;margin-top:8px">Clique em "+ Novo Projeto" para começar!</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Escolher Tipo -->
+<div class="modal-overlay" id="modalTipo">
+  <div class="modal modal-grande">
+    <div class="modal-header">
+      <span class="modal-titulo">Escolha o Tipo de Projeto</span>
+      <button class="btn-fechar" onclick="fecharModal('modalTipo')">×</button>
+    </div>
+    <div class="tipo-escolha">
+      <div class="tipo-card" id="cardTradicional" onclick="selecionarTipo('tradicional')">
+        <div class="tipo-card-icon">📋</div>
+        <div class="tipo-card-nome">Projeto Tradicional</div>
+        <div class="tipo-card-desc">Quando você precisa seguir um plano mais a fundo, com etapas definidas e entregas finais. Ideal para projetos com objetivos claros e bem definidos.</div>
+        <div style="margin-top:10px"><button class="btn-primary" style="font-size:12px;padding:6px 14px">Selecionar →</button></div>
+      </div>
+      <div class="tipo-card" id="cardAgil" onclick="selecionarTipo('agil')">
+        <div class="tipo-card-icon">⚡</div>
+        <div class="tipo-card-nome">Projeto Ágil</div>
+        <div class="tipo-card-desc">Quando você quer flexibilidade e execução contínua. Ideal para projetos com muitas incertezas ou mudanças frequentes.</div>
+        <div style="margin-top:10px"><button class="btn-primary" style="background:#38a169;font-size:12px;padding:6px 14px">Selecionar →</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Novo Projeto -->
+<div class="modal-overlay" id="modalNovoProjeto">
+  <div class="modal modal-grande" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <span class="modal-titulo" id="modalNovoProjTitulo">Novo Projeto Tradicional</span>
+      <button class="btn-fechar" onclick="fecharModal('modalNovoProjeto')">×</button>
+    </div>
+    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px;border-radius:6px;font-size:12px;margin-bottom:14px;display:none" id="novoProjErro"></div>
+    <div class="form-group"><label>Nome do Projeto *</label><input type="text" id="projNome" placeholder="Ex: Automação de Processos de RH"></div>
+    <div class="form-group"><label>Descrição</label><textarea id="projDesc" rows="3" placeholder="Descreva o objetivo do projeto..." style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit"></textarea></div>
+    <div class="form-grid-2">
+      <div class="form-group"><label>Categoria</label><input type="text" id="projCategoria" placeholder="Ex: Resolução de Problemas"></div>
+      <div class="form-group"><label>Área Responsável</label><input type="text" id="projArea" placeholder="Ex: RH, TI, Financeiro"></div>
+      <div class="form-group"><label>Responsável</label><input type="text" id="projResponsavel" placeholder="Nome do responsável"></div>
+      <div class="form-group"><label>Status</label><select id="projStatus"><option>Ativo</option><option>Pausado</option><option>Atrasado</option><option>Concluído</option></select></div>
+      <div class="form-group"><label>Data de Início</label><input type="date" id="projDataInicio"></div>
+      <div class="form-group"><label>Prazo Final</label><input type="date" id="projDataFim"></div>
+    </div>
+    <div class="form-group"><label>Tags (separadas por vírgula)</label><input type="text" id="projTags" placeholder="Ex: automação, RH, eficiência"></div>
+    <input type="hidden" id="projTipo">
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalNovoProjeto')">Cancelar</button>
+      <button class="btn-confirmar" onclick="criarProjeto()">Criar Projeto</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = '/';
+  document.getElementById('userNome').textContent = usuario.nome || '-';
+  document.getElementById('userPerfil').textContent = usuario.perfil || '-';
+  document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+
+  let projetos = [];
+
+  async function carregarProjetos() {
+    try {
+      const res = await fetch('/api/projetos', { headers: { 'Authorization': 'Bearer ' + token } });
+      if (res.status === 401) { window.location.href = '/'; return; }
+      projetos = await res.json();
+      atualizarResumo();
+      renderProjetos();
+    } catch(err) { console.error(err); }
+  }
+
+  function atualizarResumo() {
+    document.getElementById('totalAtivos').textContent = projetos.filter(p => p.status === 'Ativo').length;
+    document.getElementById('totalConcluidos').textContent = projetos.filter(p => p.status === 'Concluído').length;
+    document.getElementById('totalAtrasados').textContent = projetos.filter(p => p.status === 'Atrasado').length;
+    document.getElementById('totalProjetos').textContent = projetos.length;
+  }
+
+  function renderProjetos(lista) {
+    const grid = document.getElementById('projetosGrid');
+    const filtrados = lista || getProjFiltrados();
+    if (filtrados.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><div style="font-size:40px;margin-bottom:12px">📁</div><div>Nenhum projeto encontrado.</div></div>`;
+      return;
+    }
+    const statusCls = { 'Ativo':'status-ativo', 'Concluído':'status-concluido', 'Atrasado':'status-atrasado', 'Pausado':'status-pausado' };
+    grid.innerHTML = filtrados.map(p => `
+      <div class="projeto-card" onclick="abrirProjeto('${p._id}','${p.tipo}')">
+        <div class="projeto-card-top">
+          <div style="display:flex;gap:5px">
+            <span class="projeto-tipo tipo-${p.tipo}">${p.tipo === 'tradicional' ? 'Tradicional' : 'Ágil'}</span>
+            ${p.categoria ? `<span class="projeto-tipo" style="background:#f0f2f5;color:#718096">${p.categoria}</span>` : ''}
+          </div>
+          <span class="projeto-status ${statusCls[p.status] || 'status-ativo'}">${p.status}</span>
+        </div>
+        <div class="projeto-nome">${p.nome}</div>
+        <div class="projeto-desc">${p.descricao || 'Sem descrição'}</div>
+        <div class="projeto-meta">
+          ${p.responsavel ? `<span class="projeto-meta-item">👤 ${p.responsavel}</span>` : ''}
+          ${p.dataInicio ? `<span class="projeto-meta-item">📅 ${formatarData(p.dataInicio)}</span>` : ''}
+          ${p.dataFim ? `<span class="projeto-meta-item">⏰ ${formatarData(p.dataFim)}</span>` : ''}
+        </div>
+        ${p.tags ? `<div class="projeto-tags">${p.tags.split(',').map(t=>`<span class="projeto-tag">${t.trim()}</span>`).join('')}</div>` : ''}
+        <div class="projeto-footer">
+          ${p.area ? `<span class="projeto-area">${p.area}</span>` : '<span></span>'}
+          <div class="projeto-acoes">
+            <button class="btn-acao btn-abrir" onclick="event.stopPropagation();abrirProjeto('${p._id}','${p.tipo}')">Abrir →</button>
+            <button class="btn-acao btn-del" onclick="event.stopPropagation();deletarProjeto('${p._id}')">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function getProjFiltrados() {
+    const q = document.getElementById('searchProjeto').value.toLowerCase();
+    const tipo = document.getElementById('filtroTipo').value;
+    const status = document.getElementById('filtroStatus').value;
+    const area = document.getElementById('filtroArea').value.toLowerCase();
+    return projetos.filter(p => {
+      if (q && !p.nome.toLowerCase().includes(q) && !(p.descricao||'').toLowerCase().includes(q)) return false;
+      if (tipo && p.tipo !== tipo) return false;
+      if (status && p.status !== status) return false;
+      if (area && !(p.area||'').toLowerCase().includes(area)) return false;
+      return true;
+    });
+  }
+
+  function filtrarProjetos() { renderProjetos(); }
+  function limparFiltros() { document.getElementById('searchProjeto').value=''; document.getElementById('filtroTipo').value=''; document.getElementById('filtroStatus').value=''; document.getElementById('filtroArea').value=''; renderProjetos(); }
+
+  function formatarData(d) { if (!d) return ''; return new Date(d).toLocaleDateString('pt-BR'); }
+
+  function abrirModalTipo() { document.getElementById('modalTipo').classList.add('aberto'); }
+
+  function selecionarTipo(tipo) {
+    fecharModal('modalTipo');
+    document.getElementById('projTipo').value = tipo;
+    document.getElementById('modalNovoProjTitulo').textContent = tipo === 'tradicional' ? 'Novo Projeto Tradicional' : 'Novo Projeto Ágil';
+    document.getElementById('projNome').value = '';
+    document.getElementById('projDesc').value = '';
+    document.getElementById('projCategoria').value = '';
+    document.getElementById('projArea').value = '';
+    document.getElementById('projResponsavel').value = '';
+    document.getElementById('projStatus').value = 'Ativo';
+    document.getElementById('projDataInicio').value = '';
+    document.getElementById('projDataFim').value = '';
+    document.getElementById('projTags').value = '';
+    document.getElementById('novoProjErro').style.display = 'none';
+    document.getElementById('modalNovoProjeto').classList.add('aberto');
+  }
+
+  async function criarProjeto() {
+    const nome = document.getElementById('projNome').value.trim();
+    const tipo = document.getElementById('projTipo').value;
+    const erro = document.getElementById('novoProjErro');
+    erro.style.display = 'none';
+    if (!nome) { erro.textContent = 'Nome é obrigatório.'; erro.style.display = 'block'; return; }
+    try {
+      const res = await fetch('/api/projetos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({
+          nome, tipo,
+          descricao: document.getElementById('projDesc').value.trim(),
+          categoria: document.getElementById('projCategoria').value.trim(),
+          area: document.getElementById('projArea').value.trim(),
+          responsavel: document.getElementById('projResponsavel').value.trim(),
+          status: document.getElementById('projStatus').value,
+          dataInicio: document.getElementById('projDataInicio').value,
+          dataFim: document.getElementById('projDataFim').value,
+          tags: document.getElementById('projTags').value.trim()
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) { erro.textContent = data.erro || 'Erro ao criar projeto.'; erro.style.display = 'block'; return; }
+      fecharModal('modalNovoProjeto');
+      abrirProjeto(data._id, data.tipo);
+    } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
+  }
+
+  function abrirProjeto(id, tipo) {
+    localStorage.setItem('projetoAtual', id);
+    if (tipo === 'tradicional') window.location.href = '/projeto-tradicional';
+    else window.location.href = '/projeto-agil';
+  }
+
+  async function deletarProjeto(id) {
+    if (!confirm('Deseja deletar este projeto?')) return;
+    try {
+      await fetch(`/api/projetos/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+      carregarProjetos();
+    } catch(err) { alert('Erro ao deletar.'); }
+  }
+
+  function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
+
+  carregarProjetos();
+</script>
+</body>
+</html>

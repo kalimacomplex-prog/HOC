@@ -27,39 +27,6 @@ async function enviarEmail(para, assunto, html) {
   } catch (err) { console.error('Erro ao enviar email:', err); }
 }
 
-async function verificarAlertasLicencas(empresaId, emailAdmin) {
-  try {
-    const hoje = new Date();
-    const licencas = await Licenca.find({ empresa: empresaId, status: { $in: ['Ativa', 'Vencendo', 'Em Renovação'] } });
-    for (const lic of licencas) {
-      if (!lic.validade || !lic.alertaDias) continue;
-      const validade = new Date(lic.validade);
-      const diffDias = Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
-      if (diffDias <= lic.alertaDias && diffDias >= 0) {
-        const emails = [];
-        if (emailAdmin) emails.push(emailAdmin);
-        if (lic.responsavelEmail && lic.responsavelEmail !== emailAdmin) emails.push(lic.responsavelEmail);
-        for (const email of emails) {
-          await enviarEmail(email, `⚠️ Licença vencendo em ${diffDias} dias — ${lic.nome}`, `
-            <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px">
-              <h2 style="color:#2d1b69">⚠️ Alerta de Vencimento de Licença</h2>
-              <p>A licença abaixo vence em <strong>${diffDias} dia(s)</strong>:</p>
-              <table style="width:100%;border-collapse:collapse;margin:16px 0">
-                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">NOME</td><td style="padding:8px">${lic.nome}</td></tr>
-                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">CATEGORIA</td><td style="padding:8px">${lic.categoria}</td></tr>
-                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">FORNECEDOR</td><td style="padding:8px">${lic.fornecedor}</td></tr>
-                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">VALIDADE</td><td style="padding:8px">${new Date(lic.validade).toLocaleDateString('pt-BR')}</td></tr>
-                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">RESPONSÁVEL</td><td style="padding:8px">${lic.responsavel}</td></tr>
-                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">PENALIDADE</td><td style="padding:8px">${lic.penalidade}</td></tr>
-              </table>
-              <a href="${process.env.APP_URL}/gestao-licencas" style="display:inline-block;padding:12px 24px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Ver no HOC System</a>
-            </div>`);
-        }
-      }
-    }
-  } catch (err) { console.error('Erro ao verificar alertas:', err); }
-}
-
 // ==================== MONGODB ====================
 
 mongoose.connect(process.env.MONGO_URI)
@@ -156,13 +123,9 @@ const licencaSchema = new mongoose.Schema({
 });
 const Licenca = mongoose.model('Licenca', licencaSchema);
 
-// ===== OPERAÇÕES MODELS =====
-
 const fluxoValorSchema = new mongoose.Schema({
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true, unique: true },
-  blocos: { type: Array, default: [] },
-  conexoes: { type: Array, default: [] },
-  textos: { type: Array, default: [] },
+  blocos: { type: Array, default: [] }, conexoes: { type: Array, default: [] }, textos: { type: Array, default: [] },
   atualizadoEm: { type: Date, default: Date.now }
 });
 const FluxoValor = mongoose.model('FluxoValor', fluxoValorSchema);
@@ -244,6 +207,71 @@ const credencialSchema = new mongoose.Schema({
 });
 const Credencial = mongoose.model('Credencial', credencialSchema);
 
+// ==================== NOTIFICAÇÕES MODEL ====================
+
+const notificacaoSchema = new mongoose.Schema({
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  titulo: { type: String, required: true },
+  mensagem: { type: String, default: '' },
+  tipo: { type: String, default: 'info', enum: ['info', 'sucesso', 'aviso', 'erro', 'licenca_vencendo', 'licenca_vencida'] },
+  icone: { type: String, default: '🔔' },
+  link: { type: String, default: '' },
+  lida: { type: Boolean, default: false },
+  criadoEm: { type: Date, default: Date.now }
+});
+const Notificacao = mongoose.model('Notificacao', notificacaoSchema);
+
+// ==================== HELPERS ====================
+
+async function criarNotificacao(empresaId, titulo, mensagem, tipo, icone, link) {
+  try {
+    await Notificacao.create({ empresa: empresaId, titulo, mensagem, tipo, icone, link });
+  } catch (err) { console.error('Erro ao criar notificação:', err); }
+}
+
+async function verificarAlertasLicencas(empresaId, emailAdmin) {
+  try {
+    const hoje = new Date();
+    const licencas = await Licenca.find({ empresa: empresaId });
+    for (const lic of licencas) {
+      if (!lic.validade) continue;
+      const validade = new Date(lic.validade);
+      const diffDias = Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
+
+      // Vencida
+      if (diffDias < 0 && lic.status !== 'Vencida') {
+        await Licenca.findByIdAndUpdate(lic._id, { status: 'Vencida' });
+        await criarNotificacao(empresaId, `Licença Vencida: ${lic.nome}`, `A licença "${lic.nome}" venceu há ${Math.abs(diffDias)} dia(s). Providencie a renovação.`, 'licenca_vencida', '🔴', '/gestao-licencas');
+        if (emailAdmin) await enviarEmail(emailAdmin, `🔴 Licença Vencida — ${lic.nome}`, gerarHtmlAlertaLicenca(lic, diffDias));
+        if (lic.responsavelEmail && lic.responsavelEmail !== emailAdmin) await enviarEmail(lic.responsavelEmail, `🔴 Licença Vencida — ${lic.nome}`, gerarHtmlAlertaLicenca(lic, diffDias));
+      }
+      // Vencendo em breve
+      else if (diffDias >= 0 && diffDias <= (lic.alertaDias || 30) && lic.status !== 'Vencendo') {
+        await Licenca.findByIdAndUpdate(lic._id, { status: 'Vencendo' });
+        await criarNotificacao(empresaId, `Licença Vencendo: ${lic.nome}`, `A licença "${lic.nome}" vence em ${diffDias} dia(s).`, 'licenca_vencendo', '⚠️', '/gestao-licencas');
+        if (emailAdmin) await enviarEmail(emailAdmin, `⚠️ Licença vencendo em ${diffDias} dias — ${lic.nome}`, gerarHtmlAlertaLicenca(lic, diffDias));
+        if (lic.responsavelEmail && lic.responsavelEmail !== emailAdmin) await enviarEmail(lic.responsavelEmail, `⚠️ Licença vencendo em ${diffDias} dias — ${lic.nome}`, gerarHtmlAlertaLicenca(lic, diffDias));
+      }
+    }
+  } catch (err) { console.error('Erro ao verificar alertas:', err); }
+}
+
+function gerarHtmlAlertaLicenca(lic, diffDias) {
+  const vencida = diffDias < 0;
+  return `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px">
+    <h2 style="color:${vencida?'#c53030':'#c05621'}">${vencida?'🔴 Licença Vencida':'⚠️ Licença Vencendo'}</h2>
+    <p>${vencida?`A licença venceu há <strong>${Math.abs(diffDias)} dia(s)</strong>.`:`A licença vence em <strong>${diffDias} dia(s)</strong>.`}</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">NOME</td><td style="padding:8px">${lic.nome}</td></tr>
+      <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">FORNECEDOR</td><td style="padding:8px">${lic.fornecedor||'—'}</td></tr>
+      <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">VALIDADE</td><td style="padding:8px">${new Date(lic.validade).toLocaleDateString('pt-BR')}</td></tr>
+      <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">RESPONSÁVEL</td><td style="padding:8px">${lic.responsavel||'—'}</td></tr>
+      <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">PENALIDADE</td><td style="padding:8px">${lic.penalidade||'—'}</td></tr>
+    </table>
+    <a href="${process.env.APP_URL}/gestao-licencas" style="display:inline-block;padding:12px 24px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Ver no HOC System</a>
+  </div>`;
+}
+
 // ==================== MIDDLEWARE ====================
 
 function authMiddleware(req, res, next) {
@@ -281,7 +309,8 @@ app.post('/api/cadastro', async (req, res) => {
     let empresa = await Empresa.findOne({ nome: nomeEmpresa });
     if (!empresa) empresa = await Empresa.create({ nome: nomeEmpresa });
     const hash = await bcrypt.hash(senha, 10);
-    await Usuario.create({ nome, email, senha: hash, perfil: 'Admin', usuarioMestre: true, empresa: empresa._id, permissoes: { acessoIndependente: true, aprovacaoWikis: true, aprovacaoIdeias: true, gerenciamentoProjetos: true, edicaoFluxoValor: true, permissaoSeguranca: true } });
+    const novoUsuario = await Usuario.create({ nome, email, senha: hash, perfil: 'Admin', usuarioMestre: true, empresa: empresa._id, permissoes: { acessoIndependente: true, aprovacaoWikis: true, aprovacaoIdeias: true, gerenciamentoProjetos: true, edicaoFluxoValor: true, permissaoSeguranca: true } });
+    await criarNotificacao(empresa._id, 'Bem-vindo ao HOC System! 🎉', `Olá ${nome}! Sua conta foi criada com sucesso. Explore todas as funcionalidades.`, 'sucesso', '🎉', '/dashboard');
     res.status(201).json({ mensagem: 'Conta criada com sucesso!' });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -296,6 +325,45 @@ app.post('/api/login', async (req, res) => {
     const token = jwt.sign({ id: usuario._id, nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresa: usuario.empresa._id, empresaNome: usuario.empresa.nome }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '8h' });
     verificarAlertasLicencas(usuario.empresa._id, usuario.email).catch(console.error);
     res.json({ token, usuario: { nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresaNome: usuario.empresa.nome } });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ==================== NOTIFICAÇÕES ====================
+
+app.get('/api/notificacoes', authMiddleware, async (req, res) => {
+  try {
+    const notificacoes = await Notificacao.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }).limit(50);
+    res.json(notificacoes);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.get('/api/notificacoes/resumo', authMiddleware, async (req, res) => {
+  try {
+    const naoLidas = await Notificacao.countDocuments({ empresa: req.usuario.empresa, lida: false });
+    const temVencida = await Notificacao.countDocuments({ empresa: req.usuario.empresa, tipo: 'licenca_vencida', lida: false });
+    const temVencendo = await Notificacao.countDocuments({ empresa: req.usuario.empresa, tipo: 'licenca_vencendo', lida: false });
+    res.json({ naoLidas, temVencida, temVencendo });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/notificacoes/:id/ler', authMiddleware, async (req, res) => {
+  try {
+    await Notificacao.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { lida: true });
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/notificacoes/ler-todas', authMiddleware, async (req, res) => {
+  try {
+    await Notificacao.updateMany({ empresa: req.usuario.empresa, lida: false }, { lida: true });
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.delete('/api/notificacoes/:id', authMiddleware, async (req, res) => {
+  try {
+    await Notificacao.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
+    res.json({ ok: true });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
@@ -340,9 +408,11 @@ app.post('/api/convites', authMiddleware, async (req, res) => {
         <a href="${linkConvite}" style="display:inline-block;margin:24px 0;padding:14px 28px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Aceitar Convite</a>
         <p style="color:#a0aec0;font-size:13px">Este link expira em 48 horas.</p>
       </div>`);
+    await criarNotificacao(req.usuario.empresa, `Convite enviado para ${email}`, `Um convite foi enviado para ${email} entrar no sistema.`, 'info', '👤', '/plano-usuarios');
     res.json({ mensagem: 'Convite enviado com sucesso!' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
+
 app.get('/api/convites/:token', async (req, res) => {
   try {
     const convite = await Convite.findOne({ token: req.params.token, usado: false }).populate('empresa');
@@ -351,6 +421,7 @@ app.get('/api/convites/:token', async (req, res) => {
     res.json({ email: convite.email, empresa: convite.empresa.nome, permissoes: convite.permissoes });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
+
 app.post('/api/convites/:token/aceitar', async (req, res) => {
   try {
     const { nome, senha } = req.body;
@@ -360,6 +431,7 @@ app.post('/api/convites/:token/aceitar', async (req, res) => {
     const hash = await bcrypt.hash(senha, 10);
     await Usuario.create({ nome, email: convite.email, senha: hash, empresa: convite.empresa._id, usuarioMestre: convite.usuarioMestre, perfil: convite.usuarioMestre ? 'Admin' : 'Usuário', permissoes: convite.permissoes });
     convite.usado = true; await convite.save();
+    await criarNotificacao(convite.empresa._id, `Novo usuário: ${nome}`, `${nome} aceitou o convite e entrou no sistema.`, 'sucesso', '👤', '/plano-usuarios');
     res.json({ mensagem: 'Conta criada com sucesso!' });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -380,6 +452,7 @@ app.get('/api/projetos/:id', authMiddleware, async (req, res) => {
 app.post('/api/projetos', authMiddleware, async (req, res) => {
   try {
     const projeto = await Projeto.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    await criarNotificacao(req.usuario.empresa, `Novo projeto: ${projeto.nome}`, `O projeto "${projeto.nome}" foi criado por ${req.usuario.nome}.`, 'info', '📁', '/gestao-projetos');
     res.status(201).json(projeto);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -433,13 +506,21 @@ app.get('/api/ideias', authMiddleware, async (req, res) => {
 app.post('/api/ideias', authMiddleware, async (req, res) => {
   try {
     const ideia = await Ideia.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    if (ideia.aprovacao === 'pendente') {
+      await criarNotificacao(req.usuario.empresa, `Nova ideia para aprovação: ${ideia.titulo}`, `${req.usuario.nome} submeteu uma nova ideia: "${ideia.titulo}".`, 'info', '💡', '/ideias-livres');
+    }
     res.status(201).json(ideia);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.put('/api/ideias/:id', authMiddleware, async (req, res) => {
   try {
+    const anterior = await Ideia.findById(req.params.id);
     const ideia = await Ideia.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
     if (!ideia) return res.status(404).json({ erro: 'Ideia não encontrada' });
+    if (anterior && anterior.aprovacao !== ideia.aprovacao) {
+      if (ideia.aprovacao === 'aprovada') await criarNotificacao(req.usuario.empresa, `Ideia aprovada: ${ideia.titulo}`, `A ideia "${ideia.titulo}" foi aprovada por ${req.usuario.nome}.`, 'sucesso', '✅', '/ideias-livres');
+      if (ideia.aprovacao === 'dispensada') await criarNotificacao(req.usuario.empresa, `Ideia dispensada: ${ideia.titulo}`, `A ideia "${ideia.titulo}" foi dispensada.`, 'erro', '❌', '/ideias-livres');
+    }
     res.json(ideia);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -491,6 +572,7 @@ app.get('/api/wikis', authMiddleware, async (req, res) => {
 app.post('/api/wikis', authMiddleware, async (req, res) => {
   try {
     const wiki = await Wiki.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    await criarNotificacao(req.usuario.empresa, `Novo Wiki: ${wiki.titulo}`, `O wiki "${wiki.titulo}" foi criado por ${req.usuario.nome}.`, 'info', '📄', '/overview');
     res.status(201).json(wiki);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -498,6 +580,7 @@ app.put('/api/wikis/:id', authMiddleware, async (req, res) => {
   try {
     const wiki = await Wiki.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
     if (!wiki) return res.status(404).json({ erro: 'Wiki não encontrado' });
+    if (req.body.status === 'Aprovado') await criarNotificacao(req.usuario.empresa, `Wiki aprovado: ${wiki.titulo}`, `O wiki "${wiki.titulo}" foi aprovado.`, 'sucesso', '✅', '/overview');
     res.json(wiki);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -526,6 +609,7 @@ app.get('/api/licencas/:id', authMiddleware, async (req, res) => {
 app.post('/api/licencas', authMiddleware, async (req, res) => {
   try {
     const licenca = await Licenca.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    await criarNotificacao(req.usuario.empresa, `Nova licença cadastrada: ${licenca.nome}`, `A licença "${licenca.nome}" foi cadastrada por ${req.usuario.nome}.`, 'info', '📋', '/gestao-licencas');
     res.status(201).json(licenca);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -567,6 +651,7 @@ app.get('/api/contatos', authMiddleware, async (req, res) => {
 app.post('/api/contatos', authMiddleware, async (req, res) => {
   try {
     const contato = await Contato.create({ ...req.body, empresa: req.usuario.empresa });
+    await criarNotificacao(req.usuario.empresa, `Novo contato: ${contato.nome}`, `O contato "${contato.nome}" foi adicionado por ${req.usuario.nome}.`, 'info', '👤', '/operacoes');
     res.status(201).json(contato);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -626,13 +711,18 @@ app.get('/api/tarefas/:id', authMiddleware, async (req, res) => {
 app.post('/api/tarefas', authMiddleware, async (req, res) => {
   try {
     const tarefa = await Tarefa.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    await criarNotificacao(req.usuario.empresa, `Nova tarefa: ${tarefa.titulo}`, `A tarefa "${tarefa.titulo}" foi criada por ${req.usuario.nome}.`, 'info', '📋', '/operacoes');
     res.status(201).json(tarefa);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.put('/api/tarefas/:id', authMiddleware, async (req, res) => {
   try {
+    const anterior = await Tarefa.findById(req.params.id);
     const tarefa = await Tarefa.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
     if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
+    if (anterior && anterior.status !== 'Concluída' && tarefa.status === 'Concluída') {
+      await criarNotificacao(req.usuario.empresa, `Tarefa concluída: ${tarefa.titulo}`, `A tarefa "${tarefa.titulo}" foi concluída por ${req.usuario.nome}.`, 'sucesso', '✅', '/operacoes');
+    }
     res.json(tarefa);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -666,6 +756,7 @@ app.get('/api/processos', authMiddleware, async (req, res) => {
 app.post('/api/processos', authMiddleware, async (req, res) => {
   try {
     const processo = await Processo.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    await criarNotificacao(req.usuario.empresa, `Novo processo: ${processo.nome}`, `O processo "${processo.nome}" foi criado por ${req.usuario.nome}.`, 'info', '⚙️', '/operacoes');
     res.status(201).json(processo);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -692,13 +783,18 @@ app.get('/api/robos', authMiddleware, async (req, res) => {
 app.post('/api/robos', authMiddleware, async (req, res) => {
   try {
     const robo = await Robot.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    await criarNotificacao(req.usuario.empresa, `Novo robô: ${robo.nome}`, `O robô "${robo.nome}" foi cadastrado por ${req.usuario.nome}.`, 'info', '🤖', '/operacoes');
     res.status(201).json(robo);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.put('/api/robos/:id', authMiddleware, async (req, res) => {
   try {
+    const anterior = await Robot.findById(req.params.id);
     const robo = await Robot.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
     if (!robo) return res.status(404).json({ erro: 'Robô não encontrado' });
+    if (anterior && anterior.status !== 'Erro' && robo.status === 'Erro') {
+      await criarNotificacao(req.usuario.empresa, `Robô com erro: ${robo.nome}`, `O robô "${robo.nome}" encontrou um erro na máquina ${robo.maquina||'—'}.`, 'erro', '🔴', '/operacoes');
+    }
     res.json(robo);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });

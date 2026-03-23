@@ -96,7 +96,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" placeholder="Buscar...">
     </div>
-    
     <div class="header-right">
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
@@ -116,7 +115,6 @@
           <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
         </div>
       </div>
-      
       <div class="header-user">
         <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
         <div class="user-avatar" id="userAvatar">?</div>
@@ -245,11 +243,13 @@
   document.getElementById('userPerfil').textContent = usuario.perfil || '-';
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
 
+  const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
   let projetos = [];
 
   async function carregarProjetos() {
     try {
-      const res = await fetch('/api/projetos', { headers: { 'Authorization': 'Bearer ' + token } });
+      const res = await fetch('/api/projetos', { headers: HEADERS });
       if (res.status === 401) { window.location.href = '/'; return; }
       projetos = await res.json();
       atualizarResumo();
@@ -347,7 +347,7 @@
     try {
       const res = await fetch('/api/projetos', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        headers: HEADERS,
         body: JSON.stringify({
           nome, tipo,
           descricao: document.getElementById('projDesc').value.trim(),
@@ -376,7 +376,7 @@
   async function deletarProjeto(id) {
     if (!confirm('Deseja deletar este projeto?')) return;
     try {
-      await fetch(`/api/projetos/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+      await fetch(`/api/projetos/${id}`, { method: 'DELETE', headers: HEADERS });
       carregarProjetos();
     } catch(err) { alert('Erro ao deletar.'); }
   }
@@ -385,9 +385,7 @@
   document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
 
-  carregarProjetos();
-  
-// ===== NOTIFICAÇÕES =====
+  // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
     try {
       const [resResumo, resNotifs] = await Promise.all([
@@ -474,6 +472,8 @@
       if (dd) dd.classList.remove('aberto');
     }
   });
+
+  carregarProjetos();
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>

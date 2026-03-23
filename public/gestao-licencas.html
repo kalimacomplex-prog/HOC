@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Gestão de Licenças</title>
+  <link rel="stylesheet" href="style-global.css">
+  <style>
+    .lic-hero { background: linear-gradient(135deg, #2d1b69 0%, #1e2a4a 100%); padding: 20px 28px; margin: -24px -28px 24px; color: white; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .lic-hero-info h1 { font-size: 20px; font-weight: 700; margin-bottom: 3px; }
+    .lic-hero-info p { font-size: 12px; color: rgba(255,255,255,0.7); }
+    .lic-hero-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-lic { padding: 8px 16px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+    .btn-lic-outline { background: rgba(255,255,255,0.1); color: white; border: 1.5px solid rgba(255,255,255,0.3); }
+    .btn-lic-outline:hover { background: rgba(255,255,255,0.2); }
+    .btn-lic-outline.ativo { background: rgba(255,255,255,0.25); border-color: white; }
+    .btn-lic-add { background: white; color: #2d1b69; }
+    .btn-lic-add:hover { background: #f0f2f5; }
+
+    .resumo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
+    .resumo-card { background: white; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .resumo-card-val { font-size: 26px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
+    .resumo-card-lbl { font-size: 11px; color: #718096; }
+    .resumo-card-sub { font-size: 12px; font-weight: 600; margin-top: 4px; }
+    .sub-verde { color: #38a169; }
+    .sub-amarelo { color: #c05621; }
+    .sub-vermelho { color: #c53030; }
+
+    .lic-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .lic-search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; padding: 8px 14px; }
+    .lic-search input { border: none; outline: none; font-size: 13px; color: #1e2a4a; width: 100%; font-family: inherit; }
+    .lic-search svg { width: 14px; height: 14px; color: #a0aec0; flex-shrink: 0; }
+    .btn-mais-filtros { padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; color: #4a5568; display: flex; align-items: center; gap: 5px; }
+    .btn-mais-filtros:hover { border-color: #2d1b69; color: #2d1b69; }
+
+    .filtros-avancados { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; display: none; }
+    .filtros-avancados.aberto { display: block; }
+    .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .filtro-group label { display: block; font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
+    .filtro-input { width: 100%; padding: 7px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; outline: none; background: white; font-family: inherit; }
+    .filtro-input:focus { border-color: #2d1b69; }
+
+    .lic-table-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: auto; }
+    .lic-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; }
+    .lic-table th { padding: 10px 12px; text-align: left; background: #f8fafc; border-bottom: 1.5px solid #e2e8f0; font-size: 11px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+    .lic-table td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+    .lic-table tr:hover td { background: #fafbff; }
+    .lic-table tr:last-child td { border-bottom: none; }
+    .lic-nome { font-weight: 700; color: #1e2a4a; }
+    .lic-cat { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #f0f2f5; color: #4a5568; white-space: nowrap; }
+    .validade-aviso { font-size: 11px; font-weight: 600; }
+    .val-ok { color: #718096; }
+    .val-vencendo { color: #c05621; }
+    .val-vencida { color: #c53030; }
+
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .status-ativa { background: #f0fff4; color: #276749; }
+    .status-vencendo { background: #fffaf0; color: #c05621; }
+    .status-vencida { background: #fff5f5; color: #c53030; }
+    .status-renovacao { background: #ebf0ff; color: #3b5bdb; }
+
+    .pen-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .pen-financeira { background: #fffaf0; color: #c05621; }
+    .pen-reputacional { background: #faf5ff; color: #6b46c1; }
+    .pen-juridica { background: #fff5f5; color: #c53030; }
+    .pen-operacional { background: #f0f2f5; color: #4a5568; }
+    .pen-comercial { background: #f0fff4; color: #276749; }
+
+    .btn-acao { width: 28px; height: 28px; border: none; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; }
+    .btn-acao-edit { background: #f5f0ff; color: #2d1b69; }
+    .btn-acao-edit:hover { background: #e9e0ff; }
+    .btn-acao-del { background: #fff5f5; color: #c53030; }
+    .btn-acao-del:hover { background: #fed7d7; }
+    .btn-acao-det { background: #f0f2f5; color: #4a5568; }
+    .btn-acao-det:hover { background: #e2e8f0; }
+
+    /* Modal Licença */
+    .modal-lic { max-width: 680px; max-height: 90vh; overflow-y: auto; }
+    .modal-lic-titulo { font-size: 16px; font-weight: 700; color: #1e2a4a; }
+    .form-sec { margin-bottom: 18px; }
+    .form-sec-titulo { font-size: 11px; font-weight: 700; color: #2d1b69; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f0f2f5; }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .form-group { margin-bottom: 0; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
+    .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; color: #1e2a4a; background: white; }
+    .form-control:focus { border-color: #2d1b69; }
+    .form-full { grid-column: 1 / -1; }
+
+    /* Upload */
+    .upload-area { border: 2px dashed #e2e8f0; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; background: #f8fafc; }
+    .upload-area:hover { border-color: #2d1b69; background: #f5f0ff; }
+    .upload-area input { display: none; }
+    .upload-lista { margin-top: 10px; }
+    .upload-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 6px; }
+    .upload-item-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; flex: 1; }
+    .upload-item-tam { font-size: 11px; color: #a0aec0; }
+    .upload-item-del { background: #fff5f5; border: none; color: #c53030; border-radius: 4px; cursor: pointer; padding: 2px 6px; font-size: 11px; }
+
+    /* Modal Detalhes */
+    .modal-det { max-width: 580px; }
+    .det-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .det-item label { display: block; font-size: 10px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+    .det-item span { font-size: 13px; color: #1e2a4a; font-weight: 500; }
+    .doc-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 7px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
+    .doc-icon { font-size: 20px; }
+    .doc-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; flex: 1; }
+    .doc-tam { font-size: 11px; color: #a0aec0; }
+    .btn-baixar { padding: 5px 10px; background: #2d1b69; color: white; border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .btn-baixar:hover { background: #3d2b89; }
+
+    /* Modal Alertas */
+    .modal-alertas { max-width: 480px; }
+    .alerta-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
+    .alerta-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; }
+    .alerta-dias { display: flex; align-items: center; gap: 6px; }
+    .alerta-dias input { width: 60px; padding: 4px 8px; border: 1.5px solid #e2e8f0; border-radius: 5px; font-size: 12px; text-align: center; outline: none; }
+    .alerta-dias input:focus { border-color: #2d1b69; }
+
+    /* Vista relatório */
+    .relatorio-view { display: none; }
+    .relatorio-view.ativo { display: block; }
+    .rel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .btn-exportar { padding: 8px 16px; background: #1e2a4a; color: white; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .btn-exportar:hover { background: #2d3f6b; }
+
+    .empty-state { text-align: center; padding: 60px; color: #a0aec0; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
+    <span class="logo-text">Business Manager</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
+    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item active" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div class="header-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+    <div class="header-right">
+      <div class="header-notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- HERO -->
+    <div class="lic-hero">
+      <div class="lic-hero-info">
+        <h1>Gestão de Licenças</h1>
+        <p>Controle de licenças, custos e renovações</p>
+      </div>
+      <div class="lic-hero-acoes">
+        <button class="btn-lic btn-lic-outline ativo" id="btnTabela" onclick="mudarVista('tabela')">📋 Tabela</button>
+        <button class="btn-lic btn-lic-outline" id="btnRelatorio" onclick="mudarVista('relatorio')">📊 Relatório</button>
+        <button class="btn-lic btn-lic-outline" onclick="abrirAlertas()">🔔 Alertas</button>
+        <button class="btn-lic btn-lic-add" onclick="abrirModalLicenca()">+ Adicionar Licença</button>
+      </div>
+    </div>
+
+    <!-- RESUMO -->
+    <div class="resumo-grid">
+      <div class="resumo-card"><div class="resumo-card-val" id="resTotal">0</div><div class="resumo-card-lbl">Total de Licenças</div></div>
+      <div class="resumo-card"><div class="resumo-card-val" id="resAtivas">0</div><div class="resumo-card-lbl">Ativas</div><div class="resumo-card-sub sub-verde" id="resAtivasLbl">🟢 ativas</div></div>
+      <div class="resumo-card"><div class="resumo-card-val" id="resVencendo">0</div><div class="resumo-card-lbl">Vencendo em 30 dias</div><div class="resumo-card-sub sub-amarelo">⚠️ atenção</div></div>
+      <div class="resumo-card"><div class="resumo-card-val" id="resMensal">—</div><div class="resumo-card-lbl">Custo Mensal</div></div>
+      <div class="resumo-card"><div class="resumo-card-val" id="resAnual">—</div><div class="resumo-card-lbl">Custo Anual</div></div>
+    </div>
+
+    <!-- VISTA TABELA -->
+    <div id="vistaTabela">
+      <div class="lic-toolbar">
+        <div class="lic-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchLic" placeholder="Buscar licença..." oninput="filtrarLicencas()">
+        </div>
+        <button class="btn-mais-filtros" onclick="toggleFiltros()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          Mais Filtros
+        </button>
+      </div>
+
+      <div class="filtros-avancados" id="filtrosAvancados">
+        <div class="filtros-grid">
+          <div class="filtro-group"><label>Categoria</label><select class="filtro-input" id="fCategoria" onchange="filtrarLicencas()"><option value="">Todas</option><option>Software</option><option>SaaS</option><option>Cloud</option><option>Hardware</option><option>Serviço</option><option>Outros</option></select></div>
+          <div class="filtro-group"><label>Status</label><select class="filtro-input" id="fStatus" onchange="filtrarLicencas()"><option value="">Todos</option><option>Ativa</option><option>Vencendo</option><option>Vencida</option><option>Em Renovação</option></select></div>
+          <div class="filtro-group"><label>Penalidade</label><select class="filtro-input" id="fPenalidade" onchange="filtrarLicencas()"><option value="">Todas</option><option>Financeira</option><option>Reputacional</option><option>Jurídica</option><option>Operacional</option><option>Comercial</option></select></div>
+          <div class="filtro-group"><label>Fornecedor</label><input type="text" class="filtro-input" id="fFornecedor" placeholder="Ex: Microsoft" oninput="filtrarLicencas()"></div>
+          <div class="filtro-group"><label>Unidade / Filial</label><input type="text" class="filtro-input" id="fUnidade" placeholder="Ex: Matriz" oninput="filtrarLicencas()"></div>
+          <div class="filtro-group"><label>Responsável</label><input type="text" class="filtro-input" id="fResponsavel" placeholder="Ex: João" oninput="filtrarLicencas()"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn-primary" onclick="filtrarLicencas()" style="font-size:12px;padding:6px 14px">Aplicar</button>
+          <button class="btn-secondary" onclick="limparFiltros()" style="font-size:12px;padding:6px 14px">Limpar</button>
+        </div>
+      </div>
+
+      <div class="lic-table-wrap">
+        <table class="lic-table">
+          <thead>
+            <tr>
+              <th>Nome</th><th>Categoria</th><th>Unidade/Filial</th><th>Fornecedor</th>
+              <th>Data Emissão</th><th>Validade</th><th>Custo</th>
+              <th>Penalidade</th><th>Status</th><th>Responsável</th>
+              <th>Detalhes</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="licencasBody">
+            <tr><td colspan="12" class="empty-state">Carregando licenças...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VISTA RELATÓRIO -->
+    <div id="vistaRelatorio" class="relatorio-view">
+      <div class="rel-header">
+        <div style="font-size:15px;font-weight:700;color:#1e2a4a">📊 Relatório de Licenças</div>
+        <button class="btn-exportar" onclick="exportarRelatorio()">⬇️ Exportar PDF</button>
+      </div>
+      <div id="relatorioConteudo"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Adicionar/Editar Licença -->
+<div class="modal-overlay" id="modalLicenca">
+  <div class="modal modal-lic">
+    <div class="modal-header">
+      <span class="modal-titulo modal-lic-titulo" id="modalLicTitulo">Nova Licença</span>
+      <button class="btn-fechar" onclick="fecharModal('modalLicenca')">×</button>
+    </div>
+
+    <div class="form-sec">
+      <div class="form-sec-titulo">Informações Principais</div>
+      <div class="form-grid-2">
+        <div class="form-group"><label>Nome da Licença *</label><input type="text" class="form-control" id="licNome" placeholder="Ex: Microsoft 365"></div>
+        <div class="form-group"><label>Categoria *</label>
+          <select class="form-control" id="licCategoria">
+            <option value="">Selecione...</option><option>Software</option><option>SaaS</option><option>Cloud</option><option>Hardware</option><option>Serviço</option><option>Outros</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Fornecedor</label><input type="text" class="form-control" id="licFornecedor" placeholder="Ex: Microsoft"></div>
+        <div class="form-group"><label>Unidade / Filial</label><input type="text" class="form-control" id="licUnidade" placeholder="Ex: Matriz São Paulo"></div>
+        <div class="form-group"><label>Responsável</label><input type="text" class="form-control" id="licResponsavel" placeholder="Nome do responsável"></div>
+        <div class="form-group"><label>Email do Responsável</label><input type="email" class="form-control" id="licResponsavelEmail" placeholder="email@empresa.com"></div>
+      </div>
+    </div>
+
+    <div class="form-sec">
+      <div class="form-sec-titulo">Datas e Custos</div>
+      <div class="form-grid-3">
+        <div class="form-group"><label>Data de Emissão</label><input type="date" class="form-control" id="licDataEmissao"></div>
+        <div class="form-group"><label>Data de Validade</label><input type="date" class="form-control" id="licValidade"></div>
+        <div class="form-group"><label>Quantidade</label><input type="text" class="form-control" id="licQuantidade" placeholder="Ex: 50 usuários"></div>
+        <div class="form-group"><label>Custo Mensal (R$)</label><input type="number" class="form-control" id="licCusto" placeholder="0,00" min="0" step="0.01"></div>
+        <div class="form-group"><label>Status</label>
+          <select class="form-control" id="licStatus">
+            <option>Ativa</option><option>Vencendo</option><option>Vencida</option><option>Em Renovação</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Penalidade</label>
+          <select class="form-control" id="licPenalidade">
+            <option value="">Selecione...</option><option>Financeira</option><option>Reputacional</option><option>Jurídica</option><option>Operacional</option><option>Comercial</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-sec">
+      <div class="form-sec-titulo">Configuração de Alerta</div>
+      <div class="form-grid-2">
+        <div class="form-group"><label>Alertar com quantos dias de antecedência?</label><input type="number" class="form-control" id="licAlertaDias" value="30" min="1" max="365"></div>
+        <div class="form-group"><label>Observações</label><input type="text" class="form-control" id="licObservacoes" placeholder="Observações adicionais..."></div>
+      </div>
+    </div>
+
+    <div class="form-sec">
+      <div class="form-sec-titulo">Documentos Anexos (máx. 3 arquivos, 5MB cada)</div>
+      <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="processarArquivos(event)">
+        <div style="font-size:24px;margin-bottom:6px">📎</div>
+        <div style="font-size:13px;font-weight:600;color:#4a5568">Clique para selecionar arquivos</div>
+        <div style="font-size:11px;color:#a0aec0;margin-top:3px">PDF, DOC, DOCX, PNG, JPG — máx 5MB por arquivo</div>
+      </div>
+      <div class="upload-lista" id="uploadLista"></div>
+    </div>
+
+    <input type="hidden" id="licEditId">
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalLicenca')">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarLicenca()">💾 Salvar Licença</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhes -->
+<div class="modal-overlay" id="modalDetalhes">
+  <div class="modal modal-det">
+    <div class="modal-header">
+      <span class="modal-titulo">Detalhes da Licença</span>
+      <button class="btn-fechar" onclick="fecharModal('modalDetalhes')">×</button>
+    </div>
+    <div style="font-size:11px;color:#a0aec0;margin-bottom:14px">Informações completas e documentos anexos</div>
+    <div id="detConteudo"></div>
+    <div style="margin-top:16px">
+      <div style="font-size:11px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Documentos Anexos</div>
+      <div id="detDocumentos"></div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn-cancelar" onclick="fecharModal('modalDetalhes')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Alertas -->
+<div class="modal-overlay" id="modalAlertas">
+  <div class="modal modal-alertas">
+    <div class="modal-header">
+      <span class="modal-titulo">🔔 Configurar Alertas</span>
+      <button class="btn-fechar" onclick="fecharModal('modalAlertas')">×</button>
+    </div>
+    <p style="font-size:12px;color:#718096;margin-bottom:14px">Configure com quantos dias de antecedência deseja ser alertado para cada licença. O alerta será enviado por email ao responsável e ao administrador no próximo login.</p>
+    <div id="alertasLista"></div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalAlertas')">Fechar</button>
+      <button class="btn-confirmar" onclick="salvarAlertas()">💾 Salvar Alertas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = '/';
+  document.getElementById('userNome').textContent = usuario.nome || '-';
+  document.getElementById('userPerfil').textContent = usuario.perfil || '-';
+  document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+
+  const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+  let licencas = [], documentosTemp = [], vistaAtual = 'tabela';
+
+  // ===== UTILS =====
+  function fmtMoeda(v) { return 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function fmtData(d) { if (!d) return '—'; return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR'); }
+  function diasParaVencer(validade) { if (!validade) return null; return Math.ceil((new Date(validade + 'T12:00:00') - new Date()) / (1000*60*60*24)); }
+  function fmtValidade(validade, status) {
+    const dias = diasParaVencer(validade);
+    if (dias === null) return '<span class="val-ok">—</span>';
+    if (status === 'Vencida' || dias < 0) return `<span class="val-vencida">${fmtData(validade)}<br>Vencida há ${Math.abs(dias)} dias 🔴</span>`;
+    if (dias <= 30) return `<span class="val-vencendo">${fmtData(validade)}<br>Em ${dias} dias ⚠️</span>`;
+    return `<span class="val-ok">${fmtData(validade)}</span>`;
+  }
+
+  const STATUS_CLASS = { 'Ativa':'status-ativa', 'Vencendo':'status-vencendo', 'Vencida':'status-vencida', 'Em Renovação':'status-renovacao' };
+  const STATUS_ICON = { 'Ativa':'🟢', 'Vencendo':'🟡', 'Vencida':'🔴', 'Em Renovação':'🔄' };
+  const PEN_CLASS = { 'Financeira':'pen-financeira', 'Reputacional':'pen-reputacional', 'Jurídica':'pen-juridica', 'Operacional':'pen-operacional', 'Comercial':'pen-comercial' };
+  const PEN_ICON = { 'Financeira':'💰', 'Reputacional':'👁️', 'Jurídica':'⚖️', 'Operacional':'⚙️', 'Comercial':'🤝' };
+  const CAT_ICON = { 'Software':'💻', 'SaaS':'📦', 'Cloud':'☁️', 'Hardware':'🖥️', 'Serviço':'🔧', 'Outros':'📄' };
+
+  // ===== API =====
+  async function carregarLicencas() {
+    try {
+      const res = await fetch('/api/licencas', { headers: HEADERS });
+      if (res.status === 401) { window.location.href = '/'; return; }
+      licencas = await res.json();
+      renderResumo();
+      renderLicencas();
+    } catch(err) { console.error(err); }
+  }
+
+  // ===== RESUMO =====
+  function renderResumo() {
+    const total = licencas.length;
+    const ativas = licencas.filter(l => l.status === 'Ativa').length;
+    const vencendo = licencas.filter(l => { const d = diasParaVencer(l.validade); return d !== null && d >= 0 && d <= 30 && l.status !== 'Vencida'; }).length;
+    const custoMensal = licencas.reduce((s, l) => s + (parseFloat(l.custo) || 0), 0);
+    document.getElementById('resTotal').textContent = total;
+    document.getElementById('resAtivas').textContent = ativas;
+    document.getElementById('resAtivasLbl').textContent = `🟢 ${ativas} ativa${ativas !== 1 ? 's' : ''}`;
+    document.getElementById('resVencendo').textContent = vencendo;
+    document.getElementById('resMensal').textContent = fmtMoeda(custoMensal);
+    document.getElementById('resAnual').textContent = fmtMoeda(custoMensal * 12);
+  }
+
+  // ===== TABELA =====
+  function renderLicencas(lista) {
+    const tbody = document.getElementById('licencasBody');
+    const dados = lista !== undefined ? lista : getLicencasFiltradas();
+    if (dados.length === 0) { tbody.innerHTML = `<tr><td colspan="12" class="empty-state"><div style="font-size:32px;margin-bottom:10px">📄</div><div>Nenhuma licença encontrada.</div><div style="font-size:12px;margin-top:6px">Clique em "+ Adicionar Licença" para começar!</div></td></tr>`; return; }
+    tbody.innerHTML = dados.map(l => `
+      <tr>
+        <td><div class="lic-nome">${l.nome}</div></td>
+        <td><span class="lic-cat">${CAT_ICON[l.categoria]||'📄'} ${l.categoria||'—'}</span></td>
+        <td>${l.unidade||'—'}</td>
+        <td>${l.fornecedor||'—'}</td>
+        <td>${fmtData(l.dataEmissao)}</td>
+        <td>${fmtValidade(l.validade, l.status)}</td>
+        <td>${l.custo ? fmtMoeda(l.custo)+'/mês' : '—'}</td>
+        <td>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${PEN_ICON[l.penalidade]||''} ${l.penalidade}</span>` : '—'}</td>
+        <td><span class="status-badge ${STATUS_CLASS[l.status]||'status-ativa'}">${STATUS_ICON[l.status]||''} ${l.status||'Ativa'}</span></td>
+        <td>${l.responsavel||'—'}</td>
+        <td><button class="btn-acao btn-acao-det" onclick="verDetalhes('${l._id}')" title="Ver detalhes">👁️</button></td>
+        <td style="display:flex;gap:4px">
+          <button class="btn-acao btn-acao-edit" onclick="editarLicenca('${l._id}')" title="Editar">✏️</button>
+          <button class="btn-acao btn-acao-del" onclick="deletarLicenca('${l._id}')" title="Excluir">🗑️</button>
+        </td>
+      </tr>`).join('');
+  }
+
+  function getLicencasFiltradas() {
+    const q = (document.getElementById('searchLic').value || '').toLowerCase();
+    const fCat = document.getElementById('fCategoria').value;
+    const fStat = document.getElementById('fStatus').value;
+    const fPen = document.getElementById('fPenalidade').value;
+    const fFor = (document.getElementById('fFornecedor').value || '').toLowerCase();
+    const fUni = (document.getElementById('fUnidade').value || '').toLowerCase();
+    const fRes = (document.getElementById('fResponsavel').value || '').toLowerCase();
+    return licencas.filter(l => {
+      if (q && !l.nome.toLowerCase().includes(q) && !(l.fornecedor||'').toLowerCase().includes(q) && !(l.categoria||'').toLowerCase().includes(q)) return false;
+      if (fCat && l.categoria !== fCat) return false;
+      if (fStat && l.status !== fStat) return false;
+      if (fPen && l.penalidade !== fPen) return false;
+      if (fFor && !(l.fornecedor||'').toLowerCase().includes(fFor)) return false;
+      if (fUni && !(l.unidade||'').toLowerCase().includes(fUni)) return false;
+      if (fRes && !(l.responsavel||'').toLowerCase().includes(fRes)) return false;
+      return true;
+    });
+  }
+
+  function filtrarLicencas() { renderLicencas(); }
+  function limparFiltros() { ['fCategoria','fStatus','fPenalidade','fFornecedor','fUnidade','fResponsavel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); document.getElementById('searchLic').value = ''; renderLicencas(); }
+  function toggleFiltros() { document.getElementById('filtrosAvancados').classList.toggle('aberto'); }
+
+  // ===== UPLOAD =====
+  function processarArquivos(e) {
+    const files = Array.from(e.target.files);
+    if (documentosTemp.length + files.length > 3) { alert('Máximo de 3 arquivos permitidos.'); return; }
+    files.forEach(file => {
+      if (file.size > 5 * 1024 * 1024) { alert(`Arquivo "${file.name}" excede 5MB.`); return; }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        documentosTemp.push({ nome: file.name, tipo: file.type, tamanho: file.size, base64: ev.target.result.split(',')[1] });
+        renderUploadLista();
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  }
+
+  function renderUploadLista() {
+    document.getElementById('uploadLista').innerHTML = documentosTemp.map((doc, i) => `
+      <div class="upload-item">
+        <span style="font-size:18px">${doc.tipo.includes('pdf') ? '📄' : doc.tipo.includes('image') ? '🖼️' : '📎'}</span>
+        <span class="upload-item-nome">${doc.nome}</span>
+        <span class="upload-item-tam">${(doc.tamanho/1024).toFixed(0)} KB</span>
+        <button class="upload-item-del" onclick="removerDoc(${i})">✕</button>
+      </div>`).join('');
+  }
+
+  function removerDoc(i) { documentosTemp.splice(i, 1); renderUploadLista(); }
+
+  // ===== MODAL LICENÇA =====
+  function abrirModalLicenca() {
+    document.getElementById('licEditId').value = '';
+    document.getElementById('modalLicTitulo').textContent = 'Nova Licença';
+    ['licNome','licFornecedor','licUnidade','licResponsavel','licResponsavelEmail','licQuantidade','licObservacoes'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('licCategoria').value = '';
+    document.getElementById('licPenalidade').value = '';
+    document.getElementById('licStatus').value = 'Ativa';
+    document.getElementById('licAlertaDias').value = 30;
+    document.getElementById('licDataEmissao').value = '';
+    document.getElementById('licValidade').value = '';
+    document.getElementById('licCusto').value = '';
+    documentosTemp = [];
+    renderUploadLista();
+    document.getElementById('modalLicenca').classList.add('aberto');
+  }
+
+  function editarLicenca(id) {
+    const l = licencas.find(l => l._id === id);
+    if (!l) return;
+    document.getElementById('licEditId').value = id;
+    document.getElementById('modalLicTitulo').textContent = 'Editar Licença';
+    document.getElementById('licNome').value = l.nome || '';
+    document.getElementById('licCategoria').value = l.categoria || '';
+    document.getElementById('licFornecedor').value = l.fornecedor || '';
+    document.getElementById('licUnidade').value = l.unidade || '';
+    document.getElementById('licResponsavel').value = l.responsavel || '';
+    document.getElementById('licResponsavelEmail').value = l.responsavelEmail || '';
+    document.getElementById('licDataEmissao').value = l.dataEmissao || '';
+    document.getElementById('licValidade').value = l.validade || '';
+    document.getElementById('licQuantidade').value = l.quantidade || '';
+    document.getElementById('licCusto').value = l.custo || '';
+    document.getElementById('licStatus').value = l.status || 'Ativa';
+    document.getElementById('licPenalidade').value = l.penalidade || '';
+    document.getElementById('licAlertaDias').value = l.alertaDias || 30;
+    document.getElementById('licObservacoes').value = l.observacoes || '';
+    documentosTemp = (l.documentos || []).map(d => ({ nome: d.nome, tipo: d.tipo, tamanho: d.tamanho, base64: d.base64 }));
+    renderUploadLista();
+    document.getElementById('modalLicenca').classList.add('aberto');
+  }
+
+  async function salvarLicenca() {
+    const nome = document.getElementById('licNome').value.trim();
+    if (!nome) { alert('Nome da licença é obrigatório.'); return; }
+    const dados = {
+      nome,
+      categoria: document.getElementById('licCategoria').value,
+      fornecedor: document.getElementById('licFornecedor').value.trim(),
+      unidade: document.getElementById('licUnidade').value.trim(),
+      responsavel: document.getElementById('licResponsavel').value.trim(),
+      responsavelEmail: document.getElementById('licResponsavelEmail').value.trim(),
+      dataEmissao: document.getElementById('licDataEmissao').value,
+      validade: document.getElementById('licValidade').value,
+      quantidade: document.getElementById('licQuantidade').value.trim(),
+      custo: parseFloat(document.getElementById('licCusto').value) || 0,
+      status: document.getElementById('licStatus').value,
+      penalidade: document.getElementById('licPenalidade').value,
+      alertaDias: parseInt(document.getElementById('licAlertaDias').value) || 30,
+      observacoes: document.getElementById('licObservacoes').value.trim(),
+      documentos: documentosTemp
+    };
+    try {
+      const id = document.getElementById('licEditId').value;
+      if (id) {
+        await fetch(`/api/licencas/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(dados) });
+      } else {
+        await fetch('/api/licencas', { method: 'POST', headers: HEADERS, body: JSON.stringify(dados) });
+      }
+      fecharModal('modalLicenca');
+      await carregarLicencas();
+    } catch(err) { console.error(err); alert('Erro ao salvar licença.'); }
+  }
+
+  async function deletarLicenca(id) {
+    if (!confirm('Deletar esta licença?')) return;
+    await fetch(`/api/licencas/${id}`, { method: 'DELETE', headers: HEADERS });
+    await carregarLicencas();
+  }
+
+  // ===== DETALHES =====
+  async function verDetalhes(id) {
+    try {
+      const res = await fetch(`/api/licencas/${id}`, { headers: HEADERS });
+      const l = await res.json();
+      document.getElementById('detConteudo').innerHTML = `
+        <div class="det-grid">
+          <div class="det-item"><label>Nome</label><span>${l.nome}</span></div>
+          <div class="det-item"><label>Categoria</label><span>${CAT_ICON[l.categoria]||'📄'} ${l.categoria||'—'}</span></div>
+          <div class="det-item"><label>Fornecedor</label><span>${l.fornecedor||'—'}</span></div>
+          <div class="det-item"><label>Unidade / Filial</label><span>${l.unidade||'—'}</span></div>
+          <div class="det-item"><label>Quantidade</label><span>${l.quantidade||'—'}</span></div>
+          <div class="det-item"><label>Custo Mensal</label><span>${l.custo ? fmtMoeda(l.custo)+'/mês' : '—'}</span></div>
+          <div class="det-item"><label>Data de Emissão</label><span>${fmtData(l.dataEmissao)}</span></div>
+          <div class="det-item"><label>Data de Validade</label><span>${fmtData(l.validade)}</span></div>
+          <div class="det-item"><label>Status</label><span class="status-badge ${STATUS_CLASS[l.status]||''}">${STATUS_ICON[l.status]||''} ${l.status||'—'}</span></div>
+          <div class="det-item"><label>Penalidade</label><span>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${PEN_ICON[l.penalidade]||''} ${l.penalidade}</span>` : '—'}</span></div>
+          <div class="det-item"><label>Responsável</label><span>${l.responsavel||'—'}</span></div>
+          <div class="det-item"><label>Email Responsável</label><span>${l.responsavelEmail||'—'}</span></div>
+          ${l.observacoes ? `<div class="det-item" style="grid-column:1/-1"><label>Observações</label><span>${l.observacoes}</span></div>` : ''}
+        </div>`;
+      const docs = l.documentos || [];
+      document.getElementById('detDocumentos').innerHTML = docs.length === 0
+        ? '<div style="color:#a0aec0;font-size:12px">Nenhum documento anexado.</div>'
+        : docs.map((doc, i) => `
+          <div class="doc-item">
+            <span class="doc-icon">${doc.tipo && doc.tipo.includes('pdf') ? '📄' : doc.tipo && doc.tipo.includes('image') ? '🖼️' : '📎'}</span>
+            <span class="doc-nome">${doc.nome}</span>
+            <span class="doc-tam">${doc.tamanho ? (doc.tamanho/1024).toFixed(0)+' KB' : ''}</span>
+            <button class="btn-baixar" onclick="baixarDoc(${i}, '${l._id}')">⬇️ Baixar</button>
+          </div>`).join('');
+      document.getElementById('modalDetalhes').classList.add('aberto');
+      document.getElementById('modalDetalhes').dataset.licId = l._id;
+    } catch(err) { console.error(err); }
+  }
+
+  async function baixarDoc(docIdx, licId) {
+    try {
+      const res = await fetch(`/api/licencas/${licId}`, { headers: HEADERS });
+      const l = await res.json();
+      const doc = l.documentos[docIdx];
+      if (!doc || !doc.base64) return;
+      const byteChars = atob(doc.base64);
+      const byteArr = new Uint8Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) byteArr[i] = byteChars.charCodeAt(i);
+      const blob = new Blob([byteArr], { type: doc.tipo || 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = doc.nome;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch(err) { console.error(err); }
+  }
+
+  // ===== ALERTAS =====
+  function abrirAlertas() {
+    const lista = document.getElementById('alertasLista');
+    if (licencas.length === 0) { lista.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:20px">Nenhuma licença cadastrada.</div>'; }
+    else {
+      lista.innerHTML = licencas.map(l => `
+        <div class="alerta-item">
+          <div>
+            <div class="alerta-nome">${l.nome}</div>
+            <div style="font-size:11px;color:#718096">${l.validade ? 'Vence em: ' + fmtData(l.validade) : 'Sem validade'}</div>
+          </div>
+          <div class="alerta-dias">
+            <span style="font-size:12px;color:#718096">Alertar com</span>
+            <input type="number" value="${l.alertaDias || 30}" min="1" max="365" data-id="${l._id}" id="alerta-${l._id}">
+            <span style="font-size:12px;color:#718096">dias</span>
+          </div>
+        </div>`).join('');
+    }
+    document.getElementById('modalAlertas').classList.add('aberto');
+  }
+
+  async function salvarAlertas() {
+    const updates = licencas.map(l => {
+      const inp = document.getElementById('alerta-' + l._id);
+      return inp ? fetch(`/api/licencas/${l._id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ alertaDias: parseInt(inp.value) || 30 }) }) : Promise.resolve();
+    });
+    await Promise.all(updates);
+    await carregarLicencas();
+    fecharModal('modalAlertas');
+    alert('Alertas salvos com sucesso!');
+  }
+
+  // ===== VISTA =====
+  function mudarVista(vista) {
+    vistaAtual = vista;
+    document.getElementById('vistaTabela').style.display = vista === 'tabela' ? 'block' : 'none';
+    document.getElementById('vistaRelatorio').classList.toggle('ativo', vista === 'relatorio');
+    document.getElementById('btnTabela').classList.toggle('ativo', vista === 'tabela');
+    document.getElementById('btnRelatorio').classList.toggle('ativo', vista === 'relatorio');
+    if (vista === 'relatorio') renderRelatorio();
+  }
+
+  function renderRelatorio() {
+    const total = licencas.length;
+    const custoMensal = licencas.reduce((s,l) => s + (parseFloat(l.custo)||0), 0);
+    const porStatus = {};
+    const porCat = {};
+    licencas.forEach(l => {
+      porStatus[l.status] = (porStatus[l.status]||0) + 1;
+      porCat[l.categoria||'Outros'] = (porCat[l.categoria||'Outros']||0) + 1;
+    });
+    document.getElementById('relatorioConteudo').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div style="background:white;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+          <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:12px">📊 Por Status</div>
+          ${Object.entries(porStatus).map(([s,c]) => `
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <span class="status-badge ${STATUS_CLASS[s]||'status-ativa'}">${STATUS_ICON[s]||''} ${s}</span>
+              <strong style="font-size:13px">${c} licença${c!==1?'s':''}</strong>
+            </div>`).join('') || '<div style="color:#a0aec0;font-size:12px">Sem dados</div>'}
+        </div>
+        <div style="background:white;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+          <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:12px">📁 Por Categoria</div>
+          ${Object.entries(porCat).map(([c,n]) => `
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+              <span style="font-size:12px;color:#4a5568">${CAT_ICON[c]||'📄'} ${c}</span>
+              <strong style="font-size:13px">${n}</strong>
+            </div>`).join('') || '<div style="color:#a0aec0;font-size:12px">Sem dados</div>'}
+        </div>
+      </div>
+      <div style="background:white;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+        <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:14px">📋 Todas as Licenças</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="background:#f8fafc">
+            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">NOME</th>
+            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">FORNECEDOR</th>
+            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">VALIDADE</th>
+            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">CUSTO/MÊS</th>
+            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">STATUS</th>
+          </tr></thead>
+          <tbody>
+            ${licencas.map(l => `<tr>
+              <td style="padding:8px;border-bottom:1px solid #f0f2f5;font-weight:600">${l.nome}</td>
+              <td style="padding:8px;border-bottom:1px solid #f0f2f5">${l.fornecedor||'—'}</td>
+              <td style="padding:8px;border-bottom:1px solid #f0f2f5">${fmtData(l.validade)}</td>
+              <td style="padding:8px;border-bottom:1px solid #f0f2f5">${l.custo ? fmtMoeda(l.custo) : '—'}</td>
+              <td style="padding:8px;border-bottom:1px solid #f0f2f5"><span class="status-badge ${STATUS_CLASS[l.status]||''}">${STATUS_ICON[l.status]||''} ${l.status||'—'}</span></td>
+            </tr>`).join('')}
+            <tr style="background:#f8fafc;font-weight:700">
+              <td colspan="3" style="padding:10px;text-align:right;color:#718096">TOTAL:</td>
+              <td style="padding:10px;color:#1e2a4a">${fmtMoeda(custoMensal)}/mês</td>
+              <td style="padding:10px;color:#1e2a4a">${fmtMoeda(custoMensal*12)}/ano</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function exportarRelatorio() { window.print(); }
+
+  function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
+
+  carregarLicencas();
+</script>
+</body>
+</html>

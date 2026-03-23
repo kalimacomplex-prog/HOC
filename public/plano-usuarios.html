@@ -361,8 +361,7 @@
 
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href='/'; }
 
-  renderizarPlanos();
-  carregarUsuarios();
+
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
@@ -451,6 +450,8 @@
       if (dd) dd.classList.remove('aberto');
     }
   });
+  renderizarPlanos();
+  carregarUsuarios();
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>

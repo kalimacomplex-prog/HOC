@@ -8,7 +8,8 @@ const crypto = require('crypto');
 const fetch = require('node-fetch');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(express.static('public'));
 
 // ==================== BREVO ====================
@@ -24,6 +25,40 @@ async function enviarEmail(para, assunto, html) {
     console.log('Email enviado:', data);
     return data;
   } catch (err) { console.error('Erro ao enviar email:', err); }
+}
+
+async function verificarAlertasLicencas(empresaId, emailAdmin) {
+  try {
+    const hoje = new Date();
+    const licencas = await Licenca.find({ empresa: empresaId, status: { $in: ['Ativa', 'Vencendo', 'Em Renovação'] } });
+    for (const lic of licencas) {
+      if (!lic.validade || !lic.alertaDias) continue;
+      const validade = new Date(lic.validade);
+      const diffDias = Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
+      if (diffDias <= lic.alertaDias && diffDias >= 0) {
+        const emails = [];
+        if (emailAdmin) emails.push(emailAdmin);
+        if (lic.responsavelEmail && lic.responsavelEmail !== emailAdmin) emails.push(lic.responsavelEmail);
+        for (const email of emails) {
+          await enviarEmail(email, `⚠️ Licença vencendo em ${diffDias} dias — ${lic.nome}`, `
+            <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px">
+              <h2 style="color:#2d1b69">⚠️ Alerta de Vencimento de Licença</h2>
+              <p>A licença abaixo vence em <strong>${diffDias} dia(s)</strong>:</p>
+              <table style="width:100%;border-collapse:collapse;margin:16px 0">
+                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">NOME</td><td style="padding:8px">${lic.nome}</td></tr>
+                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">CATEGORIA</td><td style="padding:8px">${lic.categoria}</td></tr>
+                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">FORNECEDOR</td><td style="padding:8px">${lic.fornecedor}</td></tr>
+                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">VALIDADE</td><td style="padding:8px">${new Date(lic.validade).toLocaleDateString('pt-BR')}</td></tr>
+                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">RESPONSÁVEL</td><td style="padding:8px">${lic.responsavel}</td></tr>
+                <tr><td style="padding:8px;background:#f8fafc;font-weight:600;color:#718096;font-size:12px">PENALIDADE</td><td style="padding:8px">${lic.penalidade}</td></tr>
+              </table>
+              <a href="${process.env.APP_URL}/gestao-licencas" style="display:inline-block;padding:12px 24px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Ver no HOC System</a>
+              <p style="color:#a0aec0;font-size:12px;margin-top:24px">HOC System — Business Manager</p>
+            </div>`);
+        }
+      }
+    }
+  } catch (err) { console.error('Erro ao verificar alertas:', err); }
 }
 
 // ==================== MONGODB ====================
@@ -54,102 +89,88 @@ const conviteSchema = new mongoose.Schema({
 const Convite = mongoose.model('Convite', conviteSchema);
 
 const projetoSchema = new mongoose.Schema({
-  nome: { type: String, required: true },
-  tipo: { type: String, enum: ['tradicional', 'agil'], required: true },
-  descricao: { type: String, default: '' },
-  categoria: { type: String, default: '' },
-  area: { type: String, default: '' },
-  responsavel: { type: String, default: '' },
-  status: { type: String, default: 'Ativo' },
-  tags: { type: String, default: '' },
-  dataInicio: { type: String, default: '' },
-  dataFim: { type: String, default: '' },
+  nome: { type: String, required: true }, tipo: { type: String, enum: ['tradicional', 'agil'], required: true },
+  descricao: { type: String, default: '' }, categoria: { type: String, default: '' }, area: { type: String, default: '' },
+  responsavel: { type: String, default: '' }, status: { type: String, default: 'Ativo' }, tags: { type: String, default: '' },
+  dataInicio: { type: String, default: '' }, dataFim: { type: String, default: '' },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  tap: { type: Object, default: {} },
-  estudosCaso: { type: Array, default: [] },
-  escopo: { type: Object, default: {} },
-  cronograma: { type: Array, default: [] },
-  recursos: { type: Object, default: {} },
-  riscos: { type: Array, default: [] },
-  qualidade: { type: Object, default: {} },
-  changeRequests: { type: Array, default: [] },
-  execucao: { type: Object, default: {} },
-  encerramento: { type: Object, default: {} },
-  sprints: { type: Array, default: [] },
-  backlog: { type: Array, default: [] },
-  retrospectivas: { type: Array, default: [] },
-  criadoEm: { type: Date, default: Date.now },
-  atualizadoEm: { type: Date, default: Date.now }
+  tap: { type: Object, default: {} }, estudosCaso: { type: Array, default: [] }, escopo: { type: Object, default: {} },
+  cronograma: { type: Array, default: [] }, recursos: { type: Object, default: {} }, riscos: { type: Array, default: [] },
+  qualidade: { type: Object, default: {} }, changeRequests: { type: Array, default: [] }, execucao: { type: Object, default: {} },
+  encerramento: { type: Object, default: {} }, sprints: { type: Array, default: [] }, backlog: { type: Array, default: [] },
+  retrospectivas: { type: Array, default: [] }, criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
 });
 const Projeto = mongoose.model('Projeto', projetoSchema);
 
 const templateSchema = new mongoose.Schema({
-  nome: { type: String, required: true },
-  tipo: { type: String, required: true },
-  descricao: { type: String, default: '' },
-  conteudo: { type: Object, default: {} },
-  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
-  criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  publico: { type: Boolean, default: true },
+  nome: { type: String, required: true }, tipo: { type: String, required: true }, descricao: { type: String, default: '' },
+  conteudo: { type: Object, default: {} }, empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' }, publico: { type: Boolean, default: true },
   criadoEm: { type: Date, default: Date.now }
 });
 const Template = mongoose.model('Template', templateSchema);
 
 const ideiaSchema = new mongoose.Schema({
-  titulo: { type: String, required: true },
-  tipo: { type: String, default: '' },
-  responsavel: { type: String, default: '' },
-  area: { type: String, default: '' },
-  data: { type: String, default: '' },
-  complexidade: { type: String, default: '' },
-  descricao: { type: String, default: '' },
-  ganho: { type: String, default: '' },
-  periodo: { type: String, default: '' },
-  tags: { type: String, default: '' },
-  aprovacao: { type: String, default: 'pendente' },
-  status: { type: String, default: 'Não Iniciada' },
-  autor: { type: String, default: '' },
-  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  titulo: { type: String, required: true }, tipo: { type: String, default: '' }, responsavel: { type: String, default: '' },
+  area: { type: String, default: '' }, data: { type: String, default: '' }, complexidade: { type: String, default: '' },
+  descricao: { type: String, default: '' }, ganho: { type: String, default: '' }, periodo: { type: String, default: '' },
+  tags: { type: String, default: '' }, aprovacao: { type: String, default: 'pendente' }, status: { type: String, default: 'Não Iniciada' },
+  autor: { type: String, default: '' }, empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  criadoEm: { type: Date, default: Date.now },
-  atualizadoEm: { type: Date, default: Date.now }
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
 });
 const Ideia = mongoose.model('Ideia', ideiaSchema);
 
 const bowlerSchema = new mongoose.Schema({
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
-  ano: { type: Number, required: true },
-  dados: { type: Array, default: [] },
-  atualizadoEm: { type: Date, default: Date.now }
+  ano: { type: Number, required: true }, dados: { type: Array, default: [] }, atualizadoEm: { type: Date, default: Date.now }
 });
 const Bowler = mongoose.model('Bowler', bowlerSchema);
 
 const overviewSchema = new mongoose.Schema({
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true, unique: true },
-  info: { type: Object, default: {} },
-  mvv: { type: Object, default: {} },
-  timeline: { type: Array, default: [] },
-  esg: { type: Object, default: {} },
-  organograma: { type: Object, default: {} },
-  atualizadoEm: { type: Date, default: Date.now }
+  info: { type: Object, default: {} }, mvv: { type: Object, default: {} }, timeline: { type: Array, default: [] },
+  esg: { type: Object, default: {} }, organograma: { type: Object, default: {} }, atualizadoEm: { type: Date, default: Date.now }
 });
 const Overview = mongoose.model('Overview', overviewSchema);
 
 const wikiSchema = new mongoose.Schema({
-  titulo: { type: String, required: true },
-  conteudo: { type: String, default: '' },
-  tags: { type: String, default: '' },
+  titulo: { type: String, required: true }, conteudo: { type: String, default: '' }, tags: { type: String, default: '' },
+  responsavel: { type: String, default: '' }, status: { type: String, default: 'Rascunho' }, versao: { type: String, default: 'v1.0' },
+  versoes: { type: Array, default: [] }, empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
+});
+const Wiki = mongoose.model('Wiki', wikiSchema);
+
+const licencaSchema = new mongoose.Schema({
+  nome: { type: String, required: true },
+  categoria: { type: String, default: '' },
+  fornecedor: { type: String, default: '' },
+  unidade: { type: String, default: '' },
   responsavel: { type: String, default: '' },
-  status: { type: String, default: 'Rascunho' },
-  versao: { type: String, default: 'v1.0' },
-  versoes: { type: Array, default: [] },
+  responsavelEmail: { type: String, default: '' },
+  dataEmissao: { type: String, default: '' },
+  validade: { type: String, default: '' },
+  quantidade: { type: String, default: '' },
+  custo: { type: Number, default: 0 },
+  status: { type: String, default: 'Ativa', enum: ['Ativa', 'Vencendo', 'Vencida', 'Em Renovação'] },
+  penalidade: { type: String, default: '' },
+  alertaDias: { type: Number, default: 30 },
+  observacoes: { type: String, default: '' },
+  documentos: [{
+    nome: { type: String },
+    tipo: { type: String },
+    tamanho: { type: Number },
+    base64: { type: String }
+  }],
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm: { type: Date, default: Date.now },
   atualizadoEm: { type: Date, default: Date.now }
 });
-const Wiki = mongoose.model('Wiki', wikiSchema);
+const Licenca = mongoose.model('Licenca', licencaSchema);
 
 // ==================== MIDDLEWARE ====================
 
@@ -172,6 +193,7 @@ app.get('/gestao-projetos', (req, res) => res.sendFile(path.join(__dirname, 'pub
 app.get('/projeto-tradicional', (req, res) => res.sendFile(path.join(__dirname, 'public', 'projeto-tradicional.html')));
 app.get('/projeto-agil', (req, res) => res.sendFile(path.join(__dirname, 'public', 'projeto-agil.html')));
 app.get('/repositorio-templates', (req, res) => res.sendFile(path.join(__dirname, 'public', 'repositorio-templates.html')));
+app.get('/gestao-licencas', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-licencas.html')));
 app.get('/aceitar-convite', (req, res) => res.sendFile(path.join(__dirname, 'public', 'aceitar-convite.html')));
 app.get('/plano-usuarios', (req, res) => res.sendFile(path.join(__dirname, 'public', 'plano-usuarios.html')));
 
@@ -199,6 +221,8 @@ app.post('/api/login', async (req, res) => {
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
     if (!senhaCorreta) return res.status(400).json({ erro: 'Email ou senha incorretos' });
     const token = jwt.sign({ id: usuario._id, nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresa: usuario.empresa._id, empresaNome: usuario.empresa.nome }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '8h' });
+    // Verificar alertas de licenças ao fazer login
+    verificarAlertasLicencas(usuario.empresa._id, usuario.email).catch(console.error);
     res.json({ token, usuario: { nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresaNome: usuario.empresa.nome } });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -299,8 +323,7 @@ app.put('/api/projetos/:id', authMiddleware, async (req, res) => {
   try {
     const projeto = await Projeto.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
-      { ...req.body, atualizadoEm: new Date() },
-      { new: true }
+      { ...req.body, atualizadoEm: new Date() }, { new: true }
     );
     if (!projeto) return res.status(404).json({ erro: 'Projeto não encontrado' });
     res.json(projeto);
@@ -362,8 +385,7 @@ app.put('/api/ideias/:id', authMiddleware, async (req, res) => {
   try {
     const ideia = await Ideia.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
-      { ...req.body, atualizadoEm: new Date() },
-      { new: true }
+      { ...req.body, atualizadoEm: new Date() }, { new: true }
     );
     if (!ideia) return res.status(404).json({ erro: 'Ideia não encontrada' });
     res.json(ideia);
@@ -437,8 +459,7 @@ app.put('/api/wikis/:id', authMiddleware, async (req, res) => {
   try {
     const wiki = await Wiki.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
-      { ...req.body, atualizadoEm: new Date() },
-      { new: true }
+      { ...req.body, atualizadoEm: new Date() }, { new: true }
     );
     if (!wiki) return res.status(404).json({ erro: 'Wiki não encontrado' });
     res.json(wiki);
@@ -449,6 +470,48 @@ app.delete('/api/wikis/:id', authMiddleware, async (req, res) => {
   try {
     await Wiki.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
     res.json({ mensagem: 'Wiki deletado!' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ==================== LICENÇAS ====================
+
+app.get('/api/licencas', authMiddleware, async (req, res) => {
+  try {
+    const licencas = await Licenca.find({ empresa: req.usuario.empresa }).select('-documentos.base64').sort({ criadoEm: -1 });
+    res.json(licencas);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.get('/api/licencas/:id', authMiddleware, async (req, res) => {
+  try {
+    const licenca = await Licenca.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!licenca) return res.status(404).json({ erro: 'Licença não encontrada' });
+    res.json(licenca);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.post('/api/licencas', authMiddleware, async (req, res) => {
+  try {
+    const licenca = await Licenca.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    res.status(201).json(licenca);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.put('/api/licencas/:id', authMiddleware, async (req, res) => {
+  try {
+    const licenca = await Licenca.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { ...req.body, atualizadoEm: new Date() }, { new: true }
+    );
+    if (!licenca) return res.status(404).json({ erro: 'Licença não encontrada' });
+    res.json(licenca);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.delete('/api/licencas/:id', authMiddleware, async (req, res) => {
+  try {
+    await Licenca.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
+    res.json({ mensagem: 'Licença deletada!' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

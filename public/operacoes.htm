@@ -786,4 +786,908 @@
     <div class="modal-header"><span class="modal-titulo">Novo Bloco</span><button class="btn-fechar" onclick="fecharModal('modalBloco')">×</button></div>
     <div class="form-group"><label>Nome do Processo *</label><input type="text" class="form-control" id="blocoNome" placeholder="Ex: Receber Pedido"></div>
     <div class="form-group"><label>Ícone</label>
-      <select class="form-control" id="blocoIcone"><option value="📦">📦 Processo</option><option value="👤">👤 Pessoa</option><option value="🏭">🏭 Produção</option><option value="📋">📋 Documento</option><option value="🚚">🚚 Entrega</option><option value="💰">💰 Financeiro</option><option value="⚙️">⚙️ Sistema</optio
+      <select class="form-control" id="blocoIcone"><option value="📦">📦 Processo</option><option value="👤">👤 Pessoa</option><option value="🏭">🏭 Produção</option><option value="📋">📋 Documento</option><option value="🚚">🚚 Entrega</option><option value="💰">💰 Financeiro</option><option value="⚙️">⚙️ Sistema</option></select>
+    </div>
+    <div class="form-group"><label>% de Eficiência</label><input type="number" class="form-control" id="blocoEficiencia" min="0" max="100" value="100" placeholder="Ex: 95"></div>
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalBloco')">Cancelar</button><button class="btn-confirmar" onclick="confirmarBloco()">Adicionar</button></div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = '/';
+  document.getElementById('userNome').textContent = usuario.nome || '-';
+  document.getElementById('userPerfil').textContent = usuario.perfil || '-';
+  document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+  const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+  const temPermissaoFv = usuario.perfil === 'Admin';
+
+  // ===== NAV =====
+  function mudarSecao(id, btn) {
+    document.querySelectorAll('.ops-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.ops-menu-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('secao-' + id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'fluxo-valor') carregarFluxo();
+    if (id === 'comunicacao') { carregarContatos(); carregarEmailTemplates(); }
+    if (id === 'tarefas') carregarTarefas();
+    if (id === 'processos') carregarProcessos();
+    if (id === 'robos') { carregarRobos(); carregarCredenciais(); }
+  }
+
+  function mudarComTab(id, btn) {
+    document.querySelectorAll('.com-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.com-section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('com-' + id).classList.add('active');
+  }
+
+  function mudarTskTab(id, btn) {
+    document.querySelectorAll('.tsk-subtab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tsk-lista').style.display = id === 'lista' ? 'block' : 'none';
+    document.getElementById('tsk-carga').style.display = id === 'carga' ? 'block' : 'none';
+    if (id === 'carga') renderCargaTrabalho();
+  }
+
+  function mudarRoboTab(id, btn) {
+    document.querySelectorAll('.robo-subtab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.robo-secao').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('robo-' + id).classList.add('active');
+    if (id === 'dashboard') renderDashboardRobos();
+    if (id === 'calendario') renderCalendario();
+    if (id === 'ambiente') renderAmbiente();
+    if (id === 'agentes') renderAgentes();
+  }
+
+  // ===== UTILS =====
+  function fmtData(d) { if (!d) return '—'; return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR'); }
+  function btnEdit(fn, id) { return `<button onclick="${fn}('${id}')" style="padding:4px 8px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;margin-right:3px">✏️</button>`; }
+  function btnDel(fn, id) { return `<button onclick="${fn}('${id}')" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">🗑️</button>`; }
+  function emptyState(msg) { return `<tr><td colspan="20" class="empty-ops"><div style="font-size:28px;margin-bottom:8px">📭</div><div>${msg}</div></td></tr>`; }
+
+  // ===== FLUXO DE VALOR =====
+  let fvBlocos = [], fvTextos = [], fvConexoes = [], fvModo = 'viz';
+  let fvDragging = null, fvOffset = { x: 0, y: 0 };
+
+  async function carregarFluxo() {
+    try {
+      const res = await fetch('/api/fluxo-valor', { headers: HEADERS });
+      const data = await res.json();
+      fvBlocos = data.blocos || [];
+      fvTextos = data.textos || [];
+      fvConexoes = data.conexoes || [];
+      renderFluxo();
+    } catch(err) { console.error(err); }
+  }
+
+  async function salvarFluxo() {
+    try {
+      await fetch('/api/fluxo-valor', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ blocos: fvBlocos, textos: fvTextos, conexoes: fvConexoes }) });
+    } catch(err) { console.error(err); }
+  }
+
+  function renderFluxo() {
+    const canvas = document.getElementById('fvCanvas');
+    const empty = document.getElementById('fvEmpty');
+    document.querySelectorAll('.fv-block,.fv-text-node').forEach(n => n.remove());
+    if (fvBlocos.length === 0 && fvTextos.length === 0) { empty.style.display = 'flex'; renderFvSvg(); return; }
+    empty.style.display = 'none';
+    fvBlocos.forEach(b => renderFvBloco(b));
+    fvTextos.forEach(t => renderFvTexto(t));
+    renderFvSvg();
+  }
+
+  function renderFvBloco(b) {
+    const canvas = document.getElementById('fvCanvas');
+    const el = document.createElement('div');
+    el.className = 'fv-block';
+    el.id = 'fvb-' + b.id;
+    el.style.left = b.x + 'px';
+    el.style.top = b.y + 'px';
+    el.innerHTML = `
+      <div class="fv-block-header">
+        <span class="fv-block-icon">${b.icone||'📦'}</span>
+        ${fvModo==='edicao' ? `<button class="fv-block-del" onclick="removerBloco('${b.id}')">✕</button>` : ''}
+      </div>
+      <div class="fv-block-nome">${b.nome}</div>
+      <div class="fv-block-pct">${b.eficiencia||100}%</div>
+      <div class="fv-block-pct-bar"><div class="fv-block-pct-fill" style="width:${b.eficiencia||100}%"></div></div>`;
+    el.addEventListener('mousedown', e => {
+      if (fvModo !== 'edicao' || e.target.tagName === 'BUTTON') return;
+      fvDragging = { el, bloco: b };
+      const rect = el.getBoundingClientRect();
+      fvOffset.x = e.clientX - rect.left;
+      fvOffset.y = e.clientY - rect.top;
+      el.classList.add('dragging');
+      e.preventDefault();
+    });
+    canvas.appendChild(el);
+  }
+
+  function renderFvTexto(t) {
+    const canvas = document.getElementById('fvCanvas');
+    const el = document.createElement('div');
+    el.className = 'fv-text-node';
+    el.id = 'fvt-' + t.id;
+    el.style.left = t.x + 'px';
+    el.style.top = t.y + 'px';
+    el.textContent = t.texto;
+    if (fvModo === 'edicao') {
+      el.contentEditable = 'true';
+      el.addEventListener('blur', () => { t.texto = el.textContent; });
+    }
+    el.addEventListener('mousedown', e => {
+      if (fvModo !== 'edicao' || el.classList.contains('editing')) return;
+      fvDragging = { el, texto: t };
+      const rect = el.getBoundingClientRect();
+      fvOffset.x = e.clientX - rect.left;
+      fvOffset.y = e.clientY - rect.top;
+      e.preventDefault();
+    });
+    canvas.appendChild(el);
+  }
+
+  function renderFvSvg() {
+    const svg = document.getElementById('fvSvg');
+    svg.innerHTML = '';
+    fvConexoes.forEach(c => {
+      const deEl = document.getElementById('fvb-' + c.de);
+      const paraEl = document.getElementById('fvb-' + c.para);
+      if (!deEl || !paraEl) return;
+      const deB = fvBlocos.find(b => b.id === c.de);
+      const paraB = fvBlocos.find(b => b.id === c.para);
+      if (!deB || !paraB) return;
+      const x1 = deB.x + 140, y1 = deB.y + 40;
+      const x2 = paraB.x, y2 = paraB.y + 40;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const mx = (x1 + x2) / 2;
+      path.setAttribute('d', `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`);
+      path.setAttribute('fill', 'none'); path.setAttribute('stroke', '#2d1b69');
+      path.setAttribute('stroke-width', '2'); path.setAttribute('marker-end', 'url(#arrow)');
+      svg.appendChild(path);
+    });
+    // Seta
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = `<marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#2d1b69"/></marker>`;
+    svg.insertBefore(defs, svg.firstChild);
+  }
+
+  document.addEventListener('mousemove', e => {
+    if (!fvDragging) return;
+    const canvasRect = document.getElementById('fvCanvas').getBoundingClientRect();
+    const x = Math.max(0, e.clientX - canvasRect.left - fvOffset.x);
+    const y = Math.max(0, e.clientY - canvasRect.top - fvOffset.y);
+    fvDragging.el.style.left = x + 'px';
+    fvDragging.el.style.top = y + 'px';
+    if (fvDragging.bloco) { fvDragging.bloco.x = x; fvDragging.bloco.y = y; }
+    if (fvDragging.texto) { fvDragging.texto.x = x; fvDragging.texto.y = y; }
+    renderFvSvg();
+  });
+  document.addEventListener('mouseup', () => {
+    if (fvDragging) { fvDragging.el.classList.remove('dragging'); fvDragging = null; salvarFluxo(); }
+  });
+
+  function toggleModoFv() {
+    if (!temPermissaoFv) { document.getElementById('semPermissaoOverlay').style.display = 'flex'; return; }
+    fvModo = fvModo === 'viz' ? 'edicao' : 'viz';
+    document.getElementById('modoBadge').textContent = fvModo === 'edicao' ? '✏️ Edição' : '👁️ Visualização';
+    document.getElementById('modoBadge').className = 'modo-badge ' + (fvModo === 'edicao' ? 'modo-edicao' : 'modo-viz');
+    document.getElementById('btnModoFv').textContent = fvModo === 'edicao' ? '👁️ Visualizar' : '✏️ Editar';
+    document.getElementById('fvToolbarEdicao').style.display = fvModo === 'edicao' ? 'flex' : 'none';
+    renderFluxo();
+  }
+
+  function adicionarBloco() { document.getElementById('blocoNome').value = ''; document.getElementById('blocoEficiencia').value = 100; document.getElementById('modalBloco').classList.add('aberto'); }
+
+  function confirmarBloco() {
+    const nome = document.getElementById('blocoNome').value.trim();
+    if (!nome) return;
+    const b = { id: Date.now().toString(), nome, icone: document.getElementById('blocoIcone').value, eficiencia: parseInt(document.getElementById('blocoEficiencia').value) || 100, x: 50 + fvBlocos.length * 180, y: 100 };
+    if (fvBlocos.length > 0) fvConexoes.push({ de: fvBlocos[fvBlocos.length-1].id, para: b.id });
+    fvBlocos.push(b);
+    fecharModal('modalBloco');
+    renderFluxo();
+    salvarFluxo();
+  }
+
+  function adicionarTexto() {
+    const t = { id: Date.now().toString(), texto: 'Texto livre', x: 100, y: 200 };
+    fvTextos.push(t);
+    renderFluxo();
+    salvarFluxo();
+  }
+
+  function removerBloco(id) {
+    fvBlocos = fvBlocos.filter(b => b.id !== id);
+    fvConexoes = fvConexoes.filter(c => c.de !== id && c.para !== id);
+    renderFluxo();
+    salvarFluxo();
+  }
+
+  function limparCanvas() {
+    if (!confirm('Limpar todo o canvas?')) return;
+    fvBlocos = []; fvTextos = []; fvConexoes = [];
+    renderFluxo();
+    salvarFluxo();
+  }
+
+  // ===== CONTATOS =====
+  let contatos = [];
+
+  async function carregarContatos() {
+    try {
+      const res = await fetch('/api/contatos', { headers: HEADERS });
+      contatos = await res.json();
+      renderContatos();
+      renderContatosStats();
+      renderContatosGrupos();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderContatosStats() {
+    const grupos = {};
+    contatos.forEach(c => { grupos[c.grupo] = (grupos[c.grupo]||0)+1; });
+    document.getElementById('contatosStats').innerHTML = [
+      { val: contatos.length, lbl: 'Total de Contatos' },
+      { val: grupos['Clientes']||0, lbl: 'Clientes' },
+      { val: grupos['Parceiros']||0, lbl: 'Parceiros' },
+    ].map(s => `<div class="stat-mini"><div class="stat-mini-val">${s.val}</div><div class="stat-mini-lbl">${s.lbl}</div></div>`).join('');
+  }
+
+  function renderContatosGrupos() {
+    const grupos = {};
+    contatos.forEach(c => { if (!grupos[c.grupo]) grupos[c.grupo] = []; grupos[c.grupo].push(c); });
+    document.getElementById('contatosGrupos').innerHTML = `<div class="grupos-titulo">Agrupamento por Grupo</div>` +
+      Object.entries(grupos).map(([g, cs]) => `
+        <div class="grupo-item">
+          <div class="grupo-nome">${g} (${cs.length})</div>
+          ${cs.map(c => `<div class="grupo-membro">${c.nome}<div class="grupo-membro-sub">${c.descricao||c.empresa_contato||''}</div></div>`).join('')}
+        </div>`).join('') || '<div style="color:#a0aec0;font-size:12px">Nenhum contato.</div>';
+  }
+
+  function filtrarContatos() {
+    const q = document.getElementById('searchContato').value.toLowerCase();
+    const g = document.getElementById('filtroGrupo').value;
+    const lista = contatos.filter(c => {
+      if (q && !c.nome.toLowerCase().includes(q) && !(c.email||'').toLowerCase().includes(q) && !(c.telefone||'').includes(q)) return false;
+      if (g && c.grupo !== g) return false;
+      return true;
+    });
+    renderContatos(lista);
+  }
+
+  function renderContatos(lista) {
+    const dados = lista || contatos;
+    const tbody = document.getElementById('contatosBody');
+    if (dados.length === 0) { tbody.innerHTML = emptyState('Nenhum contato cadastrado.'); return; }
+    tbody.innerHTML = dados.map(c => `<tr>
+      <td><strong>${c.nome}</strong><div style="font-size:10px;color:#a0aec0">ID: ${c._id.slice(-4)}</div></td>
+      <td>${c.descricao||'—'}</td>
+      <td>${c.email||'—'}</td>
+      <td>${c.telefone||'—'}</td>
+      <td><span style="font-size:11px;padding:2px 7px;background:#f5f0ff;color:#2d1b69;border-radius:3px;font-weight:600">${c.grupo||'—'}</span></td>
+      <td>${c.empresa_contato||'—'}</td>
+      <td>${btnEdit('editarContato',c._id)}${btnDel('deletarContato',c._id)}</td>
+    </tr>`).join('');
+  }
+
+  function abrirModalContato(id) {
+    document.getElementById('cEditId').value = id||'';
+    document.getElementById('modalContatoTitulo').textContent = id ? 'Editar Contato' : 'Novo Contato';
+    if (id) { const c=contatos.find(c=>c._id===id); if(c){document.getElementById('cNome').value=c.nome;document.getElementById('cDescricao').value=c.descricao||'';document.getElementById('cEmail').value=c.email||'';document.getElementById('cTelefone').value=c.telefone||'';document.getElementById('cEmpresa').value=c.empresa_contato||'';document.getElementById('cGrupo').value=c.grupo||'Clientes';} }
+    else { ['cNome','cDescricao','cEmail','cTelefone','cEmpresa'].forEach(id=>document.getElementById(id).value=''); document.getElementById('cGrupo').value='Clientes'; }
+    document.getElementById('modalContato').classList.add('aberto');
+  }
+  function editarContato(id) { abrirModalContato(id); }
+
+  async function salvarContato() {
+    const nome = document.getElementById('cNome').value.trim();
+    if (!nome) { alert('Nome obrigatório.'); return; }
+    const dados = { nome, descricao:document.getElementById('cDescricao').value.trim(), email:document.getElementById('cEmail').value.trim(), telefone:document.getElementById('cTelefone').value.trim(), empresa_contato:document.getElementById('cEmpresa').value.trim(), grupo:document.getElementById('cGrupo').value };
+    const id = document.getElementById('cEditId').value;
+    try {
+      if (id) await fetch(`/api/contatos/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+      else await fetch('/api/contatos', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+      fecharModal('modalContato');
+      await carregarContatos();
+    } catch(err) { console.error(err); }
+  }
+
+  async function deletarContato(id) {
+    if (!confirm('Deletar contato?')) return;
+    await fetch(`/api/contatos/${id}`, { method:'DELETE', headers:HEADERS });
+    await carregarContatos();
+  }
+
+  // ===== EMAIL TEMPLATES =====
+  let emailTemplates = [];
+
+  async function carregarEmailTemplates() {
+    try {
+      const res = await fetch('/api/email-templates', { headers: HEADERS });
+      emailTemplates = await res.json();
+      renderEmailTemplates();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderEmailTemplates() {
+    const grid = document.getElementById('templatesEmailGrid');
+    if (emailTemplates.length === 0) { grid.innerHTML = `<div class="empty-ops" style="grid-column:1/-1"><div style="font-size:28px">📧</div><div>Nenhum template criado.</div></div>`; return; }
+    grid.innerHTML = emailTemplates.map(t => `
+      <div class="template-email-card">
+        <div class="tec-cat">${t.categoria||'Geral'}</div>
+        <div class="tec-nome">${t.nome}</div>
+        <div class="tec-assunto">${t.assunto||'—'}</div>
+        <div class="tec-vars">${(t.variaveis||[]).map(v=>`<span class="tec-var">{${v}}</span>`).join('')}</div>
+        <div class="tec-acoes">
+          <button class="btn-tec btn-tec-edit" onclick="editarEmailTemplate('${t._id}')">✏️ Editar</button>
+          <button class="btn-tec btn-tec-edit" onclick="duplicarEmailTemplate('${t._id}')">📋 Duplicar</button>
+          <button class="btn-tec btn-tec-del" onclick="deletarEmailTemplate('${t._id}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function abrirModalEmailTemplate(id) {
+    document.getElementById('etEditId').value = id||'';
+    document.getElementById('modalEtTitulo').textContent = id ? 'Editar Template' : 'Novo Template de E-mail';
+    if (id) { const t=emailTemplates.find(t=>t._id===id); if(t){document.getElementById('etNome').value=t.nome;document.getElementById('etCategoria').value=t.categoria||'';document.getElementById('etAssunto').value=t.assunto||'';document.getElementById('etCorpo').innerHTML=t.corpo||'';document.getElementById('etVariaveis').value=(t.variaveis||[]).join(', ');} }
+    else { ['etNome','etCategoria','etAssunto','etVariaveis'].forEach(id=>document.getElementById(id).value=''); document.getElementById('etCorpo').innerHTML=''; }
+    document.getElementById('modalEmailTemplate').classList.add('aberto');
+  }
+  function editarEmailTemplate(id) { abrirModalEmailTemplate(id); }
+  function inserirVariavel() { const v=prompt('Nome da variável:'); if(v) document.execCommand('insertText',false,`{${v}}`); }
+  function fmtEt(cmd) { document.execCommand(cmd,false,null); document.getElementById('etCorpo').focus(); }
+
+  async function salvarEmailTemplate() {
+    const nome = document.getElementById('etNome').value.trim();
+    if (!nome) { alert('Nome obrigatório.'); return; }
+    const dados = { nome, categoria:document.getElementById('etCategoria').value.trim(), assunto:document.getElementById('etAssunto').value.trim(), corpo:document.getElementById('etCorpo').innerHTML, variaveis:document.getElementById('etVariaveis').value.split(',').map(v=>v.trim()).filter(Boolean) };
+    const id = document.getElementById('etEditId').value;
+    try {
+      if (id) await fetch(`/api/email-templates/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+      else await fetch('/api/email-templates', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+      fecharModal('modalEmailTemplate');
+      await carregarEmailTemplates();
+    } catch(err) { console.error(err); }
+  }
+
+  async function duplicarEmailTemplate(id) {
+    const t = emailTemplates.find(t=>t._id===id);
+    if (!t) return;
+    const dados = { ...t, nome: t.nome + ' (cópia)', _id: undefined };
+    await fetch('/api/email-templates', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+    await carregarEmailTemplates();
+  }
+
+  async function deletarEmailTemplate(id) {
+    if (!confirm('Deletar template?')) return;
+    await fetch(`/api/email-templates/${id}`, { method:'DELETE', headers:HEADERS });
+    await carregarEmailTemplates();
+  }
+
+  // ===== TAREFAS =====
+  let tarefas = [];
+
+  async function carregarTarefas() {
+    try {
+      const res = await fetch('/api/tarefas', { headers: HEADERS });
+      tarefas = await res.json();
+      renderTarefasStats();
+      renderTarefas();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderTarefasStats() {
+    const total = tarefas.length;
+    const pendentes = tarefas.filter(t=>t.status==='Pendente').length;
+    const progresso = tarefas.filter(t=>t.status==='Em Progresso').length;
+    const concluidas = tarefas.filter(t=>t.status==='Concluída').length;
+    document.getElementById('tarefasStats').innerHTML = [
+      {val:total,lbl:'Todas as tarefas',cor:'#1e2a4a'},{val:pendentes,lbl:'Aguardando início',cor:'#718096'},
+      {val:progresso,lbl:'Em andamento',cor:'#3b5bdb'},{val:concluidas,lbl:'Finalizadas',cor:'#38a169'}
+    ].map(s=>`<div class="stat-mini"><div class="stat-mini-val" style="color:${s.cor}">${s.val}</div><div class="stat-mini-lbl">${s.lbl}</div></div>`).join('');
+  }
+
+  const PRI_CLASS = {Urgente:'pri-urgente',Alta:'pri-alta',Media:'pri-media',Baixa:'pri-baixa'};
+  const ST_CLASS = {Pendente:'stsk-pendente','Em Progresso':'stsk-progresso',Concluída:'stsk-concluida',Dispensada:'stsk-dispensada'};
+
+  function filtrarTarefas() {
+    const q = document.getElementById('searchTarefa').value.toLowerCase();
+    const st = document.getElementById('filtroStatusTsk').value;
+    const pr = document.getElementById('filtroPriTsk').value;
+    const lista = tarefas.filter(t => {
+      if (q && !t.titulo.toLowerCase().includes(q)) return false;
+      if (st && t.status !== st) return false;
+      if (pr && t.prioridade !== pr) return false;
+      return true;
+    });
+    renderTarefas(lista);
+  }
+
+  function renderTarefas(lista) {
+    const tbody = document.getElementById('tarefasBody');
+    const dados = lista || tarefas;
+    if (dados.length === 0) { tbody.innerHTML = emptyState('Nenhuma tarefa encontrada.'); return; }
+    tbody.innerHTML = dados.map(t => `<tr>
+      <td>
+        <div class="tsk-titulo">${t.titulo}</div>
+        <div class="tsk-tags">${(t.tags||[]).map(tg=>`<span class="tsk-tag">${tg}</span>`).join('')}</div>
+      </td>
+      <td><div class="tsk-resp">${(t.responsaveis||[]).slice(0,3).map(r=>`<div class="tsk-avatar" title="${r}">${r[0]?.toUpperCase()||'?'}</div>`).join('')}</div></td>
+      <td>${t.prazo ? new Date(t.prazo+'T12:00:00').toLocaleDateString('pt-BR') : '—'}</td>
+      <td>${t.competencia||'—'}</td>
+      <td><span class="pri-badge ${PRI_CLASS[t.prioridade]||'pri-media'}">${t.prioridade}</span></td>
+      <td><span class="status-tsk ${ST_CLASS[t.status]||'stsk-pendente'}">${t.status}</span></td>
+      <td><div class="progresso-bar"><div class="progresso-fill" style="width:${t.progresso||0}%"></div></div><div style="font-size:10px;color:#a0aec0;margin-top:2px">${t.progresso||0}%</div></td>
+      <td><span class="email-indicator ${t.emailAberto?'email-aberto':t.emailEnviado?'email-enviado':'email-nao'}" title="${t.emailAberto?'Aberto':t.emailEnviado?'Enviado':'Não enviado'}"></span></td>
+      <td>
+        ${t.contatoId&&t.emailTemplateId ? `<button onclick="enviarEmailTarefa('${t._id}')" style="padding:3px 6px;background:#f0fff4;color:#276749;border:1px solid #9ae6b4;border-radius:4px;cursor:pointer;font-size:10px;font-weight:600;margin-right:3px">📧</button>` : ''}
+        <button onclick="concluirTarefa('${t._id}')" style="padding:3px 6px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:10px;font-weight:600;margin-right:3px">✓</button>
+        ${btnEdit('editarTarefa',t._id)}${btnDel('deletarTarefa',t._id)}
+      </td>
+    </tr>`).join('');
+  }
+
+  function abrirModalTarefa(id) {
+    document.getElementById('tEditId').value = id||'';
+    document.getElementById('modalTarefaTitulo').textContent = id ? 'Editar Tarefa' : 'Nova Tarefa';
+    // Popula selects de contato e template
+    document.getElementById('tContato').innerHTML = '<option value="">Nenhum</option>' + contatos.map(c=>`<option value="${c._id}">${c.nome}</option>`).join('');
+    document.getElementById('tEmailTemplate').innerHTML = '<option value="">Nenhum</option>' + emailTemplates.map(t=>`<option value="${t._id}">${t.nome}</option>`).join('');
+    if (id) {
+      const t = tarefas.find(t=>t._id===id);
+      if (t) {
+        document.getElementById('tTitulo').value=t.titulo;
+        document.getElementById('tDescricao').value=t.descricao||'';
+        document.getElementById('tResponsaveis').value=(t.responsaveis||[]).join(', ');
+        document.getElementById('tAreas').value=(t.areas||[]).join(', ');
+        document.getElementById('tPrazo').value=t.prazo||'';
+        document.getElementById('tCompetencia').value=t.competencia||'';
+        document.getElementById('tPrioridade').value=t.prioridade||'Media';
+        document.getElementById('tStatus').value=t.status||'Pendente';
+        document.getElementById('tProgresso').value=t.progresso||0;
+        document.getElementById('tGrupo').value=t.grupo||'';
+        document.getElementById('tTags').value=(t.tags||[]).join(', ');
+        document.getElementById('tContato').value=t.contatoId||'';
+        document.getElementById('tEmailTemplate').value=t.emailTemplateId||'';
+        ['lem30min','lem1h','lem5d','lem10d','lem30d'].forEach(id=>{ document.getElementById(id).checked=(t.lembretes||[]).includes(document.getElementById(id).value); });
+      }
+    } else {
+      ['tTitulo','tDescricao','tResponsaveis','tAreas','tCompetencia','tGrupo','tTags'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('tPrazo').value='';
+      document.getElementById('tPrioridade').value='Media';
+      document.getElementById('tStatus').value='Pendente';
+      document.getElementById('tProgresso').value=0;
+      document.getElementById('tContato').value='';
+      document.getElementById('tEmailTemplate').value='';
+      ['lem30min','lem1h','lem5d','lem10d','lem30d'].forEach(id=>document.getElementById(id).checked=false);
+    }
+    document.getElementById('modalTarefa').classList.add('aberto');
+  }
+  function editarTarefa(id) { abrirModalTarefa(id); }
+
+  async function salvarTarefa() {
+    const titulo = document.getElementById('tTitulo').value.trim();
+    if (!titulo) { alert('Título obrigatório.'); return; }
+    const lembretes = ['lem30min','lem1h','lem5d','lem10d','lem30d'].filter(id=>document.getElementById(id).checked).map(id=>document.getElementById(id).value);
+    const dados = {
+      titulo, descricao:document.getElementById('tDescricao').value,
+      responsaveis:document.getElementById('tResponsaveis').value.split(',').map(r=>r.trim()).filter(Boolean),
+      areas:document.getElementById('tAreas').value.split(',').map(a=>a.trim()).filter(Boolean),
+      prazo:document.getElementById('tPrazo').value, competencia:document.getElementById('tCompetencia').value,
+      prioridade:document.getElementById('tPrioridade').value, status:document.getElementById('tStatus').value,
+      progresso:parseInt(document.getElementById('tProgresso').value)||0, grupo:document.getElementById('tGrupo').value,
+      tags:document.getElementById('tTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+      contatoId:document.getElementById('tContato').value||null,
+      emailTemplateId:document.getElementById('tEmailTemplate').value||null,
+      lembretes
+    };
+    const id = document.getElementById('tEditId').value;
+    try {
+      if (id) await fetch(`/api/tarefas/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+      else await fetch('/api/tarefas', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+      fecharModal('modalTarefa');
+      await carregarTarefas();
+    } catch(err) { console.error(err); }
+  }
+
+  async function concluirTarefa(id) {
+    await fetch(`/api/tarefas/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({ status:'Concluída', progresso:100 }) });
+    await carregarTarefas();
+  }
+
+  async function deletarTarefa(id) {
+    if (!confirm('Deletar tarefa?')) return;
+    await fetch(`/api/tarefas/${id}`, { method:'DELETE', headers:HEADERS });
+    await carregarTarefas();
+  }
+
+  async function enviarEmailTarefa(id) {
+    try {
+      const res = await fetch(`/api/tarefas/${id}/enviar-email`, { method:'POST', headers:HEADERS });
+      const data = await res.json();
+      if (data.erro) alert('Erro: ' + data.erro);
+      else { alert('Email enviado!'); await carregarTarefas(); }
+    } catch(err) { console.error(err); }
+  }
+
+  function renderCargaTrabalho() {
+    const responsaveis = {};
+    tarefas.forEach(t => {
+      (t.responsaveis||[]).forEach(r => {
+        if (!responsaveis[r]) responsaveis[r] = { total:0, concluidas:0, progresso:0, atrasadas:0 };
+        responsaveis[r].total++;
+        if (t.status==='Concluída') responsaveis[r].concluidas++;
+        if (t.progresso) responsaveis[r].progresso += t.progresso;
+        if (t.prazo && new Date(t.prazo) < new Date() && t.status!=='Concluída') responsaveis[r].atrasadas++;
+      });
+    });
+    const total = tarefas.length;
+    const concluidas = tarefas.filter(t=>t.status==='Concluída').length;
+    const atrasadas = tarefas.filter(t=>t.prazo&&new Date(t.prazo)<new Date()&&t.status!=='Concluída').length;
+    document.getElementById('cargaGrid').innerHTML = [
+      {val:total,lbl:'Total de Tarefas',sub:''},
+      {val:concluidas,lbl:'Concluídas',sub:`${total?Math.round(concluidas/total*100):0}% taxa de entrega`},
+      {val:atrasadas,lbl:'Atrasadas',sub:'Índice de atraso'},
+      {val:total-concluidas,lbl:'Pendentes',sub:'Aging ativo'},
+      {val:total?Math.round(concluidas/total*100):0,lbl:'Taxa de Entrega no Prazo',sub:'% concluídas no prazo'},
+      {val:tarefas.filter(t=>t.status==='Em Progresso').length,lbl:'Em Progresso',sub:'Em andamento'},
+    ].map(s=>`<div class="carga-card"><div class="carga-val">${s.val}</div><div class="carga-lbl">${s.lbl}</div><div class="carga-sub" style="color:#718096">${s.sub}</div></div>`).join('');
+    const lista = Object.entries(responsaveis).sort((a,b)=>b[1].total-a[1].total);
+    document.getElementById('cargaTabela').innerHTML = lista.length === 0
+      ? '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:20px">Nenhum dado disponível.</div>'
+      : `<table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr>
+            <th style="padding:8px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">RESPONSÁVEL</th>
+            <th style="padding:8px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">TOTAL</th>
+            <th style="padding:8px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">CONCLUÍDAS</th>
+            <th style="padding:8px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">ATRASADAS</th>
+            <th style="padding:8px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">TAXA</th>
+          </tr></thead>
+          <tbody>${lista.map(([r,d])=>`<tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #f0f2f5"><div style="display:flex;align-items:center;gap:6px"><div class="tsk-avatar">${r[0]?.toUpperCase()}</div>${r}</div></td>
+            <td style="padding:8px 12px;border-bottom:1px solid #f0f2f5;font-weight:700">${d.total}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #f0f2f5;color:#38a169;font-weight:700">${d.concluidas}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #f0f2f5;color:#e53e3e;font-weight:700">${d.atrasadas}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #f0f2f5"><div class="progresso-bar"><div class="progresso-fill" style="width:${d.total?Math.round(d.concluidas/d.total*100):0}%"></div></div></td>
+          </tr>`).join('')}</tbody>
+        </table>`;
+  }
+
+  // ===== PROCESSOS =====
+  let processos = [];
+
+  async function carregarProcessos() {
+    try {
+      const res = await fetch('/api/processos', { headers: HEADERS });
+      processos = await res.json();
+      renderProcessosStats();
+      renderProcessos();
+      renderAtividadeRecente();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderProcessosStats() {
+    const ativos = processos.filter(p=>p.status==='Ativo').length;
+    const revisao = processos.filter(p=>p.status==='Em Revisão').length;
+    const total = processos.reduce((s,p)=>s+(p.execucoes||0),0);
+    document.getElementById('processoStats').innerHTML = [
+      {val:processos.length,lbl:'Total de Processos',cor:'#1e2a4a'},
+      {val:ativos,lbl:'Processos Ativos',cor:'#38a169'},
+      {val:revisao,lbl:'Em Revisão',cor:'#c05621'},
+    ].map(s=>`<div class="stat-mini"><div class="stat-mini-val" style="color:${s.cor}">${s.val}</div><div class="stat-mini-lbl">${s.lbl}</div></div>`).join('');
+  }
+
+  function filtrarProcessos() {
+    const q = document.getElementById('searchProcesso').value.toLowerCase();
+    renderProcessos(processos.filter(p=>p.nome.toLowerCase().includes(q)||(p.categoria||'').toLowerCase().includes(q)));
+  }
+
+  function renderProcessos(lista) {
+    const tbody = document.getElementById('processosBody');
+    const dados = lista || processos;
+    if (dados.length === 0) { tbody.innerHTML = emptyState('Nenhum processo cadastrado.'); return; }
+    const stCls = {'Ativo':'status-proc-ativo','Em Revisão':'status-proc-revisao','Inativo':'status-proc-inativo'};
+    tbody.innerHTML = dados.map(p => `<tr>
+      <td><strong>${p.nome}</strong><div style="font-size:10px;color:#a0aec0">${p.descricao||''}</div></td>
+      <td>${p.categoria||'—'}</td>
+      <td><span class="versao-badge">${p.versao||'v1.0'}</span></td>
+      <td><span class="status-tsk ${stCls[p.status]||''}">${p.status}</span></td>
+      <td>${p.responsavel||'—'}</td>
+      <td><strong>${p.execucoes||0}</strong></td>
+      <td>${btnEdit('editarProcesso',p._id)}${btnDel('deletarProcesso',p._id)}</td>
+    </tr>`).join('');
+  }
+
+  function renderAtividadeRecente() {
+    const recentes = [...processos].sort((a,b)=>new Date(b.atualizadoEm)-new Date(a.atualizadoEm)).slice(0,5);
+    document.getElementById('atividadeRecente').innerHTML = recentes.length === 0
+      ? '<div style="color:#a0aec0;font-size:12px">Nenhuma atividade.</div>'
+      : recentes.map(p=>`<div class="ativ-item"><div class="ativ-dot"></div><div class="ativ-info"><div class="ativ-nome">${p.nome}</div><div class="ativ-sub">${p.responsavel||'—'} • ${new Date(p.atualizadoEm).toLocaleDateString('pt-BR')}</div></div></div>`).join('');
+  }
+
+  function abrirModalProcesso(id) {
+    document.getElementById('pEditId').value = id||'';
+    document.getElementById('modalProcTitulo').textContent = id ? 'Editar Processo' : 'Novo Processo';
+    if (id) { const p=processos.find(p=>p._id===id); if(p){document.getElementById('pNome').value=p.nome;document.getElementById('pCategoria').value=p.categoria||'';document.getElementById('pResponsavel').value=p.responsavel||'';document.getElementById('pStatus').value=p.status;document.getElementById('pDescricao').value=p.descricao||'';} }
+    else { ['pNome','pCategoria','pResponsavel','pDescricao'].forEach(id=>document.getElementById(id).value=''); document.getElementById('pStatus').value='Ativo'; }
+    document.getElementById('modalProcesso').classList.add('aberto');
+  }
+  function editarProcesso(id) { abrirModalProcesso(id); }
+
+  async function salvarProcesso() {
+    const nome = document.getElementById('pNome').value.trim();
+    if (!nome) { alert('Nome obrigatório.'); return; }
+    const dados = { nome, categoria:document.getElementById('pCategoria').value, responsavel:document.getElementById('pResponsavel').value, status:document.getElementById('pStatus').value, descricao:document.getElementById('pDescricao').value };
+    const id = document.getElementById('pEditId').value;
+    try {
+      if (id) await fetch(`/api/processos/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+      else await fetch('/api/processos', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+      fecharModal('modalProcesso');
+      await carregarProcessos();
+    } catch(err) { console.error(err); }
+  }
+
+  async function deletarProcesso(id) {
+    if (!confirm('Deletar processo?')) return;
+    await fetch(`/api/processos/${id}`, { method:'DELETE', headers:HEADERS });
+    await carregarProcessos();
+  }
+
+  // ===== ROBÔS =====
+  let robos = [], credenciais = [], maquinas = [];
+
+  async function carregarRobos() {
+    try {
+      const res = await fetch('/api/robos', { headers: HEADERS });
+      robos = await res.json();
+      renderDashboardRobos();
+      renderRobos();
+      renderCalendario();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderDashboardRobos() {
+    const total = robos.length;
+    const executando = robos.filter(r=>r.status==='Executando').length;
+    const erros = robos.filter(r=>r.status==='Erro').length;
+    const totalExec = robos.reduce((s,r)=>s+(r.totalExecucoes||0),0);
+    const totalHoras = robos.reduce((s,r)=>s+(r.tempoHumanoMinutos||0)*(r.totalExecucoes||0),0)/60;
+    const taxa = total>0?Math.round(robos.reduce((s,r)=>s+(1-(r.totalErros||0)/Math.max(r.totalExecucoes||1,1)),0)/total*100):0;
+    document.getElementById('dashGrid').innerHTML = [
+      {val:total,lbl:'Total de Robôs',sub:'cadastrados',cor:'#1e2a4a'},
+      {val:executando,lbl:'Executando',sub:'em produção',cor:'#38a169'},
+      {val:erros,lbl:'Com Erro',sub:'atenção necessária',cor:'#c53030'},
+      {val:totalExec,lbl:'Total Execuções',sub:'histórico',cor:'#2d1b69'},
+    ].map(s=>`<div class="dash-card"><div class="dash-val" style="color:${s.cor}">${s.val}</div><div class="dash-lbl">${s.lbl}</div><div class="dash-sub" style="color:${s.cor}">${s.sub}</div></div>`).join('');
+    document.getElementById('fteSaved').textContent = totalHoras.toFixed(1) + 'h';
+    document.getElementById('roiFinanceiro').textContent = 'R$' + (totalHoras*35).toFixed(0);
+    document.getElementById('taxaSucesso').textContent = taxa + '%';
+    // Top erros
+    const topErr = [...robos].sort((a,b)=>(b.totalErros||0)-(a.totalErros||0)).slice(0,5);
+    document.getElementById('topErros').innerHTML = topErr.length===0
+      ? '<div style="color:#a0aec0;font-size:12px">Nenhum erro registrado.</div>'
+      : topErr.map(r=>`<div class="bar-item"><span class="bar-nome">${r.nome}</span><div class="bar-bg"><div class="bar-fill" style="width:${Math.min((r.totalErros||0)*10,100)}%;background:#e53e3e"></div></div><span class="bar-val">${r.totalErros||0}</span></div>`).join('');
+    // Volumetria
+    const deps = {};
+    robos.forEach(r=>{ deps[r.departamento||'Outros']=(deps[r.departamento||'Outros']||0)+1; });
+    const cores = ['#2d1b69','#38a169','#3b5bdb','#e53e3e','#d69e2e'];
+    document.getElementById('volumetria').innerHTML = Object.entries(deps).map(([d,n],i)=>`<div class="bar-item"><span class="bar-nome">${d}</span><div class="bar-bg"><div class="bar-fill" style="width:${Math.round(n/total*100)}%;background:${cores[i%cores.length]}"></div></div><span class="bar-val">${n}</span></div>`).join('') || '<div style="color:#a0aec0;font-size:12px">Sem dados.</div>';
+  }
+
+  const RST_CLASS = {Executando:'rst-executando',Pausado:'rst-pausado',Erro:'rst-erro',Concluído:'rst-concluido'};
+
+  function filtrarRobos() {
+    const q = document.getElementById('searchRobo').value.toLowerCase();
+    const st = document.getElementById('filtroStatusRobo').value;
+    const lista = robos.filter(r=>(!q||r.nome.toLowerCase().includes(q))&&(!st||r.status===st));
+    renderRobos(lista);
+  }
+
+  function renderRobos(lista) {
+    const dados = lista || robos;
+    document.getElementById('robosLista').innerHTML = dados.length===0
+      ? `<div class="empty-ops"><div style="font-size:28px">🤖</div><div>Nenhum robô cadastrado.</div></div>`
+      : dados.map(r=>`<div class="robo-row">
+          <div>
+            <div class="robo-nome">${r.nome}</div>
+            <div class="robo-cat">${r.categoria||'—'} • ${r.departamento||'—'}</div>
+          </div>
+          <span class="robo-status-badge ${RST_CLASS[r.status]||'rst-pausado'}">${r.status}</span>
+          <div style="font-size:11px;color:#718096">🖥️ ${r.maquina||'—'}</div>
+          <div class="robo-prog-wrap">
+            <div class="robo-prog-bar"><div class="robo-prog-fill" style="width:${Math.min((r.totalExecucoes||0),100)}%"></div></div>
+            <div style="font-size:10px;color:#a0aec0;margin-top:2px">${r.totalExecucoes||0} execuções</div>
+          </div>
+          <span class="fila-badge">${(r.fila||[]).length} na fila</span>
+          <span style="font-size:11px;color:#718096">${r.prioridade||'—'}</span>
+          <div style="display:flex;gap:4px">
+            <button onclick="editarRobo('${r._id}')" style="padding:5px 10px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600">✏️ Editar</button>
+            <button onclick="alterarStatusRobo('${r._id}')" style="padding:5px 10px;background:#f0fff4;color:#276749;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600">▶ Executar</button>
+            <button onclick="deletarRobo('${r._id}')" style="padding:5px 10px;background:#fff5f5;color:#c53030;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600">🗑️</button>
+          </div>
+        </div>`).join('');
+  }
+
+  function abrirModalRobo(id) {
+    document.getElementById('rEditId').value = id||'';
+    document.getElementById('modalRoboTitulo').textContent = id ? 'Editar Robô' : 'Novo Robô';
+    if (id) { const r=robos.find(r=>r._id===id); if(r){document.getElementById('rNome').value=r.nome;document.getElementById('rVersao').value=r.versao||'v1.0';document.getElementById('rTipo').value=r.tipo;document.getElementById('rPrioridade').value=r.prioridade;document.getElementById('rCategoria').value=r.categoria||'';document.getElementById('rDepartamento').value=r.departamento||'';document.getElementById('rMaquina').value=r.maquina||'';document.getElementById('rTimeout').value=r.timeout||30;document.getElementById('rComando').value=r.comandoExecucao||'';document.getElementById('rDescricao').value=r.descricao||'';document.getElementById('rTempoHumano').value=r.tempoHumanoMinutos||0;document.getElementById('rStatus').value=r.status;} }
+    else { ['rNome','rCategoria','rDepartamento','rMaquina','rComando','rDescricao'].forEach(id=>document.getElementById(id).value=''); document.getElementById('rVersao').value='v1.0'; document.getElementById('rTipo').value='Background'; document.getElementById('rPrioridade').value='Media'; document.getElementById('rTimeout').value=30; document.getElementById('rTempoHumano').value=0; document.getElementById('rStatus').value='Pausado'; }
+    document.getElementById('modalRobo').classList.add('aberto');
+  }
+  function editarRobo(id) { abrirModalRobo(id); }
+
+  async function salvarRobo() {
+    const nome = document.getElementById('rNome').value.trim();
+    if (!nome) { alert('Nome obrigatório.'); return; }
+    const dados = { nome, versao:document.getElementById('rVersao').value, tipo:document.getElementById('rTipo').value, prioridade:document.getElementById('rPrioridade').value, categoria:document.getElementById('rCategoria').value, departamento:document.getElementById('rDepartamento').value, maquina:document.getElementById('rMaquina').value, timeout:parseInt(document.getElementById('rTimeout').value)||30, comandoExecucao:document.getElementById('rComando').value, descricao:document.getElementById('rDescricao').value, tempoHumanoMinutos:parseInt(document.getElementById('rTempoHumano').value)||0, status:document.getElementById('rStatus').value };
+    const id = document.getElementById('rEditId').value;
+    try {
+      if (id) await fetch(`/api/robos/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+      else await fetch('/api/robos', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+      fecharModal('modalRobo');
+      await carregarRobos();
+    } catch(err) { console.error(err); }
+  }
+
+  async function alterarStatusRobo(id) {
+    const r = robos.find(r=>r._id===id);
+    if (!r) return;
+    const novoStatus = r.status==='Executando' ? 'Pausado' : 'Executando';
+    await fetch(`/api/robos/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({ status:novoStatus, totalExecucoes:(r.totalExecucoes||0)+(novoStatus==='Executando'?1:0) }) });
+    await carregarRobos();
+  }
+
+  async function deletarRobo(id) {
+    if (!confirm('Deletar robô?')) return;
+    await fetch(`/api/robos/${id}`, { method:'DELETE', headers:HEADERS });
+    await carregarRobos();
+  }
+
+  // ===== CREDENCIAIS =====
+  async function carregarCredenciais() {
+    try {
+      const res = await fetch('/api/credenciais', { headers: HEADERS });
+      credenciais = await res.json();
+      renderCredenciais();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderCredenciais() {
+    const expirando = credenciais.filter(c=>c.status==='Expirando').length;
+    const expiradas = credenciais.filter(c=>c.status==='Expirada').length;
+    const alerta = document.getElementById('credAlertaWrap');
+    if (expirando > 0 || expiradas > 0) {
+      alerta.innerHTML = `<div class="cred-alerta"><span style="font-size:18px">⚠️</span><div class="cred-alerta-txt">Atenção: <strong>${expirando}</strong> credencial(is) expirando e <strong>${expiradas}</strong> expirada(s). Renove para evitar interrupções nos robôs.</div></div>`;
+    } else { alerta.innerHTML = ''; }
+    const tbody = document.getElementById('credenciaisBody');
+    const stCls = {'Válida':'cst-valida','Expirando':'cst-expirando','Expirada':'cst-expirada'};
+    if (credenciais.length===0) { tbody.innerHTML = emptyState('Nenhuma credencial cadastrada.'); return; }
+    tbody.innerHTML = credenciais.map(c=>`<tr>
+      <td><strong>${c.nome}</strong><div style="font-size:10px;color:#a0aec0">${c.proprietario||'—'}</div></td>
+      <td>${c.tipo}</td>
+      <td>${c.proprietario||'—'}</td>
+      <td>${c.validade ? new Date(c.validade+'T12:00:00').toLocaleDateString('pt-BR') : 'Permanente'}</td>
+      <td><span class="cred-status ${stCls[c.status]||'cst-valida'}">${c.status}</span></td>
+      <td>${btnEdit('editarCredencial',c._id)}${btnDel('deletarCredencial',c._id)}</td>
+    </tr>`).join('');
+  }
+
+  function abrirModalCredencial(id) {
+    document.getElementById('credEditId').value = id||'';
+    document.getElementById('modalCredTitulo').textContent = id ? 'Editar Credencial' : 'Nova Credencial';
+    if (id) { const c=credenciais.find(c=>c._id===id); if(c){document.getElementById('credNome').value=c.nome;document.getElementById('credTipo').value=c.tipo;document.getElementById('credProprietario').value=c.proprietario||'';document.getElementById('credValidade').value=c.validade||'';document.getElementById('credValor').value='';document.getElementById('credStatus').value=c.status;} }
+    else { ['credNome','credProprietario','credValidade','credValor'].forEach(id=>document.getElementById(id).value=''); document.getElementById('credTipo').value='API Key'; document.getElementById('credStatus').value='Válida'; }
+    document.getElementById('modalCredencial').classList.add('aberto');
+  }
+  function editarCredencial(id) { abrirModalCredencial(id); }
+
+  async function salvarCredencial() {
+    const nome = document.getElementById('credNome').value.trim();
+    if (!nome) { alert('Nome obrigatório.'); return; }
+    const dados = { nome, tipo:document.getElementById('credTipo').value, proprietario:document.getElementById('credProprietario').value, validade:document.getElementById('credValidade').value, valor:document.getElementById('credValor').value, status:document.getElementById('credStatus').value };
+    const id = document.getElementById('credEditId').value;
+    try {
+      if (id) await fetch(`/api/credenciais/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+      else await fetch('/api/credenciais', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+      fecharModal('modalCredencial');
+      await carregarCredenciais();
+    } catch(err) { console.error(err); }
+  }
+
+  async function deletarCredencial(id) {
+    if (!confirm('Deletar credencial?')) return;
+    await fetch(`/api/credenciais/${id}`, { method:'DELETE', headers:HEADERS });
+    await carregarCredenciais();
+  }
+
+  // ===== CALENDÁRIO =====
+  function renderCalendario() {
+    const comSchedule = robos.filter(r=>(r.schedules||[]).length>0);
+    const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+    document.getElementById('calLista').innerHTML = robos.length===0
+      ? '<div style="color:#a0aec0;font-size:12px">Nenhum robô com agendamento.</div>'
+      : `<div style="font-size:12px;font-weight:700;color:#2d1b69;margin-bottom:10px">Hoje — ${hoje}</div>` +
+        robos.map(r=>`<div class="cal-item"><span class="cal-hora">--:--</span><div><div class="cal-nome">${r.nome}</div><div class="cal-dur">${r.timeout||30} min • ${r.tipo}</div><div class="cal-maq">${r.maquina||'—'}</div></div><span style="font-size:10px;padding:2px 6px;background:#f5f0ff;color:#2d1b69;border-radius:3px">Agendado</span></div>`).join('');
+    document.getElementById('proxExecucoes').innerHTML = robos.slice(0,4).map(r=>`<div class="prox-item"><div><div class="prox-hora">--:--</div></div><div><div class="prox-nome">${r.nome}</div><div class="prox-maq">${r.maquina||'—'}</div></div></div>`).join('') || '<div style="color:#a0aec0;font-size:12px">Nenhum agendamento.</div>';
+  }
+
+  // ===== AMBIENTE =====
+  function renderAmbiente() {
+    const stCls = {Online:'maq-online',Offline:'maq-offline',Manutenção:'maq-manutencao',Ocupado:'maq-busy'};
+    document.getElementById('maquinasLista').innerHTML = maquinas.length===0
+      ? `<div class="empty-ops"><div style="font-size:28px">🖥️</div><div>Nenhuma máquina cadastrada.</div></div>`
+      : maquinas.map(m=>`<div class="maquina-card">
+          <div class="maq-status ${stCls[m.status]||'maq-offline'}"></div>
+          <div style="flex:1">
+            <div class="maq-nome">${m.nome}</div>
+            <div class="maq-tipo">${m.tipo} • ${m.so||'—'} • ${m.ip||'—'}</div>
+          </div>
+          <div class="maq-recursos">
+            <div class="maq-rec-item"><div class="maq-rec-lbl">CPU</div><div class="maq-rec-val">${m.cpu||'—'}</div></div>
+            <div class="maq-rec-item"><div class="maq-rec-lbl">RAM</div><div class="maq-rec-val">${m.ram||'—'}</div></div>
+            <div class="maq-rec-item"><div class="maq-rec-lbl">Slots</div><div class="slots-badge">${m.slots||0}</div></div>
+          </div>
+          <span class="status-badge ${m.status==='Online'?'status-ativa':m.status==='Offline'?'status-vencida':m.status==='Manutenção'?'status-renovacao':'status-vencendo'}">${m.status}</span>
+          ${btnEdit('editarMaquina',m._id)}${btnDel('deletarMaquina',m._id)}
+        </div>`).join('');
+  }
+
+  function abrirModalMaquina(id) {
+    document.getElementById('maqEditId').value = id||'';
+    if (id) { const m=maquinas.find(m=>m._id===id); if(m){document.getElementById('maqNome').value=m.nome;document.getElementById('maqTipo').value=m.tipo;document.getElementById('maqSO').value=m.so||'';document.getElementById('maqIP').value=m.ip||'';document.getElementById('maqCPU').value=m.cpu||'';document.getElementById('maqRAM').value=m.ram||'';document.getElementById('maqSlots').value=m.slots||10;document.getElementById('maqStatus').value=m.status;} }
+    else { ['maqNome','maqSO','maqIP','maqCPU','maqRAM'].forEach(id=>document.getElementById(id).value=''); document.getElementById('maqTipo').value='Virtual Machine'; document.getElementById('maqSlots').value=10; document.getElementById('maqStatus').value='Online'; }
+    document.getElementById('modalMaquina').classList.add('aberto');
+  }
+  function editarMaquina(id) { abrirModalMaquina(id); }
+
+  async function salvarMaquina() {
+    const nome = document.getElementById('maqNome').value.trim();
+    if (!nome) { alert('Nome obrigatório.'); return; }
+    const dados = { nome, tipo:document.getElementById('maqTipo').value, so:document.getElementById('maqSO').value, ip:document.getElementById('maqIP').value, cpu:document.getElementById('maqCPU').value, ram:document.getElementById('maqRAM').value, slots:parseInt(document.getElementById('maqSlots').value)||10, status:document.getElementById('maqStatus').value };
+    const id = document.getElementById('maqEditId').value;
+    // Salva localmente (não tem model no banco para máquinas ainda — usa localStorage como cache)
+    if (id) { const idx=maquinas.findIndex(m=>m._id===id); if(idx!==-1) maquinas[idx]={...maquinas[idx],...dados}; }
+    else maquinas.push({_id:Date.now().toString(),...dados});
+    localStorage.setItem('maquinas_'+usuario.empresaNome, JSON.stringify(maquinas));
+    fecharModal('modalMaquina');
+    renderAmbiente();
+  }
+
+  async function deletarMaquina(id) {
+    if (!confirm('Deletar máquina?')) return;
+    maquinas = maquinas.filter(m=>m._id!==id);
+    localStorage.setItem('maquinas_'+usuario.empresaNome, JSON.stringify(maquinas));
+    renderAmbiente();
+  }
+
+  // ===== AGENTES =====
+  function renderAgentes() {
+    const agentes = JSON.parse(localStorage.getItem('agentes_'+usuario.empresaNome)||'[]');
+    const stCls = {Conectado:'ast-conectado',Desconectado:'ast-desconectado',Atualizando:'ast-atualizando'};
+    document.getElementById('agentesLista').innerHTML = agentes.length===0
+      ? `<div class="empty-ops"><div style="font-size:28px">🤖</div><div>Nenhum agente instalado.</div><div style="font-size:12px;margin-top:6px">Baixe o instalador e configure o arquivo conf.bct nas máquinas de execução.</div></div>`
+      : agentes.map(a=>`<div class="agente-card">
+          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1e2a4a">${a.nome||'Agente'}</div><div style="font-size:11px;color:#718096">${a.versao||'—'} • ${a.tipo||'Unattended'}</div></div>
+          <div style="font-size:12px;color:#4a5568">🖥️ ${a.maquina||'—'}</div>
+          <span class="agente-status ${stCls[a.status]||'ast-desconectado'}">${a.status}</span>
+          <span class="slots-badge">${a.slotsLivres||0}/${a.slots||1} slots</span>
+          <span class="heartbeat">Heartbeat: <span>${a.heartbeat||'—'}</span></span>
+        </div>`).join('');
+  }
+
+  // ===== UTILS GERAIS =====
+  function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
+
+  // ===== INIT =====
+  maquinas = JSON.parse(localStorage.getItem('maquinas_'+usuario.empresaNome)||'[]');
+  carregarFluxo();
+</script>
+</body>
+</html>

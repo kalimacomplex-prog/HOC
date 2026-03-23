@@ -206,6 +206,8 @@
   document.getElementById('userPerfil').textContent = usuario.perfil || '-';
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
 
+  const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
   if (usuario.perfil !== 'Admin') {
     document.getElementById('conteudo').innerHTML = `<div class="acesso-negado"><h2>🔒 Acesso Restrito</h2><p>Apenas administradores podem acessar esta página.</p></div>`;
   }
@@ -255,7 +257,7 @@
 
   async function carregarUsuarios() {
     try {
-      const res = await fetch('/api/usuarios', { headers:{'Authorization':'Bearer '+token} });
+      const res = await fetch('/api/usuarios', { headers: HEADERS });
       if (res.status===401) { window.location.href='/'; return; }
       const usuarios = await res.json();
       const tbody = document.getElementById('tabelaUsuarios');
@@ -319,7 +321,7 @@
     const permissoes={acessoIndependente:document.getElementById('perm_acessoIndependente').checked,aprovacaoWikis:document.getElementById('perm_aprovacaoWikis').checked,aprovacaoIdeias:document.getElementById('perm_aprovacaoIdeias').checked,gerenciamentoProjetos:document.getElementById('perm_gerenciamentoProjetos').checked,edicaoFluxoValor:document.getElementById('perm_edicaoFluxoValor').checked,permissaoSeguranca:document.getElementById('perm_permissaoSeguranca').checked};
     btn.disabled=true; btn.textContent='Enviando...';
     try {
-      const res=await fetch('/api/convites',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({nome,email,usuarioMestre,permissoes})});
+      const res=await fetch('/api/convites',{method:'POST',headers:HEADERS,body:JSON.stringify({nome,email,usuarioMestre,permissoes})});
       const data=await res.json();
       if(!res.ok){erro.textContent=data.erro||'Erro ao enviar convite.';erro.style.display='block';return;}
       sucesso.textContent=`Convite enviado para ${email} com sucesso!`;
@@ -341,7 +343,7 @@
     if(!nome){erro.textContent='Nome é obrigatório.';erro.style.display='block';return;}
     btn.disabled=true; btn.textContent='Salvando...';
     try {
-      const res=await fetch(`/api/usuarios/${id}`,{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({nome,perfil,status})});
+      const res=await fetch(`/api/usuarios/${id}`,{method:'PUT',headers:HEADERS,body:JSON.stringify({nome,perfil,status})});
       const data=await res.json();
       if(!res.ok){erro.textContent=data.erro||'Erro ao salvar.';erro.style.display='block';return;}
       sucesso.textContent='Usuário atualizado!'; sucesso.style.display='block';
@@ -353,15 +355,13 @@
   async function deletarUsuario(id,nome) {
     if(!confirm(`Deletar "${nome}"?`)) return;
     try {
-      const res=await fetch(`/api/usuarios/${id}`,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});
+      const res=await fetch(`/api/usuarios/${id}`,{method:'DELETE',headers:HEADERS});
       if(!res.ok){alert('Erro ao deletar.');return;}
       carregarUsuarios();
     } catch(err){alert('Erro de conexão.');}
   }
 
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href='/'; }
-
-
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
@@ -450,6 +450,7 @@
       if (dd) dd.classList.remove('aberto');
     }
   });
+
   renderizarPlanos();
   carregarUsuarios();
   carregarNotificacoes();

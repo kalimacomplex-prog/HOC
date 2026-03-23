@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Operações</title>
+  <link rel="stylesheet" href="style-global.css">
+  <style>
+    /* ===== LAYOUT OPERAÇÕES ===== */
+    .ops-layout { display: flex; height: calc(100vh - 60px); overflow: hidden; }
+    .ops-sidebar { width: 200px; background: white; border-right: 1px solid #e2e8f0; flex-shrink: 0; display: flex; flex-direction: column; overflow-y: auto; }
+    .ops-sidebar-header { padding: 16px; border-bottom: 1px solid #f0f2f5; }
+    .ops-sidebar-title { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 2px; }
+    .ops-sidebar-sub { font-size: 11px; color: #718096; }
+    .ops-menu { padding: 8px; }
+    .ops-menu-item { display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: 7px; font-size: 12px; font-weight: 500; color: #718096; cursor: pointer; margin-bottom: 2px; transition: all 0.2s; border: none; background: none; width: 100%; text-align: left; }
+    .ops-menu-item:hover { background: #f5f0ff; color: #2d1b69; }
+    .ops-menu-item.active { background: #2d1b69; color: white; }
+    .ops-menu-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .ops-dica { margin: 8px; padding: 10px; background: #fffaf0; border-radius: 7px; border-left: 3px solid #f6c90e; }
+    .ops-dica-titulo { font-size: 10px; font-weight: 700; color: #c05621; margin-bottom: 4px; }
+    .ops-dica-texto { font-size: 11px; color: #744210; line-height: 1.4; }
+    .ops-content { flex: 1; overflow-y: auto; padding: 24px; }
+    .ops-section { display: none; }
+    .ops-section.active { display: block; }
+    .mockup-aviso { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 4px; font-size: 11px; color: #8a6d00; margin-bottom: 14px; }
+
+    /* ===== FLUXO DE VALOR ===== */
+    .fv-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .fv-toolbar-left { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+    .btn-fv { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #4a5568; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
+    .btn-fv:hover { border-color: #2d1b69; color: #2d1b69; }
+    .btn-fv.primary { background: #2d1b69; color: white; border-color: #2d1b69; }
+    .btn-fv.primary:hover { background: #3d2b89; }
+    .btn-fv.danger { background: #fff5f5; color: #c53030; border-color: #feb2b2; }
+    .modo-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .modo-edicao { background: #f5f0ff; color: #2d1b69; }
+    .modo-viz { background: #f0f2f5; color: #718096; }
+    .fv-canvas-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; position: relative; }
+    .fv-canvas { width: 100%; height: 520px; position: relative; background: #f8fafc; background-image: radial-gradient(circle, #cbd5e0 1px, transparent 1px); background-size: 24px 24px; overflow: hidden; }
+    .fv-block { position: absolute; min-width: 140px; background: white; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); border: 2px solid #e2e8f0; cursor: move; user-select: none; transition: box-shadow 0.2s; z-index: 10; }
+    .fv-block:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-color: #2d1b69; }
+    .fv-block.selected { border-color: #2d1b69; box-shadow: 0 0 0 3px rgba(45,27,105,0.2); }
+    .fv-block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .fv-block-icon { font-size: 18px; }
+    .fv-block-del { background: #fff5f5; border: none; color: #c53030; border-radius: 4px; cursor: pointer; padding: 2px 5px; font-size: 10px; opacity: 0; transition: opacity 0.2s; }
+    .fv-block:hover .fv-block-del { opacity: 1; }
+    .fv-block-nome { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
+    .fv-block-pct { font-size: 11px; color: #718096; }
+    .fv-block-pct-bar { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 4px; }
+    .fv-block-pct-fill { height: 4px; border-radius: 2px; background: #2d1b69; }
+    .fv-text-node { position: absolute; background: transparent; border: none; font-size: 13px; color: #1e2a4a; cursor: move; z-index: 10; min-width: 80px; padding: 4px; }
+    .fv-text-node.editing { background: white; border: 1.5px solid #2d1b69; border-radius: 4px; outline: none; }
+    .fv-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 5; }
+    .fv-minimap { position: absolute; bottom: 10px; right: 10px; width: 120px; height: 70px; background: rgba(255,255,255,0.9); border: 1px solid #e2e8f0; border-radius: 6px; font-size: 9px; color: #a0aec0; display: flex; align-items: center; justify-content: center; }
+    .sem-permissao-overlay { position: absolute; inset: 0; background: rgba(248,250,252,0.7); display: flex; align-items: center; justify-content: center; z-index: 20; border-radius: 10px; }
+    .sem-permissao-card { background: white; border-radius: 10px; padding: 24px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+
+    /* ===== COMUNICAÇÃO ===== */
+    .com-tabs { display: flex; gap: 2px; margin-bottom: 20px; }
+    .com-tab { padding: 8px 18px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; }
+    .com-tab.active { background: #2d1b69; color: white; border-color: #2d1b69; }
+    .com-section { display: none; }
+    .com-section.active { display: block; }
+    .contatos-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .contatos-search { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; padding: 8px 12px; }
+    .contatos-search input { border: none; outline: none; font-size: 13px; width: 100%; font-family: inherit; }
+    .contatos-search svg { width: 14px; height: 14px; color: #a0aec0; }
+    .contatos-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-mini { background: white; border-radius: 8px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .stat-mini-val { font-size: 20px; font-weight: 700; color: #1e2a4a; }
+    .stat-mini-lbl { font-size: 11px; color: #718096; }
+    .contatos-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+    .contatos-table-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .contatos-grupos { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 16px; }
+    .grupos-titulo { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 12px; }
+    .grupo-item { margin-bottom: 14px; }
+    .grupo-nome { font-size: 12px; font-weight: 700; color: #2d1b69; margin-bottom: 6px; padding: 4px 8px; background: #f5f0ff; border-radius: 4px; }
+    .grupo-membro { font-size: 11px; color: #4a5568; padding: 3px 8px; border-bottom: 1px solid #f0f2f5; }
+    .grupo-membro-sub { font-size: 10px; color: #a0aec0; }
+
+    .templates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .template-email-card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1.5px solid transparent; transition: all 0.2s; }
+    .template-email-card:hover { border-color: #2d1b69; }
+    .tec-cat { font-size: 10px; font-weight: 700; padding: 2px 7px; background: #f5f0ff; color: #2d1b69; border-radius: 3px; margin-bottom: 8px; display: inline-block; }
+    .tec-nome { font-size: 14px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
+    .tec-assunto { font-size: 12px; color: #718096; margin-bottom: 8px; font-style: italic; }
+    .tec-vars { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tec-var { font-size: 10px; padding: 2px 6px; background: #f0f2f5; color: #4a5568; border-radius: 3px; font-family: monospace; }
+    .tec-acoes { display: flex; gap: 6px; }
+    .btn-tec { padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-tec-edit { background: #f5f0ff; color: #2d1b69; }
+    .btn-tec-del { background: #fff5f5; color: #c53030; }
+
+    /* ===== TAREFAS ===== */
+    .tarefas-stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+    .tarefas-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .tarefas-search { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; padding: 8px 12px; }
+    .tarefas-search input { border: none; outline: none; font-size: 13px; width: 100%; font-family: inherit; }
+    .tarefas-table-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .tsk-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .tsk-table th { padding: 10px 12px; text-align: left; background: #f8fafc; border-bottom: 1.5px solid #e2e8f0; font-size: 11px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.4px; }
+    .tsk-table td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+    .tsk-table tr:hover td { background: #fafbff; }
+    .tsk-titulo { font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
+    .tsk-tags { display: flex; gap: 3px; flex-wrap: wrap; }
+    .tsk-tag { font-size: 10px; padding: 1px 5px; background: #f0f2f5; color: #718096; border-radius: 3px; }
+    .tsk-resp { display: flex; gap: 3px; }
+    .tsk-avatar { width: 24px; height: 24px; border-radius: 50%; background: #2d1b69; color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .pri-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
+    .pri-urgente { background: #fff5f5; color: #c53030; }
+    .pri-alta { background: #fffaf0; color: #c05621; }
+    .pri-media { background: #ebf0ff; color: #3b5bdb; }
+    .pri-baixa { background: #f0fff4; color: #276749; }
+    .status-tsk { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
+    .stsk-pendente { background: #f0f2f5; color: #718096; }
+    .stsk-progresso { background: #ebf0ff; color: #3b5bdb; }
+    .stsk-concluida { background: #f0fff4; color: #276749; }
+    .stsk-dispensada { background: #fff5f5; color: #c53030; }
+    .progresso-bar { height: 5px; background: #e2e8f0; border-radius: 3px; min-width: 80px; }
+    .progresso-fill { height: 5px; border-radius: 3px; background: #2d1b69; }
+    .email-indicator { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .email-enviado { background: #38a169; }
+    .email-aberto { background: #3b5bdb; }
+    .email-nao { background: #e2e8f0; }
+
+    /* Sub-tabs tarefas */
+    .tsk-subtabs { display: flex; gap: 2px; margin-bottom: 16px; }
+    .tsk-subtab { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; }
+    .tsk-subtab.active { background: #2d1b69; color: white; border-color: #2d1b69; }
+
+    /* Carga de trabalho */
+    .carga-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
+    .carga-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .carga-val { font-size: 28px; font-weight: 700; color: #1e2a4a; }
+    .carga-lbl { font-size: 11px; color: #718096; margin-top: 2px; }
+    .carga-sub { font-size: 12px; font-weight: 600; margin-top: 4px; }
+
+    /* ===== PROCESSOS ===== */
+    .proc-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+    .proc-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 20px; }
+    .proc-table-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .proc-sidebar-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 16px; margin-bottom: 14px; }
+    .proc-sidebar-titulo { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 12px; }
+    .ativ-item { display: flex; gap: 8px; margin-bottom: 10px; font-size: 12px; }
+    .ativ-dot { width: 8px; height: 8px; border-radius: 50%; background: #2d1b69; flex-shrink: 0; margin-top: 4px; }
+    .ativ-info { flex: 1; }
+    .ativ-nome { font-weight: 600; color: #1e2a4a; }
+    .ativ-sub { color: #a0aec0; font-size: 11px; }
+    .versao-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; background: #f0f2f5; color: #4a5568; border-radius: 3px; }
+    .status-proc-ativo { background: #f0fff4; color: #276749; }
+    .status-proc-revisao { background: #fffaf0; color: #c05621; }
+    .status-proc-inativo { background: #fff5f5; color: #c53030; }
+
+    /* ===== ROBÔS ===== */
+    .robos-subtabs { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+    .robo-subtab { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; }
+    .robo-subtab.active { background: #2d1b69; color: white; border-color: #2d1b69; }
+    .robo-secao { display: none; }
+    .robo-secao.active { display: block; }
+
+    /* Dashboard robôs */
+    .dash-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+    .dash-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .dash-val { font-size: 26px; font-weight: 700; color: #1e2a4a; }
+    .dash-lbl { font-size: 11px; color: #718096; margin-top: 2px; }
+    .dash-sub { font-size: 12px; font-weight: 600; color: #38a169; margin-top: 4px; }
+    .dash-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .dash-chart-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .dash-chart-titulo { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 12px; }
+    .bar-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .bar-nome { font-size: 12px; color: #4a5568; width: 100px; flex-shrink: 0; }
+    .bar-bg { flex: 1; height: 8px; background: #f0f2f5; border-radius: 4px; }
+    .bar-fill { height: 8px; border-radius: 4px; }
+    .bar-val { font-size: 11px; font-weight: 700; color: #1e2a4a; width: 36px; text-align: right; }
+
+    /* Produção robôs */
+    .prod-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .robo-row { background: white; border-radius: 10px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 10px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .robo-nome { font-size: 13px; font-weight: 700; color: #1e2a4a; }
+    .robo-cat { font-size: 11px; color: #718096; }
+    .robo-status-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+    .rst-executando { background: #f0fff4; color: #276749; }
+    .rst-pausado { background: #fffaf0; color: #c05621; }
+    .rst-erro { background: #fff5f5; color: #c53030; }
+    .rst-concluido { background: #ebf0ff; color: #3b5bdb; }
+    .robo-prog-wrap { flex: 1; min-width: 120px; }
+    .robo-prog-bar { height: 6px; background: #e2e8f0; border-radius: 3px; }
+    .robo-prog-fill { height: 6px; border-radius: 3px; background: #2d1b69; }
+    .fila-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; background: #f5f0ff; color: #2d1b69; border-radius: 4px; }
+
+    /* Credenciais */
+    .cred-alerta { background: #fffaf0; border: 1px solid #fbd38d; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .cred-alerta-txt { font-size: 12px; color: #744210; flex: 1; }
+    .cred-table-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .cred-status { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
+    .cst-valida { background: #f0fff4; color: #276749; }
+    .cst-expirando { background: #fffaf0; color: #c05621; }
+    .cst-expirada { background: #fff5f5; color: #c53030; }
+
+    /* Calendário */
+    .cal-layout { display: grid; grid-template-columns: 1fr 260px; gap: 16px; }
+    .cal-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 20px; }
+    .cal-titulo { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 14px; }
+    .cal-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 7px; margin-bottom: 6px; background: #f8fafc; border-left: 3px solid #2d1b69; }
+    .cal-hora { font-size: 12px; font-weight: 700; color: #2d1b69; width: 44px; }
+    .cal-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; }
+    .cal-dur { font-size: 11px; color: #718096; }
+    .cal-maq { font-size: 10px; color: #a0aec0; }
+    .prox-item { display: flex; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 7px; margin-bottom: 6px; }
+    .prox-hora { font-size: 13px; font-weight: 700; color: #2d1b69; }
+    .prox-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; }
+    .prox-maq { font-size: 11px; color: #a0aec0; }
+
+    /* Ambiente */
+    .amb-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+    .maquina-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 10px; display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+    .maq-status { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .maq-online { background: #38a169; }
+    .maq-offline { background: #e53e3e; }
+    .maq-busy { background: #d69e2e; }
+    .maq-manutencao { background: #718096; }
+    .maq-nome { font-size: 13px; font-weight: 700; color: #1e2a4a; }
+    .maq-tipo { font-size: 11px; color: #718096; }
+    .maq-recursos { display: flex; gap: 12px; flex: 1; flex-wrap: wrap; }
+    .maq-rec-item { font-size: 11px; }
+    .maq-rec-lbl { color: #a0aec0; }
+    .maq-rec-val { font-weight: 700; color: #1e2a4a; }
+    .slots-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; background: #f5f0ff; color: #2d1b69; border-radius: 4px; }
+
+    /* Agentes */
+    .agente-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 10px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .agente-status { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+    .ast-conectado { background: #f0fff4; color: #276749; }
+    .ast-desconectado { background: #fff5f5; color: #c53030; }
+    .ast-atualizando { background: #fffaf0; color: #c05621; }
+    .heartbeat { font-size: 11px; color: #a0aec0; }
+    .heartbeat span { color: #38a169; font-weight: 700; }
+
+    /* Modais */
+    .modal-ops { max-width: 560px; max-height: 85vh; overflow-y: auto; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
+    .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; color: #1e2a4a; background: white; }
+    .form-control:focus { border-color: #2d1b69; }
+    .form-full { grid-column: 1/-1; }
+    .editor-body { min-height: 120px; padding: 10px; border: 1.5px solid #e2e8f0; border-radius: 0 0 6px 6px; outline: none; font-size: 13px; line-height: 1.7; color: #1e2a4a; }
+    .editor-body:focus { border-color: #2d1b69; }
+
+    .empty-ops { text-align: center; padding: 48px; color: #a0aec0; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
+    <span class="logo-text">Business Manager</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item active" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
+    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </div>
+</div>
+
+<div class="main" style="padding:0;overflow:hidden">
+  <div class="header" style="position:sticky;top:0;z-index:100">
+    <div class="header-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar em operações...">
+    </div>
+    <div class="header-right">
+      <div class="header-notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ops-layout">
+    <!-- Menu lateral Operações -->
+    <div class="ops-sidebar">
+      <div class="ops-sidebar-header">
+        <div class="ops-sidebar-title">Operações</div>
+        <div class="ops-sidebar-sub">Gestão operacional</div>
+      </div>
+      <div class="ops-menu">
+        <button class="ops-menu-item active" onclick="mudarSecao('fluxo-valor',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M7 10v4a4 4 0 004 4"/></svg>
+          Fluxo de Valor
+        </button>
+        <button class="ops-menu-item" onclick="mudarSecao('comunicacao',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Comunicação
+        </button>
+        <button class="ops-menu-item" onclick="mudarSecao('tarefas',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Tarefas
+        </button>
+        <button class="ops-menu-item" onclick="mudarSecao('processos',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+          Processos
+        </button>
+        <button class="ops-menu-item" onclick="mudarSecao('robos',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 11V9M16 11V9"/></svg>
+          Robôs
+        </button>
+      </div>
+      <div class="ops-dica">
+        <div class="ops-dica-titulo">💡 Dica</div>
+        <div class="ops-dica-texto">Use o menu lateral para navegar entre as seções de operações.</div>
+      </div>
+    </div>
+
+    <!-- Conteúdo -->
+    <div class="ops-content">
+
+      <!-- ===== FLUXO DE VALOR ===== -->
+      <div class="ops-section active" id="secao-fluxo-valor">
+        <div class="page-title">Fluxo de Valor Whiteboard</div>
+        <div class="breadcrumb" style="margin-bottom:14px">Operações > Fluxo de Valor</div>
+
+        <div class="fv-toolbar">
+          <div class="fv-toolbar-left" id="fvToolbarEdicao" style="display:none">
+            <button class="btn-fv primary" onclick="adicionarBloco()">+ Bloco</button>
+            <button class="btn-fv" onclick="adicionarTexto()">+ Texto</button>
+            <button class="btn-fv danger" onclick="limparCanvas()">🗑️ Limpar</button>
+            <button class="btn-fv primary" onclick="salvarFluxo()">💾 Salvar</button>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <span class="modo-badge" id="modoBadge">👁️ Visualização</span>
+            <button class="btn-fv" id="btnModoFv" onclick="toggleModoFv()">✏️ Editar</button>
+          </div>
+        </div>
+
+        <div class="fv-canvas-wrap">
+          <div class="fv-canvas" id="fvCanvas">
+            <svg class="fv-svg" id="fvSvg"></svg>
+            <div id="fvEmpty" style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:10px;color:#a0aec0">
+              <div style="font-size:36px">🗺️</div>
+              <div style="font-size:13px">Nenhum bloco adicionado.</div>
+              <div style="font-size:11px">Clique em "Editar" para começar a mapear o fluxo de valor.</div>
+            </div>
+          </div>
+          <div class="fv-minimap" id="fvMinimap">Mini Mapa</div>
+          <div class="sem-permissao-overlay" id="semPermissaoOverlay" style="display:none">
+            <div class="sem-permissao-card">
+              <div style="font-size:32px;margin-bottom:8px">🔒</div>
+              <div style="font-size:14px;font-weight:700;color:#1e2a4a;margin-bottom:4px">Sem permissão de edição</div>
+              <div style="font-size:12px;color:#718096">Apenas usuários com permissão podem editar o fluxo de valor.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== COMUNICAÇÃO ===== -->
+      <div class="ops-section" id="secao-comunicacao">
+        <div class="page-title">Comunicação</div>
+        <div class="breadcrumb" style="margin-bottom:14px">Operações > Comunicação</div>
+
+        <div class="com-tabs">
+          <button class="com-tab active" onclick="mudarComTab('contatos',this)">👥 Contatos</button>
+          <button class="com-tab" onclick="mudarComTab('email-templates',this)">📧 Templates de E-mail</button>
+        </div>
+
+        <!-- Contatos -->
+        <div class="com-section active" id="com-contatos">
+          <div class="contatos-header">
+            <div class="contatos-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="searchContato" placeholder="Buscar por nome, e-mail ou telefone..." oninput="filtrarContatos()">
+            </div>
+            <button class="btn-primary" onclick="abrirModalContato()" style="font-size:12px;padding:8px 14px">+ Novo Contato</button>
+            <select class="filtro-select" id="filtroGrupo" onchange="filtrarContatos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none">
+              <option value="">Todos os Grupos</option>
+              <option>Clientes</option><option>Parceiros</option><option>Fornecedores</option>
+            </select>
+          </div>
+          <div class="contatos-stats" id="contatosStats"></div>
+          <div class="contatos-layout">
+            <div class="contatos-table-wrap">
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
+                <thead><tr>
+                  <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">NOME</th>
+                  <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">DESCRIÇÃO</th>
+                  <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">E-MAIL</th>
+                  <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">TELEFONE</th>
+                  <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">GRUPO</th>
+                  <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">EMPRESA</th>
+                  <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">AÇÕES</th>
+                </tr></thead>
+                <tbody id="contatosBody"></tbody>
+              </table>
+            </div>
+            <div class="contatos-grupos" id="contatosGrupos"></div>
+          </div>
+        </div>
+
+        <!-- Templates -->
+        <div class="com-section" id="com-email-templates">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-size:14px;font-weight:700;color:#1e2a4a">Templates Disponíveis</div>
+            <button class="btn-primary" onclick="abrirModalEmailTemplate()" style="font-size:12px;padding:8px 14px">+ Novo Template</button>
+          </div>
+          <div class="templates-grid" id="templatesEmailGrid"></div>
+        </div>
+      </div>
+
+      <!-- ===== TAREFAS ===== -->
+      <div class="ops-section" id="secao-tarefas">
+        <div class="page-title">Gestão de Tarefas</div>
+        <div class="breadcrumb" style="margin-bottom:14px">Operações > Tarefas</div>
+
+        <div class="tsk-subtabs">
+          <button class="tsk-subtab active" onclick="mudarTskTab('lista',this)">📋 Lista de Tarefas</button>
+          <button class="tsk-subtab" onclick="mudarTskTab('carga',this)">📊 Carga de Trabalho</button>
+        </div>
+
+        <!-- Lista -->
+        <div id="tsk-lista">
+          <div class="tarefas-stats" id="tarefasStats"></div>
+          <div class="tarefas-toolbar">
+            <div class="tarefas-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="searchTarefa" placeholder="Buscar tarefas..." oninput="filtrarTarefas()">
+            </div>
+            <select class="form-control" id="filtroStatusTsk" onchange="filtrarTarefas()" style="width:140px;padding:8px 10px;font-size:12px">
+              <option value="">Todos os Status</option>
+              <option>Pendente</option><option>Em Progresso</option><option>Concluída</option><option>Dispensada</option>
+            </select>
+            <select class="form-control" id="filtroPriTsk" onchange="filtrarTarefas()" style="width:130px;padding:8px 10px;font-size:12px">
+              <option value="">Todas Prioridades</option>
+              <option>Urgente</option><option>Alta</option><option>Media</option><option>Baixa</option>
+            </select>
+            <button class="btn-primary" onclick="abrirModalTarefa()" style="font-size:12px;padding:8px 14px">+ Nova Tarefa</button>
+          </div>
+          <div class="tarefas-table-wrap">
+            <table class="tsk-table">
+              <thead><tr>
+                <th>Tarefa</th><th>Responsáveis</th><th>Prazo</th><th>Competência</th>
+                <th>Prioridade</th><th>Status</th><th>Progresso</th><th>Email</th><th>Ações</th>
+              </tr></thead>
+              <tbody id="tarefasBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Carga de trabalho -->
+        <div id="tsk-carga" style="display:none">
+          <div class="carga-grid" id="cargaGrid"></div>
+          <div style="background:white;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+            <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:14px">📊 Métricas por Responsável</div>
+            <div id="cargaTabela"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PROCESSOS ===== -->
+      <div class="ops-section" id="secao-processos">
+        <div class="page-title">Processos</div>
+        <div class="breadcrumb" style="margin-bottom:14px">Operações > Processos</div>
+
+        <div class="proc-stats" id="processoStats"></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <input type="text" id="searchProcesso" class="form-control" placeholder="Buscar processos..." oninput="filtrarProcessos()" style="max-width:300px">
+          <button class="btn-primary" onclick="abrirModalProcesso()" style="font-size:12px;padding:8px 14px">+ Novo Processo</button>
+        </div>
+        <div class="proc-layout">
+          <div class="proc-table-wrap">
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+              <thead><tr>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">PROCESSO</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">CATEGORIA</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">VERSÃO</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">STATUS</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">RESPONSÁVEL</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">EXECUÇÕES</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">AÇÕES</th>
+              </tr></thead>
+              <tbody id="processosBody"></tbody>
+            </table>
+          </div>
+          <div>
+            <div class="proc-sidebar-card">
+              <div class="proc-sidebar-titulo">📌 Atividade Recente</div>
+              <div id="atividadeRecente"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ROBÔS ===== -->
+      <div class="ops-section" id="secao-robos">
+        <div class="page-title">Robôs — Orquestração de Automações</div>
+        <div class="breadcrumb" style="margin-bottom:14px">Operações > Robôs</div>
+        <div class="mockup-aviso">⚠️ Execução real de robôs requer agente instalado nas máquinas. Esta seção gerencia metadados e configurações — a execução efetiva é simulada.</div>
+
+        <div class="robos-subtabs">
+          <button class="robo-subtab active" onclick="mudarRoboTab('dashboard',this)">📊 Dashboard</button>
+          <button class="robo-subtab" onclick="mudarRoboTab('producao',this)">⚙️ Produção</button>
+          <button class="robo-subtab" onclick="mudarRoboTab('credenciais',this)">🔐 Credenciais</button>
+          <button class="robo-subtab" onclick="mudarRoboTab('calendario',this)">📅 Calendário</button>
+          <button class="robo-subtab" onclick="mudarRoboTab('ambiente',this)">🖥️ Ambiente</button>
+          <button class="robo-subtab" onclick="mudarRoboTab('agentes',this)">🤖 Agentes</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="robo-secao active" id="robo-dashboard">
+          <div class="dash-grid" id="dashGrid"></div>
+          <div class="dash-charts">
+            <div class="dash-chart-card">
+              <div class="dash-chart-titulo">🏆 Top Robôs com Erros</div>
+              <div id="topErros"></div>
+            </div>
+            <div class="dash-chart-card">
+              <div class="dash-chart-titulo">📊 Volumetria por Departamento</div>
+              <div id="volumetria"></div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+            <div class="dash-chart-card">
+              <div class="dash-chart-titulo">⏱️ Horas Economizadas (FTE)</div>
+              <div id="fteSaved" style="font-size:32px;font-weight:700;color:#38a169;text-align:center;padding:20px"></div>
+            </div>
+            <div class="dash-chart-card">
+              <div class="dash-chart-titulo">💰 ROI Financeiro</div>
+              <div id="roiFinanceiro" style="font-size:32px;font-weight:700;color:#2d1b69;text-align:center;padding:20px"></div>
+            </div>
+            <div class="dash-chart-card">
+              <div class="dash-chart-titulo">✅ Taxa de Sucesso</div>
+              <div id="taxaSucesso" style="font-size:32px;font-weight:700;color:#38a169;text-align:center;padding:20px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produção -->
+        <div class="robo-secao" id="robo-producao">
+          <div class="prod-toolbar">
+            <input type="text" id="searchRobo" class="form-control" placeholder="Buscar robôs..." oninput="filtrarRobos()" style="max-width:240px">
+            <select class="form-control" id="filtroStatusRobo" onchange="filtrarRobos()" style="width:140px;padding:8px 10px;font-size:12px">
+              <option value="">Todos os Status</option>
+              <option>Executando</option><option>Pausado</option><option>Erro</option><option>Concluído</option>
+            </select>
+            <button class="btn-primary" onclick="abrirModalRobo()" style="font-size:12px;padding:8px 14px">+ Criar Robô</button>
+          </div>
+          <div id="robosLista"></div>
+        </div>
+
+        <!-- Credenciais -->
+        <div class="robo-secao" id="robo-credenciais">
+          <div id="credAlertaWrap"></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:13px;font-weight:700;color:#1e2a4a">🔐 Cofre de Credenciais</div>
+            <button class="btn-primary" onclick="abrirModalCredencial()" style="font-size:12px;padding:8px 14px">+ Nova Credencial</button>
+          </div>
+          <div class="cred-table-wrap">
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+              <thead><tr>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">NOME</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">TIPO</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">PROPRIETÁRIO</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">VALIDADE</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">STATUS</th>
+                <th style="padding:10px 12px;text-align:left;background:#f8fafc;border-bottom:1.5px solid #e2e8f0;font-size:11px;font-weight:700;color:#718096">AÇÕES</th>
+              </tr></thead>
+              <tbody id="credenciaisBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Calendário -->
+        <div class="robo-secao" id="robo-calendario">
+          <div class="mockup-aviso">⚠️ Mockup — Agendamentos são salvos no banco mas a execução automática requer infraestrutura de agentes.</div>
+          <div class="cal-layout">
+            <div class="cal-card">
+              <div class="cal-titulo">📅 Agendamentos dos Robôs</div>
+              <div id="calLista"></div>
+            </div>
+            <div>
+              <div class="cal-card">
+                <div class="cal-titulo">⏰ Próximas Execuções</div>
+                <div id="proxExecucoes"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ambiente -->
+        <div class="robo-secao" id="robo-ambiente">
+          <div class="mockup-aviso">⚠️ Mockup — Status de máquinas em tempo real requer agente instalado enviando heartbeat. Cadastre máquinas para gerenciar a infraestrutura.</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:13px;font-weight:700;color:#1e2a4a">🖥️ Máquinas Cadastradas</div>
+            <button class="btn-primary" onclick="abrirModalMaquina()" style="font-size:12px;padding:8px 14px">+ Adicionar Máquina</button>
+          </div>
+          <div id="maquinasLista"></div>
+        </div>
+
+        <!-- Agentes -->
+        <div class="robo-secao" id="robo-agentes">
+          <div class="mockup-aviso">⚠️ Mockup — Heartbeat e status em tempo real requerem o software Agente instalado nas máquinas. Esta seção permite gerenciar as configurações dos agentes.</div>
+          <div style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#276749">
+            📥 Para instalar o Agente em uma máquina, baixe o instalador e configure o arquivo <code>conf.bct</code> com a URL do servidor e sua API Key.
+          </div>
+          <div id="agentesLista"></div>
+        </div>
+      </div>
+
+    </div><!-- /ops-content -->
+  </div><!-- /ops-layout -->
+</div><!-- /main -->
+
+<!-- ===== MODAIS ===== -->
+
+<!-- Modal Contato -->
+<div class="modal-overlay" id="modalContato">
+  <div class="modal modal-ops">
+    <div class="modal-header"><span class="modal-titulo" id="modalContatoTitulo">Novo Contato</span><button class="btn-fechar" onclick="fecharModal('modalContato')">×</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="cNome" placeholder="Nome completo"></div>
+      <div class="form-group"><label>Descrição</label><input type="text" class="form-control" id="cDescricao" placeholder="Ex: Gerente de Projetos"></div>
+      <div class="form-group"><label>E-mail *</label><input type="email" class="form-control" id="cEmail" placeholder="email@exemplo.com"></div>
+      <div class="form-group"><label>Telefone</label><input type="text" class="form-control" id="cTelefone" placeholder="(11) 99999-9999"></div>
+      <div class="form-group"><label>Empresa</label><input type="text" class="form-control" id="cEmpresa" placeholder="Nome da empresa"></div>
+      <div class="form-group"><label>Grupo</label>
+        <select class="form-control" id="cGrupo"><option>Clientes</option><option>Parceiros</option><option>Fornecedores</option></select>
+      </div>
+    </div>
+    <input type="hidden" id="cEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalContato')">Cancelar</button><button class="btn-confirmar" onclick="salvarContato()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Email Template -->
+<div class="modal-overlay" id="modalEmailTemplate">
+  <div class="modal modal-ops">
+    <div class="modal-header"><span class="modal-titulo" id="modalEtTitulo">Novo Template de E-mail</span><button class="btn-fechar" onclick="fecharModal('modalEmailTemplate')">×</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Nome do Template *</label><input type="text" class="form-control" id="etNome" placeholder="Ex: Boas-vindas ao Cliente"></div>
+      <div class="form-group"><label>Categoria</label><input type="text" class="form-control" id="etCategoria" placeholder="Ex: Onboarding, Financeiro"></div>
+      <div class="form-group form-full"><label>Assunto</label><input type="text" class="form-control" id="etAssunto" placeholder="Ex: Bem-vindo(a) à {empresa}!"></div>
+      <div class="form-group form-full"><label>Corpo do E-mail (use {variavel} para variáveis dinâmicas)</label>
+        <div style="border:1.5px solid #e2e8f0;border-radius:6px 6px 0 0;background:#f8fafc;padding:5px;display:flex;gap:3px">
+          <button class="toolbar-btn" onclick="fmtEt('bold')" style="padding:4px 7px;border:none;background:none;border-radius:4px;cursor:pointer;font-size:12px"><b>B</b></button>
+          <button class="toolbar-btn" onclick="fmtEt('italic')" style="padding:4px 7px;border:none;background:none;border-radius:4px;cursor:pointer;font-size:12px"><i>I</i></button>
+          <button onclick="inserirVariavel()" style="padding:4px 8px;border:none;background:#f5f0ff;color:#2d1b69;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">{var}</button>
+        </div>
+        <div class="editor-body" id="etCorpo" contenteditable="true" style="min-height:100px"></div>
+      </div>
+      <div class="form-group form-full"><label>Variáveis disponíveis (separadas por vírgula)</label><input type="text" class="form-control" id="etVariaveis" placeholder="Ex: cliente, empresa, data, vencimento"></div>
+    </div>
+    <input type="hidden" id="etEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalEmailTemplate')">Cancelar</button><button class="btn-confirmar" onclick="salvarEmailTemplate()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Tarefa -->
+<div class="modal-overlay" id="modalTarefa">
+  <div class="modal modal-ops" style="max-width:640px">
+    <div class="modal-header"><span class="modal-titulo" id="modalTarefaTitulo">Nova Tarefa</span><button class="btn-fechar" onclick="fecharModal('modalTarefa')">×</button></div>
+    <div class="form-row">
+      <div class="form-group form-full"><label>Título *</label><input type="text" class="form-control" id="tTitulo" placeholder="Título da tarefa"></div>
+      <div class="form-group form-full"><label>Descrição</label><textarea class="form-control" id="tDescricao" rows="2" placeholder="Descrição da tarefa..."></textarea></div>
+      <div class="form-group"><label>Responsáveis (separados por vírgula)</label><input type="text" class="form-control" id="tResponsaveis" placeholder="Ex: João, Maria"></div>
+      <div class="form-group"><label>Áreas</label><input type="text" class="form-control" id="tAreas" placeholder="Ex: TI, Financeiro"></div>
+      <div class="form-group"><label>Prazo</label><input type="date" class="form-control" id="tPrazo"></div>
+      <div class="form-group"><label>Competência</label><input type="text" class="form-control" id="tCompetencia" placeholder="Ex: Desenvolvimento"></div>
+      <div class="form-group"><label>Prioridade</label>
+        <select class="form-control" id="tPrioridade"><option>Baixa</option><option>Media</option><option value="Alta">Alta</option><option>Urgente</option></select>
+      </div>
+      <div class="form-group"><label>Status</label>
+        <select class="form-control" id="tStatus"><option>Pendente</option><option>Em Progresso</option><option>Concluída</option><option>Dispensada</option></select>
+      </div>
+      <div class="form-group"><label>Progresso (%)</label><input type="number" class="form-control" id="tProgresso" min="0" max="100" value="0"></div>
+      <div class="form-group"><label>Grupo</label><input type="text" class="form-control" id="tGrupo" placeholder="Ex: Sprint 1"></div>
+      <div class="form-group"><label>Tags (vírgula)</label><input type="text" class="form-control" id="tTags" placeholder="Ex: urgente, bug"></div>
+      <div class="form-group"><label>Contato Associado</label><select class="form-control" id="tContato"><option value="">Nenhum</option></select></div>
+      <div class="form-group"><label>Template de E-mail</label><select class="form-control" id="tEmailTemplate"><option value="">Nenhum</option></select></div>
+      <div class="form-group form-full"><label>Lembretes</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" value="30min" id="lem30min"> 30 min antes</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" value="1h" id="lem1h"> 1 hora antes</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" value="5d" id="lem5d"> 5 dias antes</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" value="10d" id="lem10d"> 10 dias antes</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px"><input type="checkbox" value="30d" id="lem30d"> 30 dias antes</label>
+        </div>
+      </div>
+    </div>
+    <input type="hidden" id="tEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalTarefa')">Cancelar</button><button class="btn-confirmar" onclick="salvarTarefa()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Processo -->
+<div class="modal-overlay" id="modalProcesso">
+  <div class="modal modal-ops">
+    <div class="modal-header"><span class="modal-titulo" id="modalProcTitulo">Novo Processo</span><button class="btn-fechar" onclick="fecharModal('modalProcesso')">×</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="pNome" placeholder="Nome do processo"></div>
+      <div class="form-group"><label>Categoria</label><input type="text" class="form-control" id="pCategoria" placeholder="Ex: Financeiro, RH"></div>
+      <div class="form-group"><label>Responsável</label><input type="text" class="form-control" id="pResponsavel" placeholder="Nome do responsável"></div>
+      <div class="form-group"><label>Status</label>
+        <select class="form-control" id="pStatus"><option>Ativo</option><option>Em Revisão</option><option>Inativo</option></select>
+      </div>
+      <div class="form-group form-full"><label>Descrição</label><textarea class="form-control" id="pDescricao" rows="3" placeholder="Descreva o processo..."></textarea></div>
+    </div>
+    <input type="hidden" id="pEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalProcesso')">Cancelar</button><button class="btn-confirmar" onclick="salvarProcesso()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Robô -->
+<div class="modal-overlay" id="modalRobo">
+  <div class="modal modal-ops">
+    <div class="modal-header"><span class="modal-titulo" id="modalRoboTitulo">Novo Robô</span><button class="btn-fechar" onclick="fecharModal('modalRobo')">×</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="rNome" placeholder="Ex: Validador Fiscal"></div>
+      <div class="form-group"><label>Versão</label><input type="text" class="form-control" id="rVersao" placeholder="Ex: v1.0"></div>
+      <div class="form-group"><label>Tipo</label><select class="form-control" id="rTipo"><option>Background</option><option>Desktop</option></select></div>
+      <div class="form-group"><label>Prioridade</label><select class="form-control" id="rPrioridade"><option>Baixa</option><option>Media</option><option>Alta</option></select></div>
+      <div class="form-group"><label>Categoria / Área</label><input type="text" class="form-control" id="rCategoria" placeholder="Ex: Financeiro"></div>
+      <div class="form-group"><label>Departamento</label><input type="text" class="form-control" id="rDepartamento" placeholder="Ex: TI"></div>
+      <div class="form-group"><label>Máquina</label><input type="text" class="form-control" id="rMaquina" placeholder="Ex: VM-PROD-01"></div>
+      <div class="form-group"><label>Timeout (min)</label><input type="number" class="form-control" id="rTimeout" value="30" min="1"></div>
+      <div class="form-group form-full"><label>Comando de Execução</label><input type="text" class="form-control" id="rComando" placeholder="Ex: python bot.py"></div>
+      <div class="form-group form-full"><label>Descrição</label><textarea class="form-control" id="rDescricao" rows="2" placeholder="Descreva o robô..."></textarea></div>
+      <div class="form-group"><label>Tempo Médio Humano (min)</label><input type="number" class="form-control" id="rTempoHumano" value="0" min="0" placeholder="Tempo manual equivalente"></div>
+      <div class="form-group"><label>Status</label><select class="form-control" id="rStatus"><option>Pausado</option><option>Executando</option><option>Erro</option><option>Concluído</option></select></div>
+    </div>
+    <input type="hidden" id="rEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalRobo')">Cancelar</button><button class="btn-confirmar" onclick="salvarRobo()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Credencial -->
+<div class="modal-overlay" id="modalCredencial">
+  <div class="modal modal-ops">
+    <div class="modal-header"><span class="modal-titulo" id="modalCredTitulo">Nova Credencial</span><button class="btn-fechar" onclick="fecharModal('modalCredencial')">×</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="credNome" placeholder="Ex: API ERP Totvs"></div>
+      <div class="form-group"><label>Tipo</label>
+        <select class="form-control" id="credTipo"><option>API Key</option><option>Database</option><option>SMTP</option><option>FTP</option><option>Certificate</option><option>Senha Windows</option><option>Outro</option></select>
+      </div>
+      <div class="form-group"><label>Proprietário</label><input type="text" class="form-control" id="credProprietario" placeholder="Ex: TI, Financeiro"></div>
+      <div class="form-group"><label>Validade</label><input type="date" class="form-control" id="credValidade"></div>
+      <div class="form-group form-full"><label>Valor (criptografado)</label><input type="password" class="form-control" id="credValor" placeholder="Valor da credencial"></div>
+      <div class="form-group"><label>Status</label><select class="form-control" id="credStatus"><option>Válida</option><option>Expirando</option><option>Expirada</option></select></div>
+    </div>
+    <input type="hidden" id="credEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalCredencial')">Cancelar</button><button class="btn-confirmar" onclick="salvarCredencial()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Máquina -->
+<div class="modal-overlay" id="modalMaquina">
+  <div class="modal modal-ops">
+    <div class="modal-header"><span class="modal-titulo" id="modalMaqTitulo">Adicionar Máquina</span><button class="btn-fechar" onclick="fecharModal('modalMaquina')">×</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Nome / Machine ID *</label><input type="text" class="form-control" id="maqNome" placeholder="Ex: VM-PROD-01"></div>
+      <div class="form-group"><label>Tipo</label><select class="form-control" id="maqTipo"><option>Virtual Machine</option><option>Physical Machine</option></select></div>
+      <div class="form-group"><label>Sistema Operacional</label><input type="text" class="form-control" id="maqSO" placeholder="Ex: Windows Server 2022"></div>
+      <div class="form-group"><label>IP</label><input type="text" class="form-control" id="maqIP" placeholder="Ex: 192.168.1.101"></div>
+      <div class="form-group"><label>CPU Total</label><input type="text" class="form-control" id="maqCPU" placeholder="Ex: 8 cores"></div>
+      <div class="form-group"><label>RAM Total</label><input type="text" class="form-control" id="maqRAM" placeholder="Ex: 16 GB"></div>
+      <div class="form-group"><label>Slots Disponíveis</label><input type="number" class="form-control" id="maqSlots" value="10" min="1"></div>
+      <div class="form-group"><label>Status</label><select class="form-control" id="maqStatus"><option>Online</option><option>Offline</option><option>Manutenção</option><option>Ocupado</option></select></div>
+    </div>
+    <input type="hidden" id="maqEditId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalMaquina')">Cancelar</button><button class="btn-confirmar" onclick="salvarMaquina()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Bloco FV -->
+<div class="modal-overlay" id="modalBloco">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header"><span class="modal-titulo">Novo Bloco</span><button class="btn-fechar" onclick="fecharModal('modalBloco')">×</button></div>
+    <div class="form-group"><label>Nome do Processo *</label><input type="text" class="form-control" id="blocoNome" placeholder="Ex: Receber Pedido"></div>
+    <div class="form-group"><label>Ícone</label>
+      <select class="form-control" id="blocoIcone"><option value="📦">📦 Processo</option><option value="👤">👤 Pessoa</option><option value="🏭">🏭 Produção</option><option value="📋">📋 Documento</option><option value="🚚">🚚 Entrega</option><option value="💰">💰 Financeiro</option><option value="⚙️">⚙️ Sistema</optio

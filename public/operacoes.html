@@ -280,7 +280,26 @@
       <input type="text" placeholder="Buscar em operações...">
     </div>
     <div class="header-right">
-      <div class="header-notif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+      
+    <div class="notif-wrap" id="notifWrap">
+        <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="notif-badge cinza" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-drop-header">
+            <span class="notif-drop-titulo">🔔 Notificações</span>
+            <div class="notif-drop-acoes">
+              <button class="btn-ler-todas" onclick="lerTodas()">Marcar todas como lidas</button>
+            </div>
+          </div>
+          <div class="notif-lista" id="notifLista">
+            <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
+          </div>
+          <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
+        </div>
+      </div>
+      
       <div class="header-user">
         <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
         <div class="user-avatar" id="userAvatar">?</div>
@@ -1688,6 +1707,96 @@
   // ===== INIT =====
   maquinas = JSON.parse(localStorage.getItem('maquinas_'+usuario.empresaNome)||'[]');
   carregarFluxo();
+
+  // ===== NOTIFICAÇÕES =====
+  async function carregarNotificacoes() {
+    try {
+      const [resResumo, resNotifs] = await Promise.all([
+        fetch('/api/notificacoes/resumo', { headers: HEADERS }),
+        fetch('/api/notificacoes', { headers: HEADERS })
+      ]);
+      if (resResumo.status === 401) return;
+      const resumo = await resResumo.json();
+      const notifs = await resNotifs.json();
+      atualizarSino(resumo);
+      renderNotificacoes(notifs);
+    } catch(err) { console.error(err); }
+  }
+  function atualizarSino(resumo) {
+    const btn = document.getElementById('notifBtn');
+    const badge = document.getElementById('notifBadge');
+    if (!btn || !badge) return;
+    btn.className = 'notif-btn';
+    badge.style.display = 'none';
+    if (resumo.temVencida > 0) {
+      btn.classList.add('vermelho');
+      badge.style.display = 'flex';
+      badge.className = 'notif-badge vermelho';
+      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+    } else if (resumo.temVencendo > 0 || resumo.naoLidas > 0) {
+      btn.classList.add('amarelo');
+      badge.style.display = 'flex';
+      badge.className = 'notif-badge amarelo';
+      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+    }
+  }
+  function renderNotificacoes(notifs) {
+    const lista = document.getElementById('notifLista');
+    if (!lista) return;
+    if (!notifs || notifs.length === 0) {
+      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
+      return;
+    }
+    lista.innerHTML = notifs.map(n => `
+      <div class="notif-item ${!n.lida?'nao-lida':''} tipo-${n.tipo}" onclick="abrirNotif('${n._id}','${n.link||''}')">
+        <div class="notif-icone ${n.tipo}">${n.icone||'🔔'}</div>
+        <div class="notif-corpo">
+          <div class="notif-titulo-item">${n.titulo}</div>
+          <div class="notif-msg">${n.mensagem}</div>
+          <div class="notif-tempo">${tempoNotif(n.criadoEm)}</div>
+        </div>
+        <button class="notif-del" onclick="deletarNotif('${n._id}',event)">×</button>
+      </div>`).join('');
+  }
+  function tempoNotif(data) {
+    if (!data) return '';
+    const diff = Math.floor((new Date() - new Date(data)) / 1000);
+    if (diff < 60) return 'Agora mesmo';
+    if (diff < 3600) return `${Math.floor(diff/60)} min atrás`;
+    if (diff < 86400) return `${Math.floor(diff/3600)}h atrás`;
+    return `${Math.floor(diff/86400)} dia(s) atrás`;
+  }
+  async function abrirNotif(id, link) {
+    try {
+      await fetch(`/api/notificacoes/${id}/ler`, { method:'PUT', headers:HEADERS });
+      await carregarNotificacoes();
+      if (link && link !== 'undefined' && link !== window.location.pathname) window.location.href = link;
+    } catch(err) { console.error(err); }
+  }
+  async function deletarNotif(id, e) {
+    e.stopPropagation();
+    try { await fetch(`/api/notificacoes/${id}`, { method:'DELETE', headers:HEADERS }); await carregarNotificacoes(); }
+    catch(err) { console.error(err); }
+  }
+  async function lerTodas() {
+    try { await fetch('/api/notificacoes/ler-todas', { method:'PUT', headers:HEADERS }); await carregarNotificacoes(); }
+    catch(err) { console.error(err); }
+  }
+  function toggleNotif() {
+    const dd = document.getElementById('notifDropdown');
+    if (!dd) return;
+    dd.classList.toggle('aberto');
+    if (dd.classList.contains('aberto')) carregarNotificacoes();
+  }
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('notifWrap');
+    if (wrap && !wrap.contains(e.target)) {
+      const dd = document.getElementById('notifDropdown');
+      if (dd) dd.classList.remove('aberto');
+    }
+  });
+  carregarNotificacoes();
+  setInterval(carregarNotificacoes, 60000);
 </script>
 </body>
 </html>

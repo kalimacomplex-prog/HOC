@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Redefinir Senha</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: white; border-radius: 12px; padding: 48px 40px; width: 100%; max-width: 400px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+    .logo { width: 48px; height: 48px; background: #2d1b69; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; margin-bottom: 24px; }
+    h2 { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
+    .subtitulo { font-size: 13px; color: #718096; margin-bottom: 28px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 5px; }
+    input { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e2a4a; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #2d1b69; }
+    .senha-forca { height: 3px; border-radius: 2px; margin-top: 6px; background: #e2e8f0; transition: all 0.3s; }
+    .btn { width: 100%; padding: 12px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #3d2b89; }
+    .btn:disabled { background: #a0aec0; cursor: not-allowed; }
+    .erro { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 14px; display: none; }
+    .link { text-align: center; margin-top: 20px; font-size: 13px; color: #718096; }
+    .link a { color: #2d1b69; font-weight: 600; text-decoration: none; }
+    .link a:hover { text-decoration: underline; }
+    /* Estados especiais */
+    .spinner { width: 48px; height: 48px; border: 4px solid #e2e8f0; border-top-color: #2d1b69; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 20px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .estado { text-align: center; display: none; }
+    .estado .icone { font-size: 56px; margin-bottom: 16px; }
+    .estado h3 { font-size: 20px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
+    .estado p { font-size: 13px; color: #718096; line-height: 1.6; margin-bottom: 24px; }
+    .estado a { display: inline-block; padding: 10px 24px; background: #2d1b69; color: white; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px; }
+    #loading { display: block; }
+    #formRedefinir { display: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+
+    <!-- Carregando / Validando token -->
+    <div class="estado" id="loading">
+      <div class="spinner"></div>
+      <h3>Verificando link...</h3>
+      <p>Aguarde enquanto validamos seu link de recuperação.</p>
+    </div>
+
+    <!-- Link inválido / expirado -->
+    <div class="estado" id="linkInvalido">
+      <div class="icone">⏰</div>
+      <h3>Link expirado</h3>
+      <p>Este link de recuperação é inválido ou expirou.<br>Os links têm validade de 1 hora.</p>
+      <a href="/recuperar-senha">Solicitar novo link</a>
+      <div class="link" style="margin-top:16px"><a href="/">← Voltar ao login</a></div>
+    </div>
+
+    <!-- Formulário de nova senha -->
+    <div id="formRedefinir">
+      <div class="logo">H</div>
+      <h2>Nova senha</h2>
+      <p class="subtitulo">Crie uma nova senha segura para sua conta.</p>
+      <div class="erro" id="erro"></div>
+      <div class="form-group">
+        <label>Nova senha</label>
+        <input type="password" id="senha" placeholder="Mínimo 6 caracteres" oninput="verificarForca()">
+        <div class="senha-forca" id="forcaBarra"></div>
+      </div>
+      <div class="form-group">
+        <label>Confirmar nova senha</label>
+        <input type="password" id="confirmarSenha" placeholder="Repita a nova senha">
+      </div>
+      <button class="btn" id="btnSalvar" onclick="redefinirSenha()">Salvar nova senha</button>
+      <div class="link"><a href="/">← Voltar ao login</a></div>
+    </div>
+
+    <!-- Sucesso -->
+    <div class="estado" id="sucesso">
+      <div class="icone">🎉</div>
+      <h3>Senha redefinida!</h3>
+      <p>Sua senha foi atualizada com sucesso.<br>Você já pode fazer login com a nova senha.</p>
+      <a href="/">Fazer login →</a>
+    </div>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    async function validarToken() {
+      if (!token) { mostrarEstado('linkInvalido'); return; }
+      try {
+        const res = await fetch(`/api/recuperar-senha/${token}`);
+        if (res.ok) {
+          mostrarEstado(null);
+          document.getElementById('formRedefinir').style.display = 'block';
+        } else {
+          mostrarEstado('linkInvalido');
+        }
+      } catch(err) {
+        mostrarEstado('linkInvalido');
+      }
+    }
+
+    function mostrarEstado(id) {
+      ['loading','linkInvalido','sucesso'].forEach(s => {
+        document.getElementById(s).style.display = s === id ? 'block' : 'none';
+      });
+    }
+
+    function verificarForca() {
+      const senha = document.getElementById('senha').value;
+      const barra = document.getElementById('forcaBarra');
+      if (senha.length === 0) { barra.style.background = '#e2e8f0'; barra.style.width = '100%'; }
+      else if (senha.length < 6) { barra.style.background = '#fc8181'; barra.style.width = '33%'; }
+      else if (senha.length < 10) { barra.style.background = '#f6ad55'; barra.style.width = '66%'; }
+      else { barra.style.background = '#68d391'; barra.style.width = '100%'; }
+    }
+
+    async function redefinirSenha() {
+      const senha = document.getElementById('senha').value;
+      const confirmarSenha = document.getElementById('confirmarSenha').value;
+      const btn = document.getElementById('btnSalvar');
+      const erro = document.getElementById('erro');
+      erro.style.display = 'none';
+
+      if (!senha || !confirmarSenha) { erro.textContent = 'Preencha os dois campos.'; erro.style.display = 'block'; return; }
+      if (senha.length < 6) { erro.textContent = 'A senha deve ter no mínimo 6 caracteres.'; erro.style.display = 'block'; return; }
+      if (senha !== confirmarSenha) { erro.textContent = 'As senhas não coincidem.'; erro.style.display = 'block'; return; }
+
+      btn.disabled = true; btn.textContent = 'Salvando...';
+      try {
+        const res = await fetch(`/api/redefinir-senha/${token}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ senha })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 404 || res.status === 400) { mostrarEstado('linkInvalido'); return; }
+          erro.textContent = data.erro || 'Erro ao redefinir senha.'; erro.style.display = 'block'; return;
+        }
+        document.getElementById('formRedefinir').style.display = 'none';
+        mostrarEstado('sucesso');
+        setTimeout(() => window.location.href = '/', 3000);
+      } catch(err) {
+        erro.textContent = 'Erro de conexão. Tente novamente.'; erro.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Salvar nova senha';
+      }
+    }
+
+    document.addEventListener('keypress', e => { if (e.key === 'Enter') redefinirSenha(); });
+    validarToken();
+  </script>
+</body>
+</html>

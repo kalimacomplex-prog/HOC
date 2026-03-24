@@ -12,6 +12,26 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(express.static('public'));
 
+// ==================== HELPERS UTILITÁRIOS ====================
+
+function validarEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validarCNPJ(cnpj) {
+  cnpj = cnpj.replace(/[^\d]/g, '');
+  if (cnpj.length !== 14) return false;
+  if (/^(\d)\1+$/.test(cnpj)) return false;
+  let soma = 0, resto;
+  for (let i = 1; i <= 12; i++) soma += parseInt(cnpj[i - 1]) * (i < 5 ? 5 - i + 1 : 13 - i + 1);
+  resto = soma % 11;
+  if (parseInt(cnpj[12]) !== (resto < 2 ? 0 : 11 - resto)) return false;
+  soma = 0;
+  for (let i = 1; i <= 13; i++) soma += parseInt(cnpj[i - 1]) * (i < 6 ? 6 - i + 1 : 14 - i + 1);
+  resto = soma % 11;
+  return parseInt(cnpj[13]) === (resto < 2 ? 0 : 11 - resto);
+}
+
 // ==================== BREVO ====================
 
 async function enviarEmail(para, assunto, html) {
@@ -35,17 +55,32 @@ mongoose.connect(process.env.MONGO_URI)
 
 // ==================== MODELS ====================
 
-const empresaSchema = new mongoose.Schema({ nome: { type: String, required: true, unique: true }, criadoEm: { type: Date, default: Date.now } });
+const empresaSchema = new mongoose.Schema({
+  nome: { type: String, required: true, unique: true },
+  cnpj: { type: String, required: true, unique: true },
+  criadoEm: { type: Date, default: Date.now }
+});
 const Empresa = mongoose.model('Empresa', empresaSchema);
 
 const usuarioSchema = new mongoose.Schema({
   nome: { type: String, required: true }, email: { type: String, required: true, unique: true }, senha: { type: String },
-  perfil: { type: String, default: 'Usuário' }, usuarioMestre: { type: Boolean, default: false }, status: { type: String, default: 'Ativo' },
+  perfil: { type: String, default: 'Usuário' }, usuarioMestre: { type: Boolean, default: false },
+  status: { type: String, default: 'Pendente', enum: ['Ativo', 'Pendente', 'Inativo'] },
+  emailConfirmado: { type: Boolean, default: false },
+  tokenConfirmacao: { type: String, default: null },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   permissoes: { acessoIndependente: { type: Boolean, default: false }, aprovacaoWikis: { type: Boolean, default: false }, aprovacaoIdeias: { type: Boolean, default: false }, gerenciamentoProjetos: { type: Boolean, default: false }, edicaoFluxoValor: { type: Boolean, default: false }, permissaoSeguranca: { type: Boolean, default: false } },
   criadoEm: { type: Date, default: Date.now }
 });
 const Usuario = mongoose.model('Usuario', usuarioSchema);
+
+const tokenRecuperacaoSchema = new mongoose.Schema({
+  usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
+  token: { type: String, required: true },
+  usado: { type: Boolean, default: false },
+  expiraEm: { type: Date, default: () => new Date(+new Date() + 60 * 60 * 1000) } // 1 hora
+});
+const TokenRecuperacao = mongoose.model('TokenRecuperacao', tokenRecuperacaoSchema);
 
 const conviteSchema = new mongoose.Schema({
   email: { type: String, required: true }, empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
@@ -237,16 +272,12 @@ async function verificarAlertasLicencas(empresaId, emailAdmin) {
       if (!lic.validade) continue;
       const validade = new Date(lic.validade);
       const diffDias = Math.ceil((validade - hoje) / (1000 * 60 * 60 * 24));
-
-      // Vencida
       if (diffDias < 0 && lic.status !== 'Vencida') {
         await Licenca.findByIdAndUpdate(lic._id, { status: 'Vencida' });
         await criarNotificacao(empresaId, `Licença Vencida: ${lic.nome}`, `A licença "${lic.nome}" venceu há ${Math.abs(diffDias)} dia(s). Providencie a renovação.`, 'licenca_vencida', '🔴', '/gestao-licencas');
         if (emailAdmin) await enviarEmail(emailAdmin, `🔴 Licença Vencida — ${lic.nome}`, gerarHtmlAlertaLicenca(lic, diffDias));
         if (lic.responsavelEmail && lic.responsavelEmail !== emailAdmin) await enviarEmail(lic.responsavelEmail, `🔴 Licença Vencida — ${lic.nome}`, gerarHtmlAlertaLicenca(lic, diffDias));
-      }
-      // Vencendo em breve
-      else if (diffDias >= 0 && diffDias <= (lic.alertaDias || 30) && lic.status !== 'Vencendo') {
+      } else if (diffDias >= 0 && diffDias <= (lic.alertaDias || 30) && lic.status !== 'Vencendo') {
         await Licenca.findByIdAndUpdate(lic._id, { status: 'Vencendo' });
         await criarNotificacao(empresaId, `Licença Vencendo: ${lic.nome}`, `A licença "${lic.nome}" vence em ${diffDias} dia(s).`, 'licenca_vencendo', '⚠️', '/gestao-licencas');
         if (emailAdmin) await enviarEmail(emailAdmin, `⚠️ Licença vencendo em ${diffDias} dias — ${lic.nome}`, gerarHtmlAlertaLicenca(lic, diffDias));
@@ -285,6 +316,9 @@ function authMiddleware(req, res, next) {
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cadastro.html')));
+app.get('/confirmar-email', (req, res) => res.sendFile(path.join(__dirname, 'public', 'confirmar-email.html')));
+app.get('/recuperar-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'recuperar-senha.html')));
+app.get('/redefinir-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'redefinir-senha.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/overview', (req, res) => res.sendFile(path.join(__dirname, 'public', 'overview.html')));
 app.get('/gestao-metas', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-metas.html')));
@@ -302,17 +336,90 @@ app.get('/plano-usuarios', (req, res) => res.sendFile(path.join(__dirname, 'publ
 
 app.post('/api/cadastro', async (req, res) => {
   try {
-    const { nome, email, senha, nomeEmpresa } = req.body;
-    if (!nome || !email || !senha || !nomeEmpresa) return res.status(400).json({ erro: 'Preencha todos os campos' });
+    const { nome, email, senha, nomeEmpresa, cnpj } = req.body;
+
+    // Validações básicas
+    if (!nome || !email || !senha || !nomeEmpresa || !cnpj) {
+      return res.status(400).json({ erro: 'Preencha todos os campos obrigatórios' });
+    }
+
+    // Validar formato de email
+    if (!validarEmail(email)) {
+      return res.status(400).json({ erro: 'Email inválido. Use um email com formato válido.' });
+    }
+
+    // Validar CNPJ
+    const cnpjLimpo = cnpj.replace(/[^\d]/g, '');
+    if (!validarCNPJ(cnpjLimpo)) {
+      return res.status(400).json({ erro: 'CNPJ inválido. Verifique o número informado.' });
+    }
+
+    // Verificar se email já existe
     const emailExiste = await Usuario.findOne({ email });
     if (emailExiste) return res.status(400).json({ erro: 'Email já cadastrado' });
-    let empresa = await Empresa.findOne({ nome: nomeEmpresa });
-    if (!empresa) empresa = await Empresa.create({ nome: nomeEmpresa });
+
+    // Verificar se CNPJ já existe
+    const cnpjExiste = await Empresa.findOne({ cnpj: cnpjLimpo });
+    if (cnpjExiste) {
+      return res.status(400).json({ erro: 'Essa empresa já possui cadastro. Entre em contato com o administrador.' });
+    }
+
+    // Verificar se nome da empresa já existe
+    const nomeExiste = await Empresa.findOne({ nome: { $regex: new RegExp(`^${nomeEmpresa.trim()}$`, 'i') } });
+    if (nomeExiste) {
+      return res.status(400).json({ erro: 'Essa empresa já possui cadastro. Entre em contato com o administrador.' });
+    }
+
+    // Criar empresa
+    const empresa = await Empresa.create({ nome: nomeEmpresa.trim(), cnpj: cnpjLimpo });
+
+    // Criar token de confirmação de email
+    const tokenConfirmacao = crypto.randomBytes(32).toString('hex');
+
+    // Criar usuário com status Pendente até confirmar email
     const hash = await bcrypt.hash(senha, 10);
-    const novoUsuario = await Usuario.create({ nome, email, senha: hash, perfil: 'Admin', usuarioMestre: true, empresa: empresa._id, permissoes: { acessoIndependente: true, aprovacaoWikis: true, aprovacaoIdeias: true, gerenciamentoProjetos: true, edicaoFluxoValor: true, permissaoSeguranca: true } });
-    await criarNotificacao(empresa._id, 'Bem-vindo ao HOC System! 🎉', `Olá ${nome}! Sua conta foi criada com sucesso. Explore todas as funcionalidades.`, 'sucesso', '🎉', '/dashboard');
-    res.status(201).json({ mensagem: 'Conta criada com sucesso!' });
+    await Usuario.create({
+      nome, email, senha: hash,
+      perfil: 'Admin', usuarioMestre: true,
+      status: 'Pendente', emailConfirmado: false,
+      tokenConfirmacao,
+      empresa: empresa._id,
+      permissoes: { acessoIndependente: true, aprovacaoWikis: true, aprovacaoIdeias: true, gerenciamentoProjetos: true, edicaoFluxoValor: true, permissaoSeguranca: true }
+    });
+
+    // Enviar email de confirmação
+    const linkConfirmacao = `${process.env.APP_URL}/confirmar-email?token=${tokenConfirmacao}`;
+    await enviarEmail(email, 'Confirme seu email — HOC System', `
+      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
+        <h2 style="color:#2d1b69">Confirme seu email 📧</h2>
+        <p style="color:#4a5568">Olá <strong>${nome}</strong>, sua conta foi criada com sucesso!</p>
+        <p style="color:#718096;margin-bottom:24px">Clique no botão abaixo para confirmar seu email e ativar sua conta.</p>
+        <a href="${linkConfirmacao}" style="display:inline-block;padding:14px 28px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Confirmar meu email</a>
+        <p style="color:#a0aec0;font-size:12px;margin-top:24px">Se você não criou esta conta, ignore este email.</p>
+      </div>`);
+
+    res.status(201).json({ mensagem: 'Conta criada! Verifique seu email para confirmar o cadastro.' });
   } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Confirmar email
+app.get('/api/confirmar-email/:token', async (req, res) => {
+  try {
+    const usuario = await Usuario.findOne({ tokenConfirmacao: req.params.token });
+    if (!usuario) return res.status(404).json({ erro: 'Link de confirmação inválido ou expirado.' });
+    if (usuario.emailConfirmado) return res.json({ mensagem: 'Email já confirmado anteriormente.' });
+
+    await Usuario.findByIdAndUpdate(usuario._id, {
+      emailConfirmado: true,
+      status: 'Ativo',
+      tokenConfirmacao: null
+    });
+
+    // Criar notificação de boas-vindas
+    await criarNotificacao(usuario.empresa, 'Bem-vindo ao HOC System! 🎉', `Olá ${usuario.nome}! Sua conta foi ativada com sucesso.`, 'sucesso', '🎉', '/dashboard');
+
+    res.json({ mensagem: 'Email confirmado com sucesso! Você já pode fazer login.' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 app.post('/api/login', async (req, res) => {
@@ -322,9 +429,83 @@ app.post('/api/login', async (req, res) => {
     if (!usuario) return res.status(400).json({ erro: 'Email ou senha incorretos' });
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
     if (!senhaCorreta) return res.status(400).json({ erro: 'Email ou senha incorretos' });
+
+    // Bloquear login se email não confirmado
+    if (!usuario.emailConfirmado) {
+      return res.status(400).json({ erro: 'Email não confirmado. Verifique sua caixa de entrada e clique no link de confirmação.' });
+    }
+
+    // Bloquear login se conta inativa
+    if (usuario.status === 'Inativo') {
+      return res.status(400).json({ erro: 'Conta inativa. Entre em contato com o administrador.' });
+    }
+
     const token = jwt.sign({ id: usuario._id, nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresa: usuario.empresa._id, empresaNome: usuario.empresa.nome }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '8h' });
     verificarAlertasLicencas(usuario.empresa._id, usuario.email).catch(console.error);
     res.json({ token, usuario: { nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresaNome: usuario.empresa.nome } });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ==================== RECUPERAÇÃO DE SENHA ====================
+
+// Solicitar recuperação
+app.post('/api/recuperar-senha', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ erro: 'Email obrigatório' });
+
+    const usuario = await Usuario.findOne({ email });
+    // Sempre retorna sucesso por segurança (não revelar se email existe)
+    if (!usuario) return res.json({ mensagem: 'Se este email estiver cadastrado, você receberá as instruções em breve.' });
+
+    // Invalidar tokens anteriores
+    await TokenRecuperacao.updateMany({ usuarioId: usuario._id, usado: false }, { usado: true });
+
+    // Criar novo token
+    const token = crypto.randomBytes(32).toString('hex');
+    await TokenRecuperacao.create({ usuarioId: usuario._id, token });
+
+    const linkRedefinicao = `${process.env.APP_URL}/redefinir-senha?token=${token}`;
+    await enviarEmail(email, 'Redefinição de senha — HOC System', `
+      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
+        <h2 style="color:#2d1b69">Redefinir senha 🔐</h2>
+        <p style="color:#4a5568">Olá <strong>${usuario.nome}</strong>!</p>
+        <p style="color:#718096;margin-bottom:8px">Recebemos uma solicitação para redefinir a senha da sua conta no HOC System.</p>
+        <p style="color:#718096;margin-bottom:24px">Clique no botão abaixo para criar uma nova senha. Este link expira em <strong>1 hora</strong>.</p>
+        <a href="${linkRedefinicao}" style="display:inline-block;padding:14px 28px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Redefinir minha senha</a>
+        <p style="color:#a0aec0;font-size:12px;margin-top:24px">Se você não solicitou isso, ignore este email. Sua senha permanecerá a mesma.</p>
+      </div>`);
+
+    res.json({ mensagem: 'Se este email estiver cadastrado, você receberá as instruções em breve.' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Validar token de recuperação
+app.get('/api/recuperar-senha/:token', async (req, res) => {
+  try {
+    const tokenDoc = await TokenRecuperacao.findOne({ token: req.params.token, usado: false });
+    if (!tokenDoc) return res.status(404).json({ erro: 'Link inválido ou expirado.' });
+    if (new Date() > tokenDoc.expiraEm) return res.status(400).json({ erro: 'Link expirado. Solicite um novo.' });
+    res.json({ valido: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Redefinir senha
+app.post('/api/redefinir-senha/:token', async (req, res) => {
+  try {
+    const { senha } = req.body;
+    if (!senha || senha.length < 6) return res.status(400).json({ erro: 'A senha deve ter pelo menos 6 caracteres.' });
+
+    const tokenDoc = await TokenRecuperacao.findOne({ token: req.params.token, usado: false });
+    if (!tokenDoc) return res.status(404).json({ erro: 'Link inválido ou expirado.' });
+    if (new Date() > tokenDoc.expiraEm) return res.status(400).json({ erro: 'Link expirado. Solicite um novo.' });
+
+    const hash = await bcrypt.hash(senha, 10);
+    await Usuario.findByIdAndUpdate(tokenDoc.usuarioId, { senha: hash });
+    tokenDoc.usado = true;
+    await tokenDoc.save();
+
+    res.json({ mensagem: 'Senha redefinida com sucesso! Você já pode fazer login.' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
@@ -396,6 +577,7 @@ app.post('/api/convites', authMiddleware, async (req, res) => {
   try {
     const { email, usuarioMestre, permissoes } = req.body;
     if (!email) return res.status(400).json({ erro: 'Email obrigatório' });
+    if (!validarEmail(email)) return res.status(400).json({ erro: 'Email inválido' });
     const usuarioExiste = await Usuario.findOne({ email });
     if (usuarioExiste) return res.status(400).json({ erro: 'Este email já possui uma conta' });
     const token = crypto.randomBytes(32).toString('hex');
@@ -429,7 +611,16 @@ app.post('/api/convites/:token/aceitar', async (req, res) => {
     if (!convite) return res.status(404).json({ erro: 'Convite inválido ou expirado' });
     if (new Date() > convite.expiraEm) return res.status(400).json({ erro: 'Convite expirado' });
     const hash = await bcrypt.hash(senha, 10);
-    await Usuario.create({ nome, email: convite.email, senha: hash, empresa: convite.empresa._id, usuarioMestre: convite.usuarioMestre, perfil: convite.usuarioMestre ? 'Admin' : 'Usuário', permissoes: convite.permissoes });
+    // Usuários convidados entram como Ativos e com email já confirmado (convite é a validação)
+    await Usuario.create({
+      nome, email: convite.email, senha: hash,
+      empresa: convite.empresa._id,
+      usuarioMestre: convite.usuarioMestre,
+      perfil: convite.usuarioMestre ? 'Admin' : 'Usuário',
+      permissoes: convite.permissoes,
+      status: 'Ativo',
+      emailConfirmado: true
+    });
     convite.usado = true; await convite.save();
     await criarNotificacao(convite.empresa._id, `Novo usuário: ${nome}`, `${nome} aceitou o convite e entrou no sistema.`, 'sucesso', '👤', '/plano-usuarios');
     res.json({ mensagem: 'Conta criada com sucesso!' });

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Login</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
+    .left-panel { width: 400px; background: #2d1b69; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: white; }
+    .left-panel h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+    .left-panel p { font-size: 13px; color: rgba(255,255,255,0.6); text-align: center; line-height: 1.6; }
+    .logo { width: 72px; height: 72px; background: rgba(255,255,255,0.15); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px; }
+    .right-panel { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+    .card { background: white; border-radius: 12px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+    .card h2 { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
+    .card p { font-size: 13px; color: #718096; margin-bottom: 28px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 5px; }
+    .label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+    .label-row label { margin-bottom: 0; }
+    .label-row a { font-size: 11px; color: #2d1b69; text-decoration: none; font-weight: 600; }
+    .label-row a:hover { text-decoration: underline; }
+    input { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e2a4a; outline: none; transition: border-color 0.2s; }
+    input:focus { border-color: #2d1b69; }
+    .btn { width: 100%; padding: 12px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 4px; }
+    .btn:hover { background: #3d2b89; }
+    .btn:disabled { background: #a0aec0; cursor: not-allowed; }
+    .link { text-align: center; margin-top: 20px; font-size: 13px; color: #718096; }
+    .link a { color: #2d1b69; font-weight: 600; text-decoration: none; }
+    .link a:hover { text-decoration: underline; }
+    .erro { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 16px; display: none; }
+    .sucesso { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 16px; display: none; }
+    @media (max-width: 768px) { .left-panel { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="left-panel">
+    <div class="logo">H</div>
+    <h1>Business Manager</h1>
+    <p>Gerencie seu negócio com eficiência e simplicidade.</p>
+  </div>
+  <div class="right-panel">
+    <div class="card">
+      <h2>Bem-vindo de volta!</h2>
+      <p>Entre com suas credenciais para acessar o sistema.</p>
+      <div class="erro" id="erro"></div>
+      <div class="sucesso" id="sucesso"></div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="seu@email.com">
+      </div>
+      <div class="form-group">
+        <div class="label-row">
+          <label>Senha</label>
+          <a href="/recuperar-senha">Esqueci minha senha</a>
+        </div>
+        <input type="password" id="senha" placeholder="••••••••">
+      </div>
+      <button class="btn" id="btnLogin" onclick="login()">Entrar</button>
+      <div class="link">Não tem conta? <a href="/cadastro">Criar conta</a></div>
+    </div>
+  </div>
+  <script>
+    if (localStorage.getItem('token')) window.location.href = '/dashboard';
+
+    async function login() {
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+      const btn = document.getElementById('btnLogin');
+      const erro = document.getElementById('erro');
+      const sucesso = document.getElementById('sucesso');
+      erro.style.display = 'none'; sucesso.style.display = 'none';
+      if (!email || !senha) { erro.textContent = 'Preencha todos os campos.'; erro.style.display = 'block'; return; }
+      btn.disabled = true; btn.textContent = 'Entrando...';
+      try {
+        const res = await fetch('/api/login', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email, senha }) });
+        const data = await res.json();
+        if (!res.ok) { erro.textContent = data.erro || 'Erro ao fazer login.'; erro.style.display = 'block'; return; }
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+        sucesso.textContent = 'Login realizado! Redirecionando...'; sucesso.style.display = 'block';
+        setTimeout(() => window.location.href = '/dashboard', 1000);
+      } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
+      finally { btn.disabled = false; btn.textContent = 'Entrar'; }
+    }
+
+    document.addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+  </script>
+</body>
+</html>

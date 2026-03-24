@@ -19,10 +19,13 @@
     label { display: block; font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 5px; }
     input { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e2a4a; outline: none; transition: border-color 0.2s; }
     input:focus { border-color: #2d1b69; }
+    input.invalido { border-color: #fc8181; }
+    input.valido { border-color: #68d391; }
     .divider { display: flex; align-items: center; gap: 10px; margin: 4px 0 14px; }
     .divider-line { flex: 1; height: 1px; background: #e2e8f0; }
     .divider-text { font-size: 11px; color: #a0aec0; white-space: nowrap; }
     .senha-forca { height: 3px; border-radius: 2px; margin-top: 6px; background: #e2e8f0; transition: all 0.3s; }
+    .campo-dica { font-size: 11px; color: #a0aec0; margin-top: 4px; }
     .btn { width: 100%; padding: 12px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 4px; }
     .btn:hover { background: #3d2b89; }
     .btn:disabled { background: #a0aec0; cursor: not-allowed; }
@@ -31,6 +34,11 @@
     .link a:hover { text-decoration: underline; }
     .erro { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 14px; display: none; }
     .sucesso { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 14px; display: none; }
+    .sucesso-grande { text-align: center; padding: 32px 0; display: none; }
+    .sucesso-grande .icone { font-size: 56px; margin-bottom: 16px; }
+    .sucesso-grande h3 { font-size: 20px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
+    .sucesso-grande p { font-size: 13px; color: #718096; line-height: 1.6; margin-bottom: 20px; }
+    .sucesso-grande a { color: #2d1b69; font-weight: 600; text-decoration: none; font-size: 13px; }
     @media (max-width: 768px) { .left-panel { display: none; } }
   </style>
 </head>
@@ -42,41 +50,105 @@
   </div>
   <div class="right-panel">
     <div class="card">
-      <h2>Criar conta</h2>
-      <p>Preencha os dados abaixo para se cadastrar.</p>
-      <div class="erro" id="erro"></div>
-      <div class="sucesso" id="sucesso"></div>
-      <div class="form-group">
-        <label>Nome completo</label>
-        <input type="text" id="nome" placeholder="Seu nome completo">
+      <div id="formCadastro">
+        <h2>Criar conta</h2>
+        <p>Preencha os dados abaixo para se cadastrar.</p>
+        <div class="erro" id="erro"></div>
+        <div class="sucesso" id="sucesso"></div>
+        <div class="form-group">
+          <label>Nome completo</label>
+          <input type="text" id="nome" placeholder="Seu nome completo">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" placeholder="seu@email.com" oninput="validarEmailInput()">
+          <div class="campo-dica" id="emailDica"></div>
+        </div>
+        <div class="form-group">
+          <label>Senha</label>
+          <input type="password" id="senha" placeholder="Mínimo 6 caracteres" oninput="verificarSenha()">
+          <div class="senha-forca" id="forcaBarra"></div>
+        </div>
+        <div class="form-group">
+          <label>Confirmar senha</label>
+          <input type="password" id="confirmarSenha" placeholder="Repita a senha">
+        </div>
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-text">Dados da empresa</span>
+          <div class="divider-line"></div>
+        </div>
+        <div class="form-group">
+          <label>Nome da empresa</label>
+          <input type="text" id="nomeEmpresa" placeholder="Nome da sua empresa">
+        </div>
+        <div class="form-group">
+          <label>CNPJ</label>
+          <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18" oninput="mascaraCNPJ(this)">
+          <div class="campo-dica" id="cnpjDica"></div>
+        </div>
+        <button class="btn" id="btnCadastro" onclick="cadastrar()">Criar conta</button>
+        <div class="link">Já tem conta? <a href="/">Fazer login</a></div>
       </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="seu@email.com">
+
+      <!-- Tela de sucesso pós-cadastro -->
+      <div class="sucesso-grande" id="telaConfirmacao">
+        <div class="icone">📧</div>
+        <h3>Verifique seu email!</h3>
+        <p>Enviamos um link de confirmação para <strong id="emailEnviado"></strong>.<br>Clique no link para ativar sua conta.</p>
+        <p style="font-size:12px;color:#a0aec0;margin-bottom:16px">Não recebeu? Verifique sua pasta de spam.</p>
+        <a href="/">← Voltar para o login</a>
       </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input type="password" id="senha" placeholder="Mínimo 6 caracteres" oninput="verificarSenha()">
-        <div class="senha-forca" id="forcaBarra"></div>
-      </div>
-      <div class="form-group">
-        <label>Confirmar senha</label>
-        <input type="password" id="confirmarSenha" placeholder="Repita a senha">
-      </div>
-      <div class="divider">
-        <div class="divider-line"></div>
-        <span class="divider-text">Dados da empresa</span>
-        <div class="divider-line"></div>
-      </div>
-      <div class="form-group">
-        <label>Nome da empresa</label>
-        <input type="text" id="nomeEmpresa" placeholder="Nome da sua empresa">
-      </div>
-      <button class="btn" id="btnCadastro" onclick="cadastrar()">Criar conta</button>
-      <div class="link">Já tem conta? <a href="/">Fazer login</a></div>
     </div>
   </div>
+
   <script>
+    function mascaraCNPJ(input) {
+      let v = input.value.replace(/\D/g, '');
+      if (v.length > 14) v = v.slice(0, 14);
+      v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+      v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+      v = v.replace(/(\d{4})(\d)/, '$1-$2');
+      input.value = v;
+      validarCNPJInput();
+    }
+
+    function validarCNPJInput() {
+      const cnpj = document.getElementById('cnpj').value.replace(/\D/g, '');
+      const dica = document.getElementById('cnpjDica');
+      const input = document.getElementById('cnpj');
+      if (cnpj.length === 0) { dica.textContent = ''; input.className = ''; return; }
+      if (cnpj.length < 14) { dica.textContent = 'CNPJ incompleto'; dica.style.color = '#a0aec0'; input.className = ''; return; }
+      if (validarCNPJ(cnpj)) {
+        dica.textContent = '✓ CNPJ válido'; dica.style.color = '#38a169'; input.className = 'valido';
+      } else {
+        dica.textContent = '✗ CNPJ inválido'; dica.style.color = '#c53030'; input.className = 'invalido';
+      }
+    }
+
+    function validarCNPJ(cnpj) {
+      if (cnpj.length !== 14 || /^(\d)\1+$/.test(cnpj)) return false;
+      let soma = 0;
+      for (let i = 1; i <= 12; i++) soma += parseInt(cnpj[i-1]) * (i < 5 ? 5 - i + 1 : 13 - i + 1);
+      let resto = soma % 11;
+      if (parseInt(cnpj[12]) !== (resto < 2 ? 0 : 11 - resto)) return false;
+      soma = 0;
+      for (let i = 1; i <= 13; i++) soma += parseInt(cnpj[i-1]) * (i < 6 ? 6 - i + 1 : 14 - i + 1);
+      resto = soma % 11;
+      return parseInt(cnpj[13]) === (resto < 2 ? 0 : 11 - resto);
+    }
+
+    function validarEmailInput() {
+      const email = document.getElementById('email').value.trim();
+      const dica = document.getElementById('emailDica');
+      const input = document.getElementById('email');
+      if (!email) { dica.textContent = ''; input.className = ''; return; }
+      const valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (valido) { dica.textContent = '✓ Email válido'; dica.style.color = '#38a169'; input.className = 'valido'; }
+      else { dica.textContent = '✗ Email inválido'; dica.style.color = '#c53030'; input.className = 'invalido'; }
+    }
+
     function verificarSenha() {
       const senha = document.getElementById('senha').value;
       const barra = document.getElementById('forcaBarra');
@@ -85,29 +157,55 @@
       else if (senha.length < 10) { barra.style.background = '#f6ad55'; barra.style.width = '66%'; }
       else { barra.style.background = '#68d391'; barra.style.width = '100%'; }
     }
+
     async function cadastrar() {
       const nome = document.getElementById('nome').value.trim();
       const email = document.getElementById('email').value.trim();
       const senha = document.getElementById('senha').value;
       const confirmarSenha = document.getElementById('confirmarSenha').value;
       const nomeEmpresa = document.getElementById('nomeEmpresa').value.trim();
+      const cnpj = document.getElementById('cnpj').value.trim();
       const btn = document.getElementById('btnCadastro');
       const erro = document.getElementById('erro');
       const sucesso = document.getElementById('sucesso');
       erro.style.display = 'none'; sucesso.style.display = 'none';
-      if (!nome || !email || !senha || !confirmarSenha || !nomeEmpresa) { erro.textContent = 'Preencha todos os campos.'; erro.style.display = 'block'; return; }
-      if (senha.length < 6) { erro.textContent = 'A senha deve ter no mínimo 6 caracteres.'; erro.style.display = 'block'; return; }
-      if (senha !== confirmarSenha) { erro.textContent = 'As senhas não coincidem.'; erro.style.display = 'block'; return; }
+
+      if (!nome || !email || !senha || !confirmarSenha || !nomeEmpresa || !cnpj) {
+        erro.textContent = 'Preencha todos os campos.'; erro.style.display = 'block'; return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        erro.textContent = 'Informe um email válido.'; erro.style.display = 'block'; return;
+      }
+      if (!validarCNPJ(cnpj.replace(/\D/g, ''))) {
+        erro.textContent = 'CNPJ inválido. Verifique o número informado.'; erro.style.display = 'block'; return;
+      }
+      if (senha.length < 6) {
+        erro.textContent = 'A senha deve ter no mínimo 6 caracteres.'; erro.style.display = 'block'; return;
+      }
+      if (senha !== confirmarSenha) {
+        erro.textContent = 'As senhas não coincidem.'; erro.style.display = 'block'; return;
+      }
+
       btn.disabled = true; btn.textContent = 'Criando conta...';
       try {
-        const res = await fetch('/api/cadastro', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nome, email, senha, nomeEmpresa }) });
+        const res = await fetch('/api/cadastro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, senha, nomeEmpresa, cnpj })
+        });
         const data = await res.json();
         if (!res.ok) { erro.textContent = data.erro || 'Erro ao criar conta.'; erro.style.display = 'block'; return; }
-        sucesso.textContent = 'Conta criada! Redirecionando para o login...'; sucesso.style.display = 'block';
-        setTimeout(() => window.location.href = '/', 2000);
-      } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
-      finally { btn.disabled = false; btn.textContent = 'Criar conta'; }
+        // Exibir tela de confirmação de email
+        document.getElementById('formCadastro').style.display = 'none';
+        document.getElementById('emailEnviado').textContent = email;
+        document.getElementById('telaConfirmacao').style.display = 'block';
+      } catch(err) {
+        erro.textContent = 'Erro de conexão.'; erro.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Criar conta';
+      }
     }
+
     document.addEventListener('keypress', e => { if (e.key === 'Enter') cadastrar(); });
   </script>
 </body>

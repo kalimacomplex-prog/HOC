@@ -399,7 +399,16 @@
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalBacklog')">Cancelar</button><button class="btn-confirmar" onclick="salvarBacklog()">Salvar</button></div>
   </div>
 </div>
-
+ <!-- Overlay de bloqueio por inadimplência -->
+<div class="bloqueio-overlay" id="bloqueioOverlay">
+  <div class="bloqueio-card">
+    <div class="bloqueio-icone">🔒</div>
+    <div class="bloqueio-titulo">Acesso suspenso</div>
+    <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
+    <div class="bloqueio-dias" id="bloqueioDias"></div>
+    <div class="bloqueio-acoes" id="bloqueioAcoes"></div>
+    <div class="bloqueio-link"><a href="/assinatura">Ver detalhes da assinatura →</a></div>
+  </div>
 <script>
   const token = localStorage.getItem('token');
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
@@ -636,6 +645,8 @@
       const notifs = await resNotifs.json();
       atualizarSino(resumo);
       renderNotificacoes(notifs);
+      // Verificar bloqueio por inadimplência
+      verificarBloqueio(resumo.assinatura);
     } catch(err) { console.error(err); }
   }
   function atualizarSino(resumo) {
@@ -761,21 +772,9 @@ function copiarPixBloqueio(codigo) {
   navigator.clipboard.writeText(codigo).then(() => alert('PIX copiado!'))
     .catch(() => { const el = document.createElement('textarea'); el.value = codigo; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert('PIX copiado!'); });
 }
-// Verificar bloqueio por inadimplência
-verificarBloqueio(resumo.assinatura);
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
-  <!-- Overlay de bloqueio por inadimplência -->
-<div class="bloqueio-overlay" id="bloqueioOverlay">
-  <div class="bloqueio-card">
-    <div class="bloqueio-icone">🔒</div>
-    <div class="bloqueio-titulo">Acesso suspenso</div>
-    <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
-    <div class="bloqueio-dias" id="bloqueioDias"></div>
-    <div class="bloqueio-acoes" id="bloqueioAcoes"></div>
-    <div class="bloqueio-link"><a href="/assinatura">Ver detalhes da assinatura →</a></div>
-  </div>
 </div>
 </body>
 </html>

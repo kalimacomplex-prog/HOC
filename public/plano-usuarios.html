@@ -6,15 +6,16 @@
   <title>HOC - Plano e Usuários</title>
   <link rel="stylesheet" href="style-global.css">
   <style>
-    .planos-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 32px; }
-    .plano-card { background: white; border-radius: 10px; padding: 22px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 2px solid transparent; position: relative; transition: all 0.2s; }
+    /* ===== PLANOS ===== */
+    .planos-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
+    .plano-card { background: white; border-radius: 12px; padding: 24px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 2px solid transparent; position: relative; transition: all 0.2s; }
     .plano-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
     .plano-card.popular { border-color: #2d1b69; }
     .plano-card.ativo { border-color: #38a169; background: #f0fff4; }
     .popular-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #2d1b69; color: white; font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
     .ativo-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #38a169; color: white; font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
     .plano-nome { font-size: 16px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
-    .plano-preco { font-size: 24px; font-weight: 700; color: #2d1b69; margin-bottom: 3px; }
+    .plano-preco { font-size: 26px; font-weight: 700; color: #2d1b69; margin-bottom: 3px; }
     .plano-preco span { font-size: 13px; font-weight: 400; color: #718096; }
     .plano-preco.enterprise { font-size: 16px; color: #1e2a4a; }
     .plano-divider { height: 1px; background: #f0f2f5; margin: 12px 0; }
@@ -28,11 +29,31 @@
     .btn-plano.secundario:hover { background: #e2e8f0; }
     .btn-plano.ativo-btn { background: #f0fff4; color: #38a169; border: 1.5px solid #9ae6b4; cursor: default; }
     .btn-plano.comercial { background: #1e2a4a; color: white; }
-    .btn-plano.comercial:hover { background: #2d3e6a; }
-
+    /* ===== STATUS ASSINATURA ===== */
+    .status-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; }
+    .status-card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .status-card-label { font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .status-card-valor { font-size: 20px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
+    .status-card-sub { font-size: 12px; color: #718096; }
+    .status-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .pill-trial { background: #f5f0ff; color: #2d1b69; }
+    .pill-ativa { background: #f0fff4; color: #276749; }
+    .pill-inadimplente { background: #fff5f5; color: #c53030; }
+    /* ===== FATURA ===== */
+    .fatura-card { background: white; border-radius: 10px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .fatura-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f2f5; }
+    .fatura-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; }
+    .fatura-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .fatura-item label { font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; display: block; margin-bottom: 3px; }
+    .fatura-item span { font-size: 14px; font-weight: 600; color: #1e2a4a; }
+    .pix-box { background: #f8fafc; border-radius: 8px; padding: 14px; border: 1.5px solid #e2e8f0; margin-top: 10px; }
+    .pix-titulo { font-size: 12px; font-weight: 700; color: #1e2a4a; margin-bottom: 7px; }
+    .pix-code { font-size: 11px; color: #4a5568; word-break: break-all; background: white; padding: 8px 10px; border-radius: 5px; border: 1px solid #e2e8f0; font-family: monospace; margin-bottom: 8px; }
+    .btn-copiar { padding: 6px 12px; background: #2d1b69; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-boleto { padding: 6px 12px; background: #f0f2f5; color: #1e2a4a; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; margin-left: 8px; }
+    /* ===== USUÁRIOS ===== */
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
     .section-title { font-size: 16px; font-weight: 700; color: #1e2a4a; }
-    .acoes { display: flex; gap: 6px; }
     .btn-acao { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
     .btn-editar { background: #f5f0ff; color: #2d1b69; }
     .btn-editar:hover { background: #ede9fe; }
@@ -45,19 +66,30 @@
     .acesso-negado { text-align: center; padding: 60px 40px; }
     .acesso-negado h2 { font-size: 20px; color: #1e2a4a; margin-bottom: 10px; }
     .acesso-negado p { color: #718096; font-size: 13px; }
-
-    /* Toggle */
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f2f5; }
+    /* ===== TOGGLE ===== */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #f8fafc; }
     .toggle-row:last-child { border-bottom: none; }
     .toggle-label { font-size: 13px; color: #1e2a4a; }
-    .toggle-desc { font-size: 11px; color: #718096; margin-top: 2px; }
-    .toggle { position: relative; width: 38px; height: 20px; }
+    .toggle-desc { font-size: 11px; color: #718096; margin-top: 1px; }
+    .toggle { position: relative; width: 38px; height: 20px; flex-shrink: 0; }
     .toggle input { opacity: 0; width: 0; height: 0; }
     .toggle-slider { position: absolute; inset: 0; background: #e2e8f0; border-radius: 20px; cursor: pointer; transition: background 0.2s; }
     .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; }
     .toggle input:checked + .toggle-slider { background: #2d1b69; }
     .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
-    .permissoes-titulo { font-size: 12px; font-weight: 600; color: #718096; margin: 14px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    /* ===== PERMISSÕES GRANULARES ===== */
+    .perm-modulo { margin-bottom: 10px; background: #f8fafc; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
+    .perm-modulo-header { padding: 9px 14px; background: #f0f2f5; font-size: 12px; font-weight: 700; color: #1e2a4a; }
+    .perm-modulo-body { padding: 8px 14px; }
+    .perm-acoes { display: flex; gap: 20px; flex-wrap: wrap; }
+    .perm-acao { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4a5568; }
+    .perm-acao input[type="checkbox"] { accent-color: #2d1b69; width: 14px; height: 14px; cursor: pointer; }
+    .perm-titulo { font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 8px; }
+    .mestre-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 4px; border-bottom: 1px solid #f0f2f5; }
+    /* ===== HISTÓRICO ===== */
+    .historico-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    @media (max-width: 900px) { .planos-grid { grid-template-columns: repeat(2,1fr); } .status-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .planos-grid { grid-template-columns: 1fr; } .status-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -90,7 +122,6 @@
       <input type="text" placeholder="Buscar...">
     </div>
     <div class="header-right">
-
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -99,9 +130,7 @@
         <div class="notif-dropdown" id="notifDropdown">
           <div class="notif-drop-header">
             <span class="notif-drop-titulo">🔔 Notificações</span>
-            <div class="notif-drop-acoes">
-              <button class="btn-ler-todas" onclick="lerTodas()">Marcar todas como lidas</button>
-            </div>
+            <div class="notif-drop-acoes"><button class="btn-ler-todas" onclick="lerTodas()">Marcar todas como lidas</button></div>
           </div>
           <div class="notif-lista" id="notifLista">
             <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
@@ -109,7 +138,6 @@
           <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
         </div>
       </div>
-      
       <div class="header-user">
         <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
         <div class="user-avatar" id="userAvatar">?</div>
@@ -121,59 +149,101 @@
     <div class="page-title">Plano e Usuários</div>
     <div class="breadcrumb">Home > Plano e Usuários</div>
 
-    <!-- Planos -->
-    <div class="planos-grid" id="planosGrid"></div>
-
-    <!-- Usuários -->
-    <div class="section-header">
-      <span class="section-title">Usuários</span>
-      <button class="btn-primary" onclick="abrirModalConvite()" style="font-size:12px;padding:8px 14px">+ Convidar Usuário</button>
+    <div class="tabs">
+      <button class="tab active" onclick="mudarTab('usuarios', this)">👥 Usuários</button>
+      <button class="tab" onclick="mudarTab('assinatura', this)">💳 Assinatura</button>
     </div>
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Email</th>
-            <th>Perfil</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tabelaUsuarios">
-          <tr><td colspan="5" class="empty">Carregando...</td></tr>
-        </tbody>
-      </table>
+
+    <!-- ===== ABA USUÁRIOS ===== -->
+    <div id="tab-usuarios">
+      <div class="section-header">
+        <span class="section-title">Usuários da Empresa</span>
+        <button class="btn-primary" onclick="abrirModalConvite()" style="font-size:12px;padding:8px 14px">+ Convidar Usuário</button>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr><th>Nome</th><th>Email</th><th>Perfil</th><th>Status</th><th>Ações</th></tr>
+          </thead>
+          <tbody id="tabelaUsuarios">
+            <tr><td colspan="5" class="empty">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== ABA ASSINATURA ===== -->
+    <div id="tab-assinatura" style="display:none">
+      <div class="status-grid">
+        <div class="status-card">
+          <div class="status-card-label">Status</div>
+          <div class="status-card-valor" id="statusValor">—</div>
+          <div class="status-card-sub" id="statusSub"></div>
+        </div>
+        <div class="status-card">
+          <div class="status-card-label">Plano Atual</div>
+          <div class="status-card-valor" id="planoValor">—</div>
+          <div class="status-card-sub" id="planoSub"></div>
+        </div>
+        <div class="status-card">
+          <div class="status-card-label">Próximo Vencimento</div>
+          <div class="status-card-valor" id="vencimentoValor">—</div>
+          <div class="status-card-sub" id="vencimentoSub"></div>
+        </div>
+      </div>
+
+      <div id="faturaSection" style="display:none">
+        <div class="fatura-card">
+          <div class="fatura-header">
+            <span class="fatura-titulo">💳 Fatura Atual</span>
+            <span id="faturaStatusBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#fffaf0;color:#c05621">Pendente</span>
+          </div>
+          <div class="fatura-grid">
+            <div class="fatura-item"><label>Plano</label><span id="faturaPlano">—</span></div>
+            <div class="fatura-item"><label>Valor</label><span id="faturaValor">—</span></div>
+            <div class="fatura-item"><label>Vencimento</label><span id="faturaVencimento">—</span></div>
+          </div>
+          <div id="faturaAcoes"></div>
+        </div>
+      </div>
+
+      <div style="font-size:15px;font-weight:700;color:#1e2a4a;margin-bottom:14px">📦 Escolha seu Plano</div>
+      <div class="planos-grid" id="planosGrid"></div>
+
+      <div style="font-size:15px;font-weight:700;color:#1e2a4a;margin-bottom:14px;margin-top:8px">📋 Histórico de Faturas</div>
+      <div class="historico-card">
+        <table>
+          <thead><tr><th>Plano</th><th>Valor</th><th>Vencimento</th><th>Pago em</th></tr></thead>
+          <tbody id="historicoBody">
+            <tr><td colspan="4" class="empty">Nenhuma fatura encontrada.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Modal Convidar -->
 <div class="modal-overlay" id="modalConvite">
-  <div class="modal" style="max-width:500px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
     <div class="modal-header">
       <span class="modal-titulo">Convidar Usuário</span>
       <button class="btn-fechar" onclick="fecharModal('modalConvite')">×</button>
     </div>
-    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:14px;display:none" id="conviteErro"></div>
-    <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:14px;display:none" id="conviteSucesso"></div>
+    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="conviteErro"></div>
+    <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="conviteSucesso"></div>
     <div class="form-group"><label>Nome</label><input type="text" id="conviteNome" placeholder="Nome completo"></div>
     <div class="form-group"><label>Email *</label><input type="email" id="conviteEmail" placeholder="email@empresa.com"></div>
-    <div class="toggle-row" style="margin-bottom:8px">
-      <div><div class="toggle-label" style="font-weight:600">Usuário Mestre</div><div class="toggle-desc">Permissões completas no sistema</div></div>
-      <label class="toggle"><input type="checkbox" id="usuarioMestre" onchange="toggleMestre()"><span class="toggle-slider"></span></label>
+    <div class="mestre-row">
+      <div><div class="toggle-label" style="font-weight:600">Usuário Mestre</div><div class="toggle-desc">Acesso total ao sistema — ignora permissões abaixo</div></div>
+      <label class="toggle"><input type="checkbox" id="conviteMestre" onchange="toggleMestreConvite()"><span class="toggle-slider"></span></label>
     </div>
-    <div id="permissoesSection">
-      <div class="permissoes-titulo">Permissões</div>
-      <div class="toggle-row"><div><div class="toggle-label">Acesso independente a módulos</div></div><label class="toggle"><input type="checkbox" id="perm_acessoIndependente"><span class="toggle-slider"></span></label></div>
-      <div class="toggle-row"><div><div class="toggle-label">Aprovação de Wikis</div></div><label class="toggle"><input type="checkbox" id="perm_aprovacaoWikis"><span class="toggle-slider"></span></label></div>
-      <div class="toggle-row"><div><div class="toggle-label">Aprovação de Ideias</div></div><label class="toggle"><input type="checkbox" id="perm_aprovacaoIdeias"><span class="toggle-slider"></span></label></div>
-      <div class="toggle-row"><div><div class="toggle-label">Gerenciamento de Projetos</div><div class="toggle-desc">Inclui TAP, orçamento, prazo, mudanças</div></div><label class="toggle"><input type="checkbox" id="perm_gerenciamentoProjetos"><span class="toggle-slider"></span></label></div>
-      <div class="toggle-row"><div><div class="toggle-label">Edição do Fluxo de Valor</div></div><label class="toggle"><input type="checkbox" id="perm_edicaoFluxoValor"><span class="toggle-slider"></span></label></div>
-      <div class="toggle-row"><div><div class="toggle-label">Permissão global de segurança (cofre)</div></div><label class="toggle"><input type="checkbox" id="perm_permissaoSeguranca"><span class="toggle-slider"></span></label></div>
+    <div id="permissoesConvite">
+      <div class="perm-titulo">Permissões por Módulo</div>
+      <div id="permModulosConvite"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalConvite')">✕ Cancelar</button>
+      <button class="btn-cancelar" onclick="fecharModal('modalConvite')">Cancelar</button>
       <button class="btn-confirmar" id="btnEnviar" onclick="enviarConvite()">✓ Enviar Convite</button>
     </div>
   </div>
@@ -181,24 +251,33 @@
 
 <!-- Modal Editar Usuário -->
 <div class="modal-overlay" id="modalEditar">
-  <div class="modal">
+  <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
     <div class="modal-header">
       <span class="modal-titulo">Editar Usuário</span>
       <button class="btn-fechar" onclick="fecharModal('modalEditar')">×</button>
     </div>
-    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:14px;display:none" id="editarErro"></div>
-    <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:14px;display:none" id="editarSucesso"></div>
+    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="editarErro"></div>
+    <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="editarSucesso"></div>
     <input type="hidden" id="editarId">
     <div class="form-group"><label>Nome</label><input type="text" id="editarNome"></div>
     <div class="form-group"><label>Perfil</label><select id="editarPerfil"><option>Usuário</option><option>Gerente</option><option>Admin</option></select></div>
     <div class="form-group"><label>Status</label><select id="editarStatus"><option>Ativo</option><option>Pendente</option><option>Inativo</option></select></div>
+    <div class="mestre-row">
+      <div><div class="toggle-label" style="font-weight:600">Usuário Mestre</div><div class="toggle-desc">Acesso total ao sistema — ignora permissões abaixo</div></div>
+      <label class="toggle"><input type="checkbox" id="editarMestre" onchange="toggleMestreEditar()"><span class="toggle-slider"></span></label>
+    </div>
+    <div id="permissoesEditar">
+      <div class="perm-titulo">Permissões por Módulo</div>
+      <div id="editarPermModulos"></div>
+    </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalEditar')">Cancelar</button>
       <button class="btn-confirmar" id="btnSalvar" onclick="salvarEdicao()">Salvar</button>
     </div>
   </div>
 </div>
-  <!-- Overlay de bloqueio por inadimplência -->
+
+<!-- Overlay de bloqueio -->
 <div class="bloqueio-overlay" id="bloqueioOverlay">
   <div class="bloqueio-card">
     <div class="bloqueio-icone">🔒</div>
@@ -206,9 +285,10 @@
     <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
     <div class="bloqueio-dias" id="bloqueioDias"></div>
     <div class="bloqueio-acoes" id="bloqueioAcoes"></div>
-    <div class="bloqueio-link"><a href="/assinatura">Ver detalhes da assinatura →</a></div>
+    <div class="bloqueio-link"><a href="/plano-usuarios">Ver detalhes da assinatura →</a></div>
   </div>
 </div>
+
 <script>
   const token = localStorage.getItem('token');
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
@@ -223,156 +303,376 @@
     document.getElementById('conteudo').innerHTML = `<div class="acesso-negado"><h2>🔒 Acesso Restrito</h2><p>Apenas administradores podem acessar esta página.</p></div>`;
   }
 
-  const planos = [
-    { id:'basico', nome:'Plano Básico', preco:'R$ 49', periodo:'/mês', features:['Até 10 usuários','1 agente incluso','3 slots simultâneos','5 GB armazenamento','100 créditos IA/mês'], popular:false, enterprise:false },
-    { id:'intermediario', nome:'Plano Intermediário', preco:'R$ 149', periodo:'/mês', features:['Até 40 usuários','3 agentes inclusos','5 slots simultâneos','20 GB armazenamento','500 créditos IA/mês'], popular:true, enterprise:false },
-    { id:'avancado', nome:'Plano Avançado', preco:'R$ 349', periodo:'/mês', features:['Até 100 usuários','5 agentes inclusos','5 slots simultâneos','50 GB armazenamento','2000 créditos IA/mês'], popular:false, enterprise:false },
-    { id:'enterprise', nome:'Enterprise', preco:'Consultar', periodo:'', features:['Usuários ilimitados','Agentes customizados','Slots ilimitados','Armazenamento ilimitado','Créditos IA personalizados'], popular:false, enterprise:true },
+  // ===== TABS =====
+  function mudarTab(id, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-usuarios').style.display = id === 'usuarios' ? 'block' : 'none';
+    document.getElementById('tab-assinatura').style.display = id === 'assinatura' ? 'block' : 'none';
+    if (id === 'assinatura') carregarAssinatura();
+  }
+
+  // ===== DEFINIÇÃO DOS MÓDULOS =====
+  const MODULOS = [
+    { id: 'overview',       nome: '🏠 Overview',          acoes: ['acessar', 'editar'] },
+    { id: 'ideiasLivres',   nome: '💡 Ideias Livres',      acoes: ['acessar', 'criar', 'aprovar'] },
+    { id: 'gestaoMetas',    nome: '🎯 Gestão de Metas',    acoes: ['acessar', 'editar'] },
+    { id: 'gestaoProjetos', nome: '📁 Gestão de Projetos', acoes: ['acessar', 'criar', 'editar'] },
+    { id: 'gestaoLicencas', nome: '📋 Gestão de Licenças', acoes: ['acessar', 'criar', 'editar'] },
+    { id: 'operacoes',      nome: '⚙️ Operações',          acoes: ['acessar', 'criar', 'editar'] },
+    { id: 'planoUsuarios',  nome: '👥 Plano e Usuários',   acoes: ['acessar', 'gerenciar'] },
   ];
 
-  let planoAtual = localStorage.getItem('planoAtual') || null;
+  const LABELS_ACAO = { acessar: 'Acessar', editar: 'Editar', criar: 'Criar', aprovar: 'Aprovar', gerenciar: 'Gerenciar' };
 
-  function renderizarPlanos() {
-    const grid = document.getElementById('planosGrid');
-    grid.innerHTML = planos.map(p => {
-      const isAtivo = planoAtual === p.id;
-      let cardClass = 'plano-card';
-      if (p.popular) cardClass += ' popular';
-      if (isAtivo) cardClass += ' ativo';
-      let badge = '';
-      if (isAtivo) badge = '<div class="ativo-badge">✓ Plano Atual</div>';
-      else if (p.popular) badge = '<div class="popular-badge">Mais Popular</div>';
-      let btnClass = 'btn-plano';
-      let btnTexto = 'Selecionar Plano';
-      if (isAtivo) { btnClass += ' ativo-btn'; btnTexto = '✓ Plano Atual'; }
-      else if (p.enterprise) { btnClass += ' comercial'; btnTexto = 'Falar com Comercial'; }
-      else if (p.popular) { btnClass += ' primario'; }
-      else { btnClass += ' secundario'; }
-      const onclick = isAtivo ? '' : p.enterprise ? `onclick="falarComercial()"` : `onclick="selecionarPlano('${p.id}')"`;
-      return `
-        <div class="${cardClass}">
-          ${badge}
-          <div class="plano-nome">${p.nome}</div>
-          <div class="plano-preco ${p.enterprise?'enterprise':''}">${p.preco}<span>${p.periodo}</span></div>
-          <div class="plano-divider"></div>
-          <ul class="plano-features">${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
-          <button class="${btnClass}" ${onclick} ${isAtivo?'disabled':''}>${btnTexto}</button>
-        </div>`;
+  // ===== RENDERIZAR MÓDULOS DE PERMISSÃO =====
+  function renderPermModulos(containerId, permissoes, prefix) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = MODULOS.map(m => {
+      return `<div class="perm-modulo">
+        <div class="perm-modulo-header">${m.nome}</div>
+        <div class="perm-modulo-body">
+          <div class="perm-acoes">
+            ${m.acoes.map(acao => {
+              const val = permissoes?.[m.id]?.[acao];
+              const checked = val ? 'checked' : '';
+              const onChange = acao === 'acessar'
+                ? `onchange="bloquearSemAcesso('${prefix}','${m.id}',this)"`
+                : `onchange="sincronizarAcessar('${prefix}','${m.id}',this)"`;
+              return `<label class="perm-acao">
+                <input type="checkbox" id="${prefix}_${m.id}_${acao}" ${checked} ${onChange}>
+                ${LABELS_ACAO[acao]}
+              </label>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>`;
     }).join('');
   }
 
-  function selecionarPlano(id) {
-    if (confirm('Deseja selecionar este plano?')) { planoAtual=id; localStorage.setItem('planoAtual',id); renderizarPlanos(); }
+  // Se marcar uma ação, garantir que "acessar" também fica marcado
+  function sincronizarAcessar(prefix, modulo, checkbox) {
+    if (checkbox.checked) {
+      const el = document.getElementById(`${prefix}_${modulo}_acessar`);
+      if (el) el.checked = true;
+    }
   }
-  function falarComercial() { alert('Em breve nossa equipe entrará em contato!'); }
 
+  // Se desmarcar "acessar", desmarcar todas as ações do módulo
+  function bloquearSemAcesso(prefix, modulo, checkbox) {
+    if (!checkbox.checked) {
+      const mod = MODULOS.find(m => m.id === modulo);
+      if (mod) mod.acoes.filter(a => a !== 'acessar').forEach(a => {
+        const el = document.getElementById(`${prefix}_${modulo}_${a}`);
+        if (el) el.checked = false;
+      });
+    }
+  }
+
+  // Ler estado atual dos checkboxes e retornar objeto de permissões
+  function lerPermModulos(prefix) {
+    const permissoes = {};
+    MODULOS.forEach(m => {
+      permissoes[m.id] = {};
+      m.acoes.forEach(acao => {
+        const el = document.getElementById(`${prefix}_${m.id}_${acao}`);
+        permissoes[m.id][acao] = el ? el.checked : false;
+      });
+    });
+    return permissoes;
+  }
+
+  // Ligar ou desligar todas as permissões
+  function definirTodasPermissoes(prefix, valor) {
+    MODULOS.forEach(m => {
+      m.acoes.forEach(acao => {
+        const el = document.getElementById(`${prefix}_${m.id}_${acao}`);
+        if (el) el.checked = valor;
+      });
+    });
+  }
+
+  // ===== PERMISSÕES PADRÃO PARA NOVO USUÁRIO =====
+  const permissoesPadrao = {
+    overview:       { acessar: true,  editar: false },
+    ideiasLivres:   { acessar: true,  criar: true,  aprovar: false },
+    gestaoMetas:    { acessar: true,  editar: false },
+    gestaoProjetos: { acessar: true,  criar: false,  editar: false },
+    gestaoLicencas: { acessar: true,  criar: false,  editar: false },
+    operacoes:      { acessar: true,  criar: false,  editar: false },
+    planoUsuarios:  { acessar: false, gerenciar: false },
+  };
+
+  // ===== USUÁRIOS =====
   async function carregarUsuarios() {
     try {
       const res = await fetch('/api/usuarios', { headers: HEADERS });
-      if (res.status===401) { window.location.href='/'; return; }
+      if (res.status === 401) { window.location.href = '/'; return; }
       const usuarios = await res.json();
       const tbody = document.getElementById('tabelaUsuarios');
-      if (usuarios.length===0) { tbody.innerHTML='<tr><td colspan="5" class="empty">Nenhum usuário cadastrado ainda.</td></tr>'; return; }
-      tbody.innerHTML = usuarios.map(u=>`
-        <tr>
-          <td><strong>${u.nome}</strong></td>
+      if (!usuarios.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum usuário cadastrado ainda.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = usuarios.map(u => {
+        const permStr = encodeURIComponent(JSON.stringify(u.permissoes || {}));
+        return `<tr>
+          <td><strong>${u.nome}</strong>${u.usuarioMestre ? ' <span style="font-size:10px;background:#f5f0ff;color:#2d1b69;padding:1px 6px;border-radius:3px;font-weight:700">Mestre</span>' : ''}</td>
           <td>${u.email}</td>
           <td>${u.perfil}</td>
           <td><span class="badge ${u.status.toLowerCase()}">${u.status}</span></td>
-          <td><div class="acoes">
-            <button class="btn-acao btn-editar" onclick="abrirModalEditar('${u._id}','${u.nome}','${u.perfil}','${u.status}')">✏️ Editar</button>
+          <td>
+            <button class="btn-acao btn-editar" onclick="abrirModalEditar('${u._id}','${u.nome}','${u.perfil}','${u.status}',${u.usuarioMestre},'${permStr}')">✏️ Editar</button>
             <button class="btn-acao btn-deletar" onclick="deletarUsuario('${u._id}','${u.nome}')">🗑️</button>
-          </div></td>
-        </tr>`).join('');
+          </td>
+        </tr>`;
+      }).join('');
     } catch(err) { console.error(err); }
   }
 
   function abrirModalConvite() {
-    document.getElementById('conviteErro').style.display='none';
-    document.getElementById('conviteSucesso').style.display='none';
-    document.getElementById('conviteNome').value='';
-    document.getElementById('conviteEmail').value='';
-    document.getElementById('usuarioMestre').checked=false;
-    document.querySelectorAll('[id^="perm_"]').forEach(el=>el.checked=false);
-    document.getElementById('permissoesSection').style.opacity='1';
-    document.getElementById('permissoesSection').style.pointerEvents='auto';
+    document.getElementById('conviteErro').style.display = 'none';
+    document.getElementById('conviteSucesso').style.display = 'none';
+    document.getElementById('conviteNome').value = '';
+    document.getElementById('conviteEmail').value = '';
+    document.getElementById('conviteMestre').checked = false;
+    document.getElementById('permissoesConvite').style.opacity = '1';
+    document.getElementById('permissoesConvite').style.pointerEvents = 'auto';
+    renderPermModulos('permModulosConvite', permissoesPadrao, 'conv');
     document.getElementById('modalConvite').classList.add('aberto');
   }
 
-  function abrirModalEditar(id,nome,perfil,status) {
-    document.getElementById('editarId').value=id;
-    document.getElementById('editarNome').value=nome;
-    document.getElementById('editarPerfil').value=perfil;
-    document.getElementById('editarStatus').value=status;
-    document.getElementById('editarErro').style.display='none';
-    document.getElementById('editarSucesso').style.display='none';
+  function toggleMestreConvite() {
+    const mestre = document.getElementById('conviteMestre').checked;
+    const section = document.getElementById('permissoesConvite');
+    section.style.opacity = mestre ? '0.4' : '1';
+    section.style.pointerEvents = mestre ? 'none' : 'auto';
+    if (mestre) definirTodasPermissoes('conv', true);
+    else renderPermModulos('permModulosConvite', permissoesPadrao, 'conv');
+  }
+
+  function abrirModalEditar(id, nome, perfil, status, usuarioMestre, permEnc) {
+    let permissoes = {};
+    try { permissoes = JSON.parse(decodeURIComponent(permEnc)); } catch(e) {}
+    document.getElementById('editarId').value = id;
+    document.getElementById('editarNome').value = nome;
+    document.getElementById('editarPerfil').value = perfil;
+    document.getElementById('editarStatus').value = status;
+    document.getElementById('editarMestre').checked = usuarioMestre === true || usuarioMestre === 'true';
+    document.getElementById('editarErro').style.display = 'none';
+    document.getElementById('editarSucesso').style.display = 'none';
+    renderPermModulos('editarPermModulos', permissoes, 'edit');
+    // Se mestre, desativar seção de permissões
+    const section = document.getElementById('permissoesEditar');
+    if (usuarioMestre === true || usuarioMestre === 'true') {
+      section.style.opacity = '0.4';
+      section.style.pointerEvents = 'none';
+      definirTodasPermissoes('edit', true);
+    } else {
+      section.style.opacity = '1';
+      section.style.pointerEvents = 'auto';
+    }
     document.getElementById('modalEditar').classList.add('aberto');
   }
 
-  function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
-  document.querySelectorAll('.modal-overlay').forEach(m=>{ m.addEventListener('click',e=>{ if(e.target===m)m.classList.remove('aberto'); }); });
-
-  function toggleMestre() {
-    const mestre=document.getElementById('usuarioMestre').checked;
-    const section=document.getElementById('permissoesSection');
-    section.style.opacity=mestre?'0.4':'1';
-    section.style.pointerEvents=mestre?'none':'auto';
-    if(mestre) document.querySelectorAll('[id^="perm_"]').forEach(el=>el.checked=true);
+  function toggleMestreEditar() {
+    const mestre = document.getElementById('editarMestre').checked;
+    const section = document.getElementById('permissoesEditar');
+    section.style.opacity = mestre ? '0.4' : '1';
+    section.style.pointerEvents = mestre ? 'none' : 'auto';
+    if (mestre) definirTodasPermissoes('edit', true);
   }
 
+  function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); });
+  });
+
   async function enviarConvite() {
-    const email=document.getElementById('conviteEmail').value.trim();
-    const nome=document.getElementById('conviteNome').value.trim();
-    const usuarioMestre=document.getElementById('usuarioMestre').checked;
-    const btn=document.getElementById('btnEnviar');
-    const erro=document.getElementById('conviteErro');
-    const sucesso=document.getElementById('conviteSucesso');
-    erro.style.display='none'; sucesso.style.display='none';
-    if(!email){erro.textContent='Email é obrigatório.';erro.style.display='block';return;}
-    const permissoes={acessoIndependente:document.getElementById('perm_acessoIndependente').checked,aprovacaoWikis:document.getElementById('perm_aprovacaoWikis').checked,aprovacaoIdeias:document.getElementById('perm_aprovacaoIdeias').checked,gerenciamentoProjetos:document.getElementById('perm_gerenciamentoProjetos').checked,edicaoFluxoValor:document.getElementById('perm_edicaoFluxoValor').checked,permissaoSeguranca:document.getElementById('perm_permissaoSeguranca').checked};
-    btn.disabled=true; btn.textContent='Enviando...';
+    const email = document.getElementById('conviteEmail').value.trim();
+    const nome = document.getElementById('conviteNome').value.trim();
+    const usuarioMestre = document.getElementById('conviteMestre').checked;
+    const btn = document.getElementById('btnEnviar');
+    const erro = document.getElementById('conviteErro');
+    const sucesso = document.getElementById('conviteSucesso');
+    erro.style.display = 'none'; sucesso.style.display = 'none';
+    if (!email) { erro.textContent = 'Email é obrigatório.'; erro.style.display = 'block'; return; }
+    const permissoes = lerPermModulos('conv');
+    btn.disabled = true; btn.textContent = 'Enviando...';
     try {
-      const res=await fetch('/api/convites',{method:'POST',headers:HEADERS,body:JSON.stringify({nome,email,usuarioMestre,permissoes})});
-      const data=await res.json();
-      if(!res.ok){erro.textContent=data.erro||'Erro ao enviar convite.';erro.style.display='block';return;}
-      sucesso.textContent=`Convite enviado para ${email} com sucesso!`;
-      sucesso.style.display='block';
-      setTimeout(()=>{fecharModal('modalConvite');carregarUsuarios();},2000);
-    } catch(err){erro.textContent='Erro de conexão.';erro.style.display='block';}
-    finally{btn.disabled=false;btn.textContent='✓ Enviar Convite';}
+      const res = await fetch('/api/convites', {
+        method: 'POST', headers: HEADERS,
+        body: JSON.stringify({ nome, email, usuarioMestre, permissoes })
+      });
+      const data = await res.json();
+      if (!res.ok) { erro.textContent = data.erro || 'Erro ao enviar convite.'; erro.style.display = 'block'; return; }
+      sucesso.textContent = `Convite enviado para ${email} com sucesso!`;
+      sucesso.style.display = 'block';
+      setTimeout(() => { fecharModal('modalConvite'); carregarUsuarios(); }, 2000);
+    } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
+    finally { btn.disabled = false; btn.textContent = '✓ Enviar Convite'; }
   }
 
   async function salvarEdicao() {
-    const id=document.getElementById('editarId').value;
-    const nome=document.getElementById('editarNome').value.trim();
-    const perfil=document.getElementById('editarPerfil').value;
-    const status=document.getElementById('editarStatus').value;
-    const btn=document.getElementById('btnSalvar');
-    const erro=document.getElementById('editarErro');
-    const sucesso=document.getElementById('editarSucesso');
-    erro.style.display='none'; sucesso.style.display='none';
-    if(!nome){erro.textContent='Nome é obrigatório.';erro.style.display='block';return;}
-    btn.disabled=true; btn.textContent='Salvando...';
+    const id = document.getElementById('editarId').value;
+    const nome = document.getElementById('editarNome').value.trim();
+    const perfil = document.getElementById('editarPerfil').value;
+    const status = document.getElementById('editarStatus').value;
+    const usuarioMestre = document.getElementById('editarMestre').checked;
+    const permissoes = lerPermModulos('edit');
+    const btn = document.getElementById('btnSalvar');
+    const erro = document.getElementById('editarErro');
+    const sucesso = document.getElementById('editarSucesso');
+    erro.style.display = 'none'; sucesso.style.display = 'none';
+    if (!nome) { erro.textContent = 'Nome é obrigatório.'; erro.style.display = 'block'; return; }
+    btn.disabled = true; btn.textContent = 'Salvando...';
     try {
-      const res=await fetch(`/api/usuarios/${id}`,{method:'PUT',headers:HEADERS,body:JSON.stringify({nome,perfil,status})});
-      const data=await res.json();
-      if(!res.ok){erro.textContent=data.erro||'Erro ao salvar.';erro.style.display='block';return;}
-      sucesso.textContent='Usuário atualizado!'; sucesso.style.display='block';
-      setTimeout(()=>{fecharModal('modalEditar');carregarUsuarios();},1500);
-    } catch(err){erro.textContent='Erro de conexão.';erro.style.display='block';}
-    finally{btn.disabled=false;btn.textContent='Salvar';}
+      const res = await fetch(`/api/usuarios/${id}`, {
+        method: 'PUT', headers: HEADERS,
+        body: JSON.stringify({ nome, perfil, status, usuarioMestre, permissoes })
+      });
+      const data = await res.json();
+      if (!res.ok) { erro.textContent = data.erro || 'Erro ao salvar.'; erro.style.display = 'block'; return; }
+      sucesso.textContent = 'Usuário atualizado com sucesso!'; sucesso.style.display = 'block';
+      setTimeout(() => { fecharModal('modalEditar'); carregarUsuarios(); }, 1500);
+    } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
+    finally { btn.disabled = false; btn.textContent = 'Salvar'; }
   }
 
-  async function deletarUsuario(id,nome) {
-    if(!confirm(`Deletar "${nome}"?`)) return;
+  async function deletarUsuario(id, nome) {
+    if (!confirm(`Deletar "${nome}"?`)) return;
     try {
-      const res=await fetch(`/api/usuarios/${id}`,{method:'DELETE',headers:HEADERS});
-      if(!res.ok){alert('Erro ao deletar.');return;}
+      const res = await fetch(`/api/usuarios/${id}`, { method: 'DELETE', headers: HEADERS });
+      if (!res.ok) { alert('Erro ao deletar.'); return; }
       carregarUsuarios();
-    } catch(err){alert('Erro de conexão.');}
+    } catch(err) { alert('Erro de conexão.'); }
   }
 
-  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href='/'; }
+  // ===== ASSINATURA =====
+  const PLANOS = [
+    { id:'basico',        nome:'Básico',        preco:'R$ 49',     periodo:'/mês', features:['Até 10 usuários','1 agente incluso','3 slots simultâneos','5 GB armazenamento','100 créditos IA/mês'], popular:false },
+    { id:'intermediario', nome:'Intermediário',  preco:'R$ 149',    periodo:'/mês', features:['Até 40 usuários','3 agentes inclusos','5 slots simultâneos','20 GB armazenamento','500 créditos IA/mês'], popular:true },
+    { id:'avancado',      nome:'Avançado',       preco:'R$ 349',    periodo:'/mês', features:['Até 100 usuários','5 agentes inclusos','5 slots simultâneos','50 GB armazenamento','2000 créditos IA/mês'], popular:false },
+    { id:'enterprise',    nome:'Enterprise',     preco:'Consultar', periodo:'',     features:['Usuários ilimitados','Agentes customizados','Slots ilimitados','Armazenamento ilimitado','Créditos IA personalizados'], popular:false, enterprise:true },
+  ];
+
+  const NOME_PLANO  = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
+  const PRECO_PLANO = { basico:'R$ 49/mês', intermediario:'R$ 149/mês', avancado:'R$ 349/mês', enterprise:'Sob consulta' };
+  const VALOR_PLANO = { basico:'R$ 49,00', intermediario:'R$ 149,00', avancado:'R$ 349,00', enterprise:'Sob consulta' };
+
+  let assinaturaAtual = null;
+
+  async function carregarAssinatura() {
+    try {
+      const res = await fetch('/api/assinatura', { headers: HEADERS });
+      if (res.status === 401) return;
+      assinaturaAtual = await res.json();
+      renderizarStatusAssinatura();
+      renderizarPlanos();
+      renderizarFatura();
+      renderizarHistorico();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderizarStatusAssinatura() {
+    if (!assinaturaAtual) return;
+    const { status, plano, vencimento, trialFim, diasTrialRestantes, diasAtraso } = assinaturaAtual;
+    const statusLabel = { trial:'Período de Teste', ativa:'Ativa', inadimplente:'Inadimplente', cancelada:'Cancelada' };
+    const statusPill  = { trial:'pill-trial', ativa:'pill-ativa', inadimplente:'pill-inadimplente', cancelada:'pill-trial' };
+    document.getElementById('statusValor').innerHTML = `<span class="status-pill ${statusPill[status]||'pill-trial'}">${statusLabel[status]||status}</span>`;
+    document.getElementById('statusSub').textContent =
+      status === 'trial' ? `${diasTrialRestantes} dia(s) restante(s)` :
+      status === 'inadimplente' ? `${diasAtraso} dia(s) em atraso` : '';
+    document.getElementById('planoValor').textContent = NOME_PLANO[plano] || '—';
+    document.getElementById('planoSub').textContent = PRECO_PLANO[plano] || '';
+    const dataFim = vencimento || trialFim;
+    document.getElementById('vencimentoValor').textContent = dataFim ? new Date(dataFim).toLocaleDateString('pt-BR') : '—';
+    document.getElementById('vencimentoSub').textContent = status === 'trial' ? 'Fim do trial' : 'Próxima cobrança';
+  }
+
+  function renderizarPlanos() {
+    const planoAtual = assinaturaAtual?.plano;
+    const status = assinaturaAtual?.status;
+    const grid = document.getElementById('planosGrid');
+    grid.innerHTML = PLANOS.map(p => {
+      const isAtivo = planoAtual === p.id && (status === 'ativa' || status === 'inadimplente');
+      const cardClass = 'plano-card' + (p.popular ? ' popular' : '') + (isAtivo ? ' ativo' : '');
+      const badge = isAtivo ? '<div class="ativo-badge">✓ Plano Atual</div>' : p.popular ? '<div class="popular-badge">Mais Popular</div>' : '';
+      const btnClass = 'btn-plano ' + (isAtivo ? 'ativo-btn' : p.enterprise ? 'comercial' : p.popular ? 'primario' : 'secundario');
+      const btnTexto = isAtivo ? '✓ Plano Atual' : p.enterprise ? 'Falar com Comercial' : 'Selecionar Plano';
+      const onclick = isAtivo ? '' : p.enterprise ? `onclick="alert('Entre em contato: comercial@hoc.com.br')"` : `onclick="ativarPlano('${p.id}')"`;
+      return `<div class="${cardClass}">
+        ${badge}
+        <div class="plano-nome">${p.nome}</div>
+        <div class="plano-preco ${p.enterprise?'enterprise':''}">${p.preco}<span>${p.periodo}</span></div>
+        <div class="plano-divider"></div>
+        <ul class="plano-features">${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+        <button class="${btnClass}" ${onclick} ${isAtivo?'disabled':''}>${btnTexto}</button>
+      </div>`;
+    }).join('');
+  }
+
+  function renderizarFatura() {
+    if (!assinaturaAtual) return;
+    const { status, plano, vencimento, coraBoletoUrl, coraPixCopiaECola } = assinaturaAtual;
+    if (status !== 'ativa' && status !== 'inadimplente') return;
+    document.getElementById('faturaSection').style.display = 'block';
+    document.getElementById('faturaPlano').textContent = NOME_PLANO[plano] || plano;
+    document.getElementById('faturaValor').textContent = VALOR_PLANO[plano] || '—';
+    document.getElementById('faturaVencimento').textContent = vencimento ? new Date(vencimento).toLocaleDateString('pt-BR') : '—';
+    const acoes = document.getElementById('faturaAcoes');
+    acoes.innerHTML = '';
+    if (coraPixCopiaECola) {
+      acoes.innerHTML += `<div class="pix-box">
+        <div class="pix-titulo">📱 PIX Copia e Cola</div>
+        <div class="pix-code">${coraPixCopiaECola}</div>
+        <button class="btn-copiar" onclick="copiarPix('${coraPixCopiaECola}')">📋 Copiar código</button>
+      </div>`;
+    }
+    if (coraBoletoUrl) {
+      acoes.innerHTML += `<a href="${coraBoletoUrl}" target="_blank" class="btn-boleto" style="margin-top:8px;display:inline-block">🧾 Abrir Boleto</a>`;
+    }
+    if (!coraPixCopiaECola && !coraBoletoUrl) {
+      acoes.innerHTML = `<p style="font-size:12px;color:#718096;margin-top:8px">Nenhuma instrução de pagamento disponível no momento.</p>`;
+    }
+  }
+
+  function renderizarHistorico() {
+    if (!assinaturaAtual?.historicoFaturas?.length) return;
+    const tbody = document.getElementById('historicoBody');
+    tbody.innerHTML = [...assinaturaAtual.historicoFaturas].reverse().map(f => `
+      <tr>
+        <td>${NOME_PLANO[f.plano] || f.plano || '—'}</td>
+        <td>${f.valor ? 'R$ ' + (f.valor/100).toFixed(2).replace('.',',') : '—'}</td>
+        <td>${f.vencimento ? new Date(f.vencimento).toLocaleDateString('pt-BR') : '—'}</td>
+        <td><span style="background:#f0fff4;color:#276749;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600">${f.pagoEm ? new Date(f.pagoEm).toLocaleDateString('pt-BR') : 'Pendente'}</span></td>
+      </tr>`).join('');
+  }
+
+  async function ativarPlano(plano) {
+    if (!confirm(`Ativar o Plano ${NOME_PLANO[plano]}?`)) return;
+    try {
+      const res = await fetch('/api/assinatura/ativar', { method: 'POST', headers: HEADERS, body: JSON.stringify({ plano }) });
+      const data = await res.json();
+      if (!res.ok) { alert(data.erro || 'Erro ao ativar plano.'); return; }
+      alert('Plano ativado com sucesso!');
+      await carregarAssinatura();
+    } catch(err) { alert('Erro de conexão.'); }
+  }
+
+  function copiarPix(codigo) {
+    navigator.clipboard.writeText(codigo)
+      .then(() => alert('PIX copiado!'))
+      .catch(() => {
+        const el = document.createElement('textarea');
+        el.value = codigo; document.body.appendChild(el); el.select();
+        document.execCommand('copy'); document.body.removeChild(el);
+        alert('PIX copiado!');
+      });
+  }
+
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
@@ -386,28 +686,24 @@
       const notifs = await resNotifs.json();
       atualizarSino(resumo);
       renderNotificacoes(notifs);
-      // Verificar bloqueio por inadimplência
       verificarBloqueio(resumo.assinatura);
     } catch(err) { console.error(err); }
   }
+
   function atualizarSino(resumo) {
     const btn = document.getElementById('notifBtn');
     const badge = document.getElementById('notifBadge');
     if (!btn || !badge) return;
-    btn.className = 'notif-btn';
-    badge.style.display = 'none';
+    btn.className = 'notif-btn'; badge.style.display = 'none';
     if (resumo.temVencida > 0) {
-      btn.classList.add('vermelho');
-      badge.style.display = 'flex';
-      badge.className = 'notif-badge vermelho';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      btn.classList.add('vermelho'); badge.style.display = 'flex';
+      badge.className = 'notif-badge vermelho'; badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
     } else if (resumo.temVencendo > 0 || resumo.naoLidas > 0) {
-      btn.classList.add('amarelo');
-      badge.style.display = 'flex';
-      badge.className = 'notif-badge amarelo';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      btn.classList.add('amarelo'); badge.style.display = 'flex';
+      badge.className = 'notif-badge amarelo'; badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
     }
   }
+
   function renderNotificacoes(notifs) {
     const lista = document.getElementById('notifLista');
     if (!lista) return;
@@ -426,6 +722,7 @@
         <button class="notif-del" onclick="deletarNotif('${n._id}',event)">×</button>
       </div>`).join('');
   }
+
   function tempoNotif(data) {
     if (!data) return '';
     const diff = Math.floor((new Date() - new Date(data)) / 1000);
@@ -434,6 +731,7 @@
     if (diff < 86400) return `${Math.floor(diff/3600)}h atrás`;
     return `${Math.floor(diff/86400)} dia(s) atrás`;
   }
+
   async function abrirNotif(id, link) {
     try {
       await fetch(`/api/notificacoes/${id}/ler`, { method:'PUT', headers:HEADERS });
@@ -441,21 +739,25 @@
       if (link && link !== 'undefined' && link !== window.location.pathname) window.location.href = link;
     } catch(err) { console.error(err); }
   }
+
   async function deletarNotif(id, e) {
     e.stopPropagation();
     try { await fetch(`/api/notificacoes/${id}`, { method:'DELETE', headers:HEADERS }); await carregarNotificacoes(); }
     catch(err) { console.error(err); }
   }
+
   async function lerTodas() {
     try { await fetch('/api/notificacoes/ler-todas', { method:'PUT', headers:HEADERS }); await carregarNotificacoes(); }
     catch(err) { console.error(err); }
   }
+
   function toggleNotif() {
     const dd = document.getElementById('notifDropdown');
     if (!dd) return;
     dd.classList.toggle('aberto');
     if (dd.classList.contains('aberto')) carregarNotificacoes();
   }
+
   document.addEventListener('click', e => {
     const wrap = document.getElementById('notifWrap');
     if (wrap && !wrap.contains(e.target)) {
@@ -463,61 +765,47 @@
       if (dd) dd.classList.remove('aberto');
     }
   });
+
   function verificarBloqueio(assinatura) {
-  if (!assinatura) return;
-  const overlay = document.getElementById('bloqueioOverlay');
-  const banner = document.getElementById('bannerAssinatura');
-  if (!overlay) return;
-
-  // Mostrar banner de trial
-  if (banner) {
-    if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
-      const expirando = assinatura.diasTrialRestantes <= 5;
-      banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
-      banner.innerHTML = `
-        <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
-        <a href="/assinatura" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>`;
-      banner.style.display = 'flex';
-    } else if (assinatura.status === 'inadimplente') {
-      banner.className = 'banner-assinatura inadimplente';
-      banner.innerHTML = `
-        <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
-        <a href="/assinatura" class="banner-assinatura-btn inadimplente">Pagar agora</a>`;
-      banner.style.display = 'flex';
+    if (!assinatura) return;
+    const overlay = document.getElementById('bloqueioOverlay');
+    const banner = document.getElementById('bannerAssinatura');
+    if (!overlay) return;
+    if (banner) {
+      if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
+        const expirando = assinatura.diasTrialRestantes <= 5;
+        banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
+        banner.innerHTML = `
+          <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
+          <button class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1])">Ver planos</button>`;
+        banner.style.display = 'flex';
+      } else if (assinatura.status === 'inadimplente') {
+        banner.className = 'banner-assinatura inadimplente';
+        banner.innerHTML = `
+          <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
+          <button class="banner-assinatura-btn inadimplente" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1])">Pagar agora</button>`;
+        banner.style.display = 'flex';
+      } else { banner.style.display = 'none'; }
+    }
+    if (assinatura.status === 'inadimplente') {
+      document.getElementById('bloqueioDias').textContent = `${assinatura.diasAtraso} dia(s) em atraso`;
+      const acoes = document.getElementById('bloqueioAcoes');
+      acoes.innerHTML = '';
+      if (assinatura.pixCopiaECola) acoes.innerHTML += `<button class="bloqueio-btn-pix" onclick="copiarPix('${assinatura.pixCopiaECola}')">📋 Copiar PIX Copia e Cola</button>`;
+      if (assinatura.boletoUrl) acoes.innerHTML += `<a href="${assinatura.boletoUrl}" target="_blank" class="bloqueio-btn-boleto">🧾 Abrir Boleto</a>`;
+      if (!assinatura.pixCopiaECola && !assinatura.boletoUrl) acoes.innerHTML = `<button class="bloqueio-btn-pix" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1]);overlay.classList.remove('ativo')">Ver opções de pagamento</button>`;
+      overlay.classList.add('ativo');
     } else {
-      banner.style.display = 'none';
+      overlay.classList.remove('ativo');
     }
   }
 
-  // Mostrar overlay de bloqueio
-  if (assinatura.status === 'inadimplente') {
-    document.getElementById('bloqueioDias').textContent = `${assinatura.diasAtraso} dia(s) em atraso`;
-    const acoes = document.getElementById('bloqueioAcoes');
-    acoes.innerHTML = '';
-    if (assinatura.pixCopiaECola) {
-      acoes.innerHTML += `<button class="bloqueio-btn-pix" onclick="copiarPixBloqueio('${assinatura.pixCopiaECola}')">📋 Copiar PIX Copia e Cola</button>`;
-    }
-    if (assinatura.boletoUrl) {
-      acoes.innerHTML += `<a href="${assinatura.boletoUrl}" target="_blank" class="bloqueio-btn-boleto">🧾 Abrir Boleto</a>`;
-    }
-    if (!assinatura.pixCopiaECola && !assinatura.boletoUrl) {
-      acoes.innerHTML = `<a href="/assinatura" class="bloqueio-btn-pix" style="text-decoration:none;display:block">Ver opções de pagamento</a>`;
-    }
-    overlay.classList.add('ativo');
-  } else {
-    overlay.classList.remove('ativo');
-  }
-}
+  function copiarPixBloqueio(codigo) { copiarPix(codigo); }
 
-function copiarPixBloqueio(codigo) {
-  navigator.clipboard.writeText(codigo).then(() => alert('PIX copiado!'))
-    .catch(() => { const el = document.createElement('textarea'); el.value = codigo; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert('PIX copiado!'); });
-}
-  renderizarPlanos();
+  // INIT
   carregarUsuarios();
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
-
 </body>
 </html>

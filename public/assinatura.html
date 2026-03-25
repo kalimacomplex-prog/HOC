@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Assinatura</title>
+  <link rel="stylesheet" href="style-global.css">
+  <style>
+    /* ===== STATUS BANNER ===== */
+    .banner-trial { background: linear-gradient(135deg, #2d1b69, #4a2e9e); color: white; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .banner-inadimplente { background: linear-gradient(135deg, #c53030, #e53e3e); color: white; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .banner-ativa { background: linear-gradient(135deg, #276749, #38a169); color: white; padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .banner-texto { font-size: 13px; font-weight: 500; }
+    .banner-texto strong { font-weight: 700; }
+    .banner-btn { padding: 7px 16px; background: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .banner-btn.trial { color: #2d1b69; }
+    .banner-btn.inadimplente { color: #c53030; }
+    .banner-btn.ativa { color: #276749; }
+
+    /* ===== STATUS CARD ===== */
+    .status-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .status-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .status-card-label { font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .status-card-valor { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
+    .status-card-sub { font-size: 12px; color: #718096; }
+    .status-pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .pill-trial { background: #f5f0ff; color: #2d1b69; }
+    .pill-ativa { background: #f0fff4; color: #276749; }
+    .pill-inadimplente { background: #fff5f5; color: #c53030; }
+    .pill-cancelada { background: #f0f2f5; color: #718096; }
+
+    /* ===== PLANOS ===== */
+    .planos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .plano-card { background: white; border-radius: 12px; padding: 24px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 2px solid transparent; position: relative; transition: all 0.2s; }
+    .plano-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .plano-card.popular { border-color: #2d1b69; }
+    .plano-card.atual { border-color: #38a169; background: #f0fff4; }
+    .plano-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
+    .plano-badge.popular { background: #2d1b69; color: white; }
+    .plano-badge.atual { background: #38a169; color: white; }
+    .plano-nome { font-size: 16px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
+    .plano-preco { font-size: 28px; font-weight: 700; color: #2d1b69; margin-bottom: 4px; }
+    .plano-preco span { font-size: 13px; font-weight: 400; color: #718096; }
+    .plano-divider { height: 1px; background: #e2e8f0; margin: 14px 0; }
+    .plano-features { list-style: none; margin-bottom: 20px; }
+    .plano-features li { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4a5568; margin-bottom: 8px; }
+    .plano-features li::before { content: '✓'; color: #38a169; font-weight: 700; flex-shrink: 0; }
+    .btn-plano { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-plano.primario { background: #2d1b69; color: white; }
+    .btn-plano.primario:hover { background: #3d2b89; }
+    .btn-plano.atual-btn { background: #f0fff4; color: #38a169; border: 1.5px solid #9ae6b4; cursor: default; }
+    .btn-plano.secundario { background: #f0f2f5; color: #4a5568; }
+    .btn-plano.secundario:hover { background: #e2e8f0; }
+    .btn-plano.comercial { background: #1e2a4a; color: white; }
+
+    /* ===== FATURA ===== */
+    .fatura-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; }
+    .fatura-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #f0f2f5; }
+    .fatura-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; }
+    .fatura-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .fatura-status.paga { background: #f0fff4; color: #276749; }
+    .fatura-status.pendente { background: #fffaf0; color: #c05621; }
+    .fatura-status.vencida { background: #fff5f5; color: #c53030; }
+    .fatura-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .fatura-item label { font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+    .fatura-item span { font-size: 14px; font-weight: 600; color: #1e2a4a; }
+    .pix-box { background: #f8fafc; border-radius: 8px; padding: 16px; border: 1.5px solid #e2e8f0; }
+    .pix-titulo { font-size: 12px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
+    .pix-code { font-size: 11px; color: #4a5568; word-break: break-all; background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; font-family: monospace; margin-bottom: 10px; }
+    .btn-copiar { padding: 7px 14px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-copiar:hover { background: #3d2b89; }
+    .btn-boleto { padding: 7px 14px; background: #f0f2f5; color: #1e2a4a; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn-boleto:hover { background: #e2e8f0; }
+
+    /* ===== HISTÓRICO ===== */
+    .historico-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+
+    /* ===== OVERLAY BLOQUEIO ===== */
+    .overlay-bloqueio { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; }
+    .overlay-bloqueio.ativo { display: flex; }
+    .overlay-card { background: white; border-radius: 16px; padding: 40px; max-width: 480px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .overlay-icone { font-size: 56px; margin-bottom: 16px; }
+    .overlay-titulo { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
+    .overlay-msg { font-size: 13px; color: #718096; line-height: 1.6; margin-bottom: 24px; }
+    .overlay-acoes { display: flex; flex-direction: column; gap: 10px; }
+    .btn-pagar-pix { padding: 14px; background: #2d1b69; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-pagar-boleto { padding: 14px; background: #f0f2f5; color: #1e2a4a; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: block; }
+    .btn-pagar-boleto:hover { background: #e2e8f0; }
+
+    @media (max-width: 900px) { .planos-grid { grid-template-columns: repeat(2, 1fr); } .status-grid { grid-template-columns: 1fr 1fr; } .fatura-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 600px) { .planos-grid { grid-template-columns: 1fr; } .status-grid { grid-template-columns: 1fr; } .fatura-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
+    <span class="logo-text">Business Manager</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="/dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
+    <a class="menu-item active" href="/assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Assinatura</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Banner dinâmico -->
+  <div id="bannerStatus" style="display:none"></div>
+
+  <div class="header">
+    <div class="header-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
+    <div class="header-right">
+      <div class="notif-wrap" id="notifWrap">
+        <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="notif-badge cinza" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-drop-header">
+            <span class="notif-drop-titulo">🔔 Notificações</span>
+            <div class="notif-drop-acoes"><button class="btn-ler-todas" onclick="lerTodas()">Marcar todas como lidas</button></div>
+          </div>
+          <div class="notif-lista" id="notifLista"><div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div></div>
+          <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
+        </div>
+      </div>
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">Assinatura</div>
+    <div class="breadcrumb">Home > Assinatura</div>
+
+    <!-- Cards de status -->
+    <div class="status-grid" id="statusGrid">
+      <div class="status-card">
+        <div class="status-card-label">Status</div>
+        <div class="status-card-valor" id="statusValor">—</div>
+        <div class="status-card-sub" id="statusSub">—</div>
+      </div>
+      <div class="status-card">
+        <div class="status-card-label">Plano Atual</div>
+        <div class="status-card-valor" id="planoValor">—</div>
+        <div class="status-card-sub" id="planoSub">—</div>
+      </div>
+      <div class="status-card">
+        <div class="status-card-label">Próximo Vencimento</div>
+        <div class="status-card-valor" id="vencimentoValor">—</div>
+        <div class="status-card-sub" id="vencimentoSub">—</div>
+      </div>
+    </div>
+
+    <!-- Fatura atual (se inadimplente ou ativa) -->
+    <div id="faturaSection" style="display:none">
+      <div class="fatura-card">
+        <div class="fatura-header">
+          <span class="fatura-titulo">💳 Fatura Atual</span>
+          <span class="fatura-status pendente" id="faturaStatusBadge">Pendente</span>
+        </div>
+        <div class="fatura-grid">
+          <div class="fatura-item"><label>Plano</label><span id="faturaPlano">—</span></div>
+          <div class="fatura-item"><label>Valor</label><span id="faturaValor">—</span></div>
+          <div class="fatura-item"><label>Vencimento</label><span id="faturaVencimento">—</span></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap" id="faturaAcoes"></div>
+      </div>
+    </div>
+
+    <!-- Planos -->
+    <div style="font-size:15px;font-weight:700;color:#1e2a4a;margin-bottom:14px">📦 Escolha seu Plano</div>
+    <div class="planos-grid" id="planosGrid"></div>
+
+    <!-- Histórico -->
+    <div style="font-size:15px;font-weight:700;color:#1e2a4a;margin-bottom:14px">📋 Histórico de Faturas</div>
+    <div class="historico-card">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:#a0aec0;text-transform:uppercase;letter-spacing:0.5px;background:#f8fafc;border-bottom:1px solid #f0f2f5">Plano</th>
+            <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:#a0aec0;text-transform:uppercase;letter-spacing:0.5px;background:#f8fafc;border-bottom:1px solid #f0f2f5">Valor</th>
+            <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:#a0aec0;text-transform:uppercase;letter-spacing:0.5px;background:#f8fafc;border-bottom:1px solid #f0f2f5">Vencimento</th>
+            <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:#a0aec0;text-transform:uppercase;letter-spacing:0.5px;background:#f8fafc;border-bottom:1px solid #f0f2f5">Pago em</th>
+          </tr>
+        </thead>
+        <tbody id="historicoBody">
+          <tr><td colspan="4" style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma fatura encontrada.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay de bloqueio (inadimplente) -->
+<div class="overlay-bloqueio" id="overlayBloqueio">
+  <div class="overlay-card">
+    <div class="overlay-icone">🔒</div>
+    <div class="overlay-titulo">Acesso suspenso</div>
+    <div class="overlay-msg" id="overlayMsg">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
+    <div class="overlay-acoes" id="overlayAcoes"></div>
+    <div style="margin-top:16px">
+      <a href="/assinatura" style="font-size:12px;color:#718096;text-decoration:none">Ver detalhes da assinatura →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('token');
+  const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+  if (!token) window.location.href = '/';
+  document.getElementById('userNome').textContent = usuario.nome || '-';
+  document.getElementById('userPerfil').textContent = usuario.perfil || '-';
+  document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+
+  const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
+  const PLANOS = [
+    { id: 'basico', nome: 'Básico', preco: 'R$ 49', periodo: '/mês', features: ['Até 10 usuários', '1 agente incluso', '3 slots simultâneos', '5 GB armazenamento', '100 créditos IA/mês'], popular: false },
+    { id: 'intermediario', nome: 'Intermediário', preco: 'R$ 149', periodo: '/mês', features: ['Até 40 usuários', '3 agentes inclusos', '5 slots simultâneos', '20 GB armazenamento', '500 créditos IA/mês'], popular: true },
+    { id: 'avancado', nome: 'Avançado', preco: 'R$ 349', periodo: '/mês', features: ['Até 100 usuários', '5 agentes inclusos', '5 slots simultâneos', '50 GB armazenamento', '2000 créditos IA/mês'], popular: false },
+    { id: 'enterprise', nome: 'Enterprise', preco: 'Consultar', periodo: '', features: ['Usuários ilimitados', 'Agentes customizados', 'Slots ilimitados', 'Armazenamento ilimitado', 'Créditos IA personalizados'], popular: false, enterprise: true }
+  ];
+
+  let assinaturaAtual = null;
+
+  async function carregarAssinatura() {
+    try {
+      const res = await fetch('/api/assinatura', { headers: HEADERS });
+      if (res.status === 401) { window.location.href = '/'; return; }
+      assinaturaAtual = await res.json();
+      renderizarStatus();
+      renderizarPlanos();
+      renderizarFatura();
+      renderizarHistorico();
+      renderizarBanner();
+    } catch(err) { console.error(err); }
+  }
+
+  function renderizarBanner() {
+    const banner = document.getElementById('bannerStatus');
+    if (!assinaturaAtual) { banner.style.display = 'none'; return; }
+    const { status, diasTrialRestantes, diasAtraso, coraBoletoUrl, coraPixCopiaECola } = assinaturaAtual;
+
+    if (status === 'trial') {
+      banner.className = 'banner-trial';
+      banner.innerHTML = `
+        <div class="banner-texto">🎉 Período de teste gratuito: <strong>${diasTrialRestantes} dia(s) restante(s)</strong>. Ative um plano para continuar após o período gratuito.</div>
+        <button class="banner-btn trial" onclick="document.getElementById('planosGrid').scrollIntoView({behavior:'smooth'})">Ver planos</button>`;
+      banner.style.display = 'flex';
+    } else if (status === 'inadimplente') {
+      banner.className = 'banner-inadimplente';
+      banner.innerHTML = `
+        <div class="banner-texto">⚠️ Sua fatura está <strong>${diasAtraso} dia(s) em atraso</strong>. Regularize para evitar o bloqueio total.</div>
+        <button class="banner-btn inadimplente" onclick="abrirPagamento()">Pagar agora</button>`;
+      banner.style.display = 'flex';
+      // Mostrar overlay de bloqueio
+      document.getElementById('overlayMsg').textContent = `Sua fatura está ${diasAtraso} dia(s) em atraso. Regularize para continuar usando o HOC System.`;
+      const acoes = document.getElementById('overlayAcoes');
+      acoes.innerHTML = '';
+      if (coraPixCopiaECola) {
+        acoes.innerHTML += `<button class="btn-pagar-pix" onclick="copiarPix('${coraPixCopiaECola}')">📋 Copiar PIX Copia e Cola</button>`;
+      }
+      if (coraBoletoUrl) {
+        acoes.innerHTML += `<a href="${coraBoletoUrl}" target="_blank" class="btn-pagar-boleto">🧾 Abrir Boleto</a>`;
+      }
+      if (!coraPixCopiaECola && !coraBoletoUrl) {
+        acoes.innerHTML = `<a href="/assinatura" class="btn-pagar-pix" style="text-decoration:none;display:block">Ver opções de pagamento</a>`;
+      }
+      // Só mostrar overlay se não estiver na página de assinatura
+      if (!window.location.pathname.includes('assinatura')) {
+        document.getElementById('overlayBloqueio').classList.add('ativo');
+      }
+    } else if (status === 'ativa') {
+      banner.className = 'banner-ativa';
+      banner.innerHTML = `<div class="banner-texto">✅ Assinatura ativa — Plano <strong>${assinaturaAtual.plano}</strong></div>`;
+      banner.style.display = 'flex';
+      setTimeout(() => banner.style.display = 'none', 4000);
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  function renderizarStatus() {
+    if (!assinaturaAtual) return;
+    const { status, plano, vencimento, trialFim, diasTrialRestantes, diasAtraso } = assinaturaAtual;
+
+    const statusLabel = { trial: 'Período de Teste', ativa: 'Ativa', inadimplente: 'Inadimplente', cancelada: 'Cancelada' };
+    const statusPill = { trial: 'pill-trial', ativa: 'pill-ativa', inadimplente: 'pill-inadimplente', cancelada: 'pill-cancelada' };
+    document.getElementById('statusValor').innerHTML = `<span class="status-pill ${statusPill[status]}">${statusLabel[status]}</span>`;
+    document.getElementById('statusSub').textContent = status === 'trial'
+      ? `${diasTrialRestantes} dias restantes`
+      : status === 'inadimplente'
+      ? `${diasAtraso} dias em atraso`
+      : status === 'ativa' ? 'Tudo certo! 🎉' : '';
+
+    const nomePlano = { basico: 'Básico', intermediario: 'Intermediário', avancado: 'Avançado', enterprise: 'Enterprise' };
+    document.getElementById('planoValor').textContent = nomePlano[plano] || '—';
+    document.getElementById('planoSub').textContent = plano === 'basico' ? 'R$ 49/mês' : plano === 'intermediario' ? 'R$ 149/mês' : plano === 'avancado' ? 'R$ 349/mês' : 'Sob consulta';
+
+    const dataFim = vencimento || trialFim;
+    if (dataFim) {
+      document.getElementById('vencimentoValor').textContent = new Date(dataFim).toLocaleDateString('pt-BR');
+      document.getElementById('vencimentoSub').textContent = status === 'trial' ? 'Fim do trial' : 'Próxima cobrança';
+    }
+  }
+
+  function renderizarPlanos() {
+    const planoAtual = assinaturaAtual?.plano;
+    const status = assinaturaAtual?.status;
+    const grid = document.getElementById('planosGrid');
+    grid.innerHTML = PLANOS.map(p => {
+      const isAtual = planoAtual === p.id && (status === 'ativa' || status === 'inadimplente');
+      let cardClass = 'plano-card';
+      if (p.popular) cardClass += ' popular';
+      if (isAtual) cardClass += ' atual';
+      let badge = '';
+      if (isAtual) badge = '<div class="plano-badge atual">✓ Plano Atual</div>';
+      else if (p.popular) badge = '<div class="plano-badge popular">Mais Popular</div>';
+      let btnClass = 'btn-plano';
+      let btnTexto = 'Selecionar Plano';
+      let btnOnclick = `onclick="ativarPlano('${p.id}')"`;
+      if (isAtual) { btnClass += ' atual-btn'; btnTexto = '✓ Plano Atual'; btnOnclick = ''; }
+      else if (p.enterprise) { btnClass += ' comercial'; btnTexto = 'Falar com Comercial'; btnOnclick = `onclick="alert('Entre em contato: suporte@hoc.com.br')"` ; }
+      else if (p.popular) { btnClass += ' primario'; }
+      else { btnClass += ' secundario'; }
+      return `
+        <div class="${cardClass}">
+          ${badge}
+          <div class="plano-nome">${p.nome}</div>
+          <div class="plano-preco">${p.preco}<span>${p.periodo}</span></div>
+          <div class="plano-divider"></div>
+          <ul class="plano-features">${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
+          <button class="${btnClass}" ${btnOnclick} ${isAtual?'disabled':''}>${btnTexto}</button>
+        </div>`;
+    }).join('');
+  }
+
+  function renderizarFatura() {
+    if (!assinaturaAtual) return;
+    const { status, plano, vencimento, coraBoletoUrl, coraPixCopiaECola } = assinaturaAtual;
+    if (status !== 'ativa' && status !== 'inadimplente') return;
+    document.getElementById('faturaSection').style.display = 'block';
+
+    const nomePlano = { basico: 'Básico — R$ 49/mês', intermediario: 'Intermediário — R$ 149/mês', avancado: 'Avançado — R$ 349/mês', enterprise: 'Enterprise' };
+    const valorPlano = { basico: 'R$ 49,00', intermediario: 'R$ 149,00', avancado: 'R$ 349,00', enterprise: 'Sob consulta' };
+    document.getElementById('faturaPlano').textContent = nomePlano[plano] || '—';
+    document.getElementById('faturaValor').textContent = valorPlano[plano] || '—';
+    document.getElementById('faturaVencimento').textContent = vencimento ? new Date(vencimento).toLocaleDateString('pt-BR') : '—';
+
+    const badge = document.getElementById('faturaStatusBadge');
+    if (status === 'inadimplente') { badge.className = 'fatura-status vencida'; badge.textContent = 'Vencida'; }
+    else { badge.className = 'fatura-status pendente'; badge.textContent = 'Aguardando'; }
+
+    const acoes = document.getElementById('faturaAcoes');
+    acoes.innerHTML = '';
+    if (coraPixCopiaECola) {
+      acoes.innerHTML += `
+        <div class="pix-box" style="flex:1;min-width:240px">
+          <div class="pix-titulo">📱 PIX Copia e Cola</div>
+          <div class="pix-code" id="pixCode">${coraPixCopiaECola}</div>
+          <button class="btn-copiar" onclick="copiarPix('${coraPixCopiaECola}')">📋 Copiar código</button>
+        </div>`;
+    }
+    if (coraBoletoUrl) {
+      acoes.innerHTML += `<a href="${coraBoletoUrl}" target="_blank" class="btn-boleto" style="align-self:flex-start;margin-top:${coraPixCopiaECola?'auto':'0'}">🧾 Abrir Boleto</a>`;
+    }
+    if (!coraBoletoUrl && !coraPixCopiaECola) {
+      acoes.innerHTML = '<div style="color:#a0aec0;font-size:12px">Fatura sendo gerada. Aguarde alguns instantes.</div>';
+    }
+  }
+
+  function renderizarHistorico() {
+    if (!assinaturaAtual?.historicoFaturas?.length) return;
+    const tbody = document.getElementById('historicoBody');
+    const nomePlano = { basico: 'Básico', intermediario: 'Intermediário', avancado: 'Avançado', enterprise: 'Enterprise' };
+    tbody.innerHTML = [...assinaturaAtual.historicoFaturas].reverse().map(f => `
+      <tr>
+        <td style="padding:14px 16px;font-size:13px;color:#1e2a4a">${nomePlano[f.plano] || f.plano}</td>
+        <td style="padding:14px 16px;font-size:13px;color:#1e2a4a">${f.valor ? 'R$ ' + (f.valor/100).toFixed(2).replace('.',',') : '—'}</td>
+        <td style="padding:14px 16px;font-size:13px;color:#1e2a4a">${f.vencimento ? new Date(f.vencimento).toLocaleDateString('pt-BR') : '—'}</td>
+        <td style="padding:14px 16px;font-size:13px"><span style="background:#f0fff4;color:#276749;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600">${f.pagoEm ? new Date(f.pagoEm).toLocaleDateString('pt-BR') : '—'}</span></td>
+      </tr>`).join('');
+  }
+
+  async function ativarPlano(plano) {
+    if (!confirm(`Deseja ativar o Plano ${plano.charAt(0).toUpperCase()+plano.slice(1)}? Uma cobrança será gerada.`)) return;
+    try {
+      const res = await fetch('/api/assinatura/ativar', { method: 'POST', headers: HEADERS, body: JSON.stringify({ plano }) });
+      const data = await res.json();
+      if (!res.ok) { alert(data.erro || 'Erro ao ativar plano.'); return; }
+      alert('Plano ativado! A cobrança foi gerada.');
+      await carregarAssinatura();
+    } catch(err) { alert('Erro de conexão.'); }
+  }
+
+  function abrirPagamento() {
+    document.getElementById('faturaSection').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function copiarPix(codigo) {
+    navigator.clipboard.writeText(codigo).then(() => {
+      alert('Código PIX copiado!');
+    }).catch(() => {
+      const el = document.createElement('textarea');
+      el.value = codigo;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      alert('Código PIX copiado!');
+    });
+  }
+
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
+
+  // ===== NOTIFICAÇÕES =====
+  async function carregarNotificacoes() {
+    try {
+      const [resResumo, resNotifs] = await Promise.all([
+        fetch('/api/notificacoes/resumo', { headers: HEADERS }),
+        fetch('/api/notificacoes', { headers: HEADERS })
+      ]);
+      if (resResumo.status === 401) return;
+      const resumo = await resResumo.json();
+      const notifs = await resNotifs.json();
+      atualizarSino(resumo);
+      renderNotificacoes(notifs);
+    } catch(err) { console.error(err); }
+  }
+  function atualizarSino(resumo) {
+    const btn = document.getElementById('notifBtn');
+    const badge = document.getElementById('notifBadge');
+    if (!btn || !badge) return;
+    btn.className = 'notif-btn';
+    badge.style.display = 'none';
+    if (resumo.temVencida > 0) {
+      btn.classList.add('vermelho'); badge.style.display = 'flex';
+      badge.className = 'notif-badge vermelho';
+      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+    } else if (resumo.temVencendo > 0 || resumo.naoLidas > 0) {
+      btn.classList.add('amarelo'); badge.style.display = 'flex';
+      badge.className = 'notif-badge amarelo';
+      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+    }
+  }
+  function renderNotificacoes(notifs) {
+    const lista = document.getElementById('notifLista');
+    if (!lista) return;
+    if (!notifs || notifs.length === 0) { lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Nenhuma notificação.</div></div>'; return; }
+    lista.innerHTML = notifs.map(n => `
+      <div class="notif-item ${!n.lida?'nao-lida':''} tipo-${n.tipo}" onclick="abrirNotif('${n._id}','${n.link||''}')">
+        <div class="notif-icone ${n.tipo}">${n.icone||'🔔'}</div>
+        <div class="notif-corpo">
+          <div class="notif-titulo-item">${n.titulo}</div>
+          <div class="notif-msg">${n.mensagem}</div>
+          <div class="notif-tempo">${tempoNotif(n.criadoEm)}</div>
+        </div>
+        <button class="notif-del" onclick="deletarNotif('${n._id}',event)">×</button>
+      </div>`).join('');
+  }
+  function tempoNotif(data) {
+    if (!data) return '';
+    const diff = Math.floor((new Date() - new Date(data)) / 1000);
+    if (diff < 60) return 'Agora mesmo';
+    if (diff < 3600) return `${Math.floor(diff/60)} min atrás`;
+    if (diff < 86400) return `${Math.floor(diff/3600)}h atrás`;
+    return `${Math.floor(diff/86400)} dia(s) atrás`;
+  }
+  async function abrirNotif(id, link) {
+    try {
+      await fetch(`/api/notificacoes/${id}/ler`, { method:'PUT', headers:HEADERS });
+      await carregarNotificacoes();
+      if (link && link !== 'undefined' && link !== window.location.pathname) window.location.href = link;
+    } catch(err) { console.error(err); }
+  }
+  async function deletarNotif(id, e) {
+    e.stopPropagation();
+    try { await fetch(`/api/notificacoes/${id}`, { method:'DELETE', headers:HEADERS }); await carregarNotificacoes(); }
+    catch(err) { console.error(err); }
+  }
+  async function lerTodas() {
+    try { await fetch('/api/notificacoes/ler-todas', { method:'PUT', headers:HEADERS }); await carregarNotificacoes(); }
+    catch(err) { console.error(err); }
+  }
+  function toggleNotif() {
+    const dd = document.getElementById('notifDropdown');
+    if (!dd) return;
+    dd.classList.toggle('aberto');
+    if (dd.classList.contains('aberto')) carregarNotificacoes();
+  }
+  document.addEventListener('click', e => {
+    const wrap = document.getElementById('notifWrap');
+    if (wrap && !wrap.contains(e.target)) {
+      const dd = document.getElementById('notifDropdown');
+      if (dd) dd.classList.remove('aberto');
+    }
+  });
+
+  // INIT
+  carregarAssinatura();
+  carregarNotificacoes();
+  setInterval(carregarNotificacoes, 60000);
+</script>
+</body>
+</html>

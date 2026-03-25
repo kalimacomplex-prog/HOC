@@ -6,8 +6,6 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const crypto = require('crypto');
 const fetch = require('node-fetch');
-const fs = require('fs');
-const https = require('https');
 
 const app = express();
 app.use(express.json({ limit: '20mb' }));
@@ -34,11 +32,6 @@ function validarCNPJ(cnpj) {
   return parseInt(cnpj[13]) === (resto < 2 ? 0 : 11 - resto);
 }
 
-function formatarDataCora(date) {
-  const d = new Date(date);
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-
 // ==================== BREVO ====================
 
 async function enviarEmail(para, assunto, html) {
@@ -52,105 +45,6 @@ async function enviarEmail(para, assunto, html) {
     console.log('Email enviado:', data);
     return data;
   } catch (err) { console.error('Erro ao enviar email:', err); }
-}
-
-// ==================== CORA API ====================
-
-let coraTokenCache = null;
-let coraTokenExpiry = null;
-
-function getCoraAgent() {
-  try {
-    // Certificados armazenados como variáveis de ambiente (conteúdo do .pem e .key)
-    const cert = process.env.CORA_CERT ? Buffer.from(process.env.CORA_CERT, 'base64').toString('utf8') : null;
-    const key = process.env.CORA_KEY ? Buffer.from(process.env.CORA_KEY, 'base64').toString('utf8') : null;
-    if (!cert || !key) return null;
-    return new https.Agent({ cert, key, rejectUnauthorized: true });
-  } catch (err) {
-    console.error('Erro ao criar agente Cora:', err);
-    return null;
-  }
-}
-
-async function getCoraToken() {
-  if (coraTokenCache && coraTokenExpiry && new Date() < coraTokenExpiry) return coraTokenCache;
-  try {
-    const agent = getCoraAgent();
-    if (!agent) { console.warn('Cora: certificados não configurados'); return null; }
-    const isProd = process.env.CORA_ENV === 'producao';
-    const url = isProd
-      ? 'https://matls-clients.api.cora.com.br/token'
-      : 'https://matls-clients.api.stage.cora.com.br/token';
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `grant_type=client_credentials&client_id=${process.env.CORA_CLIENT_ID}`,
-      agent
-    });
-    const data = await res.json();
-    if (data.access_token) {
-      coraTokenCache = data.access_token;
-      coraTokenExpiry = new Date(Date.now() + (data.expires_in - 300) * 1000);
-      return coraTokenCache;
-    }
-    console.error('Cora token error:', data);
-    return null;
-  } catch (err) { console.error('Erro ao obter token Cora:', err); return null; }
-}
-
-async function coraRequest(method, endpoint, body) {
-  try {
-    const token = await getCoraToken();
-    if (!token) return null;
-    const agent = getCoraAgent();
-    const isProd = process.env.CORA_ENV === 'producao';
-    const baseUrl = isProd ? 'https://api.cora.com.br' : 'https://api.stage.cora.com.br';
-    const res = await fetch(`${baseUrl}${endpoint}`, {
-      method,
-      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: body ? JSON.stringify(body) : undefined,
-      agent
-    });
-    return await res.json();
-  } catch (err) { console.error('Erro Cora API:', err); return null; }
-}
-
-async function criarCobrancaCora(empresa, assinatura, plano) {
-  try {
-    const valorPlano = { basico: 4900, intermediario: 14900, avancado: 34900, enterprise: 99900 };
-    const valor = valorPlano[plano] || 4900;
-    const vencimento = formatarDataCora(assinatura.vencimento);
-
-    const body = {
-      code: `HOC-${empresa._id}-${Date.now()}`,
-      customer: {
-        name: empresa.nome,
-        document: { identity: empresa.cnpj, type: 'CNPJ' }
-      },
-      payment_terms: { due_date: vencimento },
-      payment_forms: ['BOLETO', 'PIX'],
-      items: [{
-        code: plano,
-        description: `HOC System — Plano ${plano.charAt(0).toUpperCase() + plano.slice(1)} (mensal)`,
-        quantity: 1,
-        price_cents: valor
-      }],
-      notifications: [
-        { channel: 'EMAIL', trigger: { type: 'DAYS_BEFORE_DUE', days: 5 } },
-        { channel: 'EMAIL', trigger: { type: 'ON_DUE_DATE' } },
-        { channel: 'EMAIL', trigger: { type: 'DAYS_AFTER_DUE', days: 1 } }
-      ]
-    };
-
-    const result = await coraRequest('POST', '/v2/invoices', body);
-    return result;
-  } catch (err) { console.error('Erro ao criar cobrança Cora:', err); return null; }
-}
-
-async function cancelarCobrancaCora(coraCobrancaId) {
-  try {
-    return await coraRequest('DELETE', `/v2/invoices/${coraCobrancaId}`);
-  } catch (err) { console.error('Erro ao cancelar cobrança Cora:', err); return null; }
 }
 
 // ==================== MONGODB ====================
@@ -192,7 +86,15 @@ const usuarioSchema = new mongoose.Schema({
   emailConfirmado: { type: Boolean, default: false },
   tokenConfirmacao: { type: String, default: null },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
-  permissoes: { acessoIndependente: { type: Boolean, default: false }, aprovacaoWikis: { type: Boolean, default: false }, aprovacaoIdeias: { type: Boolean, default: false }, gerenciamentoProjetos: { type: Boolean, default: false }, edicaoFluxoValor: { type: Boolean, default: false }, permissaoSeguranca: { type: Boolean, default: false } },
+  permissoes: {
+    overview:       { acessar: { type: Boolean, default: true },  editar:    { type: Boolean, default: false } },
+    ideiasLivres:   { acessar: { type: Boolean, default: true },  criar:     { type: Boolean, default: true },  aprovar:   { type: Boolean, default: false } },
+    gestaoMetas:    { acessar: { type: Boolean, default: true },  editar:    { type: Boolean, default: false } },
+    gestaoProjetos: { acessar: { type: Boolean, default: true },  criar:     { type: Boolean, default: false }, editar:    { type: Boolean, default: false } },
+    gestaoLicencas: { acessar: { type: Boolean, default: true },  criar:     { type: Boolean, default: false }, editar:    { type: Boolean, default: false } },
+    operacoes:      { acessar: { type: Boolean, default: true },  criar:     { type: Boolean, default: false }, editar:    { type: Boolean, default: false } },
+    planoUsuarios:  { acessar: { type: Boolean, default: false }, gerenciar: { type: Boolean, default: false } },
+  },
   criadoEm: { type: Date, default: Date.now }
 });
 const Usuario = mongoose.model('Usuario', usuarioSchema);
@@ -505,6 +407,37 @@ async function verificarAssinatura(req, res, next) {
   }
 }
 
+
+// ==================== MIDDLEWARE DE PERMISSÕES ====================
+
+// Verifica se usuário tem permissão para acessar um módulo
+// Admin e usuarioMestre sempre têm acesso total
+function criarMiddlewarePermissao(modulo, acao) {
+  return async function(req, res, next) {
+    try {
+      // Admin sempre passa
+      if (req.usuario.perfil === 'Admin') return next();
+      const usuario = await Usuario.findById(req.usuario.id).select('permissoes usuarioMestre perfil');
+      if (!usuario) return res.status(401).json({ erro: 'Usuário não encontrado' });
+      // Usuário mestre sempre passa
+      if (usuario.usuarioMestre) return next();
+      const permMod = usuario.permissoes?.[modulo];
+      if (!permMod) return res.status(403).json({ erro: 'Sem permissão', modulo, acao });
+      if (!permMod[acao]) return res.status(403).json({ erro: 'Sem permissão', modulo, acao });
+      next();
+    } catch (err) { res.status(500).json({ erro: err.message }); }
+  };
+}
+
+// Atalhos por módulo
+const permOverview       = (acao) => criarMiddlewarePermissao('overview', acao);
+const permIdeiasLivres   = (acao) => criarMiddlewarePermissao('ideiasLivres', acao);
+const permGestaoMetas    = (acao) => criarMiddlewarePermissao('gestaoMetas', acao);
+const permGestaoProjetos = (acao) => criarMiddlewarePermissao('gestaoProjetos', acao);
+const permGestaoLicencas = (acao) => criarMiddlewarePermissao('gestaoLicencas', acao);
+const permOperacoes      = (acao) => criarMiddlewarePermissao('operacoes', acao);
+const permPlanoUsuarios  = (acao) => criarMiddlewarePermissao('planoUsuarios', acao);
+
 // ==================== PÁGINAS ====================
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
@@ -512,7 +445,6 @@ app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/confirmar-email', (req, res) => res.sendFile(path.join(__dirname, 'public', 'confirmar-email.html')));
 app.get('/recuperar-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'recuperar-senha.html')));
 app.get('/redefinir-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'redefinir-senha.html')));
-app.get('/assinatura', (req, res) => res.sendFile(path.join(__dirname, 'public', 'assinatura.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
 app.get('/overview', (req, res) => res.sendFile(path.join(__dirname, 'public', 'overview.html')));
 app.get('/gestao-metas', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-metas.html')));
@@ -555,7 +487,15 @@ app.post('/api/cadastro', async (req, res) => {
       nome, email, senha: hash, perfil: 'Admin', usuarioMestre: true,
       status: 'Pendente', emailConfirmado: false, tokenConfirmacao,
       empresa: empresa._id,
-      permissoes: { acessoIndependente: true, aprovacaoWikis: true, aprovacaoIdeias: true, gerenciamentoProjetos: true, edicaoFluxoValor: true, permissaoSeguranca: true }
+      permissoes: {
+        overview:       { acessar: true, editar: true },
+        ideiasLivres:   { acessar: true, criar: true, aprovar: true },
+        gestaoMetas:    { acessar: true, editar: true },
+        gestaoProjetos: { acessar: true, criar: true, editar: true },
+        gestaoLicencas: { acessar: true, criar: true, editar: true },
+        operacoes:      { acessar: true, criar: true, editar: true },
+        planoUsuarios:  { acessar: true, gerenciar: true },
+      }
     });
 
     const linkConfirmacao = `${process.env.APP_URL}/confirmar-email?token=${tokenConfirmacao}`;
@@ -690,40 +630,18 @@ app.get('/api/assinatura', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// Ativar plano (gerar primeira cobrança)
+// Ativar/trocar plano (sem gateway por enquanto)
 app.post('/api/assinatura/ativar', authMiddleware, async (req, res) => {
   try {
     const { plano } = req.body;
     const planosValidos = ['basico', 'intermediario', 'avancado', 'enterprise'];
     if (!planosValidos.includes(plano)) return res.status(400).json({ erro: 'Plano inválido' });
 
-    const empresa = await Empresa.findById(req.usuario.empresa);
-    if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada' });
-
-    // Definir vencimento para 30 dias
     const vencimento = new Date();
     vencimento.setDate(vencimento.getDate() + 30);
 
     let assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
-
-    // Cancelar cobrança anterior se existir
-    if (assinatura && assinatura.coraCobrancaId) {
-      await cancelarCobrancaCora(assinatura.coraCobrancaId).catch(console.error);
-    }
-
-    // Criar cobrança no Cora
-    const cobranca = await criarCobrancaCora(empresa, { vencimento }, plano);
-
-    const updateData = {
-      plano,
-      status: 'ativa',
-      vencimento,
-      coraCobrancaId: cobranca?.id || null,
-      coraBoletoUrl: cobranca?.payment?.banking_billet?.document_url || null,
-      coraPixQrCode: cobranca?.payment?.pix?.qr_code_image || null,
-      coraPixCopiaECola: cobranca?.payment?.pix?.copy_paste || null,
-      atualizadoEm: new Date()
-    };
+    const updateData = { plano, status: 'ativa', vencimento, atualizadoEm: new Date() };
 
     if (assinatura) {
       assinatura = await Assinatura.findOneAndUpdate({ empresa: req.usuario.empresa }, updateData, { new: true });
@@ -731,111 +649,8 @@ app.post('/api/assinatura/ativar', authMiddleware, async (req, res) => {
       assinatura = await Assinatura.create({ empresa: req.usuario.empresa, ...updateData });
     }
 
-    await criarNotificacao(req.usuario.empresa, `Plano ${plano} ativado! ✅`, 'Sua assinatura foi ativada com sucesso.', 'sucesso', '💳', '/assinatura');
-
+    await criarNotificacao(req.usuario.empresa, `Plano ${plano} ativado! ✅`, 'Sua assinatura foi ativada com sucesso.', 'sucesso', '💳', '/plano-usuarios');
     res.json({ mensagem: 'Plano ativado com sucesso!', assinatura });
-  } catch (err) { res.status(500).json({ erro: err.message }); }
-});
-
-// Webhook Cora — recebe notificações de pagamento
-app.post('/api/assinatura/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  try {
-    const payload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    console.log('Webhook Cora recebido:', JSON.stringify(payload));
-
-    const { type, data } = payload;
-    const cobrancaId = data?.id;
-
-    if (!cobrancaId) return res.json({ ok: true });
-
-    const assinatura = await Assinatura.findOne({ coraCobrancaId: cobrancaId });
-    if (!assinatura) return res.json({ ok: true });
-
-    // Pagamento confirmado
-    if (type === 'invoice.paid' || type === 'invoice.payment_confirmed') {
-      const novoVencimento = new Date(assinatura.vencimento || new Date());
-      novoVencimento.setDate(novoVencimento.getDate() + 30);
-
-      // Criar próxima cobrança
-      const empresa = await Empresa.findById(assinatura.empresa);
-      const proximaCobranca = await criarCobrancaCora(empresa, { vencimento: novoVencimento }, assinatura.plano);
-
-      // Guardar no histórico
-      const fatura = {
-        cobrancaId,
-        plano: assinatura.plano,
-        valor: data?.total_cents,
-        pagoEm: new Date(),
-        vencimento: assinatura.vencimento
-      };
-
-      await Assinatura.findByIdAndUpdate(assinatura._id, {
-        status: 'ativa',
-        vencimento: novoVencimento,
-        coraCobrancaId: proximaCobranca?.id || null,
-        coraBoletoUrl: proximaCobranca?.payment?.banking_billet?.document_url || null,
-        coraPixQrCode: proximaCobranca?.payment?.pix?.qr_code_image || null,
-        coraPixCopiaECola: proximaCobranca?.payment?.pix?.copy_paste || null,
-        $push: { historicoFaturas: fatura },
-        atualizadoEm: new Date()
-      });
-
-      await criarNotificacao(assinatura.empresa, 'Pagamento confirmado! ✅', 'Sua assinatura foi renovada com sucesso.', 'sucesso', '💳', '/assinatura');
-
-      // Notificar admin por email
-      const admin = await Usuario.findOne({ empresa: assinatura.empresa, usuarioMestre: true });
-      if (admin) {
-        await enviarEmail(admin.email, '✅ Pagamento confirmado — HOC System', `
-          <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-            <h2 style="color:#38a169">✅ Pagamento confirmado!</h2>
-            <p>Sua assinatura HOC System foi renovada com sucesso.</p>
-            <p style="color:#718096">Próximo vencimento: <strong>${novoVencimento.toLocaleDateString('pt-BR')}</strong></p>
-            <a href="${process.env.APP_URL}/assinatura" style="display:inline-block;margin-top:20px;padding:12px 24px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Ver assinatura</a>
-          </div>`);
-      }
-    }
-
-    // Fatura vencida / inadimplente
-    if (type === 'invoice.overdue' || type === 'invoice.late') {
-      const diffDias = Math.floor((new Date() - new Date(assinatura.vencimento)) / (1000 * 60 * 60 * 24));
-      // Aplicar carência de 1 dia
-      if (diffDias >= 1) {
-        await Assinatura.findByIdAndUpdate(assinatura._id, { status: 'inadimplente', atualizadoEm: new Date() });
-        await criarNotificacao(assinatura.empresa, '⚠️ Fatura em atraso', 'Sua assinatura está inadimplente. Regularize para continuar usando o sistema.', 'erro', '🔴', '/assinatura');
-
-        const admin = await Usuario.findOne({ empresa: assinatura.empresa, usuarioMestre: true });
-        if (admin) {
-          await enviarEmail(admin.email, '⚠️ Fatura vencida — HOC System', `
-            <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-              <h2 style="color:#c53030">⚠️ Fatura em atraso</h2>
-              <p>Sua fatura HOC System venceu há <strong>${diffDias} dia(s)</strong>.</p>
-              <p style="color:#718096">Para evitar o bloqueio do sistema, regularize agora.</p>
-              ${assinatura.coraBoletoUrl ? `<a href="${assinatura.coraBoletoUrl}" style="display:inline-block;margin-top:20px;padding:12px 24px;background:#c53030;color:white;border-radius:8px;text-decoration:none;font-weight:600">Pagar boleto</a>` : ''}
-              <br><a href="${process.env.APP_URL}/assinatura" style="display:inline-block;margin-top:12px;padding:12px 24px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Ver fatura</a>
-            </div>`);
-        }
-      }
-    }
-
-    // Cobrança cancelada
-    if (type === 'invoice.canceled') {
-      await Assinatura.findByIdAndUpdate(assinatura._id, { coraCobrancaId: null, atualizadoEm: new Date() });
-    }
-
-    res.json({ ok: true });
-  } catch (err) {
-    console.error('Erro no webhook Cora:', err);
-    res.status(500).json({ erro: err.message });
-  }
-});
-
-// Buscar fatura atual
-app.get('/api/assinatura/fatura', authMiddleware, async (req, res) => {
-  try {
-    const assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
-    if (!assinatura || !assinatura.coraCobrancaId) return res.json(null);
-    const fatura = await coraRequest('GET', `/v2/invoices/${assinatura.coraCobrancaId}`);
-    res.json(fatura);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
@@ -899,10 +714,38 @@ app.get('/api/usuarios', authMiddleware, async (req, res) => {
   try { const usuarios = await Usuario.find({ empresa: req.usuario.empresa }).select('-senha'); res.json(usuarios); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
+
+// Buscar permissões do usuário logado
+app.get('/api/usuarios/minhas-permissoes', authMiddleware, async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.usuario.id).select('permissoes usuarioMestre perfil');
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    // Admin e mestre têm tudo liberado
+    if (usuario.perfil === 'Admin' || usuario.usuarioMestre) {
+      const tudo = { acessar: true, editar: true, criar: true, aprovar: true, gerenciar: true };
+      return res.json({
+        isAdmin: true,
+        permissoes: {
+          overview: { acessar: true, editar: true },
+          ideiasLivres: { acessar: true, criar: true, aprovar: true },
+          gestaoMetas: { acessar: true, editar: true },
+          gestaoProjetos: { acessar: true, criar: true, editar: true },
+          gestaoLicencas: { acessar: true, criar: true, editar: true },
+          operacoes: { acessar: true, criar: true, editar: true },
+          planoUsuarios: { acessar: true, gerenciar: true },
+        }
+      });
+    }
+    res.json({ isAdmin: false, permissoes: usuario.permissoes });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 app.put('/api/usuarios/:id', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    const { nome, perfil, status } = req.body;
-    const usuario = await Usuario.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { nome, perfil, status }, { new: true }).select('-senha');
+    const { nome, perfil, status, permissoes } = req.body;
+    const update = { nome, perfil, status };
+    if (permissoes !== undefined) update.permissoes = permissoes;
+    const usuario = await Usuario.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, update, { new: true }).select('-senha');
     if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
     res.json(usuario);
   } catch (err) { res.status(400).json({ erro: err.message }); }
@@ -918,7 +761,7 @@ app.delete('/api/usuarios/:id', authMiddleware, verificarAssinatura, async (req,
 
 // ==================== CONVITES ====================
 
-app.post('/api/convites', authMiddleware, verificarAssinatura, async (req, res) => {
+app.post('/api/convites', authMiddleware, verificarAssinatura, permPlanoUsuarios('gerenciar'), async (req, res) => {
   try {
     const { email, usuarioMestre, permissoes } = req.body;
     if (!email) return res.status(400).json({ erro: 'Email obrigatório' });
@@ -980,21 +823,21 @@ app.get('/api/projetos/:id', authMiddleware, verificarAssinatura, async (req, re
     res.json(projeto);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.post('/api/projetos', authMiddleware, verificarAssinatura, async (req, res) => {
+app.post('/api/projetos', authMiddleware, verificarAssinatura, permGestaoProjetos('criar'), async (req, res) => {
   try {
     const projeto = await Projeto.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
     await criarNotificacao(req.usuario.empresa, `Novo projeto: ${projeto.nome}`, `O projeto "${projeto.nome}" foi criado.`, 'info', '📁', '/gestao-projetos');
     res.status(201).json(projeto);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
-app.put('/api/projetos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+app.put('/api/projetos/:id', authMiddleware, verificarAssinatura, permGestaoProjetos('editar'), async (req, res) => {
   try {
     const projeto = await Projeto.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
     if (!projeto) return res.status(404).json({ erro: 'Projeto não encontrado' });
     res.json(projeto);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
-app.delete('/api/projetos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+app.delete('/api/projetos/:id', authMiddleware, verificarAssinatura, permGestaoProjetos('editar'), async (req, res) => {
   try {
     const projeto = await Projeto.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
     if (!projeto) return res.status(404).json({ erro: 'Projeto não encontrado' });
@@ -1030,14 +873,14 @@ app.get('/api/ideias', authMiddleware, verificarAssinatura, async (req, res) => 
   try { const ideias = await Ideia.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(ideias); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.post('/api/ideias', authMiddleware, verificarAssinatura, async (req, res) => {
+app.post('/api/ideias', authMiddleware, verificarAssinatura, permIdeiasLivres('criar'), async (req, res) => {
   try {
     const ideia = await Ideia.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
     if (ideia.aprovacao === 'pendente') await criarNotificacao(req.usuario.empresa, `Nova ideia: ${ideia.titulo}`, `${req.usuario.nome} submeteu uma nova ideia.`, 'info', '💡', '/ideias-livres');
     res.status(201).json(ideia);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
-app.put('/api/ideias/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+app.put('/api/ideias/:id', authMiddleware, verificarAssinatura, permIdeiasLivres('editar'), async (req, res) => {
   try {
     const anterior = await Ideia.findById(req.params.id);
     const ideia = await Ideia.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
@@ -1062,7 +905,7 @@ app.get('/api/bowler/:ano', authMiddleware, verificarAssinatura, async (req, res
     res.json(bowler || null);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.put('/api/bowler/:ano', authMiddleware, verificarAssinatura, async (req, res) => {
+app.put('/api/bowler/:ano', authMiddleware, verificarAssinatura, permGestaoMetas('editar'), async (req, res) => {
   try {
     const bowler = await Bowler.findOneAndUpdate({ empresa: req.usuario.empresa, ano: req.params.ano }, { dados: req.body.dados, atualizadoEm: new Date() }, { new: true, upsert: true });
     res.json(bowler);
@@ -1075,7 +918,7 @@ app.get('/api/overview', authMiddleware, verificarAssinatura, async (req, res) =
   try { const overview = await Overview.findOne({ empresa: req.usuario.empresa }); res.json(overview || null); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.put('/api/overview', authMiddleware, verificarAssinatura, async (req, res) => {
+app.put('/api/overview', authMiddleware, verificarAssinatura, permOverview('editar'), async (req, res) => {
   try {
     const overview = await Overview.findOneAndUpdate({ empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true, upsert: true });
     res.json(overview);
@@ -1123,21 +966,21 @@ app.get('/api/licencas/:id', authMiddleware, verificarAssinatura, async (req, re
     res.json(licenca);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.post('/api/licencas', authMiddleware, verificarAssinatura, async (req, res) => {
+app.post('/api/licencas', authMiddleware, verificarAssinatura, permGestaoLicencas('criar'), async (req, res) => {
   try {
     const licenca = await Licenca.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
     await criarNotificacao(req.usuario.empresa, `Nova licença: ${licenca.nome}`, `A licença foi cadastrada.`, 'info', '📋', '/gestao-licencas');
     res.status(201).json(licenca);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
-app.put('/api/licencas/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+app.put('/api/licencas/:id', authMiddleware, verificarAssinatura, permGestaoLicencas('editar'), async (req, res) => {
   try {
     const licenca = await Licenca.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
     if (!licenca) return res.status(404).json({ erro: 'Licença não encontrada' });
     res.json(licenca);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
-app.delete('/api/licencas/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+app.delete('/api/licencas/:id', authMiddleware, verificarAssinatura, permGestaoLicencas('editar'), async (req, res) => {
   try { await Licenca.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ mensagem: 'Licença deletada!' }); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1163,7 +1006,7 @@ app.get('/api/contatos', authMiddleware, verificarAssinatura, async (req, res) =
   try { const contatos = await Contato.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(contatos); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.post('/api/contatos', authMiddleware, verificarAssinatura, async (req, res) => {
+app.post('/api/contatos', authMiddleware, verificarAssinatura, permOperacoes('criar'), async (req, res) => {
   try {
     const contato = await Contato.create({ ...req.body, empresa: req.usuario.empresa });
     await criarNotificacao(req.usuario.empresa, `Novo contato: ${contato.nome}`, `O contato foi adicionado.`, 'info', '👤', '/operacoes');
@@ -1217,14 +1060,14 @@ app.get('/api/tarefas/:id', authMiddleware, verificarAssinatura, async (req, res
     res.json(tarefa);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.post('/api/tarefas', authMiddleware, verificarAssinatura, async (req, res) => {
+app.post('/api/tarefas', authMiddleware, verificarAssinatura, permOperacoes('criar'), async (req, res) => {
   try {
     const tarefa = await Tarefa.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
     await criarNotificacao(req.usuario.empresa, `Nova tarefa: ${tarefa.titulo}`, `A tarefa foi criada.`, 'info', '📋', '/operacoes');
     res.status(201).json(tarefa);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
-app.put('/api/tarefas/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+app.put('/api/tarefas/:id', authMiddleware, verificarAssinatura, permOperacoes('editar'), async (req, res) => {
   try {
     const anterior = await Tarefa.findById(req.params.id);
     const tarefa = await Tarefa.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
@@ -1235,7 +1078,7 @@ app.put('/api/tarefas/:id', authMiddleware, verificarAssinatura, async (req, res
     res.json(tarefa);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
-app.delete('/api/tarefas/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+app.delete('/api/tarefas/:id', authMiddleware, verificarAssinatura, permOperacoes('editar'), async (req, res) => {
   try { await Tarefa.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ mensagem: 'Tarefa deletada!' }); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1260,7 +1103,7 @@ app.get('/api/processos', authMiddleware, verificarAssinatura, async (req, res) 
   try { const processos = await Processo.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(processos); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.post('/api/processos', authMiddleware, verificarAssinatura, async (req, res) => {
+app.post('/api/processos', authMiddleware, verificarAssinatura, permOperacoes('criar'), async (req, res) => {
   try {
     const processo = await Processo.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
     await criarNotificacao(req.usuario.empresa, `Novo processo: ${processo.nome}`, `O processo foi criado.`, 'info', '⚙️', '/operacoes');
@@ -1285,7 +1128,7 @@ app.get('/api/robos', authMiddleware, verificarAssinatura, async (req, res) => {
   try { const robos = await Robot.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(robos); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.post('/api/robos', authMiddleware, verificarAssinatura, async (req, res) => {
+app.post('/api/robos', authMiddleware, verificarAssinatura, permOperacoes('criar'), async (req, res) => {
   try {
     const robo = await Robot.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
     await criarNotificacao(req.usuario.empresa, `Novo robô: ${robo.nome}`, `O robô foi cadastrado.`, 'info', '🤖', '/operacoes');

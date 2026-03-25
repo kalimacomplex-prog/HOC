@@ -274,6 +274,7 @@
 </div>
 
 <div class="main" style="padding:0;overflow:hidden">
+  <div id="bannerAssinatura" style="display:none"></div>
   <div class="header" style="position:sticky;top:0;z-index:100">
     <div class="header-search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -1795,8 +1796,71 @@
       if (dd) dd.classList.remove('aberto');
     }
   });
+  function verificarBloqueio(assinatura) {
+  if (!assinatura) return;
+  const overlay = document.getElementById('bloqueioOverlay');
+  const banner = document.getElementById('bannerAssinatura');
+  if (!overlay) return;
+
+  // Mostrar banner de trial
+  if (banner) {
+    if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
+      const expirando = assinatura.diasTrialRestantes <= 5;
+      banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
+      banner.innerHTML = `
+        <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
+        <a href="/assinatura" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>`;
+      banner.style.display = 'flex';
+    } else if (assinatura.status === 'inadimplente') {
+      banner.className = 'banner-assinatura inadimplente';
+      banner.innerHTML = `
+        <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
+        <a href="/assinatura" class="banner-assinatura-btn inadimplente">Pagar agora</a>`;
+      banner.style.display = 'flex';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  // Mostrar overlay de bloqueio
+  if (assinatura.status === 'inadimplente') {
+    document.getElementById('bloqueioDias').textContent = `${assinatura.diasAtraso} dia(s) em atraso`;
+    const acoes = document.getElementById('bloqueioAcoes');
+    acoes.innerHTML = '';
+    if (assinatura.pixCopiaECola) {
+      acoes.innerHTML += `<button class="bloqueio-btn-pix" onclick="copiarPixBloqueio('${assinatura.pixCopiaECola}')">📋 Copiar PIX Copia e Cola</button>`;
+    }
+    if (assinatura.boletoUrl) {
+      acoes.innerHTML += `<a href="${assinatura.boletoUrl}" target="_blank" class="bloqueio-btn-boleto">🧾 Abrir Boleto</a>`;
+    }
+    if (!assinatura.pixCopiaECola && !assinatura.boletoUrl) {
+      acoes.innerHTML = `<a href="/assinatura" class="bloqueio-btn-pix" style="text-decoration:none;display:block">Ver opções de pagamento</a>`;
+    }
+    overlay.classList.add('ativo');
+  } else {
+    overlay.classList.remove('ativo');
+  }
+}
+
+function copiarPixBloqueio(codigo) {
+  navigator.clipboard.writeText(codigo).then(() => alert('PIX copiado!'))
+    .catch(() => { const el = document.createElement('textarea'); el.value = codigo; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert('PIX copiado!'); });
+}
+// Verificar bloqueio por inadimplência
+verificarBloqueio(resumo.assinatura);
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
+  <!-- Overlay de bloqueio por inadimplência -->
+<div class="bloqueio-overlay" id="bloqueioOverlay">
+  <div class="bloqueio-card">
+    <div class="bloqueio-icone">🔒</div>
+    <div class="bloqueio-titulo">Acesso suspenso</div>
+    <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
+    <div class="bloqueio-dias" id="bloqueioDias"></div>
+    <div class="bloqueio-acoes" id="bloqueioAcoes"></div>
+    <div class="bloqueio-link"><a href="/assinatura">Ver detalhes da assinatura →</a></div>
+  </div>
+</div>
 </body>
 </html>

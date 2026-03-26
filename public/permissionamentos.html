@@ -136,6 +136,16 @@
     .btn-modal-confirmar.laranja { background: #c05621; color: white; }
     .btn-modal-confirmar.laranja:hover { background: #9c4221; }
 
+    /* ===== MODAL TROCAR PLANO ===== */
+    .planos-escolha { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+    .plano-opcao { border: 2px solid #e2e8f0; border-radius: 8px; padding: 14px 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .plano-opcao:hover { border-color: #2d1b69; background: #f5f0ff; }
+    .plano-opcao.selecionado { border-color: #2d1b69; background: #f5f0ff; }
+    .plano-opcao.atual { border-color: #38a169; background: #f0fff4; }
+    .plano-opcao-nome { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
+    .plano-opcao-valor { font-size: 12px; color: #718096; }
+    .plano-opcao-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: #38a169; color: white; margin-left: 5px; }
+
     @media (max-width: 900px) {
       .dash-grid { grid-template-columns: repeat(3, 1fr); }
       .painel-content { padding: 16px; }
@@ -313,6 +323,23 @@
   </div>
 </div>
 
+<!-- Modal Trocar Plano -->
+<div class="modal-overlay" id="modalTrocarPlano">
+  <div class="modal">
+    <div class="modal-titulo">📦 Trocar Plano</div>
+    <div class="modal-sub">Selecione o novo plano para esta empresa.</div>
+    <div class="modal-empresa" id="modalTrocarEmpresaNome"></div>
+    <div class="planos-escolha" id="planosEscolha"></div>
+    <input type="hidden" id="modalTrocarEmpresaId">
+    <input type="hidden" id="modalTrocarPlanoAtual">
+    <input type="hidden" id="modalTrocarPlanoSelecionado">
+    <div class="modal-footer">
+      <button class="btn-modal-cancelar" onclick="fecharModalTrocarPlano()">Cancelar</button>
+      <button class="btn-modal-confirmar" id="btnTrocarPlano" style="background:#2d1b69;color:white" onclick="executarTrocaPlano()">📦 Confirmar Troca</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal genérico de ação com motivo -->
 <div class="modal-overlay" id="modalAcao">
   <div class="modal">
@@ -457,6 +484,7 @@
           <td><span class="valor-txt">${a.planoValor}</span></td>
           <td><span class="data-txt">${a.vencimento ? formatarDataSimples(a.vencimento) : '—'}</span></td>
           <td><div class="acoes-cell">
+            <button class="btn-act" style="background:#f5f0ff;color:#2d1b69;border:1px solid #d6bcfa" onclick="abrirModalTrocarPlano('${a.empresaId}','${a.empresaNome}','${a.plano}')">📦 Trocar Plano</button>
             <button class="btn-act btn-inadimplente" onclick="abrirModal('inadimplente','${a.empresaId}','${a.empresaNome}')">⚠️ Inadimplente</button>
             <button class="btn-act btn-cancelar-conta" onclick="abrirModal('cancelar','${a.empresaId}','${a.empresaNome}')">❌ Cancelar</button>
           </div></td>
@@ -485,6 +513,7 @@
           <td><span class="data-txt">${a.diasAtraso !== null ? a.diasAtraso + ' dia(s) em atraso' : a.status === 'trial' ? 'Período de teste' : '—'}</span></td>
           <td><div class="acoes-cell">
             <button class="btn-act btn-reativar" onclick="reativarConta('${a.empresaId}','${a.empresaNome}')">✅ Reativar</button>
+            <button class="btn-act" style="background:#f5f0ff;color:#2d1b69;border:1px solid #d6bcfa" onclick="abrirModalTrocarPlano('${a.empresaId}','${a.empresaNome}','${a.plano}')">📦 Trocar Plano</button>
             ${a.status !== 'cancelada' ? `<button class="btn-act btn-cancelar-conta" onclick="abrirModal('cancelar','${a.empresaId}','${a.empresaNome}')">❌ Cancelar</button>` : ''}
             ${a.status !== 'inadimplente' && a.status !== 'trial' ? `<button class="btn-act btn-inadimplente" onclick="abrirModal('inadimplente','${a.empresaId}','${a.empresaNome}')">⚠️ Inadimplente</button>` : ''}
           </div></td>
@@ -636,6 +665,79 @@
     t.textContent = msg; t.className = `toast ${tipo} show`;
     setTimeout(() => { t.className = `toast ${tipo}`; }, 4000);
   }
+
+  // ===== TROCAR PLANO =====
+  const PLANOS_INFO = [
+    { id: 'basico',        nome: 'Básico',        valor: 'R$ 49/mês' },
+    { id: 'intermediario', nome: 'Intermediário',  valor: 'R$ 149/mês' },
+    { id: 'avancado',      nome: 'Avançado',       valor: 'R$ 349/mês' },
+    { id: 'enterprise',    nome: 'Enterprise',     valor: 'Sob consulta' },
+  ];
+
+  function abrirModalTrocarPlano(empresaId, empresaNome, planoAtual) {
+    document.getElementById('modalTrocarEmpresaId').value = empresaId;
+    document.getElementById('modalTrocarPlanoAtual').value = planoAtual;
+    document.getElementById('modalTrocarPlanoSelecionado').value = planoAtual;
+    document.getElementById('modalTrocarEmpresaNome').textContent = '🏢 ' + empresaNome;
+    // Renderizar opções de plano
+    document.getElementById('planosEscolha').innerHTML = PLANOS_INFO.map(p => `
+      <div class="plano-opcao ${p.id === planoAtual ? 'atual selecionado' : ''}"
+        id="opcao-${p.id}" onclick="selecionarPlanoModal('${p.id}')">
+        <div class="plano-opcao-nome">
+          ${p.nome}
+          ${p.id === planoAtual ? '<span class="plano-opcao-badge">Atual</span>' : ''}
+        </div>
+        <div class="plano-opcao-valor">${p.valor}</div>
+      </div>`).join('');
+    document.getElementById('modalTrocarPlano').classList.add('aberto');
+  }
+
+  function selecionarPlanoModal(planoId) {
+    document.getElementById('modalTrocarPlanoSelecionado').value = planoId;
+    document.querySelectorAll('.plano-opcao').forEach(el => {
+      el.classList.remove('selecionado');
+      if (!el.classList.contains('atual')) el.style.borderColor = '';
+    });
+    const planoAtual = document.getElementById('modalTrocarPlanoAtual').value;
+    const el = document.getElementById('opcao-' + planoId);
+    if (el) {
+      el.classList.add('selecionado');
+      if (planoId !== planoAtual) el.style.borderColor = '#2d1b69';
+    }
+  }
+
+  function fecharModalTrocarPlano() {
+    document.getElementById('modalTrocarPlano').classList.remove('aberto');
+  }
+
+  async function executarTrocaPlano() {
+    const empresaId = document.getElementById('modalTrocarEmpresaId').value;
+    const planoAtual = document.getElementById('modalTrocarPlanoAtual').value;
+    const plano = document.getElementById('modalTrocarPlanoSelecionado').value;
+    if (plano === planoAtual) {
+      mostrarToast('Selecione um plano diferente do atual.', 'aviso');
+      return;
+    }
+    const planoInfo = PLANOS_INFO.find(p => p.id === plano);
+    const btn = document.getElementById('btnTrocarPlano');
+    btn.disabled = true; btn.textContent = 'Alterando...';
+    try {
+      const res = await fetch('/api/admin/trocar-plano', {
+        method: 'POST', headers: HEADERS(),
+        body: JSON.stringify({ empresaId, plano })
+      });
+      const data = await res.json();
+      if (!res.ok) { mostrarToast(data.erro || 'Erro ao trocar plano.', 'erro'); return; }
+      fecharModalTrocarPlano();
+      mostrarToast(`📦 Plano alterado para ${planoInfo?.nome} com sucesso!`, 'sucesso');
+      await carregarTudo();
+    } catch(err) { mostrarToast('Erro de conexão.', 'erro'); }
+    finally { btn.disabled = false; btn.textContent = '📦 Confirmar Troca'; }
+  }
+
+  document.getElementById('modalTrocarPlano').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalTrocarPlano')) fecharModalTrocarPlano();
+  });
 
   // ===== AUTO-REFRESH ===== 
   setInterval(() => { if (_secret) carregarTudo(); }, 30000);

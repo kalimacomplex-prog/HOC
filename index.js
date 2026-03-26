@@ -961,6 +961,34 @@ app.post('/api/admin/reativar-conta', adminSecretMiddleware, async (req, res) =>
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Trocar plano de uma empresa manualmente
+app.post('/api/admin/trocar-plano', adminSecretMiddleware, async (req, res) => {
+  try {
+    const { empresaId, plano } = req.body;
+    const planosValidos = ['basico', 'intermediario', 'avancado', 'enterprise'];
+    if (!empresaId) return res.status(400).json({ erro: 'empresaId obrigatório.' });
+    if (!planosValidos.includes(plano)) return res.status(400).json({ erro: 'Plano inválido.' });
+
+    const nomePlano = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
+    const vencimento = new Date();
+    vencimento.setDate(vencimento.getDate() + 30);
+
+    await Assinatura.findOneAndUpdate(
+      { empresa: empresaId },
+      { plano, status: 'ativa', vencimento, atualizadoEm: new Date() }
+    );
+
+    await criarNotificacao(
+      empresaId,
+      `📦 Plano alterado para ${nomePlano[plano]}`,
+      `Seu plano foi atualizado para ${nomePlano[plano]} pelo administrador.`,
+      'sucesso', '📦', '/plano-usuarios'
+    );
+
+    res.json({ mensagem: `Plano alterado para ${nomePlano[plano]} com sucesso.` });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 // ==================== NOTIFICAÇÕES ====================
 
 app.get('/api/notificacoes', authMiddleware, async (req, res) => {

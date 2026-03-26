@@ -820,7 +820,7 @@
     <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
     <div class="bloqueio-dias" id="bloqueioDias"></div>
     <div class="bloqueio-acoes" id="bloqueioAcoes"></div>
-    <div class="bloqueio-link"><a href="/assinatura">Ver detalhes da assinatura →</a></div>
+    <div class="bloqueio-link"><a href="/plano-usuarios">Ver detalhes da assinatura →</a></div>
   </div>
 </div>
 <script>
@@ -1821,13 +1821,13 @@
       banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
       banner.innerHTML = `
         <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
-        <a href="/assinatura" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>`;
+        <a href="/plano-usuarios" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>`;
       banner.style.display = 'flex';
     } else if (assinatura.status === 'inadimplente') {
       banner.className = 'banner-assinatura inadimplente';
       banner.innerHTML = `
         <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
-        <a href="/assinatura" class="banner-assinatura-btn inadimplente">Pagar agora</a>`;
+        <a href="/plano-usuarios" class="banner-assinatura-btn inadimplente">Pagar agora</a>`;
       banner.style.display = 'flex';
     } else {
       banner.style.display = 'none';
@@ -1846,7 +1846,7 @@
       acoes.innerHTML += `<a href="${assinatura.boletoUrl}" target="_blank" class="bloqueio-btn-boleto">🧾 Abrir Boleto</a>`;
     }
     if (!assinatura.pixCopiaECola && !assinatura.boletoUrl) {
-      acoes.innerHTML = `<a href="/assinatura" class="bloqueio-btn-pix" style="text-decoration:none;display:block">Ver opções de pagamento</a>`;
+      acoes.innerHTML = `<a href="/plano-usuarios" class="bloqueio-btn-pix" style="text-decoration:none;display:block">Ver opções de pagamento</a>`;
     }
     overlay.classList.add('ativo');
   } else {

@@ -108,9 +108,6 @@
     .aguardando-titulo { font-size: 16px; font-weight: 700; color: #744210; margin-bottom: 6px; }
     .aguardando-sub { font-size: 12px; color: #c05621; margin-bottom: 14px; line-height: 1.5; }
     .aguardando-acoes { display: flex; gap: 10px; justify-content: center; }
-    .btn-confirmar-pag { padding: 10px 20px; background: #38a169; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
-    .btn-confirmar-pag:hover { background: #276749; }
-    .btn-cancelar-sol { padding: 10px 16px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
 
     @media (max-width: 900px) { .planos-grid { grid-template-columns: repeat(2,1fr); } .status-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 600px) { .planos-grid { grid-template-columns: 1fr; } .status-grid { grid-template-columns: 1fr; } }
@@ -128,7 +125,7 @@
     <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
     <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
     <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
+
     <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
     <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
     <a class="menu-item active" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
@@ -711,11 +708,7 @@
             <strong>${solicitadoPor || 'Usuário'}</strong> solicitou o <strong>Plano ${nomePlanoSol} (${valorPlanoSol}/mês)</strong><br>
             em ${dataHora}
           </div>
-          ${isAdmin ? `
-          <div class="aguardando-acoes">
-            <button class="btn-confirmar-pag" onclick="confirmarPagamento()">✅ Confirmar Pagamento e Liberar Acesso</button>
-            <button class="btn-cancelar-sol" onclick="cancelarSolicitacao()">✕ Cancelar Solicitação</button>
-          </div>` : `<p style="font-size:12px;color:#718096">Aguarde o administrador confirmar o pagamento.</p>`}
+          <p style="font-size:12px;color:#718096;margin-top:4px">Aguarde a confirmação do administrador. Você será notificado quando o acesso for liberado.</p>
         </div>`;
       return;
     }
@@ -811,26 +804,7 @@
     finally { if (btn.textContent === 'Enviando...') { btn.disabled = false; btn.textContent = '✓ Já realizei o pagamento'; } }
   }
 
-  async function confirmarPagamento() {
-    if (!confirm('Confirmar o pagamento e liberar o acesso do cliente?')) return;
-    try {
-      const res = await fetch('/api/assinatura/confirmar', { method: 'POST', headers: HEADERS });
-      const data = await res.json();
-      if (!res.ok) { alert(data.erro || 'Erro ao confirmar.'); return; }
-      alert(data.mensagem || 'Pagamento confirmado! Acesso liberado.');
-      await carregarAssinatura();
-    } catch(err) { alert('Erro de conexão.'); }
-  }
 
-  async function cancelarSolicitacao() {
-    if (!confirm('Cancelar esta solicitação de pagamento?')) return;
-    try {
-      const res = await fetch('/api/assinatura/cancelar-solicitacao', { method: 'POST', headers: HEADERS });
-      const data = await res.json();
-      if (!res.ok) { alert(data.erro || 'Erro ao cancelar.'); return; }
-      await carregarAssinatura();
-    } catch(err) { alert('Erro de conexão.'); }
-  }
 
   function copiarPix(codigo) {
     navigator.clipboard.writeText(codigo)

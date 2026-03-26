@@ -443,6 +443,8 @@ const permOperacoes      = (acao) => criarMiddlewarePermissao('operacoes', acao)
 const permPlanoUsuarios  = (acao) => criarMiddlewarePermissao('planoUsuarios', acao);
 
 // ==================== PÁGINAS ====================
+// Rota permissionamentos — acessível pela URL mas sem link no menu
+app.get('/permissionamentos', (req, res) => res.sendFile(path.join(__dirname, 'public', 'permissionamentos.html')));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cadastro.html')));
@@ -700,79 +702,118 @@ app.post('/api/assinatura/solicitar', authMiddleware, async (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// Confirmar pagamento — apenas Admin libera o acesso
-app.post('/api/assinatura/confirmar', authMiddleware, async (req, res) => {
-  try {
-    // Apenas Admin pode confirmar
-    if (req.usuario.perfil !== 'Admin') {
-      return res.status(403).json({ erro: 'Apenas administradores podem confirmar pagamentos.' });
-    }
+// ==================== ADMIN — PAINEL DE PAGAMENTOS ====================
 
-    let assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
-    if (!assinatura) return res.status(404).json({ erro: 'Assinatura não encontrada' });
-    if (assinatura.status !== 'aguardando_confirmacao') {
-      return res.status(400).json({ erro: 'Nenhuma solicitação pendente encontrada.' });
-    }
+// Middleware para verificar ADMIN_SECRET
+function adminSecretMiddleware(req, res, next) {
+  const secret = req.headers['x-admin-secret'];
+  if (!secret || secret !== process.env.ADMIN_SECRET) {
+    return res.status(403).json({ erro: 'Acesso negado. Senha administrativa incorreta.' });
+  }
+  next();
+}
+
+// Verificar senha do painel admin
+app.post('/api/admin/verificar-senha', (req, res) => {
+  const { senha } = req.body;
+  if (!senha || senha !== process.env.ADMIN_SECRET) {
+    return res.status(401).json({ erro: 'Senha incorreta.' });
+  }
+  res.json({ ok: true });
+});
+
+// Listar todos os pagamentos pendentes (todas as empresas)
+app.get('/api/admin/pagamentos-pendentes', adminSecretMiddleware, async (req, res) => {
+  try {
+    const assinaturas = await Assinatura.find({ status: 'aguardando_confirmacao' })
+      .populate('empresa', 'nome cnpj')
+      .sort({ solicitadoEm: -1 });
+
+    const nomePlano = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
+    const valorPlano = { basico: 'R$ 49,00', intermediario: 'R$ 149,00', avancado: 'R$ 349,00', enterprise: 'Sob consulta' };
+
+    const resultado = assinaturas.map(a => ({
+      _id: a._id,
+      empresaId: a.empresa?._id,
+      empresaNome: a.empresa?.nome || 'Empresa desconhecida',
+      empresaCnpj: a.empresa?.cnpj || '—',
+      planoSolicitado: a.planoSolicitado,
+      planoNome: nomePlano[a.planoSolicitado] || a.planoSolicitado,
+      planoValor: valorPlano[a.planoSolicitado] || '—',
+      solicitadoPor: a.solicitadoPor,
+      solicitadoEm: a.solicitadoEm,
+      statusAnterior: a.plano && a.vencimento ? a.status : 'trial',
+    }));
+
+    res.json(resultado);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Confirmar pagamento de uma empresa
+app.post('/api/admin/confirmar-pagamento', adminSecretMiddleware, async (req, res) => {
+  try {
+    const { empresaId } = req.body;
+    if (!empresaId) return res.status(400).json({ erro: 'empresaId obrigatório.' });
+
+    const assinatura = await Assinatura.findOne({ empresa: empresaId, status: 'aguardando_confirmacao' });
+    if (!assinatura) return res.status(404).json({ erro: 'Nenhuma solicitação pendente para esta empresa.' });
 
     const plano = assinatura.planoSolicitado || assinatura.plano;
     const vencimento = new Date();
     vencimento.setDate(vencimento.getDate() + 30);
 
-    // Registrar no histórico
     const nomePlano = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
     const valorPlano = { basico: 4900, intermediario: 14900, avancado: 34900, enterprise: 0 };
-    const novaFatura = {
-      plano,
-      valor: valorPlano[plano],
-      vencimento,
-      pagoEm: new Date(),
-      confirmadoPor: req.usuario.id
-    };
+    const novaFatura = { plano, valor: valorPlano[plano], vencimento, pagoEm: new Date(), confirmadoPor: 'admin' };
 
-    assinatura = await Assinatura.findOneAndUpdate(
-      { empresa: req.usuario.empresa },
+    await Assinatura.findOneAndUpdate(
+      { empresa: empresaId },
       {
-        plano,
-        status: 'ativa',
-        vencimento,
-        planoSolicitado: null,
-        solicitadoEm: null,
-        solicitadoPor: null,
+        plano, status: 'ativa', vencimento,
+        planoSolicitado: null, solicitadoEm: null, solicitadoPor: null,
         atualizadoEm: new Date(),
         $push: { historicoFaturas: novaFatura }
-      },
-      { new: true }
+      }
     );
 
-    // Notificar todos os usuários da empresa
+    // Notificar usuários da empresa
     await criarNotificacao(
-      req.usuario.empresa,
+      empresaId,
       `✅ Plano ${nomePlano[plano]} ativado!`,
       'Seu pagamento foi confirmado. O acesso completo ao HOC System está liberado.',
       'sucesso', '✅', '/plano-usuarios'
     );
 
-    res.json({ mensagem: `Plano ${nomePlano[plano]} confirmado e ativado com sucesso!`, assinatura });
+    res.json({ mensagem: `Plano ${nomePlano[plano]} confirmado para empresa ${empresaId}.` });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// Cancelar solicitação pendente
-app.post('/api/assinatura/cancelar-solicitacao', authMiddleware, async (req, res) => {
+// Rejeitar pagamento de uma empresa
+app.post('/api/admin/rejeitar-pagamento', adminSecretMiddleware, async (req, res) => {
   try {
-    if (req.usuario.perfil !== 'Admin') {
-      return res.status(403).json({ erro: 'Apenas administradores podem cancelar solicitações.' });
-    }
-    const assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
-    if (!assinatura || assinatura.status !== 'aguardando_confirmacao') {
-      return res.status(400).json({ erro: 'Nenhuma solicitação pendente.' });
-    }
-    // Volta ao status anterior (trial se nunca foi ativa, inadimplente se havia plano)
-    const statusAnterior = assinatura.plano && assinatura.vencimento ? 'inadimplente' : 'trial';
+    const { empresaId, motivo } = req.body;
+    if (!empresaId) return res.status(400).json({ erro: 'empresaId obrigatório.' });
+
+    const assinatura = await Assinatura.findOne({ empresa: empresaId, status: 'aguardando_confirmacao' });
+    if (!assinatura) return res.status(404).json({ erro: 'Nenhuma solicitação pendente para esta empresa.' });
+
+    // Volta ao status anterior
+    const statusAnterior = assinatura.vencimento ? 'inadimplente' : 'trial';
+
     await Assinatura.findOneAndUpdate(
-      { empresa: req.usuario.empresa },
+      { empresa: empresaId },
       { status: statusAnterior, planoSolicitado: null, solicitadoEm: null, solicitadoPor: null, atualizadoEm: new Date() }
     );
-    res.json({ mensagem: 'Solicitação cancelada.' });
+
+    // Notificar usuários da empresa
+    await criarNotificacao(
+      empresaId,
+      `❌ Pagamento não confirmado`,
+      motivo || 'Não foi possível confirmar o pagamento. Entre em contato com o suporte.',
+      'erro', '❌', '/plano-usuarios'
+    );
+
+    res.json({ mensagem: `Pagamento rejeitado para empresa ${empresaId}.` });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

@@ -88,6 +88,9 @@
     .mestre-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 4px; border-bottom: 1px solid #f0f2f5; }
     /* ===== HISTÓRICO ===== */
     .historico-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    /* Bloqueio inadimplente no plano-usuarios */
+    .inadimplente-bloqueado { pointer-events: none !important; opacity: 0.4 !important; user-select: none !important; }
+    .tab-bloqueada { pointer-events: none !important; opacity: 0.4 !important; }
     @media (max-width: 900px) { .planos-grid { grid-template-columns: repeat(2,1fr); } .status-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 600px) { .planos-grid { grid-template-columns: 1fr; } .status-grid { grid-template-columns: 1fr; } }
   </style>
@@ -279,13 +282,14 @@
 
 <!-- Overlay de bloqueio -->
 <div class="bloqueio-overlay" id="bloqueioOverlay">
-  <div class="bloqueio-card">
+  <div class="bloqueio-card" style="position:relative">
+    <button onclick="fecharOverlayInadimplente()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;color:#a0aec0;cursor:pointer;line-height:1" title="Fechar">×</button>
     <div class="bloqueio-icone">🔒</div>
     <div class="bloqueio-titulo">Acesso suspenso</div>
     <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
     <div class="bloqueio-dias" id="bloqueioDias"></div>
     <div class="bloqueio-acoes" id="bloqueioAcoes"></div>
-    <div class="bloqueio-link"><a href="/plano-usuarios">Ver detalhes da assinatura →</a></div>
+    <div class="bloqueio-link" style="margin-top:10px;font-size:12px;color:#a0aec0">Ao fechar, apenas a aba Assinatura permanece disponível.</div>
   </div>
 </div>
 
@@ -793,11 +797,66 @@
       acoes.innerHTML = '';
       if (assinatura.pixCopiaECola) acoes.innerHTML += `<button class="bloqueio-btn-pix" onclick="copiarPix('${assinatura.pixCopiaECola}')">📋 Copiar PIX Copia e Cola</button>`;
       if (assinatura.boletoUrl) acoes.innerHTML += `<a href="${assinatura.boletoUrl}" target="_blank" class="bloqueio-btn-boleto">🧾 Abrir Boleto</a>`;
-      if (!assinatura.pixCopiaECola && !assinatura.boletoUrl) acoes.innerHTML = `<button class="bloqueio-btn-pix" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1]);overlay.classList.remove('ativo')">Ver opções de pagamento</button>`;
+      // Botão principal: fecha overlay e abre aba Assinatura
+      acoes.innerHTML += `<button class="bloqueio-btn-pix" style="margin-top:8px;width:100%" onclick="fecharOverlayInadimplente()">💳 Ver opções de pagamento</button>`;
+      // Marcar sistema como inadimplente (para manter bloqueio após fechar overlay)
+      window._sistemaInadimplente = true;
       overlay.classList.add('ativo');
     } else {
+      window._sistemaInadimplente = false;
       overlay.classList.remove('ativo');
+      liberarInterface();
     }
+  }
+
+  function fecharOverlayInadimplente() {
+    const overlay = document.getElementById('bloqueioOverlay');
+    overlay.classList.remove('ativo');
+    // Redirecionar para aba Assinatura
+    mudarTab('assinatura', document.querySelectorAll('.tab')[1]);
+    // Aplicar bloqueio parcial: desabilitar tudo exceto aba Assinatura
+    aplicarBloqueioParcial();
+    // Carregar assinatura automaticamente
+    carregarAssinatura();
+  }
+
+  function aplicarBloqueioParcial() {
+    if (!window._sistemaInadimplente) return;
+    // Bloquear aba Usuários
+    const tabUsuarios = document.querySelectorAll('.tab')[0];
+    if (tabUsuarios) tabUsuarios.classList.add('tab-bloqueada');
+    // Bloquear conteúdo da aba usuários
+    const tabContent = document.getElementById('tab-usuarios');
+    if (tabContent) tabContent.classList.add('inadimplente-bloqueado');
+    // Bloquear menu lateral exceto Plano e Usuários
+    document.querySelectorAll('.menu-item').forEach(item => {
+      if (!item.href || item.href.includes('plano-usuarios')) return;
+      item.style.pointerEvents = 'none';
+      item.style.opacity = '0.4';
+    });
+    // Mostrar aviso no topo do conteúdo de assinatura
+    const tabAssinatura = document.getElementById('tab-assinatura');
+    if (tabAssinatura && !document.getElementById('avisoInadimplente')) {
+      const aviso = document.createElement('div');
+      aviso.id = 'avisoInadimplente';
+      aviso.style.cssText = 'background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px';
+      aviso.innerHTML = '⚠️ Sistema bloqueado por inadimplência. Regularize sua assinatura para restaurar o acesso completo.';
+      tabAssinatura.insertBefore(aviso, tabAssinatura.firstChild);
+    }
+  }
+
+  function liberarInterface() {
+    // Liberar tudo quando não for mais inadimplente
+    const tabUsuarios = document.querySelectorAll('.tab')[0];
+    if (tabUsuarios) tabUsuarios.classList.remove('tab-bloqueada');
+    const tabContent = document.getElementById('tab-usuarios');
+    if (tabContent) tabContent.classList.remove('inadimplente-bloqueado');
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.style.pointerEvents = '';
+      item.style.opacity = '';
+    });
+    const aviso = document.getElementById('avisoInadimplente');
+    if (aviso) aviso.remove();
   }
 
   function copiarPixBloqueio(codigo) { copiarPix(codigo); }

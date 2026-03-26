@@ -155,7 +155,7 @@ input:focus, select:focus, textarea:focus { border-color: #2d1b69; }
 /* ===== OVERLAY DE BLOQUEIO (inadimplente) ===== */
 .bloqueio-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.75); z-index: 9999; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
 .bloqueio-overlay.ativo { display: flex; }
-.bloqueio-card { background: white; border-radius: 16px; padding: 44px 40px; max-width: 460px; width: 90%; text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,0.25); animation: bloqueio-in 0.3s ease; }
+.bloqueio-card { background: white; border-radius: 16px; padding: 44px 40px; max-width: 460px; width: 90%; text-align: center; box-shadow: 0 24px 64px rgba(0,0,0,0.25); animation: bloqueio-in 0.3s ease; position: relative; }
 @keyframes bloqueio-in { from{transform:scale(0.92);opacity:0} to{transform:scale(1);opacity:1} }
 .bloqueio-icone { font-size: 60px; margin-bottom: 16px; }
 .bloqueio-titulo { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
@@ -166,6 +166,15 @@ input:focus, select:focus, textarea:focus { border-color: #2d1b69; }
 .bloqueio-btn-pix:hover { background: #3d2b89; }
 .bloqueio-btn-boleto { padding: 14px; background: #f0f2f5; color: #1e2a4a; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; display: block; transition: background 0.2s; }
 .bloqueio-btn-boleto:hover { background: #e2e8f0; }
+.bloqueio-fechar { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 22px; color: #a0aec0; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px; transition: all 0.2s; }
+.bloqueio-fechar:hover { background: #f0f2f5; color: #718096; }
+.bloqueio-aviso-parcial { font-size: 11px; color: #a0aec0; margin-top: 14px; line-height: 1.5; }
 .bloqueio-link { margin-top: 14px; font-size: 12px; color: #a0aec0; }
 .bloqueio-link a { color: #2d1b69; text-decoration: none; font-weight: 600; }
 .bloqueio-link a:hover { text-decoration: underline; }
+
+/* ===== BLOQUEIO PARCIAL (inadimplente com overlay fechado) ===== */
+.inadimplente-bloqueado { pointer-events: none !important; opacity: 0.35 !important; user-select: none !important; filter: grayscale(30%); }
+.tab-bloqueada { pointer-events: none !important; opacity: 0.4 !important; }
+.menu-inadimplente-bloqueado { pointer-events: none !important; opacity: 0.35 !important; }
+.aviso-inadimplente { background: #fff5f5; border: 1.5px solid #feb2b2; color: #c53030; padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }

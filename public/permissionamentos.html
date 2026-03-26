@@ -6,187 +6,326 @@
   <title>HOC — Painel Administrativo</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #0f0a28; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f0a28; min-height: 100vh; }
 
-    /* ===== TELA DE LOGIN ===== */
+    /* ===== LOGIN ===== */
     .login-wrap { width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
     .login-card { background: white; border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 400px; box-shadow: 0 24px 64px rgba(0,0,0,0.4); text-align: center; }
-    .login-logo { font-size: 40px; margin-bottom: 12px; }
+    .login-logo { font-size: 44px; margin-bottom: 12px; }
     .login-titulo { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
     .login-sub { font-size: 13px; color: #718096; margin-bottom: 32px; }
-    .login-input { width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; letter-spacing: 2px; text-align: center; margin-bottom: 12px; }
+    .login-input { width: 100%; padding: 12px 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 15px; outline: none; font-family: inherit; letter-spacing: 3px; text-align: center; margin-bottom: 12px; }
     .login-input:focus { border-color: #2d1b69; }
     .login-btn { width: 100%; padding: 12px; background: #2d1b69; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
     .login-btn:hover { background: #3d2b89; }
     .login-erro { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 7px; font-size: 12px; margin-bottom: 14px; display: none; }
     .login-aviso { font-size: 11px; color: #a0aec0; margin-top: 16px; }
 
-    /* ===== PAINEL PRINCIPAL ===== */
-    .painel-wrap { display: none; width: 100%; min-height: 100vh; background: #f0f2f5; flex-direction: column; }
+    /* ===== PAINEL ===== */
+    .painel-wrap { display: none; flex-direction: column; min-height: 100vh; background: #f0f2f5; }
     .painel-wrap.ativo { display: flex; }
 
-    .painel-header { background: #2d1b69; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+    .painel-header { background: #2d1b69; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
     .painel-header-left { display: flex; align-items: center; gap: 12px; }
-    .painel-logo { font-size: 22px; font-weight: 700; color: white; }
-    .painel-badge { background: rgba(255,255,255,0.15); color: white; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
-    .btn-sair-admin { padding: 7px 14px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .painel-logo { font-size: 18px; font-weight: 700; color: white; }
+    .painel-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .btn-sair-admin { padding: 7px 14px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
     .btn-sair-admin:hover { background: rgba(255,255,255,0.2); }
+    .btn-refresh { padding: 7px 12px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); border: none; border-radius: 6px; font-size: 13px; cursor: pointer; margin-right: 8px; }
+    .btn-refresh:hover { background: rgba(255,255,255,0.15); color: white; }
 
-    .painel-content { padding: 32px; flex: 1; max-width: 1100px; margin: 0 auto; width: 100%; }
+    .painel-content { padding: 28px 32px; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-    .painel-titulo { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
-    .painel-sub { font-size: 13px; color: #718096; margin-bottom: 28px; }
+    /* ===== DASHBOARD (sempre visível) ===== */
+    .dash-titulo { font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+    .dash-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 28px; }
+    .dash-card { background: white; border-radius: 10px; padding: 18px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 4px solid transparent; }
+    .dash-card.ativas { border-left-color: #38a169; }
+    .dash-card.trial { border-left-color: #2d1b69; }
+    .dash-card.pendentes { border-left-color: #c05621; }
+    .dash-card.inadimplentes { border-left-color: #e53e3e; }
+    .dash-card.canceladas { border-left-color: #718096; }
+    .dash-card.receita { border-left-color: #3b5bdb; }
+    .dash-val { font-size: 26px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
+    .dash-val.verde { color: #38a169; }
+    .dash-val.roxo { color: #2d1b69; }
+    .dash-val.laranja { color: #c05621; }
+    .dash-val.vermelho { color: #e53e3e; }
+    .dash-val.cinza { color: #718096; }
+    .dash-val.azul { color: #3b5bdb; }
+    .dash-lbl { font-size: 11px; color: #718096; font-weight: 500; }
 
-    /* ===== STATS ===== */
-    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-    .stat-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .stat-val { font-size: 28px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
-    .stat-lbl { font-size: 12px; color: #718096; }
-    .stat-val.pendente { color: #c05621; }
-    .stat-val.confirmado { color: #38a169; }
+    /* ===== TABS ===== */
+    .tabs-wrap { display: flex; gap: 2px; border-bottom: 2px solid #e2e8f0; margin-bottom: 22px; }
+    .tab-btn { padding: 10px 20px; font-size: 13px; font-weight: 500; cursor: pointer; color: #718096; border: none; background: none; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; display: flex; align-items: center; gap: 7px; }
+    .tab-btn:hover { color: #1e2a4a; }
+    .tab-btn.ativo { color: #2d1b69; border-bottom-color: #2d1b69; font-weight: 700; }
+    .tab-count { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+    .tab-count.vermelho { background: #fff5f5; color: #c53030; }
+    .tab-count.verde { background: #f0fff4; color: #276749; }
+    .tab-count.cinza { background: #f0f2f5; color: #718096; }
+    .tab-count.laranja { background: #fffaf0; color: #c05621; }
 
-    /* ===== TABELA DE PENDENTES ===== */
-    .section-titulo { font-size: 16px; font-weight: 700; color: #1e2a4a; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
-    .count-badge { background: #fff5f5; color: #c53030; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 20px; }
-    .count-badge.zero { background: #f0fff4; color: #276749; }
-
-    .table-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 32px; }
+    /* ===== TABELA ===== */
+    .table-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
     table { width: 100%; border-collapse: collapse; }
-    th { padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #f0f2f5; }
-    td { padding: 16px; font-size: 13px; color: #1e2a4a; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+    th { padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; background: #f8fafc; border-bottom: 1px solid #f0f2f5; white-space: nowrap; }
+    td { padding: 14px 16px; font-size: 13px; color: #1e2a4a; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #fafbff; }
-
     .empresa-nome { font-weight: 700; color: #1e2a4a; margin-bottom: 2px; }
     .empresa-cnpj { font-size: 11px; color: #a0aec0; }
-    .plano-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #f5f0ff; color: #2d1b69; }
-    .valor-txt { font-weight: 700; color: #1e2a4a; }
-    .solicitante-txt { color: #4a5568; }
+    .plano-badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .plano-basico { background: #f0f2f5; color: #4a5568; }
+    .plano-intermediario { background: #f5f0ff; color: #2d1b69; }
+    .plano-avancado { background: #ebf0ff; color: #3b5bdb; }
+    .plano-enterprise { background: #fffaf0; color: #c05621; }
+    .status-badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .status-ativa { background: #f0fff4; color: #276749; }
+    .status-inadimplente { background: #fff5f5; color: #c53030; }
+    .status-cancelada { background: #f0f2f5; color: #718096; }
+    .status-trial { background: #f5f0ff; color: #2d1b69; }
+    .status-aguardando { background: #fffaf0; color: #c05621; }
     .data-txt { font-size: 12px; color: #718096; }
-    .acoes-cell { display: flex; gap: 8px; }
-    .btn-confirmar { padding: 7px 14px; background: #38a169; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-    .btn-confirmar:hover { background: #276749; }
-    .btn-confirmar:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-rejeitar { padding: 7px 14px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-    .btn-rejeitar:hover { background: #fed7d7; }
-    .btn-rejeitar:disabled { opacity: 0.5; cursor: not-allowed; }
+    .valor-txt { font-weight: 700; color: #1e2a4a; }
+    .acoes-cell { display: flex; gap: 6px; flex-wrap: wrap; }
 
-    .empty-state { text-align: center; padding: 48px; color: #a0aec0; }
-    .empty-icon { font-size: 40px; margin-bottom: 12px; }
-    .empty-txt { font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 4px; }
-    .empty-sub { font-size: 12px; }
+    /* ===== BOTÕES DE AÇÃO ===== */
+    .btn-act { padding: 6px 12px; border: none; border-radius: 5px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .btn-act:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-confirmar { background: #38a169; color: white; }
+    .btn-confirmar:hover:not(:disabled) { background: #276749; }
+    .btn-rejeitar { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+    .btn-rejeitar:hover:not(:disabled) { background: #fed7d7; }
+    .btn-cancelar-conta { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+    .btn-cancelar-conta:hover:not(:disabled) { background: #fed7d7; }
+    .btn-inadimplente { background: #fffaf0; color: #c05621; border: 1px solid #f6ad55; }
+    .btn-inadimplente:hover:not(:disabled) { background: #feebcb; }
+    .btn-reativar { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+    .btn-reativar:hover:not(:disabled) { background: #c6f6d5; }
 
-    .loading { text-align: center; padding: 32px; color: #a0aec0; font-size: 13px; }
+    /* ===== EMPTY / LOADING ===== */
+    .estado-vazio { text-align: center; padding: 48px; color: #a0aec0; }
+    .estado-vazio-icon { font-size: 40px; margin-bottom: 12px; }
+    .estado-vazio-txt { font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 4px; }
+    .estado-vazio-sub { font-size: 12px; }
+    .estado-loading { text-align: center; padding: 32px; color: #a0aec0; font-size: 13px; }
 
     /* ===== TOAST ===== */
-    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; color: white; box-shadow: 0 4px 16px rgba(0,0,0,0.2); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 9999; }
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; color: white; box-shadow: 0 4px 16px rgba(0,0,0,0.2); transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 9999; max-width: 360px; }
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.sucesso { background: #38a169; }
     .toast.erro { background: #c53030; }
+    .toast.aviso { background: #c05621; }
 
-    /* ===== MODAL REJEITAR ===== */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    /* ===== MODAL ===== */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 2000; }
     .modal-overlay.aberto { display: flex; }
-    .modal { background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
-    .modal-titulo { font-size: 16px; font-weight: 700; color: #1e2a4a; margin-bottom: 16px; }
-    .modal-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; display: block; }
+    .modal { background: white; border-radius: 12px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+    .modal-titulo { font-size: 16px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
+    .modal-sub { font-size: 13px; color: #718096; margin-bottom: 16px; }
+    .modal-empresa { background: #f8fafc; border-radius: 7px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #1e2a4a; margin-bottom: 14px; }
+    .modal-label { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 5px; display: block; }
     .modal-textarea { width: 100%; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 80px; }
-    .modal-textarea:focus { border-color: #c53030; }
+    .modal-textarea:focus { border-color: #2d1b69; }
     .modal-footer { display: flex; gap: 10px; margin-top: 16px; }
     .btn-modal-cancelar { flex: 1; padding: 10px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .btn-modal-rejeitar { flex: 2; padding: 10px; background: #c53030; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
-    .btn-modal-rejeitar:hover { background: #9b2c2c; }
+    .btn-modal-confirmar { flex: 2; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .btn-modal-confirmar.vermelho { background: #c53030; color: white; }
+    .btn-modal-confirmar.vermelho:hover { background: #9b2c2c; }
+    .btn-modal-confirmar.laranja { background: #c05621; color: white; }
+    .btn-modal-confirmar.laranja:hover { background: #9c4221; }
 
-    @media (max-width: 700px) {
+    @media (max-width: 900px) {
+      .dash-grid { grid-template-columns: repeat(3, 1fr); }
       .painel-content { padding: 16px; }
-      .stats-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .dash-grid { grid-template-columns: repeat(2, 1fr); }
       table { font-size: 12px; }
-      td, th { padding: 10px 10px; }
+      td, th { padding: 10px; }
       .acoes-cell { flex-direction: column; }
+      .tab-btn { padding: 8px 12px; font-size: 12px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ===== TELA DE LOGIN ===== -->
+<!-- ===== LOGIN ===== -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
     <div class="login-logo">🔐</div>
     <div class="login-titulo">Painel Administrativo</div>
     <div class="login-sub">HOC System — Área Restrita</div>
     <div class="login-erro" id="loginErro">Senha incorreta. Tente novamente.</div>
-    <input type="password" class="login-input" id="senhaInput" placeholder="••••••••" onkeydown="if(event.key==='Enter') verificarSenha()">
+    <input type="password" class="login-input" id="senhaInput" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter') verificarSenha()">
     <button class="login-btn" onclick="verificarSenha()" id="btnLogin">Entrar</button>
     <div class="login-aviso">Acesso restrito ao administrador do sistema</div>
   </div>
 </div>
 
-<!-- ===== PAINEL PRINCIPAL ===== -->
+<!-- ===== PAINEL ===== -->
 <div class="painel-wrap" id="painelWrap">
+
+  <!-- Header fixo -->
   <div class="painel-header">
     <div class="painel-header-left">
-      <div class="painel-logo">HOC System</div>
+      <div class="painel-logo">🏢 HOC System</div>
       <div class="painel-badge">Painel Admin</div>
     </div>
-    <button class="btn-sair-admin" onclick="sairAdmin()">Sair</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn-refresh" onclick="carregarTudo()" title="Atualizar dados">↻ Atualizar</button>
+      <button class="btn-sair-admin" onclick="sairAdmin()">✕ Sair</button>
+    </div>
   </div>
 
   <div class="painel-content">
-    <div class="painel-titulo">💳 Liberação de Pagamentos</div>
-    <div class="painel-sub">Confirme ou rejeite as solicitações de ativação de plano pendentes.</div>
 
-    <!-- Stats -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-val pendente" id="statPendentes">—</div>
-        <div class="stat-lbl">Aguardando confirmação</div>
+    <!-- ===== DASHBOARD (sempre visível) ===== -->
+    <div class="dash-titulo">📊 Visão Geral</div>
+    <div class="dash-grid">
+      <div class="dash-card ativas">
+        <div class="dash-val verde" id="dashAtivas">—</div>
+        <div class="dash-lbl">Contas Ativas</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-val confirmado" id="statHoje">—</div>
-        <div class="stat-lbl">Confirmados hoje</div>
+      <div class="dash-card trial">
+        <div class="dash-val roxo" id="dashTrial">—</div>
+        <div class="dash-lbl">Em Trial</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-val" id="statTotal">—</div>
-        <div class="stat-lbl">Total de empresas ativas</div>
+      <div class="dash-card pendentes">
+        <div class="dash-val laranja" id="dashPendentes">—</div>
+        <div class="dash-lbl">Aguardando Pagamento</div>
+      </div>
+      <div class="dash-card inadimplentes">
+        <div class="dash-val vermelho" id="dashInadimplentes">—</div>
+        <div class="dash-lbl">Inadimplentes</div>
+      </div>
+      <div class="dash-card canceladas">
+        <div class="dash-val cinza" id="dashCanceladas">—</div>
+        <div class="dash-lbl">Canceladas</div>
+      </div>
+      <div class="dash-card receita">
+        <div class="dash-val azul" id="dashReceita">—</div>
+        <div class="dash-lbl">Receita Mensal Est.</div>
       </div>
     </div>
 
-    <!-- Tabela pendentes -->
-    <div class="section-titulo">
-      Solicitações Pendentes
-      <span class="count-badge" id="countBadge">0</span>
+    <!-- ===== TABS ===== -->
+    <div class="tabs-wrap">
+      <button class="tab-btn ativo" onclick="mudarTab('pendentes', this)">
+        ⏳ Pendentes <span class="tab-count laranja" id="countPendentes">0</span>
+      </button>
+      <button class="tab-btn" onclick="mudarTab('ativas', this)">
+        ✅ Contas Ativas <span class="tab-count verde" id="countAtivas">0</span>
+      </button>
+      <button class="tab-btn" onclick="mudarTab('bloqueadas', this)">
+        🚫 Bloqueadas <span class="tab-count vermelho" id="countBloqueadas">0</span>
+      </button>
+      <button class="tab-btn" onclick="mudarTab('historico', this)">
+        📋 Histórico <span class="tab-count cinza" id="countHistorico">0</span>
+      </button>
     </div>
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>Empresa</th>
-            <th>Plano Solicitado</th>
-            <th>Valor</th>
-            <th>Solicitado por</th>
-            <th>Data / Hora</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tabelaPendentes">
-          <tr><td colspan="6" class="loading">Carregando...</td></tr>
-        </tbody>
-      </table>
+
+    <!-- Tab Pendentes -->
+    <div id="tab-pendentes">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Plano Solicitado</th>
+              <th>Valor</th>
+              <th>Solicitado por</th>
+              <th>Data / Hora</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaPendentes">
+            <tr><td colspan="6" class="estado-loading">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- Tab Ativas -->
+    <div id="tab-ativas" style="display:none">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>CNPJ</th>
+              <th>Plano</th>
+              <th>Valor/mês</th>
+              <th>Vencimento</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaAtivas">
+            <tr><td colspan="6" class="estado-loading">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab Bloqueadas -->
+    <div id="tab-bloqueadas" style="display:none">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>CNPJ</th>
+              <th>Plano</th>
+              <th>Status</th>
+              <th>Atraso / Info</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaBloqueadas">
+            <tr><td colspan="6" class="estado-loading">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab Histórico -->
+    <div id="tab-historico" style="display:none">
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Plano</th>
+              <th>Valor</th>
+              <th>Vencimento</th>
+              <th>Pago em</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaHistorico">
+            <tr><td colspan="5" class="estado-loading">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- Modal Rejeitar -->
-<div class="modal-overlay" id="modalRejeitar">
+<!-- Modal genérico de ação com motivo -->
+<div class="modal-overlay" id="modalAcao">
   <div class="modal">
-    <div class="modal-titulo">❌ Rejeitar Pagamento</div>
-    <p style="font-size:13px;color:#718096;margin-bottom:14px">Informe o motivo da rejeição. O cliente será notificado.</p>
-    <label class="modal-label">Motivo (opcional)</label>
-    <textarea class="modal-textarea" id="motivoRejeicao" placeholder="Ex: Pagamento não identificado. Entre em contato com o suporte."></textarea>
-    <input type="hidden" id="empresaIdRejeitar">
+    <div class="modal-titulo" id="modalAcaoTitulo">Confirmar ação</div>
+    <div class="modal-sub" id="modalAcaoSub">Deseja confirmar?</div>
+    <div class="modal-empresa" id="modalAcaoEmpresa"></div>
+    <label class="modal-label" id="modalAcaoMotivoLabel">Motivo (opcional)</label>
+    <textarea class="modal-textarea" id="modalAcaoMotivo" placeholder="Informe o motivo..."></textarea>
+    <input type="hidden" id="modalAcaoEmpresaId">
+    <input type="hidden" id="modalAcaoTipo">
     <div class="modal-footer">
-      <button class="btn-modal-cancelar" onclick="fecharModalRejeitar()">Cancelar</button>
-      <button class="btn-modal-rejeitar" onclick="confirmarRejeicao()">❌ Rejeitar e Notificar</button>
+      <button class="btn-modal-cancelar" onclick="fecharModalAcao()">Cancelar</button>
+      <button class="btn-modal-confirmar" id="btnModalConfirmar" onclick="executarAcao()">Confirmar</button>
     </div>
   </div>
 </div>
@@ -195,183 +334,311 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const HEADERS_ADMIN = { 'Content-Type': 'application/json' };
-  let _adminSecret = null;
+  let _secret = null;
+  const HEADERS = () => ({ 'Content-Type': 'application/json', 'x-admin-secret': _secret });
 
   // ===== LOGIN =====
   async function verificarSenha() {
     const senha = document.getElementById('senhaInput').value.trim();
     const erro = document.getElementById('loginErro');
     const btn = document.getElementById('btnLogin');
-    if (!senha) { erro.style.display = 'block'; return; }
     erro.style.display = 'none';
+    if (!senha) { erro.textContent = 'Digite a senha.'; erro.style.display = 'block'; return; }
     btn.disabled = true; btn.textContent = 'Verificando...';
     try {
       const res = await fetch('/api/admin/verificar-senha', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ senha })
       });
       if (!res.ok) {
+        erro.textContent = 'Senha incorreta. Tente novamente.';
         erro.style.display = 'block';
         document.getElementById('senhaInput').value = '';
         return;
       }
-      // Login ok — guardar secret em memória e mostrar painel
-      _adminSecret = senha;
+      _secret = senha;
       document.getElementById('loginWrap').style.display = 'none';
       document.getElementById('painelWrap').classList.add('ativo');
-      carregarPendentes();
+      carregarTudo();
     } catch(err) {
       erro.textContent = 'Erro de conexão. Tente novamente.';
       erro.style.display = 'block';
-    } finally {
-      btn.disabled = false; btn.textContent = 'Entrar';
-    }
+    } finally { btn.disabled = false; btn.textContent = 'Entrar'; }
   }
 
   function sairAdmin() {
-    _adminSecret = null;
+    _secret = null;
     document.getElementById('painelWrap').classList.remove('ativo');
     document.getElementById('loginWrap').style.display = 'flex';
     document.getElementById('senhaInput').value = '';
   }
 
-  // ===== CARREGAR PENDENTES =====
+  // ===== TABS =====
+  let tabAtual = 'pendentes';
+  function mudarTab(id, btn) {
+    tabAtual = id;
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('ativo'));
+    btn.classList.add('ativo');
+    ['pendentes','ativas','bloqueadas','historico'].forEach(t => {
+      document.getElementById('tab-' + t).style.display = t === id ? 'block' : 'none';
+    });
+  }
+
+  // ===== CARREGAR TUDO =====
+  async function carregarTudo() {
+    await Promise.all([
+      carregarDashboard(),
+      carregarPendentes(),
+      carregarAtivas(),
+      carregarBloqueadas(),
+      carregarHistorico()
+    ]);
+  }
+
+  // ===== DASHBOARD =====
+  async function carregarDashboard() {
+    try {
+      const res = await fetch('/api/admin/dashboard', { headers: HEADERS() });
+      if (!res.ok) return;
+      const d = await res.json();
+      document.getElementById('dashAtivas').textContent = d.ativas;
+      document.getElementById('dashTrial').textContent = d.trial;
+      document.getElementById('dashPendentes').textContent = d.pendentes;
+      document.getElementById('dashInadimplentes').textContent = d.inadimplentes;
+      document.getElementById('dashCanceladas').textContent = d.canceladas;
+      document.getElementById('dashReceita').textContent = 'R$ ' + d.receitaMensal.toLocaleString('pt-BR');
+    } catch(err) { console.error(err); }
+  }
+
+  // ===== PENDENTES =====
   async function carregarPendentes() {
     try {
-      const res = await fetch('/api/admin/pagamentos-pendentes', {
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': _adminSecret }
-      });
-      if (!res.ok) { mostrarToast('Erro ao carregar dados.', 'erro'); return; }
-      const pendentes = await res.json();
-      renderTabela(pendentes);
-      // Stats
-      document.getElementById('statPendentes').textContent = pendentes.length;
-      const countBadge = document.getElementById('countBadge');
-      countBadge.textContent = pendentes.length;
-      countBadge.className = 'count-badge' + (pendentes.length === 0 ? ' zero' : '');
-      // Contar confirmados hoje (não temos endpoint ainda — placeholder)
-      document.getElementById('statHoje').textContent = '—';
-      document.getElementById('statTotal').textContent = '—';
-    } catch(err) {
-      document.getElementById('tabelaPendentes').innerHTML = '<tr><td colspan="6" class="loading">Erro ao carregar. Verifique a conexão.</td></tr>';
-    }
+      const res = await fetch('/api/admin/pagamentos-pendentes', { headers: HEADERS() });
+      if (!res.ok) return;
+      const lista = await res.json();
+      document.getElementById('countPendentes').textContent = lista.length;
+      const tbody = document.getElementById('tabelaPendentes');
+      if (!lista.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="estado-vazio"><div class="estado-vazio-icon">✅</div><div class="estado-vazio-txt">Nenhuma solicitação pendente</div><div class="estado-vazio-sub">Todas as solicitações foram processadas</div></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = lista.map(p => `
+        <tr id="row-p-${p.empresaId}">
+          <td><div class="empresa-nome">${p.empresaNome}</div><div class="empresa-cnpj">${p.empresaCnpj}</div></td>
+          <td><span class="plano-badge plano-${p.planoSolicitado}">${p.planoNome}</span></td>
+          <td><span class="valor-txt">${p.planoValor}/mês</span></td>
+          <td>${p.solicitadoPor || '—'}</td>
+          <td><span class="data-txt">${formatarData(p.solicitadoEm)}</span></td>
+          <td><div class="acoes-cell">
+            <button class="btn-act btn-confirmar" onclick="confirmarPagamento('${p.empresaId}','${p.empresaNome}','${p.planoNome}')">✅ Confirmar</button>
+            <button class="btn-act btn-rejeitar" onclick="abrirModal('rejeitar','${p.empresaId}','${p.empresaNome}')">❌ Rejeitar</button>
+          </div></td>
+        </tr>`).join('');
+    } catch(err) { console.error(err); }
   }
 
-  function renderTabela(pendentes) {
-    const tbody = document.getElementById('tabelaPendentes');
-    if (pendentes.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6">
-        <div class="empty-state">
-          <div class="empty-icon">✅</div>
-          <div class="empty-txt">Nenhuma solicitação pendente</div>
-          <div class="empty-sub">Todas as solicitações foram processadas</div>
-        </div>
-      </td></tr>`;
-      return;
-    }
-    tbody.innerHTML = pendentes.map(p => {
-      const dataHora = p.solicitadoEm
-        ? new Date(p.solicitadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
-        : '—';
-      return `<tr id="row-${p.empresaId}">
-        <td>
-          <div class="empresa-nome">${p.empresaNome}</div>
-          <div class="empresa-cnpj">${p.empresaCnpj}</div>
-        </td>
-        <td><span class="plano-badge">${p.planoNome}</span></td>
-        <td><span class="valor-txt">${p.planoValor}/mês</span></td>
-        <td><span class="solicitante-txt">${p.solicitadoPor || '—'}</span></td>
-        <td><span class="data-txt">${dataHora}</span></td>
-        <td>
-          <div class="acoes-cell">
-            <button class="btn-confirmar" id="btn-confirmar-${p.empresaId}" onclick="confirmarPagamento('${p.empresaId}', '${p.planoNome}')">
-              ✅ Confirmar
-            </button>
-            <button class="btn-rejeitar" id="btn-rejeitar-${p.empresaId}" onclick="abrirModalRejeitar('${p.empresaId}')">
-              ❌ Rejeitar
-            </button>
-          </div>
-        </td>
-      </tr>`;
-    }).join('');
+  // ===== CONTAS ATIVAS =====
+  async function carregarAtivas() {
+    try {
+      const res = await fetch('/api/admin/contas-ativas', { headers: HEADERS() });
+      if (!res.ok) return;
+      const lista = await res.json();
+      document.getElementById('countAtivas').textContent = lista.length;
+      const tbody = document.getElementById('tabelaAtivas');
+      if (!lista.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="estado-vazio"><div class="estado-vazio-icon">📭</div><div class="estado-vazio-txt">Nenhuma conta ativa</div></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = lista.map(a => `
+        <tr>
+          <td><div class="empresa-nome">${a.empresaNome}</div></td>
+          <td><span class="data-txt">${a.empresaCnpj}</span></td>
+          <td><span class="plano-badge plano-${a.plano}">${a.planoNome}</span></td>
+          <td><span class="valor-txt">${a.planoValor}</span></td>
+          <td><span class="data-txt">${a.vencimento ? formatarDataSimples(a.vencimento) : '—'}</span></td>
+          <td><div class="acoes-cell">
+            <button class="btn-act btn-inadimplente" onclick="abrirModal('inadimplente','${a.empresaId}','${a.empresaNome}')">⚠️ Inadimplente</button>
+            <button class="btn-act btn-cancelar-conta" onclick="abrirModal('cancelar','${a.empresaId}','${a.empresaNome}')">❌ Cancelar</button>
+          </div></td>
+        </tr>`).join('');
+    } catch(err) { console.error(err); }
   }
 
-  // ===== CONFIRMAR =====
-  async function confirmarPagamento(empresaId, planoNome) {
-    if (!confirm(`Confirmar o pagamento do Plano ${planoNome} para esta empresa?\n\nO acesso será liberado imediatamente.`)) return;
-    const btnC = document.getElementById(`btn-confirmar-${empresaId}`);
-    const btnR = document.getElementById(`btn-rejeitar-${empresaId}`);
-    if (btnC) { btnC.disabled = true; btnC.textContent = 'Confirmando...'; }
-    if (btnR) btnR.disabled = true;
+  // ===== CONTAS BLOQUEADAS =====
+  async function carregarBloqueadas() {
+    try {
+      const res = await fetch('/api/admin/contas-bloqueadas', { headers: HEADERS() });
+      if (!res.ok) return;
+      const lista = await res.json();
+      document.getElementById('countBloqueadas').textContent = lista.length;
+      const tbody = document.getElementById('tabelaBloqueadas');
+      if (!lista.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="estado-vazio"><div class="estado-vazio-icon">🎉</div><div class="estado-vazio-txt">Nenhuma conta bloqueada</div></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = lista.map(a => `
+        <tr>
+          <td><div class="empresa-nome">${a.empresaNome}</div></td>
+          <td><span class="data-txt">${a.empresaCnpj}</span></td>
+          <td><span class="plano-badge plano-${a.plano}">${a.planoNome}</span></td>
+          <td><span class="status-badge status-${a.status}">${a.statusLabel}</span></td>
+          <td><span class="data-txt">${a.diasAtraso !== null ? a.diasAtraso + ' dia(s) em atraso' : a.status === 'trial' ? 'Período de teste' : '—'}</span></td>
+          <td><div class="acoes-cell">
+            <button class="btn-act btn-reativar" onclick="reativarConta('${a.empresaId}','${a.empresaNome}')">✅ Reativar</button>
+            ${a.status !== 'cancelada' ? `<button class="btn-act btn-cancelar-conta" onclick="abrirModal('cancelar','${a.empresaId}','${a.empresaNome}')">❌ Cancelar</button>` : ''}
+            ${a.status !== 'inadimplente' && a.status !== 'trial' ? `<button class="btn-act btn-inadimplente" onclick="abrirModal('inadimplente','${a.empresaId}','${a.empresaNome}')">⚠️ Inadimplente</button>` : ''}
+          </div></td>
+        </tr>`).join('');
+    } catch(err) { console.error(err); }
+  }
+
+  // ===== HISTÓRICO =====
+  async function carregarHistorico() {
+    try {
+      const res = await fetch('/api/admin/historico-pagamentos', { headers: HEADERS() });
+      if (!res.ok) return;
+      const lista = await res.json();
+      document.getElementById('countHistorico').textContent = lista.length;
+      const tbody = document.getElementById('tabelaHistorico');
+      if (!lista.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="estado-vazio"><div class="estado-vazio-icon">📋</div><div class="estado-vazio-txt">Nenhum pagamento confirmado ainda</div></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = lista.map(f => `
+        <tr>
+          <td><div class="empresa-nome">${f.empresaNome}</div><div class="empresa-cnpj">${f.empresaCnpj}</div></td>
+          <td><span class="plano-badge plano-${f.plano}">${f.planoNome}</span></td>
+          <td><span class="valor-txt">${f.valor ? 'R$ ' + (f.valor/100).toFixed(2).replace('.',',') : '—'}</span></td>
+          <td><span class="data-txt">${f.vencimento ? formatarDataSimples(f.vencimento) : '—'}</span></td>
+          <td><span class="status-badge status-ativa">${f.pagoEm ? formatarData(f.pagoEm) : '—'}</span></td>
+        </tr>`).join('');
+    } catch(err) { console.error(err); }
+  }
+
+  // ===== AÇÕES =====
+  async function confirmarPagamento(empresaId, empresaNome, planoNome) {
+    if (!confirm(`Confirmar o pagamento do Plano ${planoNome} para "${empresaNome}"?\n\nO acesso será liberado imediatamente.`)) return;
     try {
       const res = await fetch('/api/admin/confirmar-pagamento', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': _adminSecret },
+        method: 'POST', headers: HEADERS(),
         body: JSON.stringify({ empresaId })
       });
       const data = await res.json();
       if (!res.ok) { mostrarToast(data.erro || 'Erro ao confirmar.', 'erro'); return; }
-      mostrarToast(`✅ Plano ${planoNome} confirmado e acesso liberado!`, 'sucesso');
-      // Remover linha da tabela com animação
-      const row = document.getElementById(`row-${empresaId}`);
-      if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.4s'; setTimeout(() => carregarPendentes(), 500); }
-      else carregarPendentes();
+      mostrarToast(`✅ Plano ${planoNome} confirmado! Acesso liberado para ${empresaNome}.`, 'sucesso');
+      await carregarTudo();
     } catch(err) { mostrarToast('Erro de conexão.', 'erro'); }
-    finally {
-      if (btnC) { btnC.disabled = false; btnC.textContent = '✅ Confirmar'; }
-      if (btnR) btnR.disabled = false;
-    }
   }
 
-  // ===== REJEITAR =====
-  function abrirModalRejeitar(empresaId) {
-    document.getElementById('empresaIdRejeitar').value = empresaId;
-    document.getElementById('motivoRejeicao').value = '';
-    document.getElementById('modalRejeitar').classList.add('aberto');
-  }
-
-  function fecharModalRejeitar() {
-    document.getElementById('modalRejeitar').classList.remove('aberto');
-  }
-
-  async function confirmarRejeicao() {
-    const empresaId = document.getElementById('empresaIdRejeitar').value;
-    const motivo = document.getElementById('motivoRejeicao').value.trim() || 'Não foi possível confirmar o pagamento. Entre em contato com o suporte.';
-    const btn = document.querySelector('.btn-modal-rejeitar');
-    btn.disabled = true; btn.textContent = 'Rejeitando...';
+  async function reativarConta(empresaId, empresaNome) {
+    if (!confirm(`Reativar a conta de "${empresaNome}"?\n\nO acesso será liberado por 30 dias.`)) return;
     try {
-      const res = await fetch('/api/admin/rejeitar-pagamento', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-secret': _adminSecret },
+      const res = await fetch('/api/admin/reativar-conta', {
+        method: 'POST', headers: HEADERS(),
+        body: JSON.stringify({ empresaId })
+      });
+      const data = await res.json();
+      if (!res.ok) { mostrarToast(data.erro || 'Erro ao reativar.', 'erro'); return; }
+      mostrarToast(`✅ Conta de ${empresaNome} reativada com sucesso!`, 'sucesso');
+      await carregarTudo();
+    } catch(err) { mostrarToast('Erro de conexão.', 'erro'); }
+  }
+
+  // ===== MODAL GENÉRICO =====
+  const CONFIGS_MODAL = {
+    rejeitar: {
+      titulo: '❌ Rejeitar Pagamento',
+      sub: 'O cliente será notificado e a solicitação será cancelada.',
+      motivoLabel: 'Motivo da rejeição (opcional)',
+      placeholder: 'Ex: Pagamento não identificado. Entre em contato com o suporte.',
+      btnTexto: '❌ Rejeitar e Notificar',
+      btnClasse: 'vermelho',
+      endpoint: '/api/admin/rejeitar-pagamento'
+    },
+    cancelar: {
+      titulo: '❌ Cancelar Assinatura',
+      sub: 'A conta será cancelada e o cliente será notificado.',
+      motivoLabel: 'Motivo do cancelamento (opcional)',
+      placeholder: 'Ex: Inadimplência prolongada.',
+      btnTexto: '❌ Cancelar Conta',
+      btnClasse: 'vermelho',
+      endpoint: '/api/admin/cancelar-conta'
+    },
+    inadimplente: {
+      titulo: '⚠️ Marcar como Inadimplente',
+      sub: 'O sistema será bloqueado e o cliente será notificado.',
+      motivoLabel: 'Observação (opcional)',
+      placeholder: 'Ex: Pagamento vencido há 5 dias.',
+      btnTexto: '⚠️ Marcar Inadimplente',
+      btnClasse: 'laranja',
+      endpoint: '/api/admin/marcar-inadimplente'
+    }
+  };
+
+  function abrirModal(tipo, empresaId, empresaNome) {
+    const cfg = CONFIGS_MODAL[tipo];
+    document.getElementById('modalAcaoTitulo').textContent = cfg.titulo;
+    document.getElementById('modalAcaoSub').textContent = cfg.sub;
+    document.getElementById('modalAcaoEmpresa').textContent = '🏢 ' + empresaNome;
+    document.getElementById('modalAcaoMotivoLabel').textContent = cfg.motivoLabel;
+    document.getElementById('modalAcaoMotivo').placeholder = cfg.placeholder;
+    document.getElementById('modalAcaoMotivo').value = '';
+    document.getElementById('modalAcaoEmpresaId').value = empresaId;
+    document.getElementById('modalAcaoTipo').value = tipo;
+    const btn = document.getElementById('btnModalConfirmar');
+    btn.textContent = cfg.btnTexto;
+    btn.className = 'btn-modal-confirmar ' + cfg.btnClasse;
+    document.getElementById('modalAcao').classList.add('aberto');
+  }
+
+  function fecharModalAcao() {
+    document.getElementById('modalAcao').classList.remove('aberto');
+  }
+
+  async function executarAcao() {
+    const tipo = document.getElementById('modalAcaoTipo').value;
+    const empresaId = document.getElementById('modalAcaoEmpresaId').value;
+    const motivo = document.getElementById('modalAcaoMotivo').value.trim();
+    const cfg = CONFIGS_MODAL[tipo];
+    const btn = document.getElementById('btnModalConfirmar');
+    btn.disabled = true; btn.textContent = 'Processando...';
+    try {
+      const res = await fetch(cfg.endpoint, {
+        method: 'POST', headers: HEADERS(),
         body: JSON.stringify({ empresaId, motivo })
       });
       const data = await res.json();
-      if (!res.ok) { mostrarToast(data.erro || 'Erro ao rejeitar.', 'erro'); return; }
-      fecharModalRejeitar();
-      mostrarToast('Solicitação rejeitada. Cliente notificado.', 'sucesso');
-      const row = document.getElementById(`row-${empresaId}`);
-      if (row) { row.style.opacity = '0'; row.style.transition = 'opacity 0.4s'; setTimeout(() => carregarPendentes(), 500); }
-      else carregarPendentes();
+      if (!res.ok) { mostrarToast(data.erro || 'Erro ao executar ação.', 'erro'); return; }
+      fecharModalAcao();
+      mostrarToast(data.mensagem || 'Ação executada com sucesso!', 'sucesso');
+      await carregarTudo();
     } catch(err) { mostrarToast('Erro de conexão.', 'erro'); }
-    finally { btn.disabled = false; btn.textContent = '❌ Rejeitar e Notificar'; }
+    finally { btn.disabled = false; btn.textContent = cfg.btnTexto; }
   }
 
-  document.getElementById('modalRejeitar').addEventListener('click', e => {
-    if (e.target === document.getElementById('modalRejeitar')) fecharModalRejeitar();
+  document.getElementById('modalAcao').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalAcao')) fecharModalAcao();
   });
 
-  // ===== TOAST =====
-  function mostrarToast(msg, tipo) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.className = `toast ${tipo} show`;
-    setTimeout(() => { toast.className = `toast ${tipo}`; }, 3500);
+  // ===== HELPERS =====
+  function formatarData(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
   }
 
-  // Auto-refresh a cada 30 segundos quando logado
-  setInterval(() => { if (_adminSecret) carregarPendentes(); }, 30000);
+  function formatarDataSimples(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('pt-BR');
+  }
+
+  function mostrarToast(msg, tipo) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast ${tipo} show`;
+    setTimeout(() => { t.className = `toast ${tipo}`; }, 4000);
+  }
+
+  // ===== AUTO-REFRESH ===== 
+  setInterval(() => { if (_secret) carregarTudo(); }, 30000);
 </script>
 </body>
 </html>

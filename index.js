@@ -706,8 +706,9 @@ app.post('/api/assinatura/solicitar', authMiddleware, async (req, res) => {
 
 // Middleware para verificar ADMIN_SECRET
 function adminSecretMiddleware(req, res, next) {
-  const secret = req.headers['x-admin-secret'];
-  if (!secret || secret !== process.env.ADMIN_SECRET) {
+  const secret = (req.headers['x-admin-secret'] || '').trim();
+  const adminSecret = (process.env.ADMIN_SECRET || '').trim();
+  if (!secret || !adminSecret || secret !== adminSecret) {
     return res.status(403).json({ erro: 'Acesso negado. Senha administrativa incorreta.' });
   }
   next();
@@ -716,7 +717,8 @@ function adminSecretMiddleware(req, res, next) {
 // Verificar senha do painel admin
 app.post('/api/admin/verificar-senha', (req, res) => {
   const { senha } = req.body;
-  if (!senha || senha !== process.env.ADMIN_SECRET) {
+  const adminSecret = (process.env.ADMIN_SECRET || '').trim();
+  if (!senha || !adminSecret || senha.trim() !== adminSecret) {
     return res.status(401).json({ erro: 'Senha incorreta.' });
   }
   res.json({ ok: true });
@@ -814,6 +816,148 @@ app.post('/api/admin/rejeitar-pagamento', adminSecretMiddleware, async (req, res
     );
 
     res.json({ mensagem: `Pagamento rejeitado para empresa ${empresaId}.` });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Listar todas as empresas com assinatura ativa
+app.get('/api/admin/contas-ativas', adminSecretMiddleware, async (req, res) => {
+  try {
+    const assinaturas = await Assinatura.find({ status: 'ativa' })
+      .populate('empresa', 'nome cnpj criadoEm')
+      .sort({ atualizadoEm: -1 });
+    const nomePlano = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
+    const valorPlano = { basico:'R$ 49,00', intermediario:'R$ 149,00', avancado:'R$ 349,00', enterprise:'Sob consulta' };
+    res.json(assinaturas.map(a => ({
+      _id: a._id, empresaId: a.empresa?._id,
+      empresaNome: a.empresa?.nome || '—', empresaCnpj: a.empresa?.cnpj || '—',
+      plano: a.plano, planoNome: nomePlano[a.plano] || a.plano, planoValor: valorPlano[a.plano] || '—',
+      vencimento: a.vencimento, atualizadoEm: a.atualizadoEm
+    })));
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Listar contas bloqueadas/inadimplentes/canceladas
+app.get('/api/admin/contas-bloqueadas', adminSecretMiddleware, async (req, res) => {
+  try {
+    const assinaturas = await Assinatura.find({ status: { $in: ['inadimplente', 'cancelada', 'trial'] } })
+      .populate('empresa', 'nome cnpj criadoEm')
+      .sort({ atualizadoEm: -1 });
+    const nomePlano = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
+    const statusLabel = { inadimplente:'Inadimplente', cancelada:'Cancelada', trial:'Trial' };
+    res.json(assinaturas.map(a => ({
+      _id: a._id, empresaId: a.empresa?._id,
+      empresaNome: a.empresa?.nome || '—', empresaCnpj: a.empresa?.cnpj || '—',
+      plano: a.plano, planoNome: nomePlano[a.plano] || a.plano,
+      status: a.status, statusLabel: statusLabel[a.status] || a.status,
+      vencimento: a.vencimento, atualizadoEm: a.atualizadoEm,
+      diasAtraso: a.status === 'inadimplente' && a.vencimento
+        ? Math.floor((new Date() - new Date(a.vencimento)) / (1000*60*60*24)) : null
+    })));
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Histórico de faturas pagas (todas as empresas)
+app.get('/api/admin/historico-pagamentos', adminSecretMiddleware, async (req, res) => {
+  try {
+    const assinaturas = await Assinatura.find({ 'historicoFaturas.0': { $exists: true } })
+      .populate('empresa', 'nome cnpj')
+      .sort({ atualizadoEm: -1 });
+    const nomePlano = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
+    const valorPlano = { basico: 4900, intermediario: 14900, avancado: 34900, enterprise: 0 };
+    const historico = [];
+    assinaturas.forEach(a => {
+      (a.historicoFaturas || []).forEach(f => {
+        historico.push({
+          empresaId: a.empresa?._id,
+          empresaNome: a.empresa?.nome || '—',
+          empresaCnpj: a.empresa?.cnpj || '—',
+          plano: f.plano, planoNome: nomePlano[f.plano] || f.plano,
+          valor: f.valor || valorPlano[f.plano] || 0,
+          vencimento: f.vencimento, pagoEm: f.pagoEm,
+          confirmadoPor: f.confirmadoPor || 'admin'
+        });
+      });
+    });
+    historico.sort((a, b) => new Date(b.pagoEm) - new Date(a.pagoEm));
+    res.json(historico);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Dashboard — contadores gerais
+app.get('/api/admin/dashboard', adminSecretMiddleware, async (req, res) => {
+  try {
+    const [ativas, inadimplentes, canceladas, trial, pendentes, totalEmpresas] = await Promise.all([
+      Assinatura.countDocuments({ status: 'ativa' }),
+      Assinatura.countDocuments({ status: 'inadimplente' }),
+      Assinatura.countDocuments({ status: 'cancelada' }),
+      Assinatura.countDocuments({ status: 'trial' }),
+      Assinatura.countDocuments({ status: 'aguardando_confirmacao' }),
+      Empresa.countDocuments()
+    ]);
+    // Receita mensal estimada
+    const assinaturasAtivas = await Assinatura.find({ status: 'ativa' }).select('plano');
+    const valorPlano = { basico: 49, intermediario: 149, avancado: 349, enterprise: 0 };
+    const receitaMensal = assinaturasAtivas.reduce((s, a) => s + (valorPlano[a.plano] || 0), 0);
+    res.json({ ativas, inadimplentes, canceladas, trial, pendentes, totalEmpresas, receitaMensal });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Cancelar conta de uma empresa
+app.post('/api/admin/cancelar-conta', adminSecretMiddleware, async (req, res) => {
+  try {
+    const { empresaId, motivo } = req.body;
+    if (!empresaId) return res.status(400).json({ erro: 'empresaId obrigatório.' });
+    await Assinatura.findOneAndUpdate(
+      { empresa: empresaId },
+      { status: 'cancelada', atualizadoEm: new Date() }
+    );
+    await criarNotificacao(
+      empresaId,
+      '❌ Assinatura cancelada',
+      motivo || 'Sua assinatura foi cancelada. Entre em contato com o suporte.',
+      'erro', '❌', '/plano-usuarios'
+    );
+    res.json({ mensagem: 'Conta cancelada com sucesso.' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Marcar conta como inadimplente
+app.post('/api/admin/marcar-inadimplente', adminSecretMiddleware, async (req, res) => {
+  try {
+    const { empresaId } = req.body;
+    if (!empresaId) return res.status(400).json({ erro: 'empresaId obrigatório.' });
+    await Assinatura.findOneAndUpdate(
+      { empresa: empresaId },
+      { status: 'inadimplente', vencimento: new Date(), atualizadoEm: new Date() }
+    );
+    await criarNotificacao(
+      empresaId,
+      '⚠️ Pagamento em atraso',
+      'Identificamos um atraso no pagamento da sua assinatura. Regularize para continuar usando o HOC System.',
+      'aviso', '⚠️', '/plano-usuarios'
+    );
+    res.json({ mensagem: 'Conta marcada como inadimplente.' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Reativar conta (cancelada ou inadimplente → ativa)
+app.post('/api/admin/reativar-conta', adminSecretMiddleware, async (req, res) => {
+  try {
+    const { empresaId } = req.body;
+    if (!empresaId) return res.status(400).json({ erro: 'empresaId obrigatório.' });
+    const vencimento = new Date();
+    vencimento.setDate(vencimento.getDate() + 30);
+    await Assinatura.findOneAndUpdate(
+      { empresa: empresaId },
+      { status: 'ativa', vencimento, atualizadoEm: new Date() }
+    );
+    await criarNotificacao(
+      empresaId,
+      '✅ Assinatura reativada!',
+      'Sua assinatura foi reativada. O acesso completo ao HOC System está liberado.',
+      'sucesso', '✅', '/plano-usuarios'
+    );
+    res.json({ mensagem: 'Conta reativada com sucesso.' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

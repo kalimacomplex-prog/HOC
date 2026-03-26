@@ -88,9 +88,30 @@
     .mestre-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 4px; border-bottom: 1px solid #f0f2f5; }
     /* ===== HISTÓRICO ===== */
     .historico-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
-    /* Bloqueio inadimplente no plano-usuarios */
-    .inadimplente-bloqueado { pointer-events: none !important; opacity: 0.4 !important; user-select: none !important; }
-    .tab-bloqueada { pointer-events: none !important; opacity: 0.4 !important; }
+
+    /* ===== MODAL DE PAGAMENTO ===== */
+    .pag-modal-valor { font-size: 28px; font-weight: 700; color: #2d1b69; text-align: center; margin: 8px 0 20px; }
+    .pag-modal-plano { font-size: 13px; color: #718096; text-align: center; margin-bottom: 20px; }
+    .pag-secao { margin-bottom: 18px; }
+    .pag-secao-titulo { font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f0f2f5; }
+    .pag-pix-box { background: #f5f0ff; border-radius: 10px; padding: 16px; text-align: center; }
+    .pag-pix-chave { font-size: 15px; font-weight: 700; color: #2d1b69; margin: 8px 0; word-break: break-all; }
+    .pag-pix-info { font-size: 11px; color: #718096; }
+    .pag-instrucoes { background: #f8fafc; border-radius: 8px; padding: 14px; }
+    .pag-instrucao-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: #4a5568; margin-bottom: 8px; line-height: 1.5; }
+    .pag-instrucao-item:last-child { margin-bottom: 0; }
+    .pag-instrucao-num { width: 20px; height: 20px; background: #2d1b69; color: white; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .pag-aviso { background: #fffaf0; border: 1px solid #f6e05e; border-radius: 7px; padding: 10px 12px; font-size: 12px; color: #744210; margin-top: 14px; display: flex; gap: 8px; align-items: flex-start; }
+    /* ===== CARD AGUARDANDO CONFIRMAÇÃO ===== */
+    .aguardando-card { background: #fffaf0; border: 2px solid #f6ad55; border-radius: 10px; padding: 20px; margin-bottom: 20px; text-align: center; }
+    .aguardando-icone { font-size: 36px; margin-bottom: 8px; }
+    .aguardando-titulo { font-size: 16px; font-weight: 700; color: #744210; margin-bottom: 6px; }
+    .aguardando-sub { font-size: 12px; color: #c05621; margin-bottom: 14px; line-height: 1.5; }
+    .aguardando-acoes { display: flex; gap: 10px; justify-content: center; }
+    .btn-confirmar-pag { padding: 10px 20px; background: #38a169; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .btn-confirmar-pag:hover { background: #276749; }
+    .btn-cancelar-sol { padding: 10px 16px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
     @media (max-width: 900px) { .planos-grid { grid-template-columns: repeat(2,1fr); } .status-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 600px) { .planos-grid { grid-template-columns: 1fr; } .status-grid { grid-template-columns: 1fr; } }
   </style>
@@ -280,16 +301,60 @@
   </div>
 </div>
 
+<!-- Modal de Pagamento Manual -->
+<div class="modal-overlay" id="modalPagamento">
+  <div class="modal" style="max-width:500px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <span class="modal-titulo">💳 Instruções de Pagamento</span>
+      <button class="btn-fechar" onclick="fecharModal('modalPagamento')">×</button>
+    </div>
+    <div class="pag-modal-plano" id="pagModalPlanoNome">Plano Intermediário</div>
+    <div class="pag-modal-valor" id="pagModalValor">R$ 149,00/mês</div>
+
+    <div class="pag-secao">
+      <div class="pag-secao-titulo">Pagamento via PIX</div>
+      <div class="pag-pix-box">
+        <div class="pag-pix-info">Chave PIX</div>
+        <div class="pag-pix-chave" id="pagPixChave">Carregando...</div>
+        <div class="pag-pix-info" id="pagPixInfo">Carregando dados...</div>
+        <button class="btn-copiar" style="margin-top:10px" onclick="copiarChavePix()">📋 Copiar Chave PIX</button>
+      </div>
+    </div>
+
+    <div class="pag-secao">
+      <div class="pag-secao-titulo">Como pagar</div>
+      <div class="pag-instrucoes">
+        <div class="pag-instrucao-item"><div class="pag-instrucao-num">1</div><span>Abra o aplicativo do seu banco e acesse a opção <strong>PIX</strong></span></div>
+        <div class="pag-instrucao-item"><div class="pag-instrucao-num">2</div><span>Escolha <strong>Pagar com Chave PIX</strong> e cole ou digite a chave acima</span></div>
+        <div class="pag-instrucao-item"><div class="pag-instrucao-num">3</div><span>Informe o valor exato do plano e confirme o pagamento</span></div>
+        <div class="pag-instrucao-item"><div class="pag-instrucao-num">4</div><span>Clique em <strong>"Já realizei o pagamento"</strong> abaixo para notificar o administrador</span></div>
+      </div>
+    </div>
+
+    <div class="pag-aviso">
+      ⚠️ <span>Após clicar em "Já realizei o pagamento", seu acesso ficará em <strong>análise</strong> até que o administrador confirme o recebimento. Isso pode levar até 1 dia útil.</span>
+    </div>
+
+    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-top:12px;display:none" id="pagErro"></div>
+    <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-top:12px;display:none" id="pagSucesso"></div>
+
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn-cancelar" onclick="fecharModal('modalPagamento')">Cancelar</button>
+      <button class="btn-confirmar" id="btnJaPaguei" onclick="solicitarPlano()">✓ Já realizei o pagamento</button>
+    </div>
+  </div>
+</div>
+
 <!-- Overlay de bloqueio -->
 <div class="bloqueio-overlay" id="bloqueioOverlay">
-  <div class="bloqueio-card" style="position:relative">
-    <button onclick="fecharOverlayInadimplente()" style="position:absolute;top:12px;right:14px;background:none;border:none;font-size:20px;color:#a0aec0;cursor:pointer;line-height:1" title="Fechar">×</button>
+  <div class="bloqueio-card">
+    <button class="bloqueio-fechar" onclick="fecharOverlayInadimplente()" title="Fechar e ir para Assinatura">×</button>
     <div class="bloqueio-icone">🔒</div>
     <div class="bloqueio-titulo">Acesso suspenso</div>
     <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
     <div class="bloqueio-dias" id="bloqueioDias"></div>
     <div class="bloqueio-acoes" id="bloqueioAcoes"></div>
-    <div class="bloqueio-link" style="margin-top:10px;font-size:12px;color:#a0aec0">Ao fechar, apenas a aba Assinatura permanece disponível.</div>
+    <div class="bloqueio-aviso-parcial">Ao fechar, apenas a aba <strong>Assinatura</strong> permanece disponível.<br>As demais funções ficam bloqueadas até a regularização.</div>
   </div>
 </div>
 
@@ -582,12 +647,13 @@
   function renderizarStatusAssinatura() {
     if (!assinaturaAtual) return;
     const { status, plano, vencimento, trialFim, diasTrialRestantes, diasAtraso } = assinaturaAtual;
-    const statusLabel = { trial:'Período de Teste', ativa:'Ativa', inadimplente:'Inadimplente', cancelada:'Cancelada' };
-    const statusPill  = { trial:'pill-trial', ativa:'pill-ativa', inadimplente:'pill-inadimplente', cancelada:'pill-trial' };
+    const statusLabel = { trial:'Período de Teste', ativa:'Ativa', inadimplente:'Inadimplente', cancelada:'Cancelada', aguardando_confirmacao:'Aguardando Confirmação' };
+    const statusPill  = { trial:'pill-trial', ativa:'pill-ativa', inadimplente:'pill-inadimplente', cancelada:'pill-trial', aguardando_confirmacao:'pill-trial' };
     document.getElementById('statusValor').innerHTML = `<span class="status-pill ${statusPill[status]||'pill-trial'}">${statusLabel[status]||status}</span>`;
     document.getElementById('statusSub').textContent =
       status === 'trial' ? `${diasTrialRestantes} dia(s) restante(s)` :
-      status === 'inadimplente' ? `${diasAtraso} dia(s) em atraso` : '';
+      status === 'inadimplente' ? `${diasAtraso} dia(s) em atraso` :
+      status === 'aguardando_confirmacao' ? `Plano ${NOME_PLANO[assinaturaAtual?.planoSolicitado]} solicitado` : '';
     document.getElementById('planoValor').textContent = NOME_PLANO[plano] || '—';
     document.getElementById('planoSub').textContent = PRECO_PLANO[plano] || '';
     const dataFim = vencimento || trialFim;
@@ -598,14 +664,22 @@
   function renderizarPlanos() {
     const planoAtual = assinaturaAtual?.plano;
     const status = assinaturaAtual?.status;
+    const isAguardando = status === 'aguardando_confirmacao';
     const grid = document.getElementById('planosGrid');
     grid.innerHTML = PLANOS.map(p => {
-      const isAtivo = planoAtual === p.id && (status === 'ativa' || status === 'inadimplente');
+      const isAtivo = planoAtual === p.id && status === 'ativa';
       const cardClass = 'plano-card' + (p.popular ? ' popular' : '') + (isAtivo ? ' ativo' : '');
       const badge = isAtivo ? '<div class="ativo-badge">✓ Plano Atual</div>' : p.popular ? '<div class="popular-badge">Mais Popular</div>' : '';
-      const btnClass = 'btn-plano ' + (isAtivo ? 'ativo-btn' : p.enterprise ? 'comercial' : p.popular ? 'primario' : 'secundario');
-      const btnTexto = isAtivo ? '✓ Plano Atual' : p.enterprise ? 'Falar com Comercial' : 'Selecionar Plano';
-      const onclick = isAtivo ? '' : p.enterprise ? `onclick="alert('Entre em contato: comercial@hoc.com.br')"` : `onclick="ativarPlano('${p.id}')"`;
+      const btnClass = 'btn-plano ' + (isAtivo ? 'ativo-btn' :
+      (isAguardando && planoAtual === p.id) ? 'secundario' :
+      p.enterprise ? 'comercial' : p.popular ? 'primario' : 'secundario');
+      const btnTexto = isAtivo ? '✓ Plano Atual' :
+      (isAguardando && planoAtual === p.id) ? '⏳ Aguardando confirmação' :
+      p.enterprise ? 'Falar com Comercial' : 'Selecionar Plano';
+      const onclick = isAtivo ? '' :
+      isAguardando ? `onclick="alert('Pagamento em análise. Aguarde a confirmação do administrador.')"` :
+      p.enterprise ? `onclick="alert('Entre em contato: comercial@hoc.com.br')"` :
+      `onclick="abrirModalPagamento('${p.id}')"`;
       return `<div class="${cardClass}">
         ${badge}
         <div class="plano-nome">${p.nome}</div>
@@ -619,26 +693,56 @@
 
   function renderizarFatura() {
     if (!assinaturaAtual) return;
-    const { status, plano, vencimento, coraBoletoUrl, coraPixCopiaECola } = assinaturaAtual;
+    const { status, plano, planoSolicitado, solicitadoPor, solicitadoEm, vencimento, coraBoletoUrl, coraPixCopiaECola } = assinaturaAtual;
+    const isAdmin = usuario.perfil === 'Admin';
+
+    // Card de aguardando confirmação
+    const faturaSection = document.getElementById('faturaSection');
+    if (status === 'aguardando_confirmacao') {
+      faturaSection.style.display = 'block';
+      const nomePlanoSol = NOME_PLANO[planoSolicitado] || planoSolicitado;
+      const valorPlanoSol = VALOR_PLANO[planoSolicitado] || '—';
+      const dataHora = solicitadoEm ? new Date(solicitadoEm).toLocaleString('pt-BR') : '—';
+      document.getElementById('faturaSection').innerHTML = `
+        <div class="aguardando-card">
+          <div class="aguardando-icone">⏳</div>
+          <div class="aguardando-titulo">Pagamento aguardando confirmação</div>
+          <div class="aguardando-sub">
+            <strong>${solicitadoPor || 'Usuário'}</strong> solicitou o <strong>Plano ${nomePlanoSol} (${valorPlanoSol}/mês)</strong><br>
+            em ${dataHora}
+          </div>
+          ${isAdmin ? `
+          <div class="aguardando-acoes">
+            <button class="btn-confirmar-pag" onclick="confirmarPagamento()">✅ Confirmar Pagamento e Liberar Acesso</button>
+            <button class="btn-cancelar-sol" onclick="cancelarSolicitacao()">✕ Cancelar Solicitação</button>
+          </div>` : `<p style="font-size:12px;color:#718096">Aguarde o administrador confirmar o pagamento.</p>`}
+        </div>`;
+      return;
+    }
+
     if (status !== 'ativa' && status !== 'inadimplente') return;
-    document.getElementById('faturaSection').style.display = 'block';
-    document.getElementById('faturaPlano').textContent = NOME_PLANO[plano] || plano;
-    document.getElementById('faturaValor').textContent = VALOR_PLANO[plano] || '—';
-    document.getElementById('faturaVencimento').textContent = vencimento ? new Date(vencimento).toLocaleDateString('pt-BR') : '—';
-    const acoes = document.getElementById('faturaAcoes');
-    acoes.innerHTML = '';
-    if (coraPixCopiaECola) {
-      acoes.innerHTML += `<div class="pix-box">
-        <div class="pix-titulo">📱 PIX Copia e Cola</div>
-        <div class="pix-code">${coraPixCopiaECola}</div>
-        <button class="btn-copiar" onclick="copiarPix('${coraPixCopiaECola}')">📋 Copiar código</button>
+    faturaSection.style.display = 'block';
+    faturaSection.innerHTML = `
+      <div class="fatura-card">
+        <div class="fatura-header">
+          <span class="fatura-titulo">💳 Fatura Atual</span>
+          <span id="faturaStatusBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#fffaf0;color:#c05621">Pendente</span>
+        </div>
+        <div class="fatura-grid">
+          <div class="fatura-item"><label>Plano</label><span>${NOME_PLANO[plano] || plano}</span></div>
+          <div class="fatura-item"><label>Valor</label><span>${VALOR_PLANO[plano] || '—'}</span></div>
+          <div class="fatura-item"><label>Vencimento</label><span>${vencimento ? new Date(vencimento).toLocaleDateString('pt-BR') : '—'}</span></div>
+        </div>
+        <div id="faturaAcoes"></div>
       </div>`;
-    }
-    if (coraBoletoUrl) {
-      acoes.innerHTML += `<a href="${coraBoletoUrl}" target="_blank" class="btn-boleto" style="margin-top:8px;display:inline-block">🧾 Abrir Boleto</a>`;
-    }
-    if (!coraPixCopiaECola && !coraBoletoUrl) {
-      acoes.innerHTML = `<p style="font-size:12px;color:#718096;margin-top:8px">Nenhuma instrução de pagamento disponível no momento.</p>`;
+    const acoes = document.getElementById('faturaAcoes');
+    if (acoes) {
+      if (coraPixCopiaECola) {
+        acoes.innerHTML += `<div class="pix-box"><div class="pix-titulo">📱 PIX Copia e Cola</div><div class="pix-code">${coraPixCopiaECola}</div><button class="btn-copiar" onclick="copiarPix('${coraPixCopiaECola}')">📋 Copiar código</button></div>`;
+      }
+      if (coraBoletoUrl) {
+        acoes.innerHTML += `<a href="${coraBoletoUrl}" target="_blank" class="btn-boleto" style="margin-top:8px;display:inline-block">🧾 Abrir Boleto</a>`;
+      }
     }
   }
 
@@ -654,13 +758,76 @@
       </tr>`).join('');
   }
 
-  async function ativarPlano(plano) {
-    if (!confirm(`Ativar o Plano ${NOME_PLANO[plano]}?`)) return;
+  // Plano sendo solicitado no momento
+  let _planoSolicitando = null;
+
+  function abrirModalPagamento(plano) {
+    _planoSolicitando = plano;
+    // Preencher dados do modal
+    document.getElementById('pagModalPlanoNome').textContent = `Plano ${NOME_PLANO[plano]}`;
+    document.getElementById('pagModalValor').textContent = VALOR_PLANO[plano] + '/mês';
+    // PIX vem da assinatura já carregada
+    const pixChave = assinaturaAtual?.pixChave || 'Não configurado';
+    const pixNome = assinaturaAtual?.pixNome || '';
+    const pixBanco = assinaturaAtual?.pixBanco || '';
+    document.getElementById('pagPixChave').textContent = pixChave;
+    document.getElementById('pagPixInfo').textContent = pixNome && pixBanco ? `${pixNome} — ${pixBanco}` : pixNome || '';
+    document.getElementById('pagErro').style.display = 'none';
+    document.getElementById('pagSucesso').style.display = 'none';
+    document.getElementById('btnJaPaguei').disabled = false;
+    document.getElementById('btnJaPaguei').textContent = '✓ Já realizei o pagamento';
+    document.getElementById('modalPagamento').classList.add('aberto');
+  }
+
+  function copiarChavePix() {
+    const chave = document.getElementById('pagPixChave').textContent;
+    copiarPix(chave);
+  }
+
+  async function solicitarPlano() {
+    if (!_planoSolicitando) return;
+    const btn = document.getElementById('btnJaPaguei');
+    const erro = document.getElementById('pagErro');
+    const sucesso = document.getElementById('pagSucesso');
+    erro.style.display = 'none';
+    sucesso.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
     try {
-      const res = await fetch('/api/assinatura/ativar', { method: 'POST', headers: HEADERS, body: JSON.stringify({ plano }) });
+      const res = await fetch('/api/assinatura/solicitar', {
+        method: 'POST', headers: HEADERS,
+        body: JSON.stringify({ plano: _planoSolicitando })
+      });
       const data = await res.json();
-      if (!res.ok) { alert(data.erro || 'Erro ao ativar plano.'); return; }
-      alert('Plano ativado com sucesso!');
+      if (!res.ok) { erro.textContent = data.erro || 'Erro ao registrar solicitação.'; erro.style.display = 'block'; return; }
+      sucesso.textContent = 'Solicitação registrada! O administrador será notificado para confirmar o pagamento.';
+      sucesso.style.display = 'block';
+      btn.textContent = '✓ Enviado!';
+      setTimeout(async () => {
+        fecharModal('modalPagamento');
+        await carregarAssinatura();
+      }, 2500);
+    } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
+    finally { if (btn.textContent === 'Enviando...') { btn.disabled = false; btn.textContent = '✓ Já realizei o pagamento'; } }
+  }
+
+  async function confirmarPagamento() {
+    if (!confirm('Confirmar o pagamento e liberar o acesso do cliente?')) return;
+    try {
+      const res = await fetch('/api/assinatura/confirmar', { method: 'POST', headers: HEADERS });
+      const data = await res.json();
+      if (!res.ok) { alert(data.erro || 'Erro ao confirmar.'); return; }
+      alert(data.mensagem || 'Pagamento confirmado! Acesso liberado.');
+      await carregarAssinatura();
+    } catch(err) { alert('Erro de conexão.'); }
+  }
+
+  async function cancelarSolicitacao() {
+    if (!confirm('Cancelar esta solicitação de pagamento?')) return;
+    try {
+      const res = await fetch('/api/assinatura/cancelar-solicitacao', { method: 'POST', headers: HEADERS });
+      const data = await res.json();
+      if (!res.ok) { alert(data.erro || 'Erro ao cancelar.'); return; }
       await carregarAssinatura();
     } catch(err) { alert('Erro de conexão.'); }
   }
@@ -822,7 +989,7 @@
 
   function aplicarBloqueioParcial() {
     if (!window._sistemaInadimplente) return;
-    // Bloquear aba Usuários
+    // Bloquear aba Usuários (tab button)
     const tabUsuarios = document.querySelectorAll('.tab')[0];
     if (tabUsuarios) tabUsuarios.classList.add('tab-bloqueada');
     // Bloquear conteúdo da aba usuários
@@ -830,33 +997,38 @@
     if (tabContent) tabContent.classList.add('inadimplente-bloqueado');
     // Bloquear menu lateral exceto Plano e Usuários
     document.querySelectorAll('.menu-item').forEach(item => {
-      if (!item.href || item.href.includes('plano-usuarios')) return;
-      item.style.pointerEvents = 'none';
-      item.style.opacity = '0.4';
+      if (item.href && item.href.includes('plano-usuarios')) return;
+      item.classList.add('menu-inadimplente-bloqueado');
     });
-    // Mostrar aviso no topo do conteúdo de assinatura
+    // Mostrar aviso no topo da aba assinatura
     const tabAssinatura = document.getElementById('tab-assinatura');
     if (tabAssinatura && !document.getElementById('avisoInadimplente')) {
       const aviso = document.createElement('div');
       aviso.id = 'avisoInadimplente';
-      aviso.style.cssText = 'background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px';
-      aviso.innerHTML = '⚠️ Sistema bloqueado por inadimplência. Regularize sua assinatura para restaurar o acesso completo.';
+      aviso.className = 'aviso-inadimplente';
+      aviso.innerHTML = '⚠️ Sistema bloqueado por inadimplência. Regularize sua assinatura abaixo para restaurar o acesso completo.';
       tabAssinatura.insertBefore(aviso, tabAssinatura.firstChild);
     }
   }
 
   function liberarInterface() {
-    // Liberar tudo quando não for mais inadimplente
+    window._sistemaInadimplente = false;
+    // Liberar aba Usuários
     const tabUsuarios = document.querySelectorAll('.tab')[0];
     if (tabUsuarios) tabUsuarios.classList.remove('tab-bloqueada');
+    // Liberar conteúdo
     const tabContent = document.getElementById('tab-usuarios');
     if (tabContent) tabContent.classList.remove('inadimplente-bloqueado');
+    // Liberar menu lateral
     document.querySelectorAll('.menu-item').forEach(item => {
-      item.style.pointerEvents = '';
-      item.style.opacity = '';
+      item.classList.remove('menu-inadimplente-bloqueado');
     });
+    // Remover aviso
     const aviso = document.getElementById('avisoInadimplente');
     if (aviso) aviso.remove();
+    // Fechar overlay se ainda estiver aberto
+    const overlay = document.getElementById('bloqueioOverlay');
+    if (overlay) overlay.classList.remove('ativo');
   }
 
   function copiarPixBloqueio(codigo) { copiarPix(codigo); }

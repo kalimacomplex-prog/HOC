@@ -65,10 +65,14 @@ const Empresa = mongoose.model('Empresa', empresaSchema);
 const assinaturaSchema = new mongoose.Schema({
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true, unique: true },
   plano: { type: String, default: 'basico', enum: ['basico', 'intermediario', 'avancado', 'enterprise'] },
-  status: { type: String, default: 'trial', enum: ['trial', 'ativa', 'inadimplente', 'cancelada'] },
+  status: { type: String, default: 'trial', enum: ['trial', 'ativa', 'inadimplente', 'cancelada', 'aguardando_confirmacao'] },
   trialFim: { type: Date },
   vencimento: { type: Date },
   diasCarencia: { type: Number, default: 1 },
+  // Plano solicitado aguardando confirmação de pagamento
+  planoSolicitado: { type: String, default: null },
+  solicitadoEm: { type: Date, default: null },
+  solicitadoPor: { type: String, default: null }, // nome do usuário que solicitou
   coraCobrancaId: { type: String, default: null },
   coraBoletoUrl: { type: String, default: null },
   coraPixQrCode: { type: String, default: null },
@@ -626,31 +630,149 @@ app.get('/api/assinatura', authMiddleware, async (req, res) => {
     const diasAtraso = (assinatura.status === 'inadimplente' && assinatura.vencimento)
       ? Math.floor((agora - new Date(assinatura.vencimento)) / (1000 * 60 * 60 * 24))
       : null;
-    res.json({ ...assinatura.toObject(), diasTrialRestantes, diasAtraso });
+    res.json({
+      ...assinatura.toObject(),
+      diasTrialRestantes,
+      diasAtraso,
+      // Inclui dados de PIX configurados por variável de ambiente
+      pixChave: process.env.PIX_CHAVE || null,
+      pixNome: process.env.PIX_NOME || null,
+      pixBanco: process.env.PIX_BANCO || null,
+    });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// Ativar/trocar plano (sem gateway por enquanto)
-app.post('/api/assinatura/ativar', authMiddleware, async (req, res) => {
+// Solicitar plano — registra pedido, aguarda confirmação manual do Admin
+app.post('/api/assinatura/solicitar', authMiddleware, async (req, res) => {
   try {
     const { plano } = req.body;
     const planosValidos = ['basico', 'intermediario', 'avancado', 'enterprise'];
     if (!planosValidos.includes(plano)) return res.status(400).json({ erro: 'Plano inválido' });
 
-    const vencimento = new Date();
-    vencimento.setDate(vencimento.getDate() + 30);
+    const usuarioReq = await Usuario.findById(req.usuario.id).select('nome email');
+    if (!usuarioReq) return res.status(404).json({ erro: 'Usuário não encontrado' });
 
     let assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
-    const updateData = { plano, status: 'ativa', vencimento, atualizadoEm: new Date() };
+    const updateData = {
+      planoSolicitado: plano,
+      solicitadoEm: new Date(),
+      solicitadoPor: usuarioReq.nome,
+      status: 'aguardando_confirmacao',
+      atualizadoEm: new Date()
+    };
 
     if (assinatura) {
-      assinatura = await Assinatura.findOneAndUpdate({ empresa: req.usuario.empresa }, updateData, { new: true });
+      assinatura = await Assinatura.findOneAndUpdate(
+        { empresa: req.usuario.empresa }, updateData, { new: true }
+      );
     } else {
       assinatura = await Assinatura.create({ empresa: req.usuario.empresa, ...updateData });
     }
 
-    await criarNotificacao(req.usuario.empresa, `Plano ${plano} ativado! ✅`, 'Sua assinatura foi ativada com sucesso.', 'sucesso', '💳', '/plano-usuarios');
-    res.json({ mensagem: 'Plano ativado com sucesso!', assinatura });
+    // Notificar o Admin da empresa
+    const nomePlano = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
+    await criarNotificacao(
+      req.usuario.empresa,
+      `💳 Pagamento aguardando confirmação`,
+      `${usuarioReq.nome} solicitou o Plano ${nomePlano[plano]}. Confirme o pagamento para liberar o acesso.`,
+      'aviso', '💳', '/plano-usuarios'
+    );
+
+    // Enviar email para o admin da empresa
+    try {
+      const admin = await Usuario.findOne({ empresa: req.usuario.empresa, perfil: 'Admin' }).select('email nome');
+      if (admin) {
+        await enviarEmail(
+          admin.email,
+          `💳 HOC System — Pagamento aguardando confirmação`,
+          `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px">
+            <h2 style="color:#2d1b69">Pagamento aguardando confirmação</h2>
+            <p>${usuarioReq.nome} realizou o pagamento e solicitou a ativação do <strong>Plano ${nomePlano[plano]}</strong>.</p>
+            <p style="margin-top:16px">Acesse o HOC System e confirme o pagamento para liberar o acesso.</p>
+            <a href="${process.env.APP_URL}/plano-usuarios" style="display:inline-block;margin-top:20px;padding:12px 24px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Confirmar Pagamento</a>
+            <p style="margin-top:24px;font-size:12px;color:#a0aec0">Solicitado em: ${new Date().toLocaleString('pt-BR')}</p>
+          </div>`
+        );
+      }
+    } catch(emailErr) { console.error('Erro ao enviar email admin:', emailErr); }
+
+    res.json({ mensagem: 'Solicitação registrada! Aguarde a confirmação do administrador.', assinatura });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Confirmar pagamento — apenas Admin libera o acesso
+app.post('/api/assinatura/confirmar', authMiddleware, async (req, res) => {
+  try {
+    // Apenas Admin pode confirmar
+    if (req.usuario.perfil !== 'Admin') {
+      return res.status(403).json({ erro: 'Apenas administradores podem confirmar pagamentos.' });
+    }
+
+    let assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
+    if (!assinatura) return res.status(404).json({ erro: 'Assinatura não encontrada' });
+    if (assinatura.status !== 'aguardando_confirmacao') {
+      return res.status(400).json({ erro: 'Nenhuma solicitação pendente encontrada.' });
+    }
+
+    const plano = assinatura.planoSolicitado || assinatura.plano;
+    const vencimento = new Date();
+    vencimento.setDate(vencimento.getDate() + 30);
+
+    // Registrar no histórico
+    const nomePlano = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
+    const valorPlano = { basico: 4900, intermediario: 14900, avancado: 34900, enterprise: 0 };
+    const novaFatura = {
+      plano,
+      valor: valorPlano[plano],
+      vencimento,
+      pagoEm: new Date(),
+      confirmadoPor: req.usuario.id
+    };
+
+    assinatura = await Assinatura.findOneAndUpdate(
+      { empresa: req.usuario.empresa },
+      {
+        plano,
+        status: 'ativa',
+        vencimento,
+        planoSolicitado: null,
+        solicitadoEm: null,
+        solicitadoPor: null,
+        atualizadoEm: new Date(),
+        $push: { historicoFaturas: novaFatura }
+      },
+      { new: true }
+    );
+
+    // Notificar todos os usuários da empresa
+    await criarNotificacao(
+      req.usuario.empresa,
+      `✅ Plano ${nomePlano[plano]} ativado!`,
+      'Seu pagamento foi confirmado. O acesso completo ao HOC System está liberado.',
+      'sucesso', '✅', '/plano-usuarios'
+    );
+
+    res.json({ mensagem: `Plano ${nomePlano[plano]} confirmado e ativado com sucesso!`, assinatura });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Cancelar solicitação pendente
+app.post('/api/assinatura/cancelar-solicitacao', authMiddleware, async (req, res) => {
+  try {
+    if (req.usuario.perfil !== 'Admin') {
+      return res.status(403).json({ erro: 'Apenas administradores podem cancelar solicitações.' });
+    }
+    const assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
+    if (!assinatura || assinatura.status !== 'aguardando_confirmacao') {
+      return res.status(400).json({ erro: 'Nenhuma solicitação pendente.' });
+    }
+    // Volta ao status anterior (trial se nunca foi ativa, inadimplente se havia plano)
+    const statusAnterior = assinatura.plano && assinatura.vencimento ? 'inadimplente' : 'trial';
+    await Assinatura.findOneAndUpdate(
+      { empresa: req.usuario.empresa },
+      { status: statusAnterior, planoSolicitado: null, solicitadoEm: null, solicitadoPor: null, atualizadoEm: new Date() }
+    );
+    res.json({ mensagem: 'Solicitação cancelada.' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

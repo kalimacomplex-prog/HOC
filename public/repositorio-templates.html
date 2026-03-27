@@ -585,10 +585,19 @@
 
   function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
   document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
-  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href = '/'; }
 
   renderFiltros();
   renderTemplates();
+
+  function fecharBanner() {
+    const banner = document.getElementById('bannerAssinatura');
+    if (banner) {
+      banner.style.display = 'none';
+      document.querySelector('.main').classList.remove('banner-visivel');
+    }
+    sessionStorage.setItem('bannerFechado', '1');
+  }
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
@@ -685,24 +694,33 @@
   const banner = document.getElementById('bannerAssinatura');
   if (!overlay) return;
 
-  // Mostrar banner de trial
   if (banner) {
-    if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
-      const expirando = assinatura.diasTrialRestantes <= 5;
-      banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
-      banner.innerHTML = `
-        <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
-        <a href="/plano-usuarios" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>`;
-      banner.style.display = 'flex';
-    } else if (assinatura.status === 'inadimplente') {
-      banner.className = 'banner-assinatura inadimplente';
-      banner.innerHTML = `
-        <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
-        <a href="/plano-usuarios" class="banner-assinatura-btn inadimplente">Pagar agora</a>`;
-      banner.style.display = 'flex';
-    } else {
+    if (sessionStorage.getItem('bannerFechado') === '1') {
       banner.style.display = 'none';
-    }
+      document.querySelector('.main').classList.remove('banner-visivel');
+    } else {
+      if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
+        const expirando = assinatura.diasTrialRestantes <= 5;
+        banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
+        banner.innerHTML = `
+          <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
+          <a href="/plano-usuarios" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>
+          <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
+        banner.style.display = 'flex';
+        document.querySelector('.main').classList.add('banner-visivel');
+      } else if (assinatura.status === 'inadimplente') {
+        banner.className = 'banner-assinatura inadimplente';
+        banner.innerHTML = `
+          <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
+          <a href="/plano-usuarios" class="banner-assinatura-btn inadimplente">Pagar agora</a>
+          <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
+        banner.style.display = 'flex';
+        document.querySelector('.main').classList.add('banner-visivel');
+      } else {
+        banner.style.display = 'none';
+        document.querySelector('.main').classList.remove('banner-visivel');
+      }
+    } // fecha if bannerFechado
   }
 
   // Mostrar overlay de bloqueio

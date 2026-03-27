@@ -56,7 +56,7 @@ mongoose.connect(process.env.MONGO_URI)
 // ==================== MODELS ====================
 
 const empresaSchema = new mongoose.Schema({
-  nome: { type: String, required: true, unique: true },
+  nome: { type: String, required: true },
   cnpj: { type: String, required: true, unique: true },
   criadoEm: { type: Date, default: Date.now }
 });
@@ -475,10 +475,11 @@ app.post('/api/cadastro', async (req, res) => {
     if (!validarCNPJ(cnpjLimpo)) return res.status(400).json({ erro: 'CNPJ inválido.' });
     const emailExiste = await Usuario.findOne({ email });
     if (emailExiste) return res.status(400).json({ erro: 'Email já cadastrado' });
+    // CNPJ deve ser único — impede duplicidade independente do nome
     const cnpjExiste = await Empresa.findOne({ cnpj: cnpjLimpo });
-    if (cnpjExiste) return res.status(400).json({ erro: 'Essa empresa já possui cadastro. Entre em contato com o administrador.' });
-    const nomeExiste = await Empresa.findOne({ nome: { $regex: new RegExp(`^${nomeEmpresa.trim()}$`, 'i') } });
-    if (nomeExiste) return res.status(400).json({ erro: 'Essa empresa já possui cadastro. Entre em contato com o administrador.' });
+    if (cnpjExiste) return res.status(400).json({ erro: 'CNPJ já cadastrado. Entre em contato com o administrador.' });
+    // Nome igual + CNPJ igual = duplicata (já bloqueado acima)
+    // Nome igual + CNPJ diferente = permitido (empresas com nome fantasia igual)
 
     const empresa = await Empresa.create({ nome: nomeEmpresa.trim(), cnpj: cnpjLimpo });
 

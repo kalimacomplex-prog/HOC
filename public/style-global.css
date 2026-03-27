@@ -141,7 +141,7 @@ input:focus, select:focus, textarea:focus { border-color: #2d1b69; }
 .empty-icon { font-size: 40px; margin-bottom: 12px; }
 
 /* ===== BANNER DE ASSINATURA ===== */
-.banner-assinatura { padding: 11px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 500; position: sticky; top: 57px; z-index: 49; }
+.banner-assinatura { padding: 11px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; font-weight: 500; position: sticky; top: 57px; z-index: 51; }
 .banner-assinatura.trial { background: linear-gradient(135deg, #2d1b69, #4a2e9e); color: white; }
 .banner-assinatura.inadimplente { background: linear-gradient(135deg, #c53030, #e53e3e); color: white; animation: pulse-banner 3s infinite; }
 .banner-assinatura.trial-expirando { background: linear-gradient(135deg, #c05621, #dd6b20); color: white; }

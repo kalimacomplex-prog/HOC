@@ -39,7 +39,7 @@ function validarCNPJ(cnpj) {
 // ==================== ASAAS HELPER ====================
 
 const ASAAS_BASE_URL = process.env.ASAAS_ENV === 'production'
-  ? 'https://api.asaas.com/v3'
+  ? 'https://api.asaas.com/api/v3'
   : 'https://sandbox.asaas.com/api/v3';
 
 async function asaasRequest(method, endpoint, body = null) {
@@ -115,6 +115,7 @@ const assinaturaSchema = new mongoose.Schema({
   asaasBoletoUrl: { type: String, default: null },
   asaasBoletoLinhaDigitavel: { type: String, default: null },
   asaasFormaPagamento: { type: String, default: null },
+  asaasPixQrCodeBase64: { type: String, default: null },
   // ========================
   historicoFaturas: { type: Array, default: [] },
   criadoEm: { type: Date, default: Date.now },
@@ -577,6 +578,7 @@ app.get('/api/assinatura', authMiddleware, async (req, res) => {
       ...assinatura.toObject(),
       diasTrialRestantes, diasAtraso,
       pixCopiaECola: assinatura.asaasPixCopiaECola || assinatura.coraPixCopiaECola || null,
+      pixQrCodeBase64: assinatura.asaasPixQrCodeBase64 || null,
       boletoUrl: assinatura.asaasBoletoUrl || assinatura.coraBoletoUrl || null,
       boletoLinhaDigitavel: assinatura.asaasBoletoLinhaDigitavel || null,
       pixChave: process.env.PIX_CHAVE || null,
@@ -640,7 +642,11 @@ app.post('/api/assinatura/checkout', authMiddleware, async (req, res) => {
         const cobranca = cobranças.data[0];
         cobrancaId = cobranca.id;
         if (formaPagamento === 'PIX') {
-          try { const pixData = await asaasRequest('GET', `/payments/${cobranca.id}/pixQrCode`); pixCopiaECola = pixData.payload || null; } catch (e) { console.log('Erro PIX:', e.message); }
+          try {
+            const pixData = await asaasRequest('GET', `/payments/${cobranca.id}/pixQrCode`);
+            pixCopiaECola = pixData.payload || null;
+            updateData.asaasPixQrCodeBase64 = pixData.encodedImage || null;
+          } catch (e) { console.log('Erro PIX:', e.message); }
         }
         if (formaPagamento === 'BOLETO') {
           boletoUrl = cobranca.bankSlipUrl || null;
@@ -655,6 +661,7 @@ app.post('/api/assinatura/checkout', authMiddleware, async (req, res) => {
       asaasAssinaturaId: novaAssinaturaAsaas.id, asaasCobrancaId: cobrancaId,
       asaasPixCopiaECola: pixCopiaECola, asaasBoletoUrl: boletoUrl,
       asaasBoletoLinhaDigitavel: boletoLinhaDigitavel, asaasFormaPagamento: formaPagamento,
+      asaasPixQrCodeBase64: updateData.asaasPixQrCodeBase64 || null,
       atualizadoEm: new Date()
     };
 
@@ -663,7 +670,7 @@ app.post('/api/assinatura/checkout', authMiddleware, async (req, res) => {
 
     await criarNotificacao(req.usuario.empresa, `💳 Cobrança gerada — Plano ${NOME_PLANO[plano]}`, `Cobrança gerada via ${formaPagamento}. Aguardando pagamento.`, 'aviso', '💳', '/plano-usuarios');
 
-    res.json({ mensagem: 'Checkout iniciado! Realize o pagamento para ativar o plano.', formaPagamento, plano, pixCopiaECola, boletoUrl, boletoLinhaDigitavel, asaasAssinaturaId: novaAssinaturaAsaas.id, cobrancaId });
+    res.json({ mensagem: 'Checkout iniciado! Realize o pagamento para ativar o plano.', formaPagamento, plano, pixCopiaECola, pixQrCodeBase64: updateData.asaasPixQrCodeBase64 || null, boletoUrl, boletoLinhaDigitavel, asaasAssinaturaId: novaAssinaturaAsaas.id, cobrancaId });
   } catch (err) { console.error('Erro checkout Asaas:', err); res.status(500).json({ erro: err.message || 'Erro ao processar checkout.' }); }
 });
 
@@ -683,7 +690,7 @@ app.get('/api/assinatura/cobranca-ativa', authMiddleware, async (req, res) => {
       boletoUrl = cobranca.bankSlipUrl || null;
       if (boletoUrl) await Assinatura.findOneAndUpdate({ empresa: req.usuario.empresa }, { asaasBoletoUrl: boletoUrl });
     }
-    res.json({ status: cobranca.status, value: cobranca.value, dueDate: cobranca.dueDate, pixCopiaECola, boletoUrl, boletoLinhaDigitavel: assinatura.asaasBoletoLinhaDigitavel, formaPagamento: assinatura.asaasFormaPagamento });
+    res.json({ status: cobranca.status, value: cobranca.value, dueDate: cobranca.dueDate, pixCopiaECola, pixQrCodeBase64: assinatura.asaasPixQrCodeBase64 || null, boletoUrl, boletoLinhaDigitavel: assinatura.asaasBoletoLinhaDigitavel, formaPagamento: assinatura.asaasFormaPagamento });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

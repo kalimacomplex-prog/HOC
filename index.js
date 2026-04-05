@@ -633,7 +633,7 @@ app.post('/api/assinatura/checkout', authMiddleware, async (req, res) => {
     });
     console.log('Assinatura Asaas criada:', novaAssinaturaAsaas.id);
 
-    let pixCopiaECola = null, boletoUrl = null, boletoLinhaDigitavel = null, cobrancaId = null;
+    let pixCopiaECola = null, pixQrCodeBase64 = null, boletoUrl = null, boletoLinhaDigitavel = null, cobrancaId = null;
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     try {
@@ -645,7 +645,7 @@ app.post('/api/assinatura/checkout', authMiddleware, async (req, res) => {
           try {
             const pixData = await asaasRequest('GET', `/payments/${cobranca.id}/pixQrCode`);
             pixCopiaECola = pixData.payload || null;
-            updateData.asaasPixQrCodeBase64 = pixData.encodedImage || null;
+            pixQrCodeBase64 = pixData.encodedImage || null;
           } catch (e) { console.log('Erro PIX:', e.message); }
         }
         if (formaPagamento === 'BOLETO') {
@@ -661,7 +661,7 @@ app.post('/api/assinatura/checkout', authMiddleware, async (req, res) => {
       asaasAssinaturaId: novaAssinaturaAsaas.id, asaasCobrancaId: cobrancaId,
       asaasPixCopiaECola: pixCopiaECola, asaasBoletoUrl: boletoUrl,
       asaasBoletoLinhaDigitavel: boletoLinhaDigitavel, asaasFormaPagamento: formaPagamento,
-      asaasPixQrCodeBase64: updateData.asaasPixQrCodeBase64 || null,
+      asaasPixQrCodeBase64: pixQrCodeBase64 || null,
       atualizadoEm: new Date()
     };
 
@@ -670,7 +670,7 @@ app.post('/api/assinatura/checkout', authMiddleware, async (req, res) => {
 
     await criarNotificacao(req.usuario.empresa, `💳 Cobrança gerada — Plano ${NOME_PLANO[plano]}`, `Cobrança gerada via ${formaPagamento}. Aguardando pagamento.`, 'aviso', '💳', '/plano-usuarios');
 
-    res.json({ mensagem: 'Checkout iniciado! Realize o pagamento para ativar o plano.', formaPagamento, plano, pixCopiaECola, pixQrCodeBase64: updateData.asaasPixQrCodeBase64 || null, boletoUrl, boletoLinhaDigitavel, asaasAssinaturaId: novaAssinaturaAsaas.id, cobrancaId });
+    res.json({ mensagem: 'Checkout iniciado! Realize o pagamento para ativar o plano.', formaPagamento, plano, pixCopiaECola, pixQrCodeBase64: pixQrCodeBase64 || null, boletoUrl, boletoLinhaDigitavel, asaasAssinaturaId: novaAssinaturaAsaas.id, cobrancaId });
   } catch (err) { console.error('Erro checkout Asaas:', err); res.status(500).json({ erro: err.message || 'Erro ao processar checkout.' }); }
 });
 

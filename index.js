@@ -39,7 +39,7 @@ function validarCNPJ(cnpj) {
 // ==================== ASAAS HELPER ====================
 
 const ASAAS_BASE_URL = process.env.ASAAS_ENV === 'production'
-  ? 'https://api.asaas.com/api/v3'
+  ? 'https://api.asaas.com/v3'
   : 'https://sandbox.asaas.com/api/v3';
 
 async function asaasRequest(method, endpoint, body = null) {

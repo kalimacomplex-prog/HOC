@@ -39,7 +39,7 @@ function validarCNPJ(cnpj) {
 // ==================== ASAAS HELPER ====================
 
 const ASAAS_BASE_URL = process.env.ASAAS_ENV === 'production'
-  ? 'https://api.asaas.com/v3'
+  ? 'https://api.asaas.com/api/v3'
   : 'https://sandbox.asaas.com/api/v3';
 
 async function asaasRequest(method, endpoint, body = null) {
@@ -736,6 +736,116 @@ app.post('/api/webhook/asaas', async (req, res) => {
     }
     res.json({ ok: true });
   } catch (err) { console.error('Erro no webhook Asaas:', err); res.status(500).json({ erro: err.message }); }
+});
+
+
+// ==================== ASAAS — CHECKOUT CARTÃO ====================
+
+app.post('/api/assinatura/checkout-cartao', authMiddleware, async (req, res) => {
+  try {
+    const { plano, cartao, parcelas } = req.body;
+    if (!['basico','intermediario','avancado'].includes(plano)) return res.status(400).json({ erro: 'Plano inválido.' });
+    if (!cartao?.numero || !cartao?.nome || !cartao?.mes || !cartao?.ano || !cartao?.cvv || !cartao?.cpfCnpj) return res.status(400).json({ erro: 'Dados do cartão incompletos.' });
+
+    const empresa = await Empresa.findById(req.usuario.empresa);
+    if (!empresa) return res.status(404).json({ erro: 'Empresa não encontrada.' });
+    const admin = await Usuario.findOne({ empresa: req.usuario.empresa, perfil: 'Admin' }).select('nome email');
+
+    let assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
+    let asaasClienteId = assinatura?.asaasClienteId;
+
+    // Criar ou reutilizar cliente Asaas
+    if (!asaasClienteId) {
+      try {
+        const busca = await asaasRequest('GET', `/customers?cpfCnpj=${empresa.cnpj}`);
+        if (busca.data && busca.data.length > 0) asaasClienteId = busca.data[0].id;
+      } catch (e) {}
+      if (!asaasClienteId) {
+        const novoCliente = await asaasRequest('POST', '/customers', { name: empresa.nome, cpfCnpj: empresa.cnpj, email: admin?.email, notificationDisabled: false });
+        asaasClienteId = novoCliente.id;
+      }
+    }
+
+    // Cancelar assinatura anterior se existir
+    if (assinatura?.asaasAssinaturaId) {
+      try { await asaasRequest('DELETE', `/subscriptions/${assinatura.asaasAssinaturaId}`); } catch (e) {}
+    }
+
+    const proximoVencimento = new Date();
+    proximoVencimento.setDate(proximoVencimento.getDate() + 1);
+    const dataVencimentoStr = proximoVencimento.toISOString().split('T')[0];
+
+    // Criar assinatura com cartão
+    const payload = {
+      customer: asaasClienteId,
+      billingType: 'CREDIT_CARD',
+      value: VALOR_PLANO_CENTAVOS[plano] / 100,
+      nextDueDate: dataVencimentoStr,
+      cycle: 'MONTHLY',
+      description: `HOC System — Plano ${NOME_PLANO[plano]}`,
+      externalReference: req.usuario.empresa.toString(),
+      installmentCount: parcelas && parcelas > 1 ? parcelas : undefined,
+      creditCard: {
+        holderName: cartao.nome,
+        number: cartao.numero,
+        expiryMonth: cartao.mes,
+        expiryYear: cartao.ano,
+        ccv: cartao.cvv
+      },
+      creditCardHolderInfo: {
+        name: cartao.nome,
+        email: admin?.email || '',
+        cpfCnpj: cartao.cpfCnpj,
+        postalCode: '01310100',
+        addressNumber: '1',
+        phone: ''
+      }
+    };
+
+    const novaAssinaturaAsaas = await asaasRequest('POST', '/subscriptions', payload);
+    console.log('Assinatura cartão criada:', novaAssinaturaAsaas.id);
+
+    // Se aprovado imediatamente
+    const planoAtivado = novaAssinaturaAsaas.status === 'ACTIVE';
+    const vencimento = new Date(); vencimento.setDate(vencimento.getDate() + 30);
+
+    const updateData = {
+      planoSolicitado: planoAtivado ? null : plano,
+      solicitadoEm: planoAtivado ? null : new Date(),
+      solicitadoPor: planoAtivado ? null : admin?.nome,
+      plano: planoAtivado ? plano : assinatura?.plano,
+      status: planoAtivado ? 'ativa' : 'aguardando_confirmacao',
+      vencimento: planoAtivado ? vencimento : assinatura?.vencimento,
+      asaasClienteId,
+      asaasAssinaturaId: novaAssinaturaAsaas.id,
+      asaasFormaPagamento: 'CREDIT_CARD',
+      atualizadoEm: new Date()
+    };
+
+    if (planoAtivado) {
+      const novaFatura = { plano, valor: VALOR_PLANO_CENTAVOS[plano], vencimento, pagoEm: new Date(), confirmadoPor: 'asaas_cartao' };
+      updateData.$push = { historicoFaturas: novaFatura };
+    }
+
+    if (assinatura) {
+      assinatura = await Assinatura.findOneAndUpdate({ empresa: req.usuario.empresa }, updateData, { new: true });
+    } else {
+      assinatura = await Assinatura.create({ empresa: req.usuario.empresa, ...updateData });
+    }
+
+    if (planoAtivado) {
+      await criarNotificacao(req.usuario.empresa, `✅ Plano ${NOME_PLANO[plano]} ativado!`, 'Pagamento via cartão aprovado. Acesso liberado!', 'sucesso', '✅', '/plano-usuarios');
+    }
+
+    res.json({ mensagem: planoAtivado ? 'Pagamento aprovado! Plano ativado.' : 'Processando pagamento...', aprovado: planoAtivado, asaasAssinaturaId: novaAssinaturaAsaas.id });
+  } catch (err) {
+    console.error('Erro checkout cartão:', err);
+    // Tratar erros específicos do Asaas
+    const msg = err.message || '';
+    if (msg.includes('invalid') || msg.includes('card')) return res.status(400).json({ erro: 'Dados do cartão inválidos. Verifique e tente novamente.' });
+    if (msg.includes('declined') || msg.includes('recusado')) return res.status(400).json({ erro: 'Cartão recusado. Tente outro cartão ou forma de pagamento.' });
+    res.status(500).json({ erro: msg || 'Erro ao processar pagamento com cartão.' });
+  }
 });
 
 // ==================== SOLICITAR PLANO (fallback manual) ====================

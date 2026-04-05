@@ -109,6 +109,13 @@
     .aguardando-sub { font-size: 12px; color: #c05621; margin-bottom: 14px; line-height: 1.5; }
     .aguardando-acoes { display: flex; gap: 10px; justify-content: center; }
 
+    /* ===== FORMA DE PAGAMENTO ===== */
+    .pag-forma-btn { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; text-align: center; width: 100%; }
+    .pag-forma-btn:hover { border-color: #2d1b69; background: #f5f0ff; }
+    .pag-forma-btn.selecionado { border-color: #2d1b69; background: #f5f0ff; }
+    .btn-secondary { background: #f0f2f5; color: #4a5568; border: none; border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-secondary:hover { background: #e2e8f0; }
+
     @media (max-width: 900px) { .planos-grid { grid-template-columns: repeat(2,1fr); } .status-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 600px) { .planos-grid { grid-template-columns: 1fr; } .status-grid { grid-template-columns: 1fr; } }
   </style>
@@ -298,46 +305,155 @@
   </div>
 </div>
 
-<!-- Modal de Pagamento Manual -->
+<!-- Modal de Pagamento Asaas -->
 <div class="modal-overlay" id="modalPagamento">
-  <div class="modal" style="max-width:500px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
     <div class="modal-header">
-      <span class="modal-titulo">💳 Instruções de Pagamento</span>
+      <span class="modal-titulo">💳 Assinar Plano</span>
       <button class="btn-fechar" onclick="fecharModal('modalPagamento')">×</button>
     </div>
-    <div class="pag-modal-plano" id="pagModalPlanoNome">Plano Intermediário</div>
-    <div class="pag-modal-valor" id="pagModalValor">R$ 149,00/mês</div>
+    <div class="pag-modal-plano" id="pagModalPlanoNome">Plano Básico</div>
+    <div class="pag-modal-valor" id="pagModalValor">R$ 49,00/mês</div>
 
-    <div class="pag-secao">
-      <div class="pag-secao-titulo">Pagamento via PIX</div>
-      <div class="pag-pix-box">
-        <div class="pag-pix-info">Chave PIX</div>
-        <div class="pag-pix-chave" id="pagPixChave">Carregando...</div>
-        <div class="pag-pix-info" id="pagPixInfo">Carregando dados...</div>
-        <button class="btn-copiar" style="margin-top:10px" onclick="copiarChavePix()">📋 Copiar Chave PIX</button>
+    <!-- Seleção de forma de pagamento -->
+    <div class="pag-secao" id="pagSecaoEscolha">
+      <div class="pag-secao-titulo">Como você quer pagar?</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
+        <button class="pag-forma-btn" id="btnEscolhaPix" onclick="selecionarFormaPag('PIX')">
+          <div style="font-size:24px;margin-bottom:4px">📱</div>
+          <div style="font-size:13px;font-weight:700;color:#1e2a4a">PIX</div>
+          <div style="font-size:11px;color:#718096">Aprovação imediata</div>
+        </button>
+        <button class="pag-forma-btn" id="btnEscolhaBoleto" onclick="selecionarFormaPag('BOLETO')">
+          <div style="font-size:24px;margin-bottom:4px">🧾</div>
+          <div style="font-size:13px;font-weight:700;color:#1e2a4a">Boleto</div>
+          <div style="font-size:11px;color:#718096">Até 3 dias úteis</div>
+        </button>
+        <button class="pag-forma-btn" id="btnEscolhaCartao" onclick="selecionarFormaPag('CREDIT_CARD')">
+          <div style="font-size:24px;margin-bottom:4px">💳</div>
+          <div style="font-size:13px;font-weight:700;color:#1e2a4a">Cartão</div>
+          <div style="font-size:11px;color:#718096">Até 12x</div>
+        </button>
       </div>
     </div>
 
-    <div class="pag-secao">
-      <div class="pag-secao-titulo">Como pagar</div>
-      <div class="pag-instrucoes">
-        <div class="pag-instrucao-item"><div class="pag-instrucao-num">1</div><span>Abra o aplicativo do seu banco e acesse a opção <strong>PIX</strong></span></div>
-        <div class="pag-instrucao-item"><div class="pag-instrucao-num">2</div><span>Escolha <strong>Pagar com Chave PIX</strong> e cole ou digite a chave acima</span></div>
-        <div class="pag-instrucao-item"><div class="pag-instrucao-num">3</div><span>Informe o valor exato do plano e confirme o pagamento</span></div>
-        <div class="pag-instrucao-item"><div class="pag-instrucao-num">4</div><span>Clique em <strong>"Já realizei o pagamento"</strong> abaixo para notificar o administrador</span></div>
-      </div>
+    <!-- Loading -->
+    <div id="pagLoading" style="display:none;text-align:center;padding:32px">
+      <div style="font-size:32px;margin-bottom:12px">⏳</div>
+      <div style="font-size:14px;font-weight:600;color:#1e2a4a">Gerando cobrança...</div>
+      <div style="font-size:12px;color:#718096;margin-top:4px">Aguarde, estamos processando via Asaas</div>
     </div>
 
-    <div class="pag-aviso">
-      ⚠️ <span>Após clicar em "Já realizei o pagamento", seu acesso ficará em <strong>análise</strong> até que o administrador confirme o recebimento. Isso pode levar até 1 dia útil.</span>
+    <!-- Resultado PIX -->
+    <div id="pagResultadoPix" style="display:none">
+      <div class="pag-secao">
+        <div class="pag-secao-titulo">📱 PIX Copia e Cola</div>
+        <div class="pag-pix-box">
+          <div class="pag-pix-info" style="margin-bottom:6px">Copie o código abaixo e pague no seu banco:</div>
+          <div id="pagPixCopiaCola" style="font-size:10px;word-break:break-all;background:white;padding:8px;border-radius:5px;border:1px solid #e2e8f0;font-family:monospace;margin-bottom:8px"></div>
+          <button class="btn-copiar" onclick="copiarPixCopiaECola()">📋 Copiar código PIX</button>
+        </div>
+      </div>
+      <div class="pag-secao">
+        <div class="pag-secao-titulo">Como pagar</div>
+        <div class="pag-instrucoes">
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">1</div><span>Abra o app do seu banco</span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">2</div><span>Vá em <strong>PIX → Pagar → Copia e Cola</strong></span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">3</div><span>Cole o código copiado e confirme</span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">4</div><span>Seu plano será ativado <strong>automaticamente</strong> após o pagamento! ✅</span></div>
+        </div>
+      </div>
+      <div style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:7px;padding:10px 12px;font-size:12px;color:#276749;margin-top:8px">
+        ✅ <strong>Ativação automática!</strong> Assim que confirmado pelo Asaas, seu plano é ativado instantaneamente.
+      </div>
+      <div id="pagStatusPix" style="text-align:center;padding:12px;font-size:12px;color:#718096;margin-top:4px"></div>
+    </div>
+
+    <!-- Resultado Boleto -->
+    <div id="pagResultadoBoleto" style="display:none">
+      <div class="pag-secao">
+        <div class="pag-secao-titulo">🧾 Boleto Bancário</div>
+        <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1.5px solid #e2e8f0">
+          <div id="pagBoletoLinha" style="font-size:11px;color:#4a5568;word-break:break-all;font-family:monospace;margin-bottom:10px;background:white;padding:8px;border-radius:4px;border:1px solid #e2e8f0"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-copiar" onclick="copiarLinhaDigitavel()">📋 Copiar linha digitável</button>
+            <a id="pagBoletoUrl" href="#" target="_blank" class="btn-boleto">🔗 Abrir boleto</a>
+          </div>
+        </div>
+      </div>
+      <div class="pag-secao">
+        <div class="pag-secao-titulo">Como pagar</div>
+        <div class="pag-instrucoes">
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">1</div><span>Clique em <strong>"Abrir boleto"</strong> ou copie a linha digitável</span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">2</div><span>Pague no seu banco, lotérica ou app bancário</span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">3</div><span>O vencimento é em <strong>1 dia útil</strong></span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">4</div><span>Após compensação, seu plano é ativado automaticamente ✅</span></div>
+        </div>
+      </div>
+      <div class="pag-aviso">⚠️ <span>Boletos levam até <strong>3 dias úteis</strong> para compensar. Após a compensação, o plano é ativado automaticamente.</span></div>
+    </div>
+
+    <!-- Resultado Cartão -->
+    <div id="pagResultadoCartao" style="display:none">
+      <div class="pag-secao">
+        <div class="pag-secao-titulo">💳 Dados do Cartão</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Nome no Cartão *</label>
+            <input type="text" id="ccNome" placeholder="Nome igual ao cartão" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Número do Cartão *</label>
+            <input type="text" id="ccNumero" placeholder="0000 0000 0000 0000" maxlength="19" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;font-family:monospace" oninput="mascaraCartao(this)">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div class="form-group" style="margin:0">
+              <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Mês *</label>
+              <input type="text" id="ccMes" placeholder="MM" maxlength="2" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;text-align:center" oninput="this.value=this.value.replace(/\D/g,'')">
+            </div>
+            <div class="form-group" style="margin:0">
+              <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Ano *</label>
+              <input type="text" id="ccAno" placeholder="AAAA" maxlength="4" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;text-align:center" oninput="this.value=this.value.replace(/\D/g,'')">
+            </div>
+            <div class="form-group" style="margin:0">
+              <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">CVV *</label>
+              <input type="text" id="ccCvv" placeholder="000" maxlength="4" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;text-align:center;font-family:monospace" oninput="this.value=this.value.replace(/\D/g,'')">
+            </div>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">CPF/CNPJ do Titular *</label>
+            <input type="text" id="ccCpfCnpj" placeholder="000.000.000-00" maxlength="18" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box" oninput="mascaraCpfCnpj(this)">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Parcelamento</label>
+            <select id="ccParcelas" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;background:white">
+              <option value="1">1x sem juros</option>
+              <option value="2">2x sem juros</option>
+              <option value="3">3x sem juros</option>
+              <option value="4">4x sem juros</option>
+              <option value="5">5x sem juros</option>
+              <option value="6">6x sem juros</option>
+              <option value="7">7x sem juros</option>
+              <option value="8">8x sem juros</option>
+              <option value="9">9x sem juros</option>
+              <option value="10">10x sem juros</option>
+              <option value="11">11x sem juros</option>
+              <option value="12">12x sem juros</option>
+            </select>
+          </div>
+        </div>
+        <div style="background:#f5f0ff;border-radius:7px;padding:10px 12px;font-size:11px;color:#4a5568;margin-top:10px;display:flex;gap:6px;align-items:center">
+          🔒 <span>Seus dados são transmitidos com criptografia SSL diretamente para o Asaas. O HOC System não armazena dados do cartão.</span>
+        </div>
+        <button class="btn-confirmar" onclick="enviarPagamentoCartao()" id="btnPagarCartao" style="width:100%;margin-top:12px;padding:12px">💳 Pagar agora</button>
+      </div>
     </div>
 
     <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-top:12px;display:none" id="pagErro"></div>
-    <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-top:12px;display:none" id="pagSucesso"></div>
 
     <div class="modal-footer" style="margin-top:16px">
-      <button class="btn-cancelar" onclick="fecharModal('modalPagamento')">Cancelar</button>
-      <button class="btn-confirmar" id="btnJaPaguei" onclick="solicitarPlano()">✓ Já realizei o pagamento</button>
+      <button class="btn-cancelar" onclick="fecharModal('modalPagamento')">Fechar</button>
+      <button class="btn-secondary" id="btnVoltarEscolha" style="display:none" onclick="voltarEscolhaPagamento()">← Mudar forma</button>
     </div>
   </div>
 </div>
@@ -751,57 +867,242 @@
       </tr>`).join('');
   }
 
-  // Plano sendo solicitado no momento
+  // ===== CHECKOUT ASAAS =====
   let _planoSolicitando = null;
+  let _pollingInterval = null;
 
   function abrirModalPagamento(plano) {
     _planoSolicitando = plano;
-    // Preencher dados do modal
     document.getElementById('pagModalPlanoNome').textContent = `Plano ${NOME_PLANO[plano]}`;
     document.getElementById('pagModalValor').textContent = VALOR_PLANO[plano] + '/mês';
-    // PIX vem da assinatura já carregada
-    const pixChave = assinaturaAtual?.pixChave || 'Não configurado';
-    const pixNome = assinaturaAtual?.pixNome || '';
-    const pixBanco = assinaturaAtual?.pixBanco || '';
-    document.getElementById('pagPixChave').textContent = pixChave;
-    document.getElementById('pagPixInfo').textContent = pixNome && pixBanco ? `${pixNome} — ${pixBanco}` : pixNome || '';
     document.getElementById('pagErro').style.display = 'none';
-    document.getElementById('pagSucesso').style.display = 'none';
-    document.getElementById('btnJaPaguei').disabled = false;
-    document.getElementById('btnJaPaguei').textContent = '✓ Já realizei o pagamento';
+    document.getElementById('pagSecaoEscolha').style.display = 'block';
+    document.getElementById('pagLoading').style.display = 'none';
+    document.getElementById('pagResultadoPix').style.display = 'none';
+    document.getElementById('pagResultadoBoleto').style.display = 'none';
+    document.getElementById('pagResultadoCartao').style.display = 'none';
+    document.getElementById('btnVoltarEscolha').style.display = 'none';
+    document.querySelectorAll('.pag-forma-btn').forEach(b => b.classList.remove('selecionado'));
+    if (_pollingInterval) { clearInterval(_pollingInterval); _pollingInterval = null; }
     document.getElementById('modalPagamento').classList.add('aberto');
   }
 
-  function copiarChavePix() {
-    const chave = document.getElementById('pagPixChave').textContent;
-    copiarPix(chave);
+  function voltarEscolhaPagamento() {
+    if (_pollingInterval) { clearInterval(_pollingInterval); _pollingInterval = null; }
+    document.getElementById('pagSecaoEscolha').style.display = 'block';
+    document.getElementById('pagLoading').style.display = 'none';
+    document.getElementById('pagResultadoPix').style.display = 'none';
+    document.getElementById('pagResultadoBoleto').style.display = 'none';
+    document.getElementById('pagResultadoCartao').style.display = 'none';
+    document.getElementById('btnVoltarEscolha').style.display = 'none';
+    document.getElementById('pagErro').style.display = 'none';
+    document.querySelectorAll('.pag-forma-btn').forEach(b => b.classList.remove('selecionado'));
   }
 
-  async function solicitarPlano() {
+  async function selecionarFormaPag(forma) {
     if (!_planoSolicitando) return;
-    const btn = document.getElementById('btnJaPaguei');
-    const erro = document.getElementById('pagErro');
-    const sucesso = document.getElementById('pagSucesso');
-    erro.style.display = 'none';
-    sucesso.style.display = 'none';
-    btn.disabled = true;
-    btn.textContent = 'Enviando...';
+    const btnId = forma === 'PIX' ? 'btnEscolhaPix' : forma === 'BOLETO' ? 'btnEscolhaBoleto' : 'btnEscolhaCartao';
+    document.getElementById(btnId).classList.add('selecionado');
+    document.getElementById('pagSecaoEscolha').style.display = 'none';
+    document.getElementById('pagErro').style.display = 'none';
+
+    // Cartão: só mostrar formulário, sem chamar API ainda
+    if (forma === 'CREDIT_CARD') {
+      document.getElementById('pagResultadoCartao').style.display = 'block';
+      document.getElementById('btnVoltarEscolha').style.display = 'inline-block';
+      // Limpar campos
+      ['ccNome','ccNumero','ccMes','ccAno','ccCvv','ccCpfCnpj'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+      document.getElementById('ccParcelas').value = '1';
+      return;
+    }
+
+    document.getElementById('pagLoading').style.display = 'block';
     try {
-      const res = await fetch('/api/assinatura/solicitar', {
+      const res = await fetch('/api/assinatura/checkout', {
         method: 'POST', headers: HEADERS,
-        body: JSON.stringify({ plano: _planoSolicitando })
+        body: JSON.stringify({ plano: _planoSolicitando, formaPagamento: forma })
       });
       const data = await res.json();
-      if (!res.ok) { erro.textContent = data.erro || 'Erro ao registrar solicitação.'; erro.style.display = 'block'; return; }
-      sucesso.textContent = 'Solicitação registrada! O administrador será notificado para confirmar o pagamento.';
-      sucesso.style.display = 'block';
-      btn.textContent = '✓ Enviado!';
-      setTimeout(async () => {
-        fecharModal('modalPagamento');
-        await carregarAssinatura();
-      }, 2500);
-    } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
-    finally { if (btn.textContent === 'Enviando...') { btn.disabled = false; btn.textContent = '✓ Já realizei o pagamento'; } }
+      document.getElementById('pagLoading').style.display = 'none';
+      document.getElementById('btnVoltarEscolha').style.display = 'inline-block';
+      if (!res.ok) {
+        document.getElementById('pagErro').textContent = data.erro || 'Erro ao gerar cobrança.';
+        document.getElementById('pagErro').style.display = 'block';
+        document.getElementById('pagSecaoEscolha').style.display = 'block';
+        document.getElementById('btnVoltarEscolha').style.display = 'none';
+        return;
+      }
+      if (forma === 'PIX') {
+        document.getElementById('pagResultadoPix').style.display = 'block';
+        const pix = data.pixCopiaECola || '';
+        document.getElementById('pagPixCopiaCola').textContent = pix || 'PIX sendo gerado, aguarde...';
+        if (!pix) iniciarPollingPix();
+        else iniciarPollingConfirmacao();
+      } else if (forma === 'BOLETO') {
+        document.getElementById('pagResultadoBoleto').style.display = 'block';
+        document.getElementById('pagBoletoLinha').textContent = data.boletoLinhaDigitavel || 'Linha digitável sendo gerada...';
+        const linkBoleto = document.getElementById('pagBoletoUrl');
+        linkBoleto.href = data.boletoUrl || '#';
+        linkBoleto.style.opacity = data.boletoUrl ? '1' : '0.5';
+        if (!data.boletoLinhaDigitavel) iniciarPollingBoleto();
+      } else if (forma === 'CREDIT_CARD') {
+        // Cartão: não chama /checkout ainda, mostra formulário
+        document.getElementById('pagResultadoCartao').style.display = 'block';
+        document.getElementById('btnVoltarEscolha').style.display = 'inline-block';
+        return; // Não continua para carregarAssinatura
+      }
+      await carregarAssinatura();
+    } catch(err) {
+      document.getElementById('pagLoading').style.display = 'none';
+      document.getElementById('pagSecaoEscolha').style.display = 'block';
+      document.getElementById('pagErro').textContent = 'Erro de conexão. Tente novamente.';
+      document.getElementById('pagErro').style.display = 'block';
+    }
+  }
+
+  function iniciarPollingPix() {
+    let tentativas = 0;
+    document.getElementById('pagStatusPix').textContent = '⏳ Aguardando geração do PIX...';
+    _pollingInterval = setInterval(async () => {
+      tentativas++;
+      if (tentativas > 20) { clearInterval(_pollingInterval); document.getElementById('pagStatusPix').textContent = ''; return; }
+      try {
+        const res = await fetch('/api/assinatura/cobranca-ativa', { headers: HEADERS });
+        const data = await res.json();
+        if (data.pixCopiaECola) {
+          document.getElementById('pagPixCopiaCola').textContent = data.pixCopiaECola;
+          document.getElementById('pagStatusPix').textContent = '✅ PIX gerado! Copie e pague no seu banco.';
+          clearInterval(_pollingInterval);
+          iniciarPollingConfirmacao();
+        }
+      } catch(e) {}
+    }, 3000);
+  }
+
+  function iniciarPollingConfirmacao() {
+    let tentativas = 0;
+    _pollingInterval = setInterval(async () => {
+      tentativas++;
+      if (tentativas > 40) { clearInterval(_pollingInterval); return; }
+      try {
+        const res = await fetch('/api/assinatura/cobranca-ativa', { headers: HEADERS });
+        const data = await res.json();
+        if (data.status === 'RECEIVED' || data.status === 'CONFIRMED') {
+          clearInterval(_pollingInterval);
+          document.getElementById('pagStatusPix').textContent = '🎉 Pagamento confirmado! Ativando plano...';
+          setTimeout(async () => { fecharModal('modalPagamento'); await carregarAssinatura(); }, 2000);
+        }
+      } catch(e) {}
+    }, 4000);
+  }
+
+  function iniciarPollingBoleto() {
+    let tentativas = 0;
+    _pollingInterval = setInterval(async () => {
+      tentativas++;
+      if (tentativas > 10) { clearInterval(_pollingInterval); return; }
+      try {
+        const res = await fetch('/api/assinatura/cobranca-ativa', { headers: HEADERS });
+        const data = await res.json();
+        if (data.boletoLinhaDigitavel) {
+          document.getElementById('pagBoletoLinha').textContent = data.boletoLinhaDigitavel;
+          clearInterval(_pollingInterval);
+        }
+        if (data.boletoUrl) {
+          const link = document.getElementById('pagBoletoUrl');
+          link.href = data.boletoUrl;
+          link.style.opacity = '1';
+        }
+      } catch(e) {}
+    }, 3000);
+  }
+
+  function copiarPixCopiaECola() {
+    const codigo = document.getElementById('pagPixCopiaCola').textContent;
+    copiarPix(codigo);
+  }
+
+  function copiarLinhaDigitavel() {
+    const linha = document.getElementById('pagBoletoLinha').textContent;
+    copiarPix(linha);
+  }
+
+  // ===== CARTÃO DE CRÉDITO =====
+  function mascaraCartao(input) {
+    let v = input.value.replace(/\D/g, '').substring(0, 16);
+    v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+    input.value = v;
+  }
+
+  function mascaraCpfCnpj(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length <= 11) {
+      v = v.replace(/(\d{3})(\d)/, '$1.$2');
+      v = v.replace(/(\d{3})(\d)/, '$1.$2');
+      v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    } else {
+      v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+      v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+      v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+      v = v.replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    input.value = v.substring(0, 18);
+  }
+
+  async function enviarPagamentoCartao() {
+    const nome = document.getElementById('ccNome').value.trim();
+    const numero = document.getElementById('ccNumero').value.replace(/\s/g, '');
+    const mes = document.getElementById('ccMes').value.trim();
+    const ano = document.getElementById('ccAno').value.trim();
+    const cvv = document.getElementById('ccCvv').value.trim();
+    const cpfCnpj = document.getElementById('ccCpfCnpj').value.replace(/\D/g, '');
+    const parcelas = parseInt(document.getElementById('ccParcelas').value);
+    const erro = document.getElementById('pagErro');
+    erro.style.display = 'none';
+
+    if (!nome || !numero || !mes || !ano || !cvv || !cpfCnpj) {
+      erro.textContent = 'Preencha todos os campos do cartão.';
+      erro.style.display = 'block'; return;
+    }
+    if (numero.length < 13) { erro.textContent = 'Número do cartão inválido.'; erro.style.display = 'block'; return; }
+    if (mes.length !== 2 || parseInt(mes) < 1 || parseInt(mes) > 12) { erro.textContent = 'Mês inválido (01-12).'; erro.style.display = 'block'; return; }
+    if (ano.length !== 4 || parseInt(ano) < new Date().getFullYear()) { erro.textContent = 'Ano inválido.'; erro.style.display = 'block'; return; }
+    if (cvv.length < 3) { erro.textContent = 'CVV inválido.'; erro.style.display = 'block'; return; }
+    if (cpfCnpj.length !== 11 && cpfCnpj.length !== 14) { erro.textContent = 'CPF ou CNPJ inválido.'; erro.style.display = 'block'; return; }
+
+    const btn = document.getElementById('btnPagarCartao');
+    btn.disabled = true;
+    btn.textContent = '⏳ Processando...';
+
+    try {
+      const res = await fetch('/api/assinatura/checkout-cartao', {
+        method: 'POST', headers: HEADERS,
+        body: JSON.stringify({
+          plano: _planoSolicitando,
+          cartao: { numero, nome, mes, ano, cvv, cpfCnpj },
+          parcelas
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        erro.textContent = data.erro || 'Erro ao processar pagamento.';
+        erro.style.display = 'block';
+        btn.disabled = false; btn.textContent = '💳 Pagar agora';
+        return;
+      }
+      // Sucesso
+      document.getElementById('pagResultadoCartao').innerHTML = `
+        <div style="text-align:center;padding:32px">
+          <div style="font-size:48px;margin-bottom:12px">🎉</div>
+          <div style="font-size:18px;font-weight:700;color:#276749;margin-bottom:8px">Pagamento aprovado!</div>
+          <div style="font-size:13px;color:#718096">Seu plano foi ativado com sucesso.</div>
+        </div>`;
+      setTimeout(async () => { fecharModal('modalPagamento'); await carregarAssinatura(); }, 2500);
+    } catch(err) {
+      erro.textContent = 'Erro de conexão. Tente novamente.';
+      erro.style.display = 'block';
+      btn.disabled = false; btn.textContent = '💳 Pagar agora';
+    }
   }
 
 
@@ -817,16 +1118,7 @@
       });
   }
 
-  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href = '/'; }
-
-  function fecharBanner() {
-    const banner = document.getElementById('bannerAssinatura');
-    if (banner) {
-      banner.style.display = 'none';
-      document.querySelector('.main').classList.remove('banner-visivel');
-    }
-    sessionStorage.setItem('bannerFechado', '1');
-  }
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
@@ -926,32 +1218,20 @@
     const banner = document.getElementById('bannerAssinatura');
     if (!overlay) return;
     if (banner) {
-      if (sessionStorage.getItem('bannerFechado') === '1') {
-        banner.style.display = 'none';
-        document.querySelector('.main').classList.remove('banner-visivel');
-      } else {
-        if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
-          const expirando = assinatura.diasTrialRestantes <= 5;
-          banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
-          banner.innerHTML = `
-            <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
-            <button class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1])">Ver planos</button>
-            <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
-          banner.style.display = 'flex';
-          document.querySelector('.main').classList.add('banner-visivel');
-        } else if (assinatura.status === 'inadimplente') {
-          banner.className = 'banner-assinatura inadimplente';
-          banner.innerHTML = `
-            <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
-            <button class="banner-assinatura-btn inadimplente" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1])">Pagar agora</button>
-            <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
-          banner.style.display = 'flex';
-          document.querySelector('.main').classList.add('banner-visivel');
-        } else {
-          banner.style.display = 'none';
-          document.querySelector('.main').classList.remove('banner-visivel');
-        }
-      } // fecha if bannerFechado
+      if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
+        const expirando = assinatura.diasTrialRestantes <= 5;
+        banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
+        banner.innerHTML = `
+          <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
+          <button class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1])">Ver planos</button>`;
+        banner.style.display = 'flex';
+      } else if (assinatura.status === 'inadimplente') {
+        banner.className = 'banner-assinatura inadimplente';
+        banner.innerHTML = `
+          <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
+          <button class="banner-assinatura-btn inadimplente" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1])">Pagar agora</button>`;
+        banner.style.display = 'flex';
+      } else { banner.style.display = 'none'; }
     }
     if (assinatura.status === 'inadimplente') {
       document.getElementById('bloqueioDias').textContent = `${assinatura.diasAtraso} dia(s) em atraso`;

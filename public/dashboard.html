@@ -214,6 +214,26 @@
 
   function verificarBloqueio(assinatura) {
     if (!assinatura) return;
+
+    // Detectar mudança de status e agir
+    const statusAtual = assinatura.status;
+    if (_statusAssinaturaAnterior !== null && _statusAssinaturaAnterior !== statusAtual) {
+      if (statusAtual === 'ativa') {
+        mostrarToast('🎉 Pagamento confirmado!', 'Seu plano foi ativado. Todos os módulos estão liberados.', '#276749', '#f0fff4', '#9ae6b4');
+        // Liberar interface
+        document.querySelectorAll('.menu-inadimplente-bloqueado').forEach(el => el.classList.remove('menu-inadimplente-bloqueado'));
+        document.querySelectorAll('.tab-bloqueada').forEach(el => el.classList.remove('tab-bloqueada'));
+        document.querySelectorAll('.inadimplente-bloqueado').forEach(el => el.classList.remove('inadimplente-bloqueado'));
+        const aviso = document.getElementById('avisoInadimplente');
+        if (aviso) aviso.remove();
+        const overlay2 = document.getElementById('bloqueioOverlay');
+        if (overlay2) overlay2.classList.remove('ativo');
+      } else if (statusAtual === 'inadimplente') {
+        mostrarToast('⚠️ Pagamento em atraso', `Sua fatura está ${assinatura.diasAtraso||0} dia(s) em atraso. Acesse Plano e Usuários para regularizar.`, '#c05621', '#fffaf0', '#f6ad55');
+      }
+    }
+    _statusAssinaturaAnterior = statusAtual;
+
     const overlay = document.getElementById('bloqueioOverlay');
     const banner = document.getElementById('bannerAssinatura');
     if (banner) {
@@ -327,10 +347,29 @@
     }
   });
 
+  // ===== POLLING DE STATUS =====
+  let _statusAssinaturaAnterior = null;
+
+  function mostrarToast(titulo, mensagem, corTexto, corFundo, corBorda) {
+    const jaExiste = document.getElementById('hocToastGlobal');
+    if (jaExiste) jaExiste.remove();
+    const toast = document.createElement('div');
+    toast.id = 'hocToastGlobal';
+    toast.style.cssText = `position:fixed;bottom:24px;right:24px;background:${corFundo};border:1.5px solid ${corBorda};border-radius:12px;padding:16px 20px;max-width:360px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:99999;font-family:'Segoe UI',sans-serif;animation:slideInToast 0.3s ease`;
+    toast.innerHTML = `<div style="font-size:14px;font-weight:700;color:${corTexto};margin-bottom:4px">${titulo}</div><div style="font-size:12px;color:#4a5568;line-height:1.5">${mensagem}</div>`;
+    if (!document.getElementById('toastStyle')) {
+      const s = document.createElement('style');
+      s.id = 'toastStyle';
+      s.textContent = '@keyframes slideInToast{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}';
+      document.head.appendChild(s);
+    }
+    document.body.appendChild(toast);
+    setTimeout(() => { if(toast.parentNode) toast.remove(); }, 6000);
+  }
+
   carregarDados();
   carregarNotificacoes();
-  setInterval(carregarNotificacoes, 60000);
+  setInterval(carregarNotificacoes, 10000);
 </script>
-  <script src="/global.js"></script>
 </body>
 </html>

@@ -146,7 +146,12 @@
   async function carregarDados() {
     try {
       const res = await fetch('/api/usuarios', { headers: HEADERS });
-      if (res.status === 401) { window.location.href = '/'; return; }
+      if (res.status === 401) { 
+        localStorage.removeItem('token'); 
+        localStorage.removeItem('usuario'); 
+        window.location.href = '/'; 
+        return; 
+      }
       const usuarios = await res.json();
       document.getElementById('totalUsuarios').textContent = usuarios.length;
       document.getElementById('totalAtivos').textContent = usuarios.filter(u => u.status === 'Ativo').length;

@@ -33,7 +33,12 @@
       const res = await fetch('/api/notificacoes/resumo', {
         headers: { 'Authorization': 'Bearer ' + token }
       });
-      if (res.status === 401) { pararPolling(); return; }
+      if (res.status === 401) {
+        pararPolling();
+        // Só redireciona se realmente não há token (sessão expirada)
+        if (!localStorage.getItem('token')) window.location.href = '/';
+        return;
+      }
 
       const data = await res.json();
       const assinatura = data.assinatura;
@@ -255,11 +260,18 @@
     liberarInterface,
   };
 
-  // ===== AUTO-INICIAR quando DOM estiver pronto =====
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', iniciarPollingGlobal);
-  } else {
-    iniciarPollingGlobal();
+  // ===== AUTO-INICIAR apenas em páginas autenticadas =====
+  const PAGINAS_PUBLICAS = ['/', '/cadastro', '/confirmar-email', '/recuperar-senha', '/redefinir-senha', '/aceitar-convite'];
+  const paginaAtual = window.location.pathname.replace(/\/$/, '') || '/';
+  const isPaginaPublica = PAGINAS_PUBLICAS.some(p => paginaAtual === p || paginaAtual.startsWith(p + '?'));
+  const temToken = !!localStorage.getItem('token');
+
+  if (!isPaginaPublica && temToken) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', iniciarPollingGlobal);
+    } else {
+      iniciarPollingGlobal();
+    }
   }
 
 })();

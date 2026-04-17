@@ -1,9 +1,13 @@
-.some-class {
+.app {
     font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
-.other-class {
+.header {
     font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
-/* Repeat for all instances found in the original style-global.css file */
+.footer {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* Add other styles here, ensuring all have the updated font-family */

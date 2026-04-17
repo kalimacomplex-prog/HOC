@@ -66,6 +66,20 @@
     /* Modal novo projeto */
     .modal-grande { max-width: 560px; }
     .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ===== MODAL PERFIL ===== */
+    .perfil-modal-avatar { width: 80px; height: 80px; border-radius: 50%; background: #6b46c1; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white; margin: 0 auto 16px; overflow: hidden; cursor: pointer; position: relative; border: 3px solid #e2e8f0; transition: all 0.2s; }
+    .perfil-modal-avatar:hover { border-color: #2d1b69; }
+    .perfil-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .perfil-avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; font-size: 20px; }
+    .perfil-modal-avatar:hover .perfil-avatar-overlay { opacity: 1; }
+    .perfil-badge { display: inline-block; padding: 3px 10px; background: #f5f0ff; color: #2d1b69; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 16px; }
+    .perfil-tabs { display: flex; gap: 2px; border-bottom: 2px solid #f0f2f5; margin-bottom: 18px; }
+    .perfil-tab { padding: 8px 16px; font-size: 12px; font-weight: 500; color: #718096; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .perfil-tab.active { color: #2d1b69; border-bottom-color: #2d1b69; font-weight: 700; }
+    /* Header user clicável */
+    .header-user { cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.2s; }
+    .header-user:hover { background: #f0f2f5; }
   </style>
 </head>
 <body>
@@ -116,7 +130,7 @@
           <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
         </div>
       </div>
-      <div class="header-user">
+      <div class="header-user" id="headerUser" title="Editar perfil">
         <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
         <div class="user-avatar" id="userAvatar">?</div>
       </div>
@@ -246,13 +260,92 @@
     <div class="bloqueio-link"><a href="/plano-usuarios">Ver detalhes da assinatura →</a></div>
   </div>
 </div>
+<!-- Modal Perfil -->
+<div class="modal-overlay" id="modalPerfil">
+  <div class="modal" style="max-width:460px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header">
+      <span class="modal-titulo">👤 Meu Perfil</span>
+      <button class="btn-fechar" onclick="fecharModal('modalPerfil')">×</button>
+    </div>
+
+    <!-- Avatar clicável -->
+    <div style="text-align:center;margin-bottom:8px">
+      <div class="perfil-modal-avatar" id="perfilAvatar" onclick="document.getElementById('perfilFotoInput').click()">
+        <span id="perfilAvatarLetra">?</span>
+        <div class="perfil-avatar-overlay">📷</div>
+      </div>
+      <input type="file" id="perfilFotoInput" accept="image/*" style="display:none" onchange="carregarFoto(event)">
+      <div style="font-size:11px;color:#a0aec0;margin-top:4px">Clique no avatar para trocar a foto</div>
+      <div class="perfil-badge" id="perfilPerfilBadge">Usuário</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="perfil-tabs">
+      <button class="perfil-tab active" onclick="mudarPerfilTab('dados',this)">Dados</button>
+      <button class="perfil-tab" onclick="mudarPerfilTab('senha',this)">Senha</button>
+    </div>
+
+    <!-- Tab Dados -->
+    <div id="perfilTabDados">
+      <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="perfilErro"></div>
+      <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="perfilSucesso"></div>
+      <div class="form-group">
+        <label>Nome *</label>
+        <input type="text" id="perfilNome" placeholder="Seu nome completo">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="perfilEmail" disabled style="background:#f8fafc;color:#718096">
+      </div>
+      <div class="form-group">
+        <label>Cargo</label>
+        <input type="text" id="perfilCargo" placeholder="Ex: CEO, Gerente de Projetos, Analista...">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancelar" onclick="fecharModal('modalPerfil')">Cancelar</button>
+        <button class="btn-confirmar" onclick="salvarPerfil()">Salvar alterações</button>
+      </div>
+    </div>
+
+    <!-- Tab Senha -->
+    <div id="perfilTabSenha" style="display:none">
+      <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="senhaErro"></div>
+      <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="senhaSucesso"></div>
+      <div class="form-group">
+        <label>Senha atual *</label>
+        <input type="password" id="senhaAtual" placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label>Nova senha *</label>
+        <input type="password" id="senhaNova" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="form-group">
+        <label>Confirmar nova senha *</label>
+        <input type="password" id="senhaConfirm" placeholder="Repita a nova senha">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancelar" onclick="fecharModal('modalPerfil')">Cancelar</button>
+        <button class="btn-confirmar" onclick="salvarSenha()">Alterar senha</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   const token = localStorage.getItem('token');
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
   if (!token) window.location.href = '/';
   document.getElementById('userNome').textContent = usuario.nome || '-';
-  document.getElementById('userPerfil').textContent = usuario.perfil || '-';
-  document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+  document.getElementById('userPerfil').textContent = usuario.cargo || usuario.perfil || '-';
+  // Avatar com foto ou letra
+  const avatarEl = document.getElementById('userAvatar');
+  if (usuario.foto) {
+    avatarEl.innerHTML = `<img src="${usuario.foto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else {
+    avatarEl.textContent = (usuario.nome || '?')[0].toUpperCase();
+  }
+  // Header user abre modal de perfil
+  document.getElementById('headerUser').onclick = abrirModalPerfil;
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
 
@@ -394,16 +487,7 @@
 
   function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
   document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
-  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href = '/'; }
-
-  function fecharBanner() {
-    const banner = document.getElementById('bannerAssinatura');
-    if (banner) {
-      banner.style.display = 'none';
-      document.querySelector('.main').classList.remove('banner-visivel');
-    }
-    sessionStorage.setItem('bannerFechado', '1');
-  }
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
@@ -496,37 +580,43 @@
   });
   function verificarBloqueio(assinatura) {
   if (!assinatura) return;
+  const statusAtual = assinatura.status;
+  if (_statusAssinaturaAnterior !== null && _statusAssinaturaAnterior !== statusAtual) {
+    if (statusAtual === 'ativa') {
+      mostrarToast('🎉 Pagamento confirmado!', 'Seu plano foi ativado. Todos os módulos estão liberados.', '#276749', '#f0fff4', '#9ae6b4');
+      document.querySelectorAll('.menu-inadimplente-bloqueado').forEach(el => el.classList.remove('menu-inadimplente-bloqueado'));
+      document.querySelectorAll('.inadimplente-bloqueado').forEach(el => el.classList.remove('inadimplente-bloqueado'));
+      const avisoEl = document.getElementById('avisoInadimplente');
+      if (avisoEl) avisoEl.remove();
+      const overlay2 = document.getElementById('bloqueioOverlay');
+      if (overlay2) overlay2.classList.remove('ativo');
+    } else if (statusAtual === 'inadimplente') {
+      mostrarToast('⚠️ Pagamento em atraso', `Sua fatura está ${assinatura.diasAtraso||0} dia(s) em atraso.`, '#c05621', '#fffaf0', '#f6ad55');
+    }
+  }
+  _statusAssinaturaAnterior = statusAtual;
   const overlay = document.getElementById('bloqueioOverlay');
   const banner = document.getElementById('bannerAssinatura');
   if (!overlay) return;
 
+  // Mostrar banner de trial
   if (banner) {
-    if (sessionStorage.getItem('bannerFechado') === '1') {
-      banner.style.display = 'none';
-      document.querySelector('.main').classList.remove('banner-visivel');
+    if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
+      const expirando = assinatura.diasTrialRestantes <= 5;
+      banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
+      banner.innerHTML = `
+        <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
+        <a href="/plano-usuarios" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>`;
+      banner.style.display = 'flex';
+    } else if (assinatura.status === 'inadimplente') {
+      banner.className = 'banner-assinatura inadimplente';
+      banner.innerHTML = `
+        <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
+        <a href="/plano-usuarios" class="banner-assinatura-btn inadimplente">Pagar agora</a>`;
+      banner.style.display = 'flex';
     } else {
-      if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
-        const expirando = assinatura.diasTrialRestantes <= 5;
-        banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
-        banner.innerHTML = `
-          <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
-          <a href="/plano-usuarios" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>
-          <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
-        banner.style.display = 'flex';
-        document.querySelector('.main').classList.add('banner-visivel');
-      } else if (assinatura.status === 'inadimplente') {
-        banner.className = 'banner-assinatura inadimplente';
-        banner.innerHTML = `
-          <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
-          <a href="/plano-usuarios" class="banner-assinatura-btn inadimplente">Pagar agora</a>
-          <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
-        banner.style.display = 'flex';
-        document.querySelector('.main').classList.add('banner-visivel');
-      } else {
-        banner.style.display = 'none';
-        document.querySelector('.main').classList.remove('banner-visivel');
-      }
-    } // fecha if bannerFechado
+      banner.style.display = 'none';
+    }
   }
 
   // Mostrar overlay de bloqueio
@@ -557,6 +647,5 @@ function copiarPixBloqueio(codigo) {
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
-  <script src="/global.js"></script>
 </body>
 </html>

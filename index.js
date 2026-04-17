@@ -39,7 +39,7 @@ function validarCNPJ(cnpj) {
 // ==================== ASAAS HELPER ====================
 
 const ASAAS_BASE_URL = process.env.ASAAS_ENV === 'production'
-  ? 'https://api.asaas.com/v3'
+  ? 'https://api.asaas.com/api/v3'
   : 'https://sandbox.asaas.com/api/v3';
 
 async function asaasRequest(method, endpoint, body = null) {
@@ -139,6 +139,8 @@ const usuarioSchema = new mongoose.Schema({
     operacoes:      { acessar: { type: Boolean, default: true },  criar:     { type: Boolean, default: false }, editar:    { type: Boolean, default: false } },
     planoUsuarios:  { acessar: { type: Boolean, default: false }, gerenciar: { type: Boolean, default: false } },
   },
+  foto: { type: String, default: null },
+  cargo: { type: String, default: '' },
   criadoEm: { type: Date, default: Date.now }
 });
 const Usuario = mongoose.model('Usuario', usuarioSchema);
@@ -387,7 +389,8 @@ async function verificarAssinatura(req, res, next) {
       '/api/webhook/asaas',
       '/api/notificacoes',
       '/api/notificacoes/resumo',
-      '/api/usuarios'
+      '/api/usuarios',
+      '/api/perfil'
     ];
     const rota = req.path;
     if (rotasLiberadas.some(r => rota.startsWith(r))) return next();
@@ -520,7 +523,7 @@ app.post('/api/login', async (req, res) => {
       process.env.JWT_SECRET || 'segredo123', { expiresIn: '8h' }
     );
     verificarAlertasLicencas(usuario.empresa._id, usuario.email).catch(console.error);
-    res.json({ token, usuario: { nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresaNome: usuario.empresa.nome }, assinatura: { status: statusAssinatura, diasTrialRestantes } });
+    res.json({ token, usuario: { nome: usuario.nome, email: usuario.email, perfil: usuario.perfil, empresaNome: usuario.empresa.nome, foto: usuario.foto || null, cargo: usuario.cargo || '' }, assinatura: { status: statusAssinatura, diasTrialRestantes } });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
@@ -1053,6 +1056,45 @@ app.put('/api/notificacoes/ler-todas', authMiddleware, async (req, res) => {
 app.delete('/api/notificacoes/:id', authMiddleware, async (req, res) => {
   try { await Notificacao.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ ok: true }); }
   catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ==================== PERFIL ====================
+
+app.get('/api/perfil', authMiddleware, async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.usuario.id).select('-senha');
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    res.json(usuario);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/perfil', authMiddleware, async (req, res) => {
+  try {
+    const { nome, cargo, foto } = req.body;
+    if (!nome || nome.trim().length < 2) return res.status(400).json({ erro: 'Nome deve ter pelo menos 2 caracteres.' });
+    // Validar tamanho da foto (base64 ~1.33x do arquivo original — limite 2MB)
+    if (foto && foto.length > 2800000) return res.status(400).json({ erro: 'Foto muito grande. Máximo 2MB.' });
+    const update = { nome: nome.trim(), cargo: cargo?.trim() || '' };
+    if (foto !== undefined) update.foto = foto;
+    const usuario = await Usuario.findByIdAndUpdate(req.usuario.id, update, { new: true }).select('-senha');
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    res.json({ mensagem: 'Perfil atualizado!', usuario });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/perfil/senha', authMiddleware, async (req, res) => {
+  try {
+    const { senhaAtual, novaSenha } = req.body;
+    if (!senhaAtual || !novaSenha) return res.status(400).json({ erro: 'Preencha todos os campos.' });
+    if (novaSenha.length < 6) return res.status(400).json({ erro: 'Nova senha deve ter pelo menos 6 caracteres.' });
+    const usuario = await Usuario.findById(req.usuario.id);
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    const senhaCorreta = await bcrypt.compare(senhaAtual, usuario.senha);
+    if (!senhaCorreta) return res.status(400).json({ erro: 'Senha atual incorreta.' });
+    const hash = await bcrypt.hash(novaSenha, 10);
+    await Usuario.findByIdAndUpdate(req.usuario.id, { senha: hash });
+    res.json({ mensagem: 'Senha alterada com sucesso!' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 // ==================== USUÁRIOS ====================

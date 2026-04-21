@@ -703,34 +703,109 @@
   function renderConexoes() {
     const svg = document.getElementById('orgSvg');
     svg.innerHTML = '';
+
     // Marcador de seta
     const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
     const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
-    marker.setAttribute('id','arrowhead'); marker.setAttribute('markerWidth','10'); marker.setAttribute('markerHeight','7');
-    marker.setAttribute('refX','9'); marker.setAttribute('refY','3.5'); marker.setAttribute('orient','auto');
+    marker.setAttribute('id','arrowhead');
+    marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','6');
+    marker.setAttribute('refX','7'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
     const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    poly.setAttribute('points','0 0, 10 3.5, 0 7'); poly.setAttribute('fill','#2d1b69');
+    poly.setAttribute('points','0 0, 8 3, 0 6');
+    poly.setAttribute('fill','#2d1b69');
     marker.appendChild(poly); defs.appendChild(marker); svg.appendChild(defs);
+
+    // Só renderizar membros visíveis no departamento ativo
+    const membrosVisiveis = depAtivo === 'todos'
+      ? membros
+      : membros.filter(m => m.depId == depAtivo);
+    const idsVisiveis = new Set(membrosVisiveis.map(m => m.id));
+
+    const W = getLarguraCard();
+    const fScale = getFontScale();
+
     conexoes.forEach(c => {
-      const de = membros.find(m => m.id == c.de), para = membros.find(m => m.id == c.para);
+      // Só desenhar se AMBOS os membros estão visíveis
+      if (!idsVisiveis.has(c.de) || !idsVisiveis.has(c.para)) return;
+
+      const de = membros.find(m => m.id == c.de);
+      const para = membros.find(m => m.id == c.para);
       if (!de || !para) return;
-      const W = getLarguraCard(), H = Math.round(110 * getFontScale());
-      const cx1 = de.x + W/2, cy1 = de.y + H/2, cx2 = para.x + W/2, cy2 = para.y + H/2;
-      const dx = cx2 - cx1, dy = cy2 - cy1;
+
+      // Pegar posição real do node no DOM
+      const nodeDE = document.getElementById('node-' + de.id);
+      const nodePARA = document.getElementById('node-' + para.id);
+      if (!nodeDE || !nodePARA) return;
+
+      const canvas = document.getElementById('orgCanvas');
+      const canvasRect = canvas.getBoundingClientRect();
+      const rDE = nodeDE.getBoundingClientRect();
+      const rPARA = nodePARA.getBoundingClientRect();
+
+      // Coordenadas relativas ao canvas
+      const deLeft = rDE.left - canvasRect.left;
+      const deTop = rDE.top - canvasRect.top;
+      const deW = rDE.width;
+      const deH = rDE.height;
+
+      const paraLeft = rPARA.left - canvasRect.left;
+      const paraTop = rPARA.top - canvasRect.top;
+      const paraW = rPARA.width;
+      const paraH = rPARA.height;
+
+      // Centros
+      const cx1 = deLeft + deW / 2;
+      const cy1 = deTop + deH / 2;
+      const cx2 = paraLeft + paraW / 2;
+      const cy2 = paraTop + paraH / 2;
+
+      const dx = cx2 - cx1;
+      const dy = cy2 - cy1;
+
+      // Ponto de saída e entrada nas bordas dos cards
       let x1, y1, x2, y2;
       if (Math.abs(dy) >= Math.abs(dx)) {
-        if (dy > 0) { x1=cx1; y1=de.y+H; x2=cx2; y2=para.y; }
-        else { x1=cx1; y1=de.y; x2=cx2; y2=para.y+H; }
+        if (dy > 0) {
+          x1 = cx1; y1 = deTop + deH;
+          x2 = cx2; y2 = paraTop + 2;
+        } else {
+          x1 = cx1; y1 = deTop;
+          x2 = cx2; y2 = paraTop + paraH - 2;
+        }
       } else {
-        if (dx > 0) { x1=de.x+W; y1=cy1; x2=para.x; y2=cy2; }
-        else { x1=de.x; y1=cy1; x2=para.x+W; y2=cy2; }
+        if (dx > 0) {
+          x1 = deLeft + deW; y1 = cy1;
+          x2 = paraLeft + 2; y2 = cy2;
+        } else {
+          x1 = deLeft; y1 = cy1;
+          x2 = paraLeft + paraW - 2; y2 = cy2;
+        }
       }
-      const mx=(x1+x2)/2, my=(y1+y2)/2;
+
+      // Curva suave
+      const distH = Math.abs(x2 - x1);
+      const distV = Math.abs(y2 - y1);
+      let cp1x, cp1y, cp2x, cp2y;
+
+      if (Math.abs(dy) >= Math.abs(dx)) {
+        // Conexão vertical — curva horizontal
+        const offset = Math.min(distV * 0.5, 80);
+        cp1x = x1; cp1y = y1 + (dy > 0 ? offset : -offset);
+        cp2x = x2; cp2y = y2 + (dy > 0 ? -offset : offset);
+      } else {
+        // Conexão horizontal — curva vertical
+        const offset = Math.min(distH * 0.5, 80);
+        cp1x = x1 + (dx > 0 ? offset : -offset); cp1y = y1;
+        cp2x = x2 + (dx > 0 ? -offset : offset); cp2y = y2;
+      }
+
       const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d',`M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`);
-      path.setAttribute('fill','none'); path.setAttribute('stroke','#2d1b69');
-      path.setAttribute('stroke-width','2'); path.setAttribute('stroke-opacity','0.5');
-      path.setAttribute('marker-end','url(#arrowhead)');
+      path.setAttribute('d', `M${x1},${y1} C${cp1x},${cp1y} ${cp2x},${cp2y} ${x2},${y2}`);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', '#2d1b69');
+      path.setAttribute('stroke-width', '1.5');
+      path.setAttribute('stroke-opacity', '0.6');
+      path.setAttribute('marker-end', 'url(#arrowhead)');
       svg.appendChild(path);
     });
   }
@@ -790,10 +865,21 @@
         e.preventDefault();
       });
     });
-    renderConexoes();
+    // Aguardar o browser renderizar os nodes antes de desenhar as setas
+    requestAnimationFrame(() => renderConexoes());
   }
 
-  document.addEventListener('mousemove',e=>{if(!dragging)return;const r=document.getElementById('orgCanvas').getBoundingClientRect();const x=Math.max(0,e.clientX-r.left-dragOffset.x),y=Math.max(0,e.clientY-r.top-dragOffset.y);dragging.node.style.left=x+'px';dragging.node.style.top=y+'px';dragging.membro.x=x;dragging.membro.y=y;renderConexoes();});
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const r = document.getElementById('orgCanvas').getBoundingClientRect();
+    const x = Math.max(0, e.clientX - r.left - dragOffset.x);
+    const y = Math.max(0, e.clientY - r.top - dragOffset.y);
+    dragging.node.style.left = x + 'px';
+    dragging.node.style.top = y + 'px';
+    dragging.membro.x = x;
+    dragging.membro.y = y;
+    requestAnimationFrame(() => renderConexoes());
+  });
   document.addEventListener('mouseup',async()=>{if(dragging){dragging.node.classList.remove('dragging');await salvarOrg();dragging=null;}});
 
   // ===== PASTAS =====

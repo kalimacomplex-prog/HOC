@@ -459,7 +459,7 @@
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-' + id).style.display = 'block';
     btn.classList.add('active');
-    if (id === 'biblioteca') carregarWikis();
+    if (id === 'biblioteca') { if (pastas.length === 0) carregarPastas(); else carregarWikis(); }
   }
 
   // ===== VISÃO GERAL — API =====
@@ -885,18 +885,34 @@
   // ===== PASTAS =====
   let pastas = [], pastaAtiva = null;
 
+  async function carregarPastas() {
+    try {
+      const res = await fetch('/api/pastas', { headers: HEADERS });
+      if (res.ok) pastas = await res.json();
+      renderPastasSidebar();
+    } catch(e) { console.error(e); }
+    finally { carregarWikis(); }
+  }
+
   function criarPasta() {
     document.getElementById('novaPastaNome').value = '';
     document.getElementById('modalNovaPasta').classList.add('aberto');
     setTimeout(() => document.getElementById('novaPastaNome').focus(), 100);
   }
 
-  function confirmarNovaPasta() {
+  async function confirmarNovaPasta() {
     const nome = document.getElementById('novaPastaNome').value.trim();
     if (!nome) return;
-    pastas.push({ id: Date.now(), nome });
-    renderPastasSidebar();
-    fecharModal('modalNovaPasta');
+    try {
+      const res = await fetch('/api/pastas', {
+        method: 'POST', headers: HEADERS,
+        body: JSON.stringify({ nome })
+      });
+      const novaPasta = await res.json();
+      pastas.push(novaPasta);
+      renderPastasSidebar();
+      fecharModal('modalNovaPasta');
+    } catch(e) { console.error(e); }
   }
 
   function renderPastasSidebar() {
@@ -919,15 +935,17 @@
     filtrarWikis();
   }
 
-  function removerPasta(id, e) {
+  async function removerPasta(id, e) {
     e.stopPropagation();
     if (!confirm('Remover esta pasta? Os wikis dentro dela não serão deletados.')) return;
-    // Desassociar wikis dessa pasta
-    wikis.forEach(w => { if (w.pastaId === id) w.pastaId = null; });
-    pastas = pastas.filter(p => p.id !== id);
-    if (pastaAtiva === id) pastaAtiva = null;
-    renderPastasSidebar();
-    filtrarWikis();
+    try {
+      await fetch(`/api/pastas/${id}`, { method: 'DELETE', headers: HEADERS });
+      wikis.forEach(w => { if (w.pastaId === id) w.pastaId = null; });
+      pastas = pastas.filter(p => p.id !== id);
+      if (pastaAtiva === id) pastaAtiva = null;
+      renderPastasSidebar();
+      filtrarWikis();
+    } catch(e) { console.error(e); }
   }
 
   // ===== WIKIS — API =====
@@ -1080,7 +1098,7 @@
   carregarInfo();
   renderTimeline();
   carregarOrg();
-  carregarWikis();
+  carregarPastas();
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {

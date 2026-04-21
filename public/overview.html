@@ -73,6 +73,9 @@
     .modo-conexao-aviso.ativo { display: block; }
     .org-node.selecionado-conexao { border-color: #38a169; box-shadow: 0 0 0 3px rgba(56,161,105,0.3); }
     .bib-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .pasta-sidebar-btn { display: block; width: 100%; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #718096; margin-bottom: 3px; transition: all 0.2s; }
+    .pasta-sidebar-btn:hover { background: #f8fafc; color: #1e2a4a; }
+    .pasta-sidebar-btn.active { background: #f5f0ff; color: #2d1b69; font-weight: 700; }
     .bib-search { flex: 1; min-width: 200px; padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
     .bib-search:focus { border-color: #2d1b69; }
     .wiki-table { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
@@ -261,18 +264,39 @@
     <!-- BIBLIOTECA -->
     <div class="tab-content" id="tab-biblioteca">
       <div id="bibLista">
-        <div class="bib-header">
-          <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()">
-          <div style="display:flex;gap:8px">
-            <button class="btn-secondary" style="font-size:12px;padding:6px 12px">📁 Todas as Pastas</button>
-            <button class="btn-primary" onclick="novoWiki()" style="font-size:12px;padding:6px 12px">+ Novo Wiki</button>
+        <div style="display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start">
+          <!-- Sidebar Pastas -->
+          <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;position:sticky;top:0">
+            <div style="padding:12px 14px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:12px;font-weight:700;color:#1e2a4a">PASTAS</span>
+              <button onclick="criarPasta()" style="padding:3px 7px;background:#f0f2f5;border:none;border-radius:4px;font-size:11px;cursor:pointer;color:#4a5568;font-weight:600">+ Nova</button>
+            </div>
+            <div id="pastasSidebar" style="padding:8px">
+              <button class="pasta-sidebar-btn active" onclick="selecionarPasta(this,null)">📁 Todos os documentos</button>
+            </div>
           </div>
-        </div>
-        <div class="wiki-table">
-          <table>
-            <thead><tr><th>Nome</th><th>Tags</th><th>Responsável</th><th>Status</th><th>Versão</th><th>Atualizado em</th><th>Ações</th></tr></thead>
-            <tbody id="wikisBody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#a0aec0">Carregando wikis...</td></tr></tbody>
-          </table>
+          <!-- Conteúdo -->
+          <div>
+            <div class="bib-header">
+              <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()">
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <select id="filtroStatus" onchange="filtrarWikis()" style="padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;background:white">
+                  <option value="">Todos os Status</option>
+                  <option value="Rascunho">Rascunho</option>
+                  <option value="Aprovado">Aprovado</option>
+                  <option value="Pendente">Pendente</option>
+                </select>
+                <button class="btn-secondary" onclick="novoDocExterno()" style="font-size:12px;padding:6px 10px">🔗 Doc. Externo</button>
+                <button class="btn-primary" onclick="novoWiki()" style="font-size:12px;padding:6px 12px">+ Novo Wiki</button>
+              </div>
+            </div>
+            <div class="wiki-table">
+              <table>
+                <thead><tr><th>Nome</th><th>Pasta</th><th>Tags</th><th>Responsável</th><th>Status</th><th>Versão</th><th>Atualizado</th><th>Ações</th></tr></thead>
+                <tbody id="wikisBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Carregando wikis...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
       <div class="wiki-editor" id="wikiEditor">
@@ -732,6 +756,47 @@
   document.addEventListener('mousemove',e=>{if(!dragging)return;const r=document.getElementById('orgCanvas').getBoundingClientRect();const x=Math.max(0,e.clientX-r.left-dragOffset.x),y=Math.max(0,e.clientY-r.top-dragOffset.y);dragging.node.style.left=x+'px';dragging.node.style.top=y+'px';dragging.membro.x=x;dragging.membro.y=y;renderConexoes();});
   document.addEventListener('mouseup',async()=>{if(dragging){dragging.node.classList.remove('dragging');await salvarOrg();dragging=null;}});
 
+  // ===== PASTAS =====
+  let pastas = [], pastaAtiva = null;
+
+  function criarPasta() {
+    const nome = prompt('Nome da nova pasta:');
+    if (!nome || !nome.trim()) return;
+    pastas.push({ id: Date.now(), nome: nome.trim() });
+    renderPastasSidebar();
+  }
+
+  function renderPastasSidebar() {
+    const sidebar = document.getElementById('pastasSidebar');
+    if (!sidebar) return;
+    sidebar.innerHTML = `<button class="pasta-sidebar-btn ${pastaAtiva===null?'active':''}" onclick="selecionarPasta(this,null)">📁 Todos os documentos</button>`;
+    pastas.forEach(p => {
+      sidebar.innerHTML += `
+        <button class="pasta-sidebar-btn ${pastaAtiva===p.id?'active':''}" onclick="selecionarPasta(this,${p.id})" style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+          <span>📂 ${p.nome}</span>
+          <span onclick="removerPasta(${p.id},event)" style="color:#a0aec0;cursor:pointer;font-size:12px;padding:0 2px;flex-shrink:0" title="Remover pasta">×</span>
+        </button>`;
+    });
+  }
+
+  function selecionarPasta(btn, id) {
+    pastaAtiva = id;
+    document.querySelectorAll('.pasta-sidebar-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filtrarWikis();
+  }
+
+  function removerPasta(id, e) {
+    e.stopPropagation();
+    if (!confirm('Remover esta pasta? Os wikis dentro dela não serão deletados.')) return;
+    // Desassociar wikis dessa pasta
+    wikis.forEach(w => { if (w.pastaId === id) w.pastaId = null; });
+    pastas = pastas.filter(p => p.id !== id);
+    if (pastaAtiva === id) pastaAtiva = null;
+    renderPastasSidebar();
+    filtrarWikis();
+  }
+
   // ===== WIKIS — API =====
   let wikis = [], wikiEditando = null;
 
@@ -759,7 +824,7 @@
   async function salvarWiki() {
     const titulo = document.getElementById('editorTitulo').value.trim();
     if (!titulo) { alert('Título obrigatório'); return; }
-    const dados = { titulo, conteudo: document.getElementById('editorArea').innerHTML, tags: document.getElementById('editorTags').value.trim(), responsavel: document.getElementById('editorResponsavel').value.trim(), status: 'Rascunho', versao: 'v1.0' };
+    const dados = { titulo, conteudo: document.getElementById('editorArea').innerHTML, tags: document.getElementById('editorTags').value.trim(), responsavel: document.getElementById('editorResponsavel').value.trim(), status: 'Rascunho', versao: 'v1.0', pastaId: wikiEditando ? wikis.find(w=>w._id===wikiEditando)?.pastaId : pastaAtiva };
     try {
       if (wikiEditando) {
         const wiki = wikis.find(w=>w._id===wikiEditando);
@@ -796,27 +861,73 @@
   }
 
   function renderWikis(lista) {
-    const tbody=document.getElementById('wikisBody'),filtro=lista||wikis;
-    if(filtro.length===0){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:#a0aec0">Nenhum wiki criado ainda.</td></tr>';return;}
-    const statusCor={'Aprovado':'badge-verde','Rascunho':'badge-cinza','Pendente':'badge-amarelo'};
-    tbody.innerHTML=filtro.map(w=>`
-      <tr>
-        <td><strong>${w.titulo}</strong></td>
-        <td>${w.tags?w.tags.split(',').map(t=>`<span class="wiki-tag">${t.trim()}</span>`).join(''):'—'}</td>
+    const tbody = document.getElementById('wikisBody'), filtro = lista !== undefined ? lista : wikis;
+    if (filtro.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Nenhum documento nesta pasta.</td></tr>'; return; }
+    const statusCor = { 'Aprovado':'badge-verde', 'Rascunho':'badge-cinza', 'Pendente':'badge-amarelo' };
+    tbody.innerHTML = filtro.map(w => {
+      const pasta = pastas.find(p => p.id === w.pastaId);
+      const pastaOpts = pastas.map(p => `<option value="${p.id}" ${w.pastaId===p.id?'selected':''}>${p.nome}</option>`).join('');
+      return `<tr>
+        <td><strong>${w.titulo}</strong>${w.urlExterno ? ` <a href="${w.urlExterno}" target="_blank" style="font-size:11px;color:#2d1b69">↗</a>` : ''}</td>
+        <td>
+          <select onchange="moverWikiPasta('${w._id}',this.value)" style="font-size:11px;padding:2px 4px;border:1px solid #e2e8f0;border-radius:4px;color:#718096;background:white;cursor:pointer">
+            <option value="">Sem pasta</option>
+            ${pastaOpts}
+          </select>
+        </td>
+        <td>${w.tags ? w.tags.split(',').map(t=>`<span class="wiki-tag">${t.trim()}</span>`).join('') : '—'}</td>
         <td>${w.responsavel||'—'}</td>
         <td><span class="badge ${statusCor[w.status]||'badge-cinza'}">${w.status}</span></td>
         <td><span class="versao-badge">${w.versao}</span></td>
         <td>${new Date(w.atualizadoEm||w.criadoEm).toLocaleDateString('pt-BR')}</td>
-        <td>
-          <button onclick="editarWiki('${w._id}')" style="padding:4px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️ Editar</button>
-          <button onclick="deletarWiki('${w._id}')" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:4px">🗑️</button>
+        <td style="white-space:nowrap">
+          ${w.tipo !== 'externo' ? `<button onclick="editarWiki('${w._id}')" style="padding:4px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️</button>` : ''}
+          ${w.status === 'Aprovado' && w.tipo !== 'externo' ? `<button onclick="novaVersaoWiki('${w._id}')" style="padding:4px 8px;background:#f0fff4;color:#276749;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:2px" title="Nova Versão">📋</button>` : ''}
+          <button onclick="deletarWiki('${w._id}')" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:2px">🗑️</button>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
+  }
+
+  async function moverWikiPasta(id, pastaIdStr) {
+    const pastaId = pastaIdStr ? parseInt(pastaIdStr) : null;
+    const wiki = wikis.find(w => w._id === id);
+    if (!wiki) return;
+    wiki.pastaId = pastaId;
+    await fetch(`/api/wikis/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({ pastaId }) });
+    renderPastasSidebar();
+    filtrarWikis();
+  }
+
+  async function novaVersaoWiki(id) {
+    const wiki = wikis.find(w=>w._id===id);
+    if (!wiki) return;
+    if (!confirm(`Criar nova versão do wiki "${wiki.titulo}"?`)) return;
+    const novaVersao = 'v' + (parseFloat(wiki.versao.replace('v','')) + 1).toFixed(1);
+    const dados = { titulo: wiki.titulo, conteudo: wiki.conteudo, tags: wiki.tags, responsavel: wiki.responsavel, status: 'Rascunho', versao: novaVersao, pastaId: wiki.pastaId };
+    await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+    await carregarWikis();
+    alert(`Nova versão ${novaVersao} criada!`);
   }
 
   function filtrarWikis() {
-    const q=document.getElementById('searchWiki').value.toLowerCase();
-    renderWikis(wikis.filter(w=>w.titulo.toLowerCase().includes(q)||(w.tags||'').toLowerCase().includes(q)||(w.responsavel||'').toLowerCase().includes(q)));
+    const q = document.getElementById('searchWiki').value.toLowerCase();
+    const st = document.getElementById('filtroStatus')?.value || '';
+    renderWikis(wikis.filter(w => {
+      if (pastaAtiva !== null && w.pastaId !== pastaAtiva) return false;
+      if (q && !w.titulo.toLowerCase().includes(q) && !(w.tags||'').toLowerCase().includes(q) && !(w.responsavel||'').toLowerCase().includes(q)) return false;
+      if (st && w.status !== st) return false;
+      return true;
+    }));
+  }
+
+  function novoDocExterno() {
+    const titulo = prompt('Título do documento:');
+    if (!titulo) return;
+    const url = prompt('URL do documento (ex: https://docs.google.com/...):');
+    if (!url) return;
+    const dados = { titulo, conteudo: '', tags: '', responsavel: '', status: 'Aprovado', versao: 'v1.0', tipo: 'externo', urlExterno: url, pastaId: pastaAtiva };
+    fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) }).then(()=>carregarWikis());
   }
 
   function fmt(cmd,val){document.execCommand(cmd,false,val||null);document.getElementById('editorArea').focus();}

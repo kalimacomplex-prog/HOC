@@ -203,14 +203,20 @@ const Bowler = mongoose.model('Bowler', bowlerSchema);
 const overviewSchema = new mongoose.Schema({
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true, unique: true },
   info: { type: Object, default: {} }, mvv: { type: Object, default: {} }, timeline: { type: Array, default: [] },
-  esg: { type: Object, default: {} }, organograma: { type: Object, default: {} }, atualizadoEm: { type: Date, default: Date.now }
+  esg: { type: Object, default: {} }, organograma: { type: Object, default: {} },
+  pastas: { type: Array, default: [] },
+  atualizadoEm: { type: Date, default: Date.now }
 });
 const Overview = mongoose.model('Overview', overviewSchema);
 
 const wikiSchema = new mongoose.Schema({
   titulo: { type: String, required: true }, conteudo: { type: String, default: '' }, tags: { type: String, default: '' },
   responsavel: { type: String, default: '' }, status: { type: String, default: 'Rascunho' }, versao: { type: String, default: 'v1.0' },
-  versoes: { type: Array, default: [] }, empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  versoes: { type: Array, default: [] },
+  pastaId: { type: Number, default: null },
+  tipo: { type: String, default: 'wiki' },
+  urlExterno: { type: String, default: null },
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
 });
@@ -1281,6 +1287,42 @@ app.put('/api/bowler/:ano', authMiddleware, verificarAssinatura, permGestaoMetas
 app.get('/api/overview', authMiddleware, verificarAssinatura, async (req, res) => {
   try { const overview = await Overview.findOne({ empresa: req.usuario.empresa }); res.json(overview || null); }
   catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ==================== PASTAS DA BIBLIOTECA ====================
+
+app.get('/api/pastas', authMiddleware, async (req, res) => {
+  try {
+    const overview = await Overview.findOne({ empresa: req.usuario.empresa }).select('pastas');
+    res.json(overview?.pastas || []);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.post('/api/pastas', authMiddleware, async (req, res) => {
+  try {
+    const { nome } = req.body;
+    if (!nome?.trim()) return res.status(400).json({ erro: 'Nome obrigatório.' });
+    const novaPasta = { id: Date.now(), nome: nome.trim(), criadoEm: new Date() };
+    await Overview.findOneAndUpdate(
+      { empresa: req.usuario.empresa },
+      { $push: { pastas: novaPasta }, atualizadoEm: new Date() },
+      { upsert: true }
+    );
+    res.status(201).json(novaPasta);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.delete('/api/pastas/:id', authMiddleware, async (req, res) => {
+  try {
+    const pastaId = parseInt(req.params.id);
+    await Overview.findOneAndUpdate(
+      { empresa: req.usuario.empresa },
+      { $pull: { pastas: { id: pastaId } }, atualizadoEm: new Date() }
+    );
+    // Desassociar wikis desta pasta
+    await Wiki.updateMany({ empresa: req.usuario.empresa, pastaId }, { $unset: { pastaId: '' } });
+    res.json({ mensagem: 'Pasta removida.' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 app.put('/api/overview', authMiddleware, verificarAssinatura, permOverview('editar'), async (req, res) => {
   try {

@@ -672,18 +672,59 @@
   }
 
   function renderOrganograma() {
-    const canvas=document.getElementById('orgCanvas'),empty=document.getElementById('orgEmpty');
-    const filtrados=depAtivo==='todos'?membros:membros.filter(m=>m.depId==depAtivo);
-    document.querySelectorAll('.org-node').forEach(n=>n.remove());
-    if(filtrados.length===0){empty.style.display='flex';renderConexoes();return;}
-    empty.style.display='none';
-    filtrados.forEach(m=>{
-      const cor=getDepCor(m.depId),dep=departamentos.find(d=>d.id==m.depId);
-      const node=document.createElement('div');node.className='org-node';node.id='node-'+m.id;node.style.left=m.x+'px';node.style.top=m.y+'px';node.style.borderColor=cor;
-      node.innerHTML=`<div class="org-node-top"><div class="org-node-avatar" style="background:${cor}">${m.nome[0].toUpperCase()}</div><div class="org-node-actions"><button class="org-node-btn edit" onclick="abrirModalMembro(${m.id});event.stopPropagation()">✏️</button><button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()">🗑️</button></div></div><div class="org-node-nome">${m.nome}</div><div class="org-node-cargo" style="color:${cor}">${m.cargo}</div>${dep?`<div class="org-node-area">${dep.nome}</div>`:''} ${m.email?`<div class="org-node-email">${m.email}</div>`:''}`;
-      node.addEventListener('click',()=>clicarMembro(m.id));
+    const canvas = document.getElementById('orgCanvas'), empty = document.getElementById('orgEmpty');
+    const filtrados = depAtivo === 'todos' ? membros : membros.filter(m => m.depId == depAtivo);
+    document.querySelectorAll('.org-node').forEach(n => n.remove());
+    if (filtrados.length === 0) { empty.style.display = 'flex'; renderConexoes(); return; }
+    empty.style.display = 'none';
+
+    const W = getLarguraCard();
+    const fScale = getFontScale();
+    const pad = fScale < 0.8 ? '8px' : '14px';
+
+    filtrados.forEach(m => {
+      const cor = getDepCor(m.depId), dep = departamentos.find(d => d.id == m.depId);
+      const nomes = m.nome.trim().split(' ');
+      const primeiro = nomes[0];
+      const ultimo = nomes.length > 1 ? nomes[nomes.length - 1] : '';
+      const meio = nomes.length > 2 ? nomes.slice(1, -1).join(' ') : '';
+      const nomeHtml = `<strong>${primeiro}</strong>${meio ? ' ' + meio : ''}<strong>${ultimo ? ' ' + ultimo : ''}</strong>`;
+
+      const fotoHtml = m.foto
+        ? `<img src="${m.foto}" style="width:${Math.round(44*fScale)}px;height:${Math.round(44*fScale)}px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:0 auto ${fScale<0.8?3:6}px;display:block">`
+        : '';
+
+      const node = document.createElement('div');
+      node.className = 'org-node';
+      node.id = 'node-' + m.id;
+      node.style.cssText = `left:${m.x}px;top:${m.y}px;width:${W}px;border-color:${cor};text-align:center;padding:${pad};position:absolute`;
+
+      node.innerHTML = `
+        <div class="org-node-actions" style="position:absolute;top:5px;right:5px;display:flex;gap:2px;opacity:0;transition:opacity 0.2s">
+          <button class="org-node-btn edit" onclick="abrirModalMembro(${m.id});event.stopPropagation()" title="Editar">✏️</button>
+          <button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()" title="Remover">🗑️</button>
+        </div>
+        ${fotoHtml}
+        <div style="font-size:${Math.round(13*fScale)}px;font-weight:600;color:#1e2a4a;margin-bottom:2px;line-height:1.3">${nomeHtml}</div>
+        <div style="font-size:${Math.round(11*fScale)}px;color:${cor};font-weight:600;margin-bottom:2px">${m.cargo}</div>
+        ${dep && fScale >= 0.8 ? `<div style="font-size:${Math.round(10*fScale)}px;color:#718096">${dep.nome}</div>` : ''}
+        ${m.email && fScale >= 1.0 ? `<div style="font-size:${Math.round(10*fScale)}px;color:#a0aec0;margin-top:1px">${m.email}</div>` : ''}
+        ${fScale >= 0.7 ? `<div style="margin-top:${fScale<0.8?4:7}px;border-top:1px solid #f0f2f5;padding-top:4px">
+          <button onclick="iniciarConexao(${m.id},event)" style="padding:2px 7px;background:#f5f0ff;color:#2d1b69;border:1px solid #e9d8fd;border-radius:4px;font-size:${Math.round(10*fScale)}px;cursor:pointer;font-weight:600">🔗</button>
+        </div>` : ''}
+      `;
+
+      node.addEventListener('click', () => clicarMembro(m.id));
       canvas.appendChild(node);
-      node.addEventListener('mousedown',e=>{if(e.target.tagName==='BUTTON'||modoConexao)return;dragging={node,membro:m};const rect=node.getBoundingClientRect();dragOffset.x=e.clientX-rect.left;dragOffset.y=e.clientY-rect.top;node.classList.add('dragging');e.preventDefault();});
+      node.addEventListener('mousedown', e => {
+        if (e.target.tagName === 'BUTTON' || modoConexao) return;
+        dragging = { node, membro: m };
+        const rect = node.getBoundingClientRect();
+        dragOffset.x = e.clientX - rect.left;
+        dragOffset.y = e.clientY - rect.top;
+        node.classList.add('dragging');
+        e.preventDefault();
+      });
     });
     renderConexoes();
   }

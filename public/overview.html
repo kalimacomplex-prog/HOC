@@ -234,8 +234,13 @@
       <div class="time-toolbar">
         <div class="deps-lista" id="listaDeps"><button class="dep-btn active" onclick="selecionarDep(this,'todos')">Todos os Departamentos</button></div>
         <div class="time-acoes">
+          <div style="display:flex;align-items:center;gap:4px;background:white;border:1.5px solid #e2e8f0;border-radius:6px;padding:3px 8px">
+            <button onclick="ajustarZoom(-1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#718096;padding:0 2px;line-height:1" title="Diminuir">−</button>
+            <span id="zoomLabel" style="font-size:11px;font-weight:600;color:#4a5568;min-width:32px;text-align:center">100%</span>
+            <button onclick="ajustarZoom(1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#718096;padding:0 2px;line-height:1" title="Aumentar">+</button>
+          </div>
           <button class="btn-secondary" onclick="toggleModoConexao()" id="btnConexao" style="font-size:12px;padding:6px 12px">🔗 Conectar</button>
-          <button class="btn-secondary" onclick="abrirModalDep()" style="font-size:12px;padding:6px 12px">+ Novo</button>
+          <button class="btn-secondary" onclick="abrirModalDep()" style="font-size:12px;padding:6px 12px">+ Novo Departamento</button>
           <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px;padding:6px 12px">+ Membro</button>
         </div>
       </div>
@@ -507,6 +512,19 @@
   const DEP_CORES = ['#2d1b69','#38a169','#3b5bdb','#e53e3e','#d69e2e','#00b5d8'];
   let departamentos = [], membros = [], conexoes = [], depAtivo = 'todos';
   let dragging = null, dragOffset = { x:0, y:0 }, modoConexao = false, conexaoSelecionado = null;
+  let zoomNivel = 4; // índice no array de tamanhos
+  const ZOOM_NIVEIS = [60, 80, 100, 120, 140, 180];
+  const ZOOM_LABELS = ['60%', '80%', '100%', '120%', '140%', '180%'];
+  const ZOOM_LARGURAS = [100, 130, 180, 200, 220, 260]; // largura do card em px
+
+  function ajustarZoom(delta) {
+    zoomNivel = Math.max(0, Math.min(ZOOM_NIVEIS.length - 1, zoomNivel + delta));
+    document.getElementById('zoomLabel').textContent = ZOOM_LABELS[zoomNivel];
+    renderOrganograma();
+  }
+
+  function getLarguraCard() { return ZOOM_LARGURAS[zoomNivel]; }
+  function getFontScale() { return ZOOM_NIVEIS[zoomNivel] / 100; }
 
   function getDepIdx(depId) { return departamentos.findIndex(d => d.id == depId); }
   function getDepCor(depId) { const idx = getDepIdx(depId); return DEP_CORES[idx % DEP_CORES.length] || '#2d1b69'; }
@@ -632,7 +650,7 @@
     conexoes.forEach(c => {
       const de = membros.find(m => m.id == c.de), para = membros.find(m => m.id == c.para);
       if (!de || !para) return;
-      const W = 180, H = 110;
+      const W = getLarguraCard(), H = Math.round(110 * getFontScale());
       const cx1 = de.x + W/2, cy1 = de.y + H/2, cx2 = para.x + W/2, cy2 = para.y + H/2;
       const dx = cx2 - cx1, dy = cy2 - cy1;
       let x1, y1, x2, y2;

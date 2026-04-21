@@ -43,9 +43,6 @@
     .dep-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; transition: all 0.2s; }
     .dep-btn:hover { border-color: #2d1b69; color: #2d1b69; }
     .dep-btn.active { background: #2d1b69; color: white; border-color: #2d1b69; }
-    .dep-sidebar-btn { display: block; width: 100%; text-align: left; padding: 9px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; border-left: 3px solid transparent; background: transparent; color: #718096; margin-bottom: 3px; transition: all 0.2s; }
-    .dep-sidebar-btn:hover { background: #f8fafc; }
-    .dep-sidebar-btn.active { background: #f5f0ff; }
     .time-acoes { display: flex; gap: 8px; }
     .org-container { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 24px; min-height: 480px; position: relative; overflow: hidden; }
     .org-canvas { position: relative; width: 100%; height: 480px; }
@@ -76,9 +73,6 @@
     .modo-conexao-aviso.ativo { display: block; }
     .org-node.selecionado-conexao { border-color: #38a169; box-shadow: 0 0 0 3px rgba(56,161,105,0.3); }
     .bib-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-    .pasta-sidebar-btn { display: block; width: 100%; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #718096; margin-bottom: 3px; transition: all 0.2s; }
-    .pasta-sidebar-btn:hover { background: #f8fafc; color: #1e2a4a; }
-    .pasta-sidebar-btn.active { background: #f5f0ff; color: #2d1b69; font-weight: 700; }
     .bib-search { flex: 1; min-width: 200px; padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
     .bib-search:focus { border-color: #2d1b69; }
     .wiki-table { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
@@ -142,7 +136,10 @@
 <div class="main">
   <div id="bannerAssinatura" style="display:none"></div>
   <div class="header">
-    <div style="font-size:15px;font-weight:700;color:#1e2a4a">OVERVIEW</div>
+    <div class="header-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar...">
+    </div>
     <div class="header-right">
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
@@ -170,35 +167,32 @@
   </div>
 
   <div class="content">
-    <div class="page-title">OVERVIEW</div>
-    
+    <div class="page-title">Overview</div>
+    <div class="breadcrumb">Home > Overview</div>
 
     <div class="tabs">
-      <button class="tab active" onclick="mudarTab('visao-geral', this)">VISÃO GERAL</button>
-      <button class="tab" onclick="mudarTab('nosso-time', this)">NOSSO TIME</button>
-      <button class="tab" onclick="mudarTab('biblioteca', this)">BIBLIOTECA</button>
-      <button class="tab" onclick="mudarTab('oraculo', this)">ORÁCULO</button>
+      <button class="tab active" onclick="mudarTab('visao-geral', this)">Visão Geral</button>
+      <button class="tab" onclick="mudarTab('nosso-time', this)">Nosso Time</button>
+      <button class="tab" onclick="mudarTab('biblioteca', this)">Biblioteca</button>
+      <button class="tab" onclick="mudarTab('oraculo', this)">Oráculo</button>
     </div>
 
     <!-- VISÃO GERAL -->
     <div class="tab-content active" id="tab-visao-geral">
       <div class="sobre-card">
         <div class="sobre-header">
-          <span class="sobre-titulo">🏢 Sobre a Empresa</span>
+          <span class="sobre-titulo">Sobre a Empresa</span>
           <div>
             <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()" style="font-size:12px;padding:6px 12px">✏️ Editar</button>
             <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none;font-size:12px;padding:6px 12px">💾 Salvar</button>
           </div>
         </div>
         <div class="info-grid">
-          <div class="info-item"><div class="info-label">Resumo</div><div class="info-value" id="val-definicao">Clique em Editar para adicionar.</div><textarea class="info-textarea" id="inp-definicao" style="display:none" placeholder="Descreva sua empresa..."></textarea></div>
+          <div class="info-item"><div class="info-label">Definição</div><div class="info-value" id="val-definicao">Clique em Editar para adicionar.</div><textarea class="info-textarea" id="inp-definicao" style="display:none" placeholder="Descreva sua empresa..."></textarea></div>
           <div class="info-item"><div class="info-label">Data de Fundação</div><div class="info-value" id="val-fundacao">—</div><input type="text" class="info-input" id="inp-fundacao" style="display:none" placeholder="Ex: 12/03/2020"></div>
           <div class="info-item"><div class="info-label">Setor de Atuação</div><div class="info-value" id="val-setor">—</div><input type="text" class="info-input" id="inp-setor" style="display:none" placeholder="Ex: Tecnologia da Informação"></div>
           <div class="info-item"><div class="info-label">Site / Contato</div><div class="info-value" id="val-site">—</div><input type="text" class="info-input" id="inp-site" style="display:none" placeholder="Ex: www.empresa.com.br"></div>
         </div>
-        <!-- Categorias extras -->
-        <div id="categoriasExtras" style="margin-top:8px"></div>
-        <button id="btnNovaCategoria" onclick="adicionarCategoriaExtra()" style="display:none;margin-top:8px;padding:6px 12px;background:#f0f2f5;color:#718096;border:none;border-radius:6px;font-size:12px;cursor:pointer">+ Nova Categoria</button>
       </div>
 
       <div class="mvv-grid">
@@ -240,11 +234,13 @@
       <div class="time-toolbar">
         <div class="deps-lista" id="listaDeps"><button class="dep-btn active" onclick="selecionarDep(this,'todos')">Todos os Departamentos</button></div>
         <div class="time-acoes">
-          <button class="btn-secondary" onclick="abrirModalDep()" style="font-size:12px;padding:6px 12px">+ Novo Departamento</button>
+          <button class="btn-secondary" onclick="toggleModoConexao()" id="btnConexao" style="font-size:12px;padding:6px 12px">🔗 Conectar</button>
+          <button class="btn-secondary" onclick="abrirModalDep()" style="font-size:12px;padding:6px 12px">+ Novo</button>
           <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px;padding:6px 12px">+ Membro</button>
         </div>
       </div>
-      
+      <div class="modo-conexao-aviso" id="modoConexaoAviso">🔗 Modo conexão ativo — clique em dois membros para conectá-los. Clique em "Conectar" novamente para sair.</div>
+      <div class="modo-conexao-aviso" id="modoConexaoAviso">🔗 Modo conexão ativo — clique em dois membros para conectá-los. Clique em "Conectar" para sair.</div>
       <div class="org-container">
         <div class="org-canvas" id="orgCanvas">
           <svg class="org-svg" id="orgSvg"></svg>
@@ -260,46 +256,18 @@
     <!-- BIBLIOTECA -->
     <div class="tab-content" id="tab-biblioteca">
       <div id="bibLista">
-        <div style="display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start">
-          <!-- Sidebar Pastas -->
-          <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden">
-            <div style="padding:12px 14px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between">
-              <span style="font-size:12px;font-weight:700;color:#1e2a4a">PASTAS</span>
-              <button onclick="criarPasta()" style="padding:3px 7px;background:#f0f2f5;border:none;border-radius:4px;font-size:11px;cursor:pointer;color:#4a5568">+ Nova</button>
-            </div>
-            <div id="pastasSidebar" style="padding:8px">
-              <button class="pasta-sidebar-btn active" onclick="selecionarPasta(this,null)" style="background:#f5f0ff;color:#2d1b69">
-                📁 Todos os documentos
-              </button>
-            </div>
+        <div class="bib-header">
+          <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()">
+          <div style="display:flex;gap:8px">
+            <button class="btn-secondary" style="font-size:12px;padding:6px 12px">📁 Todas as Pastas</button>
+            <button class="btn-primary" onclick="novoWiki()" style="font-size:12px;padding:6px 12px">+ Novo Wiki</button>
           </div>
-          <!-- Conteúdo -->
-          <div>
-            <div class="bib-header">
-              <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()">
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <select id="filtroStatus" onchange="filtrarWikis()" style="padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none">
-                  <option value="">Todos os Status</option>
-                  <option value="Rascunho">Rascunho</option>
-                  <option value="Aprovado">Aprovado</option>
-                  <option value="Pendente">Pendente</option>
-                </select>
-                <select id="filtroTipo" onchange="filtrarWikis()" style="padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none">
-                  <option value="">Todos os Tipos</option>
-                  <option value="wiki">Wiki Interno</option>
-                  <option value="externo">Doc. Externo</option>
-                </select>
-                <button class="btn-secondary" onclick="novoDocExterno()" style="font-size:12px;padding:6px 10px">🔗 Doc. Externo</button>
-                <button class="btn-primary" onclick="novoWiki()" style="font-size:12px;padding:6px 12px">+ Novo Wiki</button>
-              </div>
-            </div>
-            <div class="wiki-table">
-              <table>
-                <thead><tr><th>Nome</th><th>Tipo</th><th>Tags</th><th>Responsável</th><th>Status</th><th>Versão</th><th>Atualizado</th><th>Ações</th></tr></thead>
-                <tbody id="wikisBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Carregando...</td></tr></tbody>
-              </table>
-            </div>
-          </div>
+        </div>
+        <div class="wiki-table">
+          <table>
+            <thead><tr><th>Nome</th><th>Tags</th><th>Responsável</th><th>Status</th><th>Versão</th><th>Atualizado em</th><th>Ações</th></tr></thead>
+            <tbody id="wikisBody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#a0aec0">Carregando wikis...</td></tr></tbody>
+          </table>
         </div>
       </div>
       <div class="wiki-editor" id="wikiEditor">
@@ -336,7 +304,7 @@
       <div class="oraculo-wrap">
         <div class="oraculo-hero">
           <div class="oraculo-icon">🔮</div>
-          <div class="oraculo-titulo">Olá! Sou o ORÁCULO ✨</div>
+          <div class="oraculo-titulo">Olá! Sou o Oráculo ✨</div>
           <div class="oraculo-sub">Como posso ajudar você hoje?</div>
         </div>
         <div class="oraculo-atalhos">
@@ -347,14 +315,14 @@
         </div>
         <div class="chat-box">
           <div class="chat-msgs" id="chatMsgs">
-            <div class="chat-msg bot"><div class="chat-bubble">Olá! Sou o ORÁCULO do HOC System. Em breve poderei responder perguntas sobre os dados internos da sua empresa!</div></div>
+            <div class="chat-msg bot"><div class="chat-bubble">Olá! Sou o Oráculo do HOC System. Em breve poderei responder perguntas sobre os dados internos da sua empresa!</div></div>
           </div>
           <div class="chat-input-row">
             <input class="chat-input" type="text" placeholder="Digite sua pergunta... (em breve)" disabled>
             <button class="chat-send" disabled>Enviar</button>
           </div>
         </div>
-        <div class="oraculo-aviso">⚙️ O ORÁCULO estará disponível em breve.</div>
+        <div class="oraculo-aviso">⚙️ O Oráculo estará disponível em breve.</div>
       </div>
     </div>
   </div>
@@ -362,23 +330,10 @@
 
 <!-- Modal Timeline -->
 <div class="modal-overlay" id="modalTimeline">
-  <div class="modal" style="max-width:560px">
+  <div class="modal">
     <div class="modal-header"><span class="modal-titulo">Adicionar Marco Histórico</span><button class="btn-fechar" onclick="fecharModal('modalTimeline')">×</button></div>
     <div class="form-group"><label>Ano</label><input type="text" id="timelineAno" placeholder="Ex: 2020"></div>
-    <div class="form-group">
-      <label>Descrição</label>
-      <div style="border:1.5px solid #e2e8f0;border-radius:6px;overflow:hidden">
-        <div style="display:flex;gap:2px;padding:5px;background:#f8fafc;border-bottom:1px solid #e2e8f0;flex-wrap:wrap">
-          <button type="button" onclick="fmtTL('bold')" style="padding:4px 7px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:12px;font-weight:700">B</button>
-          <button type="button" onclick="fmtTL('italic')" style="padding:4px 7px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:12px;font-style:italic">I</button>
-          <button type="button" onclick="fmtTL('underline')" style="padding:4px 7px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:12px;text-decoration:underline">U</button>
-          <button type="button" onclick="fmtTL('insertUnorderedList')" style="padding:4px 7px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:12px">• Lista</button>
-          <button type="button" onclick="fmtTL('insertOrderedList')" style="padding:4px 7px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:12px">1. Lista</button>
-          <button type="button" onclick="inserirLinkTL()" style="padding:4px 7px;border:none;background:none;border-radius:3px;cursor:pointer;font-size:12px">🔗 Link</button>
-        </div>
-        <div id="timelineDesc" contenteditable="true" style="min-height:80px;padding:10px;font-size:13px;outline:none;line-height:1.6;color:#1e2a4a"></div>
-      </div>
-    </div>
+    <div class="form-group"><label>Descrição</label><textarea id="timelineDesc" rows="3" placeholder="Descreva o marco..."></textarea></div>
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalTimeline')">Cancelar</button><button class="btn-confirmar" onclick="adicionarTimeline()">Adicionar</button></div>
   </div>
 </div>
@@ -492,9 +447,6 @@
     document.getElementById('btnEditar').style.display = modoEdicao ? 'none' : 'inline-block';
     document.getElementById('btnSalvar').style.display = modoEdicao ? 'inline-block' : 'none';
     document.getElementById('btnAddTimeline').style.display = modoEdicao ? 'flex' : 'none';
-    const btnCat = document.getElementById('btnNovaCategoria');
-    if (btnCat) btnCat.style.display = modoEdicao ? 'inline-block' : 'none';
-    renderTimeline(); // atualiza botões de remover timeline
     document.querySelectorAll('.mvv-textarea,.esg-textarea').forEach(el => el.style.display = modoEdicao ? 'block' : 'none');
     document.querySelectorAll('.mvv-texto,.esg-texto').forEach(el => el.style.display = modoEdicao ? 'none' : 'block');
   }
@@ -529,14 +481,13 @@
 
   async function adicionarTimeline() {
     const ano = document.getElementById('timelineAno').value.trim();
-    const descEl = document.getElementById('timelineDesc');
-    const desc = descEl.innerHTML.trim();
-    if (!ano || !desc || desc === '<br>') return;
-    timelineData.push({ ano, desc, isHtml: true });
+    const desc = document.getElementById('timelineDesc').value.trim();
+    if (!ano || !desc) return;
+    timelineData.push({ ano, desc });
     timelineData.sort((a,b) => a.ano - b.ano);
     renderTimeline();
     document.getElementById('timelineAno').value = '';
-    descEl.innerHTML = '';
+    document.getElementById('timelineDesc').value = '';
     fecharModal('modalTimeline');
     try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ timeline: timelineData }) }); } catch(err) { console.error(err); }
   }
@@ -544,20 +495,12 @@
   function renderTimeline() {
     const container = document.getElementById('timeline');
     if (timelineData.length === 0) { container.innerHTML = '<p style="color:#a0aec0;font-size:13px">Nenhum marco histórico adicionado ainda.</p>'; return; }
-    container.innerHTML = timelineData.map((item,i) => `
+    container.innerHTML = timelineData.map(item => `
       <div class="timeline-item">
         <div class="timeline-dot"></div>
-        <div class="timeline-ano" style="display:flex;align-items:center;gap:8px">${item.ano}
-          ${modoEdicao ? `<button onclick="removerTimeline(${i})" style="background:none;border:none;color:#a0aec0;cursor:pointer;font-size:11px" title="Remover">✕</button>` : ''}
-        </div>
-        <div class="timeline-desc">${item.isHtml ? item.desc : item.desc}</div>
+        <div class="timeline-ano">${item.ano}</div>
+        <div class="timeline-desc">${item.desc}</div>
       </div>`).join('');
-  }
-
-  async function removerTimeline(i) {
-    timelineData.splice(i, 1);
-    renderTimeline();
-    try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ timeline: timelineData }) }); } catch(err) { console.error(err); }
   }
 
   // ===== NOSSO TIME — API =====
@@ -586,16 +529,25 @@
     try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ organograma: { departamentos, membros, conexoes } }) }); } catch(err) { console.error(err); }
   }
 
-  function selecionarDep(btn, dep) {
-    document.querySelectorAll('.dep-sidebar-btn').forEach(b=>{ b.classList.remove('active'); b.style.background=''; });
-    btn.classList.add('active');
-    const i = departamentos.findIndex(d=>d.id==dep);
-    const cor = i>=0 ? DEP_CORES[i%DEP_CORES.length] : '#2d1b69';
-    btn.style.background = i>=0 ? cor+'22' : '#f5f0ff';
-    btn.style.color = i>=0 ? cor : '#2d1b69';
-    depAtivo=dep;
-    renderOrganograma();
+  function iniciarConexao(id, e) {
+    e.stopPropagation();
+    if (!modoConexao) {
+      // Ativar modo conexão automaticamente
+      modoConexao = true;
+      const aviso = document.getElementById('modoConexaoAviso');
+      const btn = document.getElementById('btnConexao');
+      if (aviso) { aviso.classList.add('ativo'); aviso.textContent = '🔗 Clique em "Conectar" em outro membro para criar a ligação. Ou clique em "Conectar" na toolbar para sair.'; }
+      if (btn) { btn.style.background='#f0fff4'; btn.style.color='#276749'; btn.style.borderColor='#9ae6b4'; btn.textContent='✅ Conectando...'; }
+    }
+    if (!conexaoSelecionado) {
+      conexaoSelecionado = id;
+      document.getElementById('node-'+id)?.classList.add('selecionado-conexao');
+    } else {
+      clicarMembro(id);
+    }
   }
+
+  function selecionarDep(btn, dep) { document.querySelectorAll('.dep-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); depAtivo=dep; renderOrganograma(); }
   function abrirModalDep() { document.getElementById('depNome').value=''; document.getElementById('modalDep').classList.add('aberto'); }
   async function adicionarDep() { const nome=document.getElementById('depNome').value.trim(); if(!nome)return; departamentos.push({id:Date.now(),nome}); renderDepButtons(); fecharModal('modalDep'); await salvarOrg(); }
 
@@ -635,7 +587,20 @@
     renderOrganograma();
   }
 
-  function toggleModoConexao() { modoConexao=!modoConexao; conexaoSelecionado=null; document.getElementById('modoConexaoAviso').classList.toggle('ativo',modoConexao); document.getElementById('btnConexao').style.background=modoConexao?'#f0fff4':''; document.getElementById('btnConexao').style.color=modoConexao?'#276749':''; document.querySelectorAll('.org-node').forEach(n=>n.classList.remove('selecionado-conexao')); }
+  function toggleModoConexao() {
+    modoConexao = !modoConexao;
+    conexaoSelecionado = null;
+    const aviso = document.getElementById('modoConexaoAviso');
+    const btn = document.getElementById('btnConexao');
+    if (aviso) aviso.classList.toggle('ativo', modoConexao);
+    if (btn) {
+      btn.style.background = modoConexao ? '#f0fff4' : '';
+      btn.style.color = modoConexao ? '#276749' : '';
+      btn.style.borderColor = modoConexao ? '#9ae6b4' : '';
+      btn.textContent = modoConexao ? '✅ Conectando...' : '🔗 Conectar';
+    }
+    document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+  }
 
   async function clicarMembro(id) {
     if (!modoConexao) return;
@@ -654,18 +619,37 @@
   }
 
   function renderConexoes() {
-    const svg=document.getElementById('orgSvg'); svg.innerHTML='';
-    conexoes.forEach(c=>{
-      const de=membros.find(m=>m.id==c.de),para=membros.find(m=>m.id==c.para);
-      if(!de||!para)return;
-      const x1=de.x+90,y1=de.y+70,x2=para.x+90,y2=para.y,my=(y1+y2)/2;
-      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    const svg = document.getElementById('orgSvg');
+    svg.innerHTML = '';
+    // Marcador de seta
+    const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+    const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
+    marker.setAttribute('id','arrowhead'); marker.setAttribute('markerWidth','10'); marker.setAttribute('markerHeight','7');
+    marker.setAttribute('refX','9'); marker.setAttribute('refY','3.5'); marker.setAttribute('orient','auto');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points','0 0, 10 3.5, 0 7'); poly.setAttribute('fill','#2d1b69');
+    marker.appendChild(poly); defs.appendChild(marker); svg.appendChild(defs);
+    conexoes.forEach(c => {
+      const de = membros.find(m => m.id == c.de), para = membros.find(m => m.id == c.para);
+      if (!de || !para) return;
+      const W = 180, H = 110;
+      const cx1 = de.x + W/2, cy1 = de.y + H/2, cx2 = para.x + W/2, cy2 = para.y + H/2;
+      const dx = cx2 - cx1, dy = cy2 - cy1;
+      let x1, y1, x2, y2;
+      if (Math.abs(dy) >= Math.abs(dx)) {
+        if (dy > 0) { x1=cx1; y1=de.y+H; x2=cx2; y2=para.y; }
+        else { x1=cx1; y1=de.y; x2=cx2; y2=para.y+H; }
+      } else {
+        if (dx > 0) { x1=de.x+W; y1=cy1; x2=para.x; y2=cy2; }
+        else { x1=de.x; y1=cy1; x2=para.x+W; y2=cy2; }
+      }
+      const mx=(x1+x2)/2, my=(y1+y2)/2;
+      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
       path.setAttribute('d',`M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`);
-      path.setAttribute('fill','none');path.setAttribute('stroke','#cbd5e0');path.setAttribute('stroke-width','1.5');path.setAttribute('stroke-dasharray','4,3');
+      path.setAttribute('fill','none'); path.setAttribute('stroke','#2d1b69');
+      path.setAttribute('stroke-width','2'); path.setAttribute('stroke-opacity','0.5');
+      path.setAttribute('marker-end','url(#arrowhead)');
       svg.appendChild(path);
-      const arrow=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-      arrow.setAttribute('points',`${x2-4},${y2-8} ${x2+4},${y2-8} ${x2},${y2}`);arrow.setAttribute('fill','#cbd5e0');
-      svg.appendChild(arrow);
     });
   }
 
@@ -677,13 +661,8 @@
     empty.style.display='none';
     filtrados.forEach(m=>{
       const cor=getDepCor(m.depId),dep=departamentos.find(d=>d.id==m.depId);
-      const node=document.createElement('div');node.className='org-node';node.id='node-'+m.id;node.style.left=m.x+'px';node.style.top=m.y+'px';node.style.borderColor=cor;node.style.textAlign='center';
-      const nomes=m.nome.trim().split(' ');const primeiro=nomes[0];const ultimo=nomes.length>1?nomes[nomes.length-1]:'';const meio=nomes.length>2?nomes.slice(1,-1).join(' '):'';
-      const nomeHtml=`<strong>${primeiro}</strong>${meio?' '+meio:''}<strong>${ultimo?' '+ultimo:''}</strong>`;
-      // Foto ou cor sólida
-      const fotoHtml = m.foto ? `<img src="${m.foto}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:0 auto 8px;display:block">` : `<div style="width:52px;height:52px;border-radius:50%;background:${cor};margin:0 auto 8px;border:2px solid ${cor}"></div>`;
-      node.innerHTML=`<div class="org-node-actions" style="position:absolute;top:8px;right:8px;display:flex;gap:3px;opacity:0;transition:opacity 0.2s"><button class="org-node-btn edit" onclick="abrirModalMembro(${m.id});event.stopPropagation()">✏️</button><button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()">🗑️</button><button class="org-node-btn link" onclick="toggleConexaoMembro(${m.id},event)" title="Conectar">🔗</button></div>${fotoHtml}<div class="org-node-nome" style="font-size:14px;font-weight:500;text-align:center">${nomeHtml}</div><div class="org-node-cargo" style="color:${cor};font-size:12px;text-align:center;margin-top:2px">${m.cargo}</div>${dep?`<div class="org-node-area" style="font-size:11px;text-align:center">${dep.nome}</div>`:''} ${m.email?`<div class="org-node-email" style="text-align:center">${m.email}</div>`:''}`;
-      node.style.position='absolute';
+      const node=document.createElement('div');node.className='org-node';node.id='node-'+m.id;node.style.left=m.x+'px';node.style.top=m.y+'px';node.style.borderColor=cor;
+      node.innerHTML=`<div class="org-node-top"><div class="org-node-avatar" style="background:${cor}">${m.nome[0].toUpperCase()}</div><div class="org-node-actions"><button class="org-node-btn edit" onclick="abrirModalMembro(${m.id});event.stopPropagation()">✏️</button><button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()">🗑️</button></div></div><div class="org-node-nome">${m.nome}</div><div class="org-node-cargo" style="color:${cor}">${m.cargo}</div>${dep?`<div class="org-node-area">${dep.nome}</div>`:''} ${m.email?`<div class="org-node-email">${m.email}</div>`:''}`;
       node.addEventListener('click',()=>clicarMembro(m.id));
       canvas.appendChild(node);
       node.addEventListener('mousedown',e=>{if(e.target.tagName==='BUTTON'||modoConexao)return;dragging={node,membro:m};const rect=node.getBoundingClientRect();dragOffset.x=e.clientX-rect.left;dragOffset.y=e.clientY-rect.top;node.classList.add('dragging');e.preventDefault();});
@@ -759,171 +738,29 @@
 
   function renderWikis(lista) {
     const tbody=document.getElementById('wikisBody'),filtro=lista||wikis;
-    if(filtro.length===0){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Nenhum documento criado ainda.</td></tr>';return;}
+    if(filtro.length===0){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:#a0aec0">Nenhum wiki criado ainda.</td></tr>';return;}
     const statusCor={'Aprovado':'badge-verde','Rascunho':'badge-cinza','Pendente':'badge-amarelo'};
     tbody.innerHTML=filtro.map(w=>`
       <tr>
-        <td><strong>${w.titulo}</strong>${w.urlExterno?` <a href="${w.urlExterno}" target="_blank" style="font-size:11px;color:#2d1b69;margin-left:4px">↗</a>`:''}</td>
-        <td><span style="font-size:11px;padding:2px 6px;border-radius:3px;background:${w.tipo==='externo'?'#fffaf0':'#f5f0ff'};color:${w.tipo==='externo'?'#c05621':'#2d1b69'}">${w.tipo==='externo'?'Externo':'Wiki'}</span></td>
+        <td><strong>${w.titulo}</strong></td>
         <td>${w.tags?w.tags.split(',').map(t=>`<span class="wiki-tag">${t.trim()}</span>`).join(''):'—'}</td>
         <td>${w.responsavel||'—'}</td>
         <td><span class="badge ${statusCor[w.status]||'badge-cinza'}">${w.status}</span></td>
         <td><span class="versao-badge">${w.versao}</span></td>
         <td>${new Date(w.atualizadoEm||w.criadoEm).toLocaleDateString('pt-BR')}</td>
-        <td style="white-space:nowrap">
-          ${w.tipo!=='externo'?`<button onclick="editarWiki('${w._id}')" style="padding:4px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️</button>`:''}
-          ${w.status==='Aprovado'&&w.tipo!=='externo'?`<button onclick="novaVersaoWiki('${w._id}')" style="padding:4px 8px;background:#f0fff4;color:#276749;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:2px" title="Nova Versão">📋</button>`:''}
-          <button onclick="deletarWiki('${w._id}')" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:2px">🗑️</button>
+        <td>
+          <button onclick="editarWiki('${w._id}')" style="padding:4px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️ Editar</button>
+          <button onclick="deletarWiki('${w._id}')" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:4px">🗑️</button>
         </td>
       </tr>`).join('');
   }
 
-  async function novaVersaoWiki(id) {
-    const wiki = wikis.find(w=>w._id===id);
-    if (!wiki) return;
-    if (!confirm(`Criar nova versão do wiki "${wiki.titulo}"? A versão atual ficará imutável.`)) return;
-    const novaVersao = 'v' + (parseFloat(wiki.versao.replace('v','')) + 1).toFixed(1);
-    const dados = { titulo: wiki.titulo, conteudo: wiki.conteudo, tags: wiki.tags, responsavel: wiki.responsavel, status: 'Rascunho', versao: novaVersao };
-    await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
-    await carregarWikis();
-    alert(`Nova versão ${novaVersao} criada!`);
-  }
-
   function filtrarWikis() {
-    const q = document.getElementById('searchWiki').value.toLowerCase();
-    const st = document.getElementById('filtroStatus')?.value || '';
-    const tp = document.getElementById('filtroTipo')?.value || '';
-    renderWikis(wikis.filter(w => {
-      if (q && !w.titulo.toLowerCase().includes(q) && !(w.tags||'').toLowerCase().includes(q) && !(w.responsavel||'').toLowerCase().includes(q)) return false;
-      if (st && w.status !== st) return false;
-      if (tp === 'externo' && w.tipo !== 'externo') return false;
-      if (tp === 'wiki' && w.tipo === 'externo') return false;
-      return true;
-    }));
+    const q=document.getElementById('searchWiki').value.toLowerCase();
+    renderWikis(wikis.filter(w=>w.titulo.toLowerCase().includes(q)||(w.tags||'').toLowerCase().includes(q)||(w.responsavel||'').toLowerCase().includes(q)));
   }
 
   function fmt(cmd,val){document.execCommand(cmd,false,val||null);document.getElementById('editorArea').focus();}
-
-  // Timeline com rich text
-  function fmtTL(cmd){document.execCommand(cmd,false,null);document.getElementById('timelineDesc').focus();}
-  function inserirLinkTL(){const url=prompt('URL do link:');if(url){document.execCommand('createLink',false,url);}}
-
-  // Categorias extras na Visão Geral
-  let categoriasExtras = [];
-  function adicionarCategoriaExtra() {
-    const nome = prompt('Nome da nova categoria:');
-    if (!nome) return;
-    categoriasExtras.push({nome, valor:''});
-    renderCategoriasExtras();
-  }
-  function renderCategoriasExtras() {
-    const container = document.getElementById('categoriasExtras');
-    if (!container) return;
-    container.innerHTML = categoriasExtras.map((c,i) => `
-      <div class="info-grid" style="margin-bottom:8px">
-        <div class="info-item">
-          <div class="info-label">${c.nome} <button onclick="removerCategoria(${i})" style="background:none;border:none;color:#a0aec0;cursor:pointer;font-size:10px" id="btnRemCat${i}">✕</button></div>
-          <div class="info-value" id="val-cat-${i}">${c.valor||'—'}</div>
-          <textarea class="info-textarea" id="inp-cat-${i}" style="display:none" placeholder="Digite aqui...">${c.valor||''}</textarea>
-        </div>
-      </div>`).join('');
-    // Sincronizar com modo edição atual
-    if (modoEdicao) {
-      categoriasExtras.forEach((_,i) => {
-        const v = document.getElementById('val-cat-'+i); const inp = document.getElementById('inp-cat-'+i);
-        if(v && inp){v.style.display='none';inp.style.display='block';}
-      });
-    }
-  }
-  function removerCategoria(i) {
-    if (!confirm('Remover esta categoria?')) return;
-    categoriasExtras.splice(i,1);
-    renderCategoriasExtras();
-  }
-
-  // Pastas da Biblioteca
-  let pastas = [], pastaAtiva = null;
-
-  function criarPasta() {
-    const nome = prompt('Nome da pasta:');
-    if (!nome) return;
-    pastas.push({id: Date.now(), nome});
-    renderPastasSidebar();
-  }
-
-  function renderPastasSidebar() {
-    const sidebar = document.getElementById('pastasSidebar');
-    if (!sidebar) return;
-    sidebar.innerHTML = '<button class="pasta-sidebar-btn active" onclick="selecionarPasta(this,null)">📁 Todos os documentos</button>';
-    pastas.forEach(p => {
-      sidebar.innerHTML += `<button class="pasta-sidebar-btn" onclick="selecionarPasta(this,${p.id})" style="display:flex;align-items:center;justify-content:space-between">
-        <span>📂 ${p.nome}</span>
-        <button onclick="removerPasta(${p.id},event)" style="background:none;border:none;color:#a0aec0;cursor:pointer;font-size:11px">×</button>
-      </button>`;
-    });
-  }
-
-  function selecionarPasta(btn, id) {
-    document.querySelectorAll('.pasta-sidebar-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    pastaAtiva = id;
-    filtrarWikis();
-  }
-
-  function removerPasta(id, e) {
-    e.stopPropagation();
-    if (!confirm('Remover esta pasta?')) return;
-    pastas = pastas.filter(p=>p.id!==id);
-    if (pastaAtiva===id) pastaAtiva=null;
-    renderPastasSidebar();
-    filtrarWikis();
-  }
-
-  // Documento externo
-  function novoDocExterno() {
-    const titulo = prompt('Título do documento:');
-    if (!titulo) return;
-    const url = prompt('URL do documento (ex: https://docs.google.com/...):');
-    if (!url) return;
-    const dados = { titulo, conteudo: '', tags: '', responsavel: '', status: 'Aprovado', versao: 'v1.0', tipo: 'externo', urlExterno: url };
-    fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) })
-      .then(()=>carregarWikis());
-  }
-
-  // Oráculo
-  async function enviarMensagem() {
-    const input = document.getElementById('chatInput');
-    const msg = input.value.trim();
-    if (!msg) return;
-    input.value = '';
-    const msgs = document.getElementById('chatMsgs');
-    msgs.innerHTML += `<div class="chat-msg user"><div class="chat-bubble">${msg}</div></div>`;
-    msgs.scrollTop = msgs.scrollHeight;
-    // Resposta via Claude API
-    const sendBtn = document.querySelector('.chat-send');
-    sendBtn.disabled = true; sendBtn.textContent = '...';
-    msgs.innerHTML += `<div class="chat-msg bot" id="chatTyping"><div class="chat-bubble">⏳ Pensando...</div></div>`;
-    msgs.scrollTop = msgs.scrollHeight;
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          messages: [{ role: 'user', content: `Você é o Oráculo do HOC System, um assistente de gestão empresarial. Responda de forma concisa e útil: ${msg}` }]
-        })
-      });
-      const data = await res.json();
-      const resposta = data.content?.[0]?.text || 'Não consegui processar sua pergunta.';
-      document.getElementById('chatTyping').outerHTML = '<div class="chat-msg bot"><div class="chat-bubble">' + resposta.split('\n').join('<br>') + '</div></div>';
-    } catch(e) {
-      document.getElementById('chatTyping').outerHTML = `<div class="chat-msg bot"><div class="chat-bubble">Erro ao processar. Tente novamente.</div></div>`;
-    }
-    sendBtn.disabled = false; sendBtn.textContent = 'Enviar';
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-
   function fecharModal(id){document.getElementById(id).classList.remove('aberto');}
   document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('aberto');});});
   function sair(){localStorage.removeItem('token');localStorage.removeItem('usuario');window.location.href='/';}

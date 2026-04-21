@@ -916,8 +916,7 @@
       });
       const data = await res.json();
       const resposta = data.content?.[0]?.text || 'Não consegui processar sua pergunta.';
-      document.getElementById('chatTyping').outerHTML = `<div class="chat-msg bot"><div class="chat-bubble">${resposta.replace(/
-/g,'<br>')}</div></div>`;
+      document.getElementById('chatTyping').outerHTML = '<div class="chat-msg bot"><div class="chat-bubble">' + resposta.split('\n').join('<br>') + '</div></div>';
     } catch(e) {
       document.getElementById('chatTyping').outerHTML = `<div class="chat-msg bot"><div class="chat-bubble">Erro ao processar. Tente novamente.</div></div>`;
     }

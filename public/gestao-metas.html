@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HOC - Gestão de Metas</title>
+  <title>HOC - Gestão de Resultados</title>
   <link rel="stylesheet" href="style-global.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <style>
@@ -128,12 +128,8 @@
 </div>
 
 <div class="main">
-  <div id="bannerAssinatura" style="display:none"></div>
   <div class="header">
-    <div class="header-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Buscar...">
-    </div>
+    <div style="font-size:15px;font-weight:700;color:#1e2a4a">GESTÃO DE RESULTADOS</div>
     <div class="header-right">
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
@@ -164,8 +160,7 @@
   </div>
 
   <div class="content">
-    <div class="page-title">Gestão de Metas</div>
-    <div class="breadcrumb">Home > Gestão de Metas</div>
+    <div class="page-title">GESTÃO DE RESULTADOS</div>
 
     <div class="tabs">
       <button class="tab active" onclick="mudarTab('tendencias',this)">Resumo de Tendências</button>
@@ -174,44 +169,48 @@
 
     <!-- TENDÊNCIAS -->
     <div id="tab-tendencias">
-      <div class="filtros">
+
+      <!-- Filtros minimalistas -->
+      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
         <select class="filtro-select" id="filtroArea" onchange="atualizarTendencias()"><option value="todos">Todas as Áreas</option></select>
-        <select class="filtro-select" id="filtroCategoria" onchange="atualizarTendencias()"><option value="todos">Todas as Categorias</option></select>
+        <select class="filtro-select" id="filtroCategoria" onchange="atualizarTendencias()"><option value="todas">Todas as Categorias</option></select>
+        <select class="filtro-select" id="filtroIndicador" onchange="atualizarTendencias()"><option value="todos">Todos os Indicadores</option></select>
         <select class="filtro-select" id="filtroPeriodo" onchange="atualizarTendencias()">
           <option value="3">Últimos 3 meses</option>
           <option value="6">Últimos 6 meses</option>
-          <option value="12">Ano completo</option>
+          <option value="12">Ano atual</option>
+          <option value="24">Último ano</option>
         </select>
-        <button class="btn-exportar">📊 Exportar Relatório</button>
+        <button onclick="exportarPDF()" style="margin-left:auto;padding:7px 16px;background:#1e2a4a;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">📄 Exportar PDF</button>
       </div>
 
-      <div class="cards-grid">
+      <!-- Rankings no TOPO -->
+      <div class="rankings-grid" style="margin-bottom:20px">
+        <div class="ranking-card"><div class="ranking-titulo">🏆 Top 5 Melhores Indicadores</div><div id="rankingMelhores"></div></div>
+        <div class="ranking-card"><div class="ranking-titulo">⚠️ Top 5 Piores Indicadores</div><div id="rankingPiores"></div></div>
+      </div>
+
+      <!-- Cards de resumo -->
+      <div class="cards-grid" style="margin-bottom:20px">
         <div class="meta-card"><div class="meta-card-icon">🎯</div><div class="meta-card-valor" id="cardAtingimento">—</div><div class="meta-card-label">Atingimento Médio</div></div>
         <div class="meta-card"><div class="meta-card-icon">✅</div><div class="meta-card-valor" id="cardMetas">—</div><div class="meta-card-label">Metas Atingidas</div></div>
         <div class="meta-card"><div class="meta-card-icon">🏆</div><div class="meta-card-valor" id="cardMelhor">—</div><div class="meta-card-label" id="cardMelhorLabel">Melhor Indicador</div></div>
         <div class="meta-card"><div class="meta-card-icon">⚠️</div><div class="meta-card-valor" id="cardPior">—</div><div class="meta-card-label" id="cardPiorLabel">Pior Indicador</div></div>
       </div>
 
-      <div class="tendencias-layout">
-        <div class="grafico-card">
-          <div class="grafico-titulo">Evolução de Metas</div>
-          <canvas id="graficoEvolucao" height="180"></canvas>
-        </div>
-        <div>
-          <div style="font-size:14px;font-weight:700;color:#1e2a4a;margin-bottom:10px">💡 Recomendações</div>
-          <div id="recomendacoes"></div>
-        </div>
+      <!-- Gráfico largura total -->
+      <div class="grafico-card" style="margin-bottom:20px">
+        <div class="grafico-titulo" style="margin-bottom:12px">Meta vs Resultado</div>
+        <canvas id="graficoEvolucao" height="80"></canvas>
       </div>
 
-      <div class="rankings-grid">
-        <div class="ranking-card"><div class="ranking-titulo">🏆 Top 5 Melhores Indicadores</div><div id="rankingMelhores"></div></div>
-        <div class="ranking-card"><div class="ranking-titulo">⚠️ Top 5 Piores Indicadores</div><div id="rankingPiores"></div></div>
+      <!-- Destaques + Recomendações -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="destaque-card"><div class="destaque-titulo">💡 Recomendações</div><div id="recomendacoes"></div></div>
+        <div class="destaque-card"><div class="destaque-titulo">📊 Por Departamento</div><div id="destaquesDeptos"></div></div>
+        <div class="destaque-card"><div class="destaque-titulo">⭐ Top Categorias</div><div id="destaqueCategorias"></div></div>
       </div>
 
-      <div class="destaques-grid">
-        <div class="destaque-card"><div class="destaque-titulo">📊 Destaques por Departamento</div><div id="destaquesDeptos"></div></div>
-        <div class="destaque-card"><div class="destaque-titulo">⭐ Categorias Top Performers</div><div id="destaqueCategorias"></div></div>
-      </div>
     </div>
 
     <!-- BOWLER -->
@@ -464,31 +463,71 @@
     return (parseFloat(act)/parseFloat(plan))*100;
   }
 
-  function atualizarTendencias() {
+  function getMesesIdx() {
+    const fPeriodo = parseInt(document.getElementById('filtroPeriodo')?.value || '12');
+    const mesAtual = new Date().getMonth();
+    if (fPeriodo === 24) return Array.from({length:12}, (_,i) => i);
+    return Array.from({length: fPeriodo}, (_,i) => (mesAtual - fPeriodo + 1 + i + 12) % 12);
+  }
+
+  function getDadosFiltrados() {
+    const fArea = document.getElementById('filtroArea')?.value || 'todos';
+    const fCat  = document.getElementById('filtroCategoria')?.value || 'todas';
+    const fInd  = document.getElementById('filtroIndicador')?.value || 'todos';
+    const mesesIdx = getMesesIdx();
+    const rows = bowlerData.filter(r =>
+      (fArea === 'todos' || r.area === fArea) &&
+      (fCat  === 'todas' || r.categoria === fCat) &&
+      (fInd  === 'todos' || r.indicador === fInd)
+    );
     const todos = [];
-    bowlerData.forEach(row => { row.meses.forEach(m => { const pct = calcularPct(m.plan,m.act); if (pct!==null) todos.push({ indicador:row.indicador, area:row.area, categoria:row.categoria, pct }); }); });
+    rows.forEach(row => {
+      mesesIdx.forEach(mi => {
+        const m = row.meses[mi];
+        if (!m) return;
+        const pct = calcularPct(m.plan, m.act);
+        if (pct !== null) todos.push({ indicador:row.indicador, area:row.area, categoria:row.categoria, pct, mi });
+      });
+    });
+    return { rows, mesesIdx, todos };
+  }
+
+  function atualizarTendencias() {
+    atualizarFiltros();
+    const { todos } = getDadosFiltrados();
     if (todos.length === 0) {
       ['cardAtingimento','cardMetas','cardMelhor','cardPior'].forEach(id => document.getElementById(id).textContent = 'Sem dados');
       renderRecomendacoes([]); renderRankings([]); renderDestaques([]); renderGrafico(); return;
     }
-    const media = todos.reduce((s,i)=>s+i.pct,0)/todos.length;
-    const atingidas = todos.filter(i=>i.pct>=90).length;
-    const melhor = todos.reduce((a,b)=>a.pct>b.pct?a:b);
-    const pior = todos.reduce((a,b)=>a.pct<b.pct?a:b);
-    document.getElementById('cardAtingimento').textContent = media.toFixed(0)+'%';
+    const media     = todos.reduce((s,i) => s + i.pct, 0) / todos.length;
+    const atingidas = todos.filter(i => i.pct >= 90).length;
+    const melhor    = todos.reduce((a,b) => a.pct > b.pct ? a : b);
+    const pior      = todos.reduce((a,b) => a.pct < b.pct ? a : b);
+    document.getElementById('cardAtingimento').textContent = media.toFixed(0) + '%';
     document.getElementById('cardMetas').textContent = `${atingidas}/${todos.length}`;
-    document.getElementById('cardMelhor').textContent = melhor.pct.toFixed(0)+'%';
+    document.getElementById('cardMelhor').textContent = melhor.pct.toFixed(0) + '%';
     document.getElementById('cardMelhorLabel').textContent = melhor.indicador;
-    document.getElementById('cardPior').textContent = pior.pct.toFixed(0)+'%';
+    document.getElementById('cardPior').textContent = pior.pct.toFixed(0) + '%';
     document.getElementById('cardPiorLabel').textContent = pior.indicador;
-    renderRecomendacoes(todos); renderRankings(todos); renderDestaques(todos); renderGrafico(); atualizarFiltros();
+    renderRecomendacoes(todos); renderRankings(todos); renderDestaques(todos); renderGrafico();
   }
 
   function atualizarFiltros() {
-    const areas = [...new Set(bowlerData.map(r=>r.area))];
-    const cats = [...new Set(bowlerData.map(r=>r.categoria))];
-    document.getElementById('filtroArea').innerHTML = '<option value="todos">Todas as Áreas</option>'+areas.map(a=>`<option>${a}</option>`).join('');
-    document.getElementById('filtroCategoria').innerHTML = '<option value="todos">Todas as Categorias</option>'+cats.map(c=>`<option>${c}</option>`).join('');
+    const areas = [...new Set(bowlerData.map(r => r.area))];
+    const cats  = [...new Set(bowlerData.map(r => r.categoria))];
+    const inds  = [...new Set(bowlerData.map(r => r.indicador))];
+    const vArea = document.getElementById('filtroArea')?.value || 'todos';
+    const vCat  = document.getElementById('filtroCategoria')?.value || 'todas';
+    const vInd  = document.getElementById('filtroIndicador')?.value || 'todos';
+    document.getElementById('filtroArea').innerHTML =
+      '<option value="todos">Todas as Áreas</option>' +
+      areas.map(a => `<option ${a===vArea?'selected':''}>${a}</option>`).join('');
+    document.getElementById('filtroCategoria').innerHTML =
+      '<option value="todas">Todas as Categorias</option>' +
+      cats.map(c => `<option ${c===vCat?'selected':''}>${c}</option>`).join('');
+    document.getElementById('filtroIndicador').innerHTML =
+      '<option value="todos">Todos os Indicadores</option>' +
+      inds.map(i => `<option ${i===vInd?'selected':''}>${i}</option>`).join('');
   }
 
   function renderRecomendacoes(todos) {
@@ -542,19 +581,129 @@
   function renderGrafico() {
     const ctx = document.getElementById('graficoEvolucao').getContext('2d');
     if (graficoChart) graficoChart.destroy();
-    const cats = [...new Set(bowlerData.map(r=>r.categoria))];
-    const cores = ['#2d1b69','#38a169','#3b5bdb','#e53e3e','#d69e2e','#00b5d8'];
-    const datasets = cats.map((cat,i)=>({
-      label:cat, tension:0.4, pointRadius:3, spanGaps:true,
-      borderColor:cores[i%cores.length], backgroundColor:'transparent',
-      data:MESES.map((_,mi)=>{ const vals=[]; bowlerData.filter(r=>r.categoria===cat).forEach(row=>{ const pct=calcularPct(row.meses[mi].plan,row.meses[mi].act); if(pct!==null)vals.push(pct); }); return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null; })
-    }));
-    graficoChart = new Chart(ctx,{ type:'line', data:{ labels:MESES, datasets }, options:{ responsive:true, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } }, scales:{ y:{ min:0, max:150, ticks:{ callback:v=>v+'%', font:{ size:11 } } }, x:{ ticks:{ font:{ size:11 } } } } } });
+    const { rows, mesesIdx } = getDadosFiltrados();
+    const labels = mesesIdx.map(i => MESES[i]);
+    const dataMeta = mesesIdx.map(mi => {
+      const vals = rows.map(r => parseFloat(r.meses[mi]?.plan||'')).filter(v => !isNaN(v) && v > 0);
+      return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    });
+    const dataResult = mesesIdx.map(mi => {
+      const vals = rows.map(r => parseFloat(r.meses[mi]?.act||'')).filter(v => !isNaN(v) && v >= 0);
+      return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    });
+    graficoChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label:'Meta (Plan)', data:dataMeta, borderColor:'#2d1b69',
+            backgroundColor:'rgba(45,27,105,0.06)', borderWidth:2, borderDash:[6,4],
+            pointRadius:4, pointBackgroundColor:'#2d1b69', tension:0.4, spanGaps:true, fill:false },
+          { label:'Resultado (Act)', data:dataResult, borderColor:'#38a169',
+            backgroundColor:'rgba(56,161,105,0.1)', borderWidth:2.5,
+            pointRadius:4, pointBackgroundColor:'#38a169', tension:0.4, spanGaps:true, fill:true }
+        ]
+      },
+      options: {
+        responsive:true,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{
+          legend:{ position:'bottom', labels:{ font:{size:11}, usePointStyle:true, padding:16 } },
+          tooltip:{ callbacks:{ label: c => `${c.dataset.label}: ${c.parsed.y!=null?c.parsed.y.toFixed(1):'—'}` } }
+        },
+        scales:{
+          y:{ beginAtZero:true, grid:{color:'rgba(0,0,0,0.04)'}, ticks:{font:{size:11}} },
+          x:{ grid:{display:false}, ticks:{font:{size:11}} }
+        }
+      }
+    });
+  }
+
+  async function exportarPDF() {
+    const btn = document.querySelector('[onclick="exportarPDF()"]');
+    btn.textContent = '⏳ Gerando...'; btn.disabled = true;
+    await new Promise(r => setTimeout(r, 400));
+    const canvasOrig = document.getElementById('graficoEvolucao');
+    const graficoImg = canvasOrig ? canvasOrig.toDataURL('image/png') : '';
+    const fPeriodo = document.getElementById('filtroPeriodo');
+    const fArea    = document.getElementById('filtroArea');
+    const fCat     = document.getElementById('filtroCategoria');
+    const fInd     = document.getElementById('filtroIndicador');
+    const getHTML  = id => document.getElementById(id)?.innerHTML || '';
+    const getVal   = (el, def) => !el || el.value === def ? 'Todos' : el.value;
+    const cards = [
+      {id:'cardAtingimento', label:'Atingimento Médio', icon:'🎯'},
+      {id:'cardMetas',       label:'Metas Atingidas',   icon:'✅'},
+      {id:'cardMelhor',      label: document.getElementById('cardMelhorLabel')?.textContent||'Melhor', icon:'🏆'},
+      {id:'cardPior',        label: document.getElementById('cardPiorLabel')?.textContent||'Pior',     icon:'⚠️'},
+    ].map(c => `<div class="pcard"><div style="font-size:22px">${c.icon}</div>
+      <div style="font-size:20px;font-weight:700;color:#1e2a4a">${document.getElementById(c.id)?.textContent||'—'}</div>
+      <div style="font-size:11px;color:#718096">${c.label}</div></div>`).join('');
+    const w = window.open('','_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Gestão de Resultados — Relatório</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'Segoe UI',sans-serif;padding:28px;color:#1e2a4a;font-size:12px}
+      h1{font-size:19px;color:#2d1b69;margin-bottom:3px}
+      .sub{color:#718096;font-size:11px;margin-bottom:6px}
+      .filtros-info{font-size:11px;color:#718096;margin-bottom:20px;padding:6px 10px;background:#f8fafc;border-radius:6px}
+      .pcards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+      .pcard{background:#f8fafc;border-radius:8px;padding:12px;border:1px solid #e2e8f0;text-align:center}
+      .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+      .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+      .box{background:#f8fafc;border-radius:8px;padding:12px;border:1px solid #e2e8f0}
+      .box-t{font-size:12px;font-weight:700;margin-bottom:8px}
+      .ranking-item{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+      .ranking-barra-bg{flex:1;height:4px;background:#e2e8f0;border-radius:2px}
+      .ranking-barra{height:4px;border-radius:2px}
+      .ranking-pos{font-size:11px;font-weight:700;color:#a0aec0;width:18px}
+      .ranking-nome{font-size:11px;font-weight:600}
+      .ranking-dep{font-size:10px;color:#718096}
+      .ranking-pct{font-size:11px;font-weight:700;width:30px;text-align:right}
+      .ranking-info{flex:1}
+      .dep-item,.cat-item{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+      .dep-nome{font-size:11px;font-weight:600;width:80px}
+      .dep-barra-bg{flex:1;height:4px;background:#e2e8f0;border-radius:2px}
+      .dep-barra{height:4px;border-radius:2px}
+      .dep-pct,.cat-pct{font-size:11px;font-weight:700;width:30px;text-align:right}
+      .rec-card{padding:8px;border-left:3px solid #e53e3e;margin-bottom:7px;background:#fff5f5;border-radius:3px}
+      .rec-card.media{border-left-color:#d69e2e;background:#fffaf0}
+      .rec-card.baixa{border-left-color:#38a169;background:#f0fff4}
+      .rec-nome{font-size:11px;font-weight:600}
+      .rec-desc{font-size:10px;color:#718096}
+      .badge-acao{font-size:9px;font-weight:700;padding:1px 4px;background:#fff5f5;color:#e53e3e;border-radius:3px}
+      img{width:100%;border-radius:6px;margin-bottom:16px}
+      @media print{@page{margin:16px}}
+    </style></head><body>
+    <h1>📊 Gestão de Resultados</h1>
+    <div class="sub">Gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
+    <div class="filtros-info">
+      Período: <b>${fPeriodo?.options[fPeriodo.selectedIndex]?.text||''}</b> &nbsp;|&nbsp;
+      Área: <b>${getVal(fArea,'todos')}</b> &nbsp;|&nbsp;
+      Categoria: <b>${getVal(fCat,'todas')}</b> &nbsp;|&nbsp;
+      Indicador: <b>${getVal(fInd,'todos')}</b>
+    </div>
+    <div class="pcards">${cards}</div>
+    <div class="grid2">
+      <div class="box"><div class="box-t">🏆 Top 5 Melhores</div>${getHTML('rankingMelhores')}</div>
+      <div class="box"><div class="box-t">⚠️ Top 5 Piores</div>${getHTML('rankingPiores')}</div>
+    </div>
+    ${graficoImg?`<img src="${graficoImg}" alt="Gráfico Meta vs Resultado">`:''}
+    <div class="grid3">
+      <div class="box"><div class="box-t">💡 Recomendações</div>${getHTML('recomendacoes')}</div>
+      <div class="box"><div class="box-t">📊 Por Departamento</div>${getHTML('destaquesDeptos')}</div>
+      <div class="box"><div class="box-t">⭐ Top Categorias</div>${getHTML('destaqueCategorias')}</div>
+    </div>
+    </body></html>`);
+    w.document.close();
+    setTimeout(() => { w.print(); }, 700);
+    btn.textContent = '📄 Exportar PDF'; btn.disabled = false;
   }
 
   function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
   document.querySelectorAll('.modal-overlay').forEach(m=>{ m.addEventListener('click',e=>{ if(e.target===m)m.classList.remove('aberto'); }); });
-  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href='/'; }
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href='/'; }
 
   // INIT — carrega do banco
   carregarBowler();
@@ -566,32 +715,22 @@
     const banner = document.getElementById('bannerAssinatura');
     if (!overlay) return;
     if (banner) {
-      if (sessionStorage.getItem('bannerFechado') === '1') {
-        banner.style.display = 'none';
-        document.querySelector('.main').classList.remove('banner-visivel');
+      if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
+        const expirando = assinatura.diasTrialRestantes <= 5;
+        banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
+        banner.innerHTML = `
+          <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
+          <a href="/plano-usuarios" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>`;
+        banner.style.display = 'flex';
+      } else if (assinatura.status === 'inadimplente') {
+        banner.className = 'banner-assinatura inadimplente';
+        banner.innerHTML = `
+          <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
+          <a href="/plano-usuarios" class="banner-assinatura-btn inadimplente">Pagar agora</a>`;
+        banner.style.display = 'flex';
       } else {
-        if (assinatura.status === 'trial' && assinatura.diasTrialRestantes !== null) {
-          const expirando = assinatura.diasTrialRestantes <= 5;
-          banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
-          banner.innerHTML = `
-            <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
-            <a href="/plano-usuarios" class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}">Ver planos</a>
-            <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
-          banner.style.display = 'flex';
-          document.querySelector('.main').classList.add('banner-visivel');
-        } else if (assinatura.status === 'inadimplente') {
-          banner.className = 'banner-assinatura inadimplente';
-          banner.innerHTML = `
-            <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
-            <a href="/plano-usuarios" class="banner-assinatura-btn inadimplente">Pagar agora</a>
-            <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
-          banner.style.display = 'flex';
-          document.querySelector('.main').classList.add('banner-visivel');
-        } else {
-          banner.style.display = 'none';
-          document.querySelector('.main').classList.remove('banner-visivel');
-        }
-      } // fecha if bannerFechado
+        banner.style.display = 'none';
+      }
     }
     if (assinatura.status === 'inadimplente') {
       document.getElementById('bloqueioDias').textContent = `${assinatura.diasAtraso} dia(s) em atraso`;
@@ -609,15 +748,6 @@
   function copiarPixBloqueio(codigo) {
     navigator.clipboard.writeText(codigo).then(() => alert('PIX copiado!'))
       .catch(() => { const el = document.createElement('textarea'); el.value = codigo; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert('PIX copiado!'); });
-  }
-
-  function fecharBanner() {
-    const banner = document.getElementById('bannerAssinatura');
-    if (banner) {
-      banner.style.display = 'none';
-      document.querySelector('.main').classList.remove('banner-visivel');
-    }
-    sessionStorage.setItem('bannerFechado', '1');
   }
 
   // ===== NOTIFICAÇÕES =====
@@ -711,6 +841,5 @@
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
-  <script src="/global.js"></script>
 </body>
 </html>

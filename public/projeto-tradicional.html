@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -155,6 +155,123 @@
     .sub-tab { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; color: #718096; border: 1.5px solid #e2e8f0; background: white; transition: all 0.2s; }
     .sub-tab:hover { border-color: #2d1b69; color: #2d1b69; }
     .sub-tab.active { background: #2d1b69; color: white; border-color: #2d1b69; }
+
+    /* ===== Estudo de Caso Biblioteca ===== */
+    .ec-layout { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: start; }
+    .ec-sidebar { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; position: sticky; top: 120px; }
+    .ec-sidebar-header { padding: 10px 14px; border-bottom: 1px solid #f0f2f5; display: flex; align-items: center; justify-content: space-between; }
+    .ec-sidebar-header span { font-size: 12px; font-weight: 700; color: #1e2a4a; }
+    .ec-sidebar-body { padding: 6px 6px; }
+    .ec-pasta-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 5px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #718096; margin-bottom: 1px; transition: all 0.2s; gap: 4px; }
+    .ec-pasta-btn:hover { background: #f8fafc; color: #1e2a4a; }
+    .ec-pasta-btn:hover .ec-pasta-del { opacity: 1; }
+    .ec-pasta-btn.active { background: #f5f0ff; color: #2d1b69; font-weight: 700; }
+    .ec-pasta-del { background: none; border: none; cursor: pointer; padding: 1px 4px; border-radius: 3px; font-size: 10px; color: #a0aec0; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+    .ec-pasta-del:hover { background: #e2e8f0; color: #c53030; }
+    .ec-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .ec-search { flex: 1; min-width: 160px; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; outline: none; }
+    .ec-search:focus { border-color: #2d1b69; }
+    .ec-section-title { font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 10px; }
+    .ec-section-title:first-child { margin-top: 0; }
+    /* Template cards pequenos */
+    .ec-template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+    .ec-tpl-card { border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; text-align: center; }
+    .ec-tpl-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .ec-tpl-card .ec-tpl-icon { font-size: 22px; margin-bottom: 5px; }
+    .ec-tpl-card .ec-tpl-nome { font-size: 11px; font-weight: 700; line-height: 1.3; }
+    .ec-tpl-card .ec-tpl-desc { font-size: 10px; opacity: 0.8; margin-top: 2px; line-height: 1.3; }
+    .ec-tpl-card.kaizen { background: linear-gradient(135deg,#667eea,#764ba2); color: white; }
+    .ec-tpl-card.a3 { background: linear-gradient(135deg,#4facfe,#00f2fe); color: white; }
+    .ec-tpl-card.sw2h { background: linear-gradient(135deg,#43e97b,#38f9d7); color: white; }
+    .ec-tpl-card.pdca { background: linear-gradient(135deg,#f093fb,#f5576c); color: white; }
+    .ec-tpl-card.ishikawa { background: linear-gradient(135deg,#fa709a,#fee140); color: white; }
+    .ec-tpl-card.dmaic { background: linear-gradient(135deg,#a18cd1,#fbc2eb); color: white; }
+    .ec-tpl-card.masp { background: linear-gradient(135deg,#ffecd2,#fcb69f); color: #1e2a4a; }
+    .ec-tpl-card.swot { background: linear-gradient(135deg,#a1c4fd,#c2e9fb); color: #1e2a4a; }
+    /* Materiais do usuário */
+    .ec-material-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 6px; cursor: pointer; transition: all 0.2s; border: 1.5px solid transparent; }
+    .ec-material-item:hover { border-color: #2d1b69; }
+    .ec-material-icon { font-size: 20px; flex-shrink: 0; width: 32px; text-align: center; }
+    .ec-material-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; flex: 1; }
+    .ec-material-meta { font-size: 11px; color: #a0aec0; }
+    .ec-material-acoes { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+    .ec-material-item:hover .ec-material-acoes { opacity: 1; }
+    .ec-mat-btn { padding: 3px 7px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
+    /* Editor de notas inline */
+    .ec-editor-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .ec-editor-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid #f0f2f5; flex-wrap: wrap; }
+    .ec-editor-titulo { flex: 1; border: none; outline: none; font-size: 15px; font-weight: 700; color: #1e2a4a; font-family: inherit; min-width: 200px; }
+    .ec-editor-body { padding: 16px; min-height: 300px; }
+    .ec-editor-area { outline: none; font-size: 13px; color: #1e2a4a; line-height: 1.7; min-height: 260px; }
+    .ec-editor-toolbar { display: flex; gap: 2px; flex-wrap: wrap; padding: 8px 16px; border-bottom: 1px solid #f0f2f5; background: #fafafa; }
+    /* Modal template EC */
+    .ec-modal-campo { background: #f8fafc; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+    .ec-modal-campo-label { font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
+    .ec-modal-campo-input { width: 100%; border: none; background: none; outline: none; font-size: 13px; color: #1e2a4a; font-family: inherit; resize: vertical; }
+    /* Editor toolbar buttons */
+    .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #4a5568; }
+    .toolbar-btn:hover { background: #e2e8f0; }
+    /* Card "Novo Documento" estilo item */
+    .ec-novo-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; background: white; border: 1.5px dashed #c4b5fd; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; color: #6b46c1; }
+    .ec-novo-item:hover { border-color: #2d1b69; background: #f5f0ff; }
+    /* ===== Template full-screen view ===== */
+    .ec-tpl-view { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .ec-tpl-view-top { display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid #f0f2f5; flex-wrap:wrap; position:sticky; top:0; background:white; z-index:5; border-radius:10px 10px 0 0; }
+    .ec-tpl-view-body { padding:20px; }
+    .ec-tpl-sec { margin-bottom:20px; }
+    .ec-tpl-sec-lbl { font-size:10px; font-weight:700; color:#a0aec0; text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+    .ec-tpl-field { width:100%; border:1.5px solid #e2e8f0; border-radius:6px; padding:7px 10px; font-size:12px; outline:none; font-family:inherit; resize:vertical; background:white; color:#1e2a4a; box-sizing:border-box; }
+    .ec-tpl-field:focus { border-color:#6b46c1; }
+    /* Dynamic table */
+    .ec-dtbl-wrap { overflow-x:auto; margin-bottom:6px; border-radius:6px; border:1px solid #e2e8f0; }
+    .ec-dtbl { width:100%; border-collapse:collapse; font-size:12px; }
+    .ec-dtbl thead th { background:#f5f0ff; color:#2d1b69; font-weight:700; padding:0; border:1px solid #e2e8f0; min-width:90px; }
+    .ec-dtbl thead th .ec-dtbl-colname { padding:6px 8px; outline:none; min-height:28px; }
+    .ec-dtbl thead th .ec-dtbl-colname:focus { background:#faf5ff; }
+    .ec-dtbl thead th .ec-dtbl-delcol { display:block; text-align:center; font-size:9px; color:#d0bfff; cursor:pointer; padding:1px 0 2px; background:#ede9fe; border-top:1px solid #e2e8f0; }
+    .ec-dtbl thead th .ec-dtbl-delcol:hover { color:#c53030; background:#fef0f0; }
+    .ec-dtbl thead th.ec-dtbl-addcol { background:#f8fafc; color:#a0aec0; cursor:pointer; text-align:center; font-size:16px; min-width:36px; width:36px; border:1px dashed #c4b5fd; }
+    .ec-dtbl thead th.ec-dtbl-addcol:hover { color:#6b46c1; background:#f5f0ff; }
+    .ec-dtbl tbody td { padding:5px 8px; border:1px solid #e2e8f0; vertical-align:top; min-width:90px; min-height:28px; outline:none; }
+    .ec-dtbl tbody td:focus { background:#faf5ff; outline:2px solid #c4b5fd; outline-offset:-2px; }
+    .ec-dtbl tbody td.ec-dtbl-del { background:none; border-color:transparent; cursor:pointer; color:#e2e8f0; text-align:center; width:22px; min-width:22px; padding:4px 2px; }
+    .ec-dtbl tbody td.ec-dtbl-del:hover { color:#c53030; }
+    .ec-dtbl-addrow { margin-top:4px; font-size:11px; color:#6b46c1; background:none; border:1.5px dashed #c4b5fd; border-radius:4px; padding:3px 12px; cursor:pointer; }
+    .ec-dtbl-addrow:hover { background:#f5f0ff; }
+    /* A3 board */
+    .ec-a3-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .ec-a3-cell { border:1.5px solid #e2e8f0; border-radius:8px; overflow:hidden; }
+    .ec-a3-hd { background:#f5f0ff; color:#2d1b69; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; padding:6px 10px; display:flex; align-items:center; justify-content:space-between; }
+    .ec-a3-bd { padding:10px; }
+    .ec-a3-span { grid-column:1/-1; }
+    /* SWOT */
+    .ec-swot-outer { border:2px solid #2d1b69; border-radius:10px; overflow:hidden; }
+    .ec-swot-grid { display:grid; grid-template-columns:1fr 1fr; }
+    .ec-swot-cell { padding:14px; min-height:160px; }
+    .ec-swot-cell:nth-child(1) { border-right:1.5px solid #2d1b69; border-bottom:1.5px solid #2d1b69; background:#f0fff4; }
+    .ec-swot-cell:nth-child(2) { border-bottom:1.5px solid #2d1b69; background:#fff5f5; }
+    .ec-swot-cell:nth-child(3) { border-right:1.5px solid #2d1b69; background:#ebf8ff; }
+    .ec-swot-cell:nth-child(4) { background:#fffaf0; }
+    .ec-swot-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px; }
+    .ec-swot-cell:nth-child(1) .ec-swot-lbl { color:#276749; }
+    .ec-swot-cell:nth-child(2) .ec-swot-lbl { color:#c53030; }
+    .ec-swot-cell:nth-child(3) .ec-swot-lbl { color:#2b6cb0; }
+    .ec-swot-cell:nth-child(4) .ec-swot-lbl { color:#c05621; }
+    .ec-swot-area { outline:none; font-size:12px; color:#1e2a4a; line-height:1.7; min-height:120px; width:100%; }
+    /* Folder tree picker */
+    .ec-folder-picker { border: 1.5px solid #e2e8f0; border-radius: 8px; max-height: 170px; overflow-y: auto; background: white; }
+    .ec-fpick-item { display: flex; align-items: center; gap: 6px; padding: 6px 10px; cursor: pointer; font-size: 12px; color: #4a5568; border: none; background: none; width: 100%; text-align: left; border-bottom: 1px solid #f5f7fa; line-height: 1.3; }
+    .ec-fpick-item:last-child { border-bottom: none; }
+    .ec-fpick-item:hover { background: #f8fafc; color: #1e2a4a; }
+    .ec-fpick-item.selected { background: #f5f0ff; color: #2d1b69; font-weight: 600; }
+    /* Breadcrumb de pastas EC */
+    .ec-breadcrumb { padding: 6px 6px 2px; border-bottom: 1px solid #f0f2f5; margin-bottom: 4px; }
+    .ec-bc-btn { background: none; border: none; cursor: pointer; font-size: 11px; color: #718096; padding: 2px 4px; border-radius: 4px; display: block; width: 100%; text-align: left; margin-bottom: 2px; }
+    .ec-bc-btn:hover { background: #f0f2f5; color: #1e2a4a; }
+    .ec-bc-path { font-size: 10px; color: #a0aec0; padding: 0 4px 4px; line-height: 1.4; display: flex; flex-wrap: wrap; gap: 1px; align-items: center; }
+    .ec-bc-item { cursor: pointer; color: #6b46c1; } .ec-bc-item:hover { text-decoration: underline; }
+    /* Auto-save indicator */
+    .ec-autosave { font-size: 11px; color: #a0aec0; margin-left: 4px; min-width: 80px; }
   </style>
 </head>
 <body>
@@ -165,17 +282,22 @@
     <span class="logo-text">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
     <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
     <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
     <a class="menu-item active" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
     <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
-    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+    <details class="sidebar-sistema" id="sistemaMenu">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items">
+        <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
+        <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
+        <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+      </div>
+    </details>
   </div>
 </div>
 
@@ -190,10 +312,7 @@
         <span class="proj-badge tipo-tradicional">Tradicional</span>
         <span class="proj-badge" id="projStatusBadge" style="background:#f0fff4;color:#276749">Ativo</span>
       </div>
-      <div class="proj-acoes">
-        <button class="btn-export" onclick="exportarPDF()">📄 Exportar PDF</button>
-        <button class="btn-primary" onclick="salvarProjeto()" style="font-size:12px;padding:7px 14px">💾 Salvar</button>
-      </div>
+      <div class="proj-acoes" id="projSaveIndicator" style="font-size:11px;color:#48bb78;font-weight:600;min-width:60px;text-align:right"></div>
     </div>
     <div class="proj-meta-row">
       <span class="proj-meta-item" id="projResp">👤 —</span>
@@ -217,58 +336,39 @@
 
     <!-- ESTUDO DE CASO -->
     <div id="tab-estudo">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <div>
-          <div style="font-size:15px;font-weight:700;color:#1e2a4a">Estudo de Caso</div>
-          <div style="font-size:12px;color:#718096">Selecione um template para análise de causa raiz antes de iniciar o projeto</div>
-        </div>
-        <button class="btn-primary" onclick="abrirModalEstudo()" style="font-size:12px;padding:7px 14px">+ Novo Estudo de Caso</button>
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;color:#718096">Selecione um material para te apoiar no estudo deste projeto</div>
       </div>
-      <div class="template-grid">
-        <div class="template-card kaizen" onclick="usarTemplate('Kaizen')">
-          <div class="template-nome">Kaizen Charter</div>
-          <div class="template-desc">Melhoria contínua e rápida</div>
+
+      <div class="ec-layout">
+        <!-- Sidebar Pastas -->
+        <div class="ec-sidebar">
+          <div class="ec-sidebar-header">
+            <span>PASTAS</span>
+            <button onclick="criarPastaEC()" style="padding:3px 8px;background:#f0f2f5;border:none;border-radius:4px;font-size:11px;cursor:pointer;color:#4a5568;font-weight:600">+ Nova</button>
+          </div>
+          <div class="ec-sidebar-body">
+            <button class="ec-pasta-btn active" id="ecBtnTemplates" onclick="selecionarPastaEC('templates')">
+              <span>📚 Templates e Ferramentas</span>
+            </button>
+            <div id="ecPastasSidebar"></div>
+          </div>
+          <div style="padding:6px 10px;border-top:1px solid #f0f2f5">
+            <span id="ecSaveStatus" style="font-size:10px;color:#a0aec0"></span>
+          </div>
         </div>
-        <div class="template-card pdca" onclick="usarTemplate('PDCA')">
-          <div class="template-nome">PDCA</div>
-          <div class="template-desc">Plan, Do, Check, Act</div>
-        </div>
-        <div class="template-card masp" onclick="usarTemplate('MASP')">
-          <div class="template-nome">MASP</div>
-          <div class="template-desc">Método de análise e solução</div>
-        </div>
-        <div class="template-card a3" onclick="usarTemplate('A3 Thinking')">
-          <div class="template-nome">A3 Thinking</div>
-          <div class="template-desc">Relatório A3 Toyota</div>
-        </div>
-        <div class="template-card ishikawa" onclick="usarTemplate('Ishikawa')">
-          <div class="template-nome">Ishikawa</div>
-          <div class="template-desc">Diagrama espinha de peixe</div>
-        </div>
-        <div class="template-card dmaic" onclick="usarTemplate('DMAIC')">
-          <div class="template-nome">DMAIC</div>
-          <div class="template-desc">Define, Measure, Analyze...</div>
-        </div>
-        <div class="template-card swot" onclick="usarTemplate('SWOT')">
-          <div class="template-nome">SWOT</div>
-          <div class="template-desc">Forças, Fraquezas, Oport...</div>
-        </div>
-        <div class="template-card custom" onclick="abrirModalEstudo()">
-          <div style="font-size:24px;margin-bottom:6px">+</div>
-          <div class="template-nome">Novo Template</div>
-          <div class="template-desc">Criar do zero</div>
+
+        <!-- Área de conteúdo -->
+        <div id="ecAreaPrincipal">
+          <!-- Lista / Editor injetados aqui pelo JS -->
         </div>
       </div>
-      <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:10px">Estudos de Caso Salvos</div>
-      <div id="estudosLista"><div style="color:#a0aec0;font-size:13px;padding:20px;text-align:center">Nenhum estudo de caso criado ainda.</div></div>
     </div>
 
     <!-- TAP -->
     <div id="tab-tap" style="display:none">
       <div class="tap-acoes">
         <button class="btn-secondary" id="btnEditarTAP" onclick="toggleTAP()" style="font-size:12px;padding:7px 14px">✏️ Editar</button>
-        <button class="btn-primary" id="btnSalvarTAP" onclick="salvarTAP()" style="display:none;font-size:12px;padding:7px 14px">💾 Salvar TAP</button>
-        <button class="btn-export" onclick="exportarPDF()">📄 Exportar PDF</button>
       </div>
 
       <!-- 1. Identificação -->
@@ -414,7 +514,6 @@
             <button class="btn-primary" onclick="adicionarNoWBS(0)" style="font-size:12px;padding:7px 14px">+ Nível 0</button>
             <button class="btn-secondary" onclick="adicionarNoWBS(1)" style="font-size:12px;padding:7px 14px">+ Nível 1</button>
             <button class="btn-secondary" onclick="adicionarNoWBS(2)" style="font-size:12px;padding:7px 14px">+ Nível 2</button>
-            <button class="btn-export" onclick="salvarProjeto()" style="margin-left:auto">💾 Salvar</button>
           </div>
           <div class="wbs-canvas" id="wbsCanvas" style="min-height:450px;position:relative">
             <svg class="wbs-svg" id="wbsSvg"></svg>
@@ -430,7 +529,6 @@
             <div style="font-size:14px;font-weight:700;color:#1e2a4a">Cronograma do Projeto</div>
             <div style="display:flex;gap:8px">
               <button class="btn-secondary" onclick="adicionarTarefaGantt()" style="font-size:12px;padding:7px 12px">+ Nova Tarefa</button>
-              <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
             </div>
           </div>
           <table class="gantt-table">
@@ -458,7 +556,6 @@
             <div class="tap-section-title" style="margin-bottom:0;border:none;padding:0">Orçamento e Recursos</div>
             <div style="display:flex;gap:8px">
               <button class="btn-secondary" onclick="adicionarRecurso()" style="font-size:12px;padding:7px 12px">+ Recurso</button>
-              <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
             </div>
           </div>
           <table class="tap-table">
@@ -479,7 +576,6 @@
             <div class="tap-section-title" style="margin-bottom:0;border:none;padding:0">Matriz de Riscos</div>
             <div style="display:flex;gap:8px">
               <button class="btn-secondary" onclick="adicionarRiscoDetalhado()" style="font-size:12px;padding:7px 12px">+ Risco</button>
-              <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
             </div>
           </div>
           <table class="tap-table">
@@ -497,7 +593,6 @@
             <div class="tap-section-title" style="margin-bottom:0;border:none;padding:0">Checklists de Qualidade</div>
             <div style="display:flex;gap:8px">
               <button class="btn-secondary" onclick="adicionarChecklist()" style="font-size:12px;padding:7px 12px">+ Novo Checklist</button>
-              <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
             </div>
           </div>
           <div id="qualidadeLista"><div style="text-align:center;padding:32px;color:#a0aec0;font-size:13px">Nenhum checklist criado.</div></div>
@@ -526,7 +621,6 @@
         <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Execução</div><div style="font-size:12px;color:#718096">Documentos e acompanhamento da execução</div></div>
         <div style="display:flex;gap:8px">
           <button class="btn-secondary" onclick="adicionarDocumento()" style="font-size:12px;padding:7px 12px">+ Documento</button>
-          <button class="btn-export" onclick="salvarProjeto()">💾 Salvar</button>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -536,8 +630,7 @@
         </div>
         <div class="tap-section">
           <div class="tap-section-title" style="margin-bottom:12px;border:none;padding:0">💬 Anotações</div>
-          <textarea id="execAnotacoes" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;min-height:180px;font-family:inherit" placeholder="Registre anotações, decisões e informações importantes..."></textarea>
-          <button class="btn-primary" onclick="salvarAnotacoes()" style="font-size:12px;padding:7px 14px;margin-top:8px">Salvar Anotações</button>
+          <textarea id="execAnotacoes" style="width:100%;padding:10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;min-height:180px;font-family:inherit" placeholder="Registre anotações, decisões e informações importantes..." oninput="salvarAnotacoes()"></textarea>
         </div>
       </div>
     </div>
@@ -548,7 +641,6 @@
         <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">Encerramento do Projeto</div></div>
         <div style="display:flex;gap:8px">
           <button class="btn-secondary" id="btnEditEnc" onclick="toggleEnc()" style="font-size:12px;padding:7px 14px">✏️ Editar</button>
-          <button class="btn-export" onclick="exportarPDF()">📄 Exportar PDF</button>
         </div>
       </div>
       <div class="enc-section">
@@ -614,22 +706,97 @@
   </div>
 </div>
 
-<!-- Modal Estudo de Caso -->
-<div class="modal-overlay" id="modalEstudo">
-  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
+<!-- Modal Template EC -->
+<div class="modal-overlay" id="modalTplEC">
+  <div class="modal" style="max-width:600px;max-height:90vh;overflow-y:auto">
     <div class="modal-header">
-      <span class="modal-titulo" id="modalEstudoTitulo">Novo Estudo de Caso</span>
-      <button class="btn-fechar" onclick="fecharModal('modalEstudo')">×</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="ecTplModalIcon" style="font-size:28px"></div>
+        <div>
+          <div class="modal-titulo" id="ecTplModalNome"></div>
+          <div style="font-size:11px;color:#718096" id="ecTplModalDesc"></div>
+        </div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal('modalTplEC')">×</button>
     </div>
-    <div class="form-group"><label>Título *</label><input type="text" id="estudoTitulo" placeholder="Título do estudo"></div>
-    <div class="form-group"><label>Método</label><input type="text" id="estudoMetodo" placeholder="Ex: PDCA, Kaizen, MASP..."></div>
-    <div class="form-group"><label>Responsável</label><input type="text" id="estudoResp" placeholder="Nome do responsável"></div>
-    <div class="form-group"><label>Data</label><input type="date" id="estudoData"></div>
-    <div class="form-group"><label>Descrição / Conteúdo</label><textarea id="estudoConteudo" rows="5" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit" placeholder="Descreva o estudo de caso..."></textarea></div>
-    <input type="hidden" id="estudoEditId">
+    <div id="ecTplModalCampos" style="padding:4px 0"></div>
+    <div class="form-group" style="margin-top:8px"><label>Salvar em</label>
+      <div class="ec-folder-picker" id="ecTplPastaPickerWrap"></div>
+      <input type="hidden" id="ecTplPastaSelect">
+    </div>
     <div class="modal-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalEstudo')">Cancelar</button>
-      <button class="btn-confirmar" onclick="salvarEstudo()">Salvar</button>
+      <button class="btn-cancelar" onclick="fecharModal('modalTplEC')" style="margin-right:auto">Fechar</button>
+      <button class="btn-confirmar" onclick="salvarMaterialTemplate()">💾 Salvar como Material</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nova Nota EC -->
+<div class="modal-overlay" id="modalNovaNotaEC">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><span class="modal-titulo">📝 Novo Documento</span><button class="btn-fechar" onclick="fecharModal('modalNovaNotaEC')">×</button></div>
+    <div class="form-group"><label>Título *</label><input type="text" id="novaNotaECTitulo" placeholder="Título do documento..."></div>
+    <div class="form-group"><label>Salvar em</label>
+      <div class="ec-folder-picker" id="novaNotaECPastaWrap"></div>
+      <input type="hidden" id="novaNotaECPasta">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalNovaNotaEC')">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarNovaNotaEC()">Criar Documento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Upload EC -->
+<div class="modal-overlay" id="modalUploadEC">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><span class="modal-titulo">📎 Upload de Arquivo</span><button class="btn-fechar" onclick="fecharModal('modalUploadEC')">×</button></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0 16px;border-bottom:1px solid #f0f2f5;margin-bottom:14px">
+      <div style="font-size:28px">📎</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:#1e2a4a" id="uploadECFilenome">—</div>
+        <div style="font-size:11px;color:#a0aec0" id="uploadECFilesize">—</div>
+      </div>
+    </div>
+    <div class="form-group"><label>Salvar em</label>
+      <div class="ec-folder-picker" id="uploadECPastaWrap"></div>
+      <input type="hidden" id="uploadECPasta">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="cancelarUploadEC()">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarUploadEC()">Salvar Arquivo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nova Pasta EC -->
+<div class="modal-overlay" id="modalNovaPastaEC">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header"><span class="modal-titulo">Nova Pasta</span><button class="btn-fechar" onclick="fecharModal('modalNovaPastaEC')">×</button></div>
+    <div class="form-group"><label>Nome da pasta</label><input type="text" id="novaPastaECNome" placeholder="Ex: Análises, Referências..."></div>
+    <div class="form-group"><label>Criar dentro de</label>
+      <div class="ec-folder-picker" id="novaPastaECParentWrap"></div>
+      <input type="hidden" id="novaPastaECParent">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalNovaPastaEC')">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarNovaPastaEC()">Criar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Link Picker EC -->
+<div class="modal-overlay" id="modalECLinkPicker">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <span class="modal-titulo">🔗 Vincular Material</span>
+      <button class="btn-fechar" onclick="fecharModal('modalECLinkPicker')">×</button>
+    </div>
+    <div class="modal-body" style="padding:12px">
+      <input type="hidden" id="ecLinkPickerMid">
+      <input type="hidden" id="ecLinkPickerKey">
+      <input type="text" id="ecLinkPickerSearch" placeholder="🔍 Buscar material..." oninput="_ecLinkPickerFilter()" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;margin-bottom:10px;box-sizing:border-box">
+      <div id="ecLinkPickerBody" style="max-height:260px;overflow-y:auto"></div>
     </div>
   </div>
 </div>
@@ -739,9 +906,8 @@
     renderOrcamento();
     renderEquipe();
     renderAprovacoes();
-    // Estudos
-    estudos = projeto.estudosCaso || [];
-    renderEstudos();
+    // Estudo de Caso biblioteca
+    carregarDadosEC();
     // Change Requests
     changeRequests = projeto.changeRequests || [];
     renderCRs();
@@ -816,33 +982,25 @@
     document.getElementById('equipeLista').style.display = tapEditando ? 'none' : 'block';
     document.getElementById('aprovacoesEdit').style.display = tapEditando ? 'block' : 'none';
     document.getElementById('aprovacoesList').style.display = tapEditando ? 'none' : 'block';
-    document.getElementById('btnEditarTAP').style.display = tapEditando ? 'none' : 'inline-block';
-    document.getElementById('btnSalvarTAP').style.display = tapEditando ? 'inline-block' : 'none';
+    document.getElementById('btnEditarTAP').textContent = tapEditando ? '✓ Concluir' : '✏️ Editar';
     if (tapEditando) { renderMarcosTbody(); renderRiscosTbody(); renderOrcamentoTbody(); renderEquipeTbody(); renderAprovacoesTbody(); }
-    else { renderMarcos(); renderRiscos(); renderOrcamento(); renderEquipe(); renderAprovacoes(); }
+    else { _salvarTAPSilent(); renderMarcos(); renderRiscos(); renderOrcamento(); renderEquipe(); renderAprovacoes(); }
   }
 
-  function salvarTAP() {
-    const tap = {
-      nome: document.getElementById('tap-nome').value,
-      gerente: document.getElementById('tap-gerente').value,
-      patrocinador: document.getElementById('tap-patrocinador').value,
-      inicio: document.getElementById('tap-inicio').value,
-      fim: document.getElementById('tap-fim').value,
-      versao: document.getElementById('tap-versao').value,
-      justificativa: document.getElementById('tap-justificativa').value,
-      objetivos: document.getElementById('tap-objetivos').value,
-      premissas: document.getElementById('tap-premissas').value,
-      restricoes: document.getElementById('tap-restricoes').value,
-      escopoIn: document.getElementById('tap-escopo-in').value,
-      escopoOut: document.getElementById('tap-escopo-out').value,
+  function _salvarTAPSilent() {
+    const get = id => document.getElementById(id)?.value || '';
+    projeto.tap = {
+      nome: get('tap-nome'), gerente: get('tap-gerente'), patrocinador: get('tap-patrocinador'),
+      inicio: get('tap-inicio'), fim: get('tap-fim'), versao: get('tap-versao'),
+      justificativa: get('tap-justificativa'), objetivos: get('tap-objetivos'),
+      premissas: get('tap-premissas'), restricoes: get('tap-restricoes'),
+      escopoIn: get('tap-escopo-in'), escopoOut: get('tap-escopo-out'),
       marcos, riscos, orcamento, equipe, aprovacoes
     };
-    projeto.tap = tap;
-    salvarProjeto();
-    toggleTAP();
+    agendarSalvarProjeto();
     carregarDadosProjeto();
   }
+  function salvarTAP() { _salvarTAPSilent(); }
 
   function renderEscopoView(tipo, texto) {
     const el = document.getElementById('tap-escopo-' + tipo + '-v');
@@ -956,66 +1114,640 @@
     lista.innerHTML = `<table class="tap-table"><thead><tr><th>Papel</th><th>Nome</th><th>Assinatura</th><th>Data</th></tr></thead><tbody>${aprovacoes.map(a=>`<tr><td>${a.papel}</td><td>${a.nome}</td><td>${a.assinatura||'—'}</td><td>${formatarData(a.data)}</td></tr>`).join('')}</tbody></table>`;
   }
 
-  // ===== ESTUDOS DE CASO =====
-  function usarTemplate(tipo) {
-    document.getElementById('estudoMetodo').value = tipo;
-    document.getElementById('estudoTitulo').value = '';
-    document.getElementById('estudoConteudo').value = '';
-    document.getElementById('estudoResp').value = '';
-    document.getElementById('estudoData').value = new Date().toISOString().split('T')[0];
-    document.getElementById('estudoEditId').value = '';
-    document.getElementById('modalEstudo').classList.add('aberto');
+  // ===== ESTUDO DE CASO — BIBLIOTECA =====
+  const EC_TEMPLATES = [
+    { id:'kaizen', cls:'kaizen', icon:'📋', nome:'Kaizen Charter', desc:'Melhoria contínua e rápida', quando:'Quando há oportunidades de melhoria de processo com impacto rápido.', como:'Defina o problema, a meta e o plano de ação em equipe multidisciplinar.', campos:[{secao:'Identificação',itens:[{label:'Título do Kaizen',tipo:'text',ph:'Ex: Redução de Setup da Linha 3'},{label:'Área / Processo',tipo:'text',ph:'Ex: Produção'},{label:'Responsável',tipo:'text',ph:'Nome'},{label:'Data',tipo:'date',ph:''}]},{secao:'Problema',itens:[{label:'Descrição do Problema',tipo:'textarea',ph:'Descreva o problema atual...'},{label:'Impacto Atual',tipo:'textarea',ph:'Qual o impacto?'}]},{secao:'Meta e Solução',itens:[{label:'Situação Atual',tipo:'text',ph:'Ex: 45 min'},{label:'Meta',tipo:'text',ph:'Ex: 20 min'},{label:'Plano de Ação',tipo:'textarea',ph:'Ações planejadas...'},{label:'Resultados Alcançados',tipo:'textarea',ph:'Preencha após implementação...'}]}] },
+    { id:'a3', cls:'a3', icon:'📄', nome:'A3 — Resolução de Problemas', desc:'Relatório A3 Toyota', quando:'Quando é necessária análise estruturada de causa raiz.', como:'Complete as seções de contexto, análise, contramedidas e acompanhamento.', campos:[{secao:'Contexto',itens:[{label:'Título',tipo:'text',ph:'Título do problema'},{label:'Dono do Processo',tipo:'text',ph:'Nome'},{label:'Data',tipo:'date',ph:''}]},{secao:'Situação Atual',itens:[{label:'Descrição',tipo:'textarea',ph:'Descreva a situação atual...'},{label:'Dados e Métricas',tipo:'textarea',ph:'Dados quantitativos...'}]},{secao:'Análise de Causa Raiz',itens:[{label:'5 Porquês',tipo:'textarea',ph:'Por quê 1:\nPor quê 2:\nPor quê 3:\nPor quê 4:\nPor quê 5:'}]},{secao:'Contramedidas',itens:[{label:'Ações Propostas',tipo:'textarea',ph:'Liste as contramedidas...'},{label:'Indicador de Sucesso',tipo:'text',ph:'Como medir?'}]}] },
+    { id:'5w2h', cls:'sw2h', icon:'📊', nome:'5W2H — Plano de Ação', desc:'O quê, Quem, Quando, Onde, Por quê, Como, Quanto', quando:'Quando se precisa estruturar um plano de ação claro.', como:'Responda cada uma das 7 perguntas para detalhar completamente a ação.', campos:[{secao:'Identificação',itens:[{label:'Projeto / Iniciativa',tipo:'text',ph:'Nome do projeto'},{label:'Responsável Geral',tipo:'text',ph:'Nome'}]},{secao:'5W2H',itens:[{label:'WHAT — O que será feito?',tipo:'textarea',ph:'Descreva a ação...'},{label:'WHO — Quem fará?',tipo:'text',ph:'Responsável'},{label:'WHEN — Quando?',tipo:'date',ph:''},{label:'WHERE — Onde?',tipo:'text',ph:'Local'},{label:'WHY — Por quê?',tipo:'textarea',ph:'Justificativa...'},{label:'HOW — Como?',tipo:'textarea',ph:'Método...'},{label:'HOW MUCH — Quanto custa?',tipo:'text',ph:'Ex: R$ 5.000'}]}] },
+    { id:'pdca', cls:'pdca', icon:'🔄', nome:'PDCA', desc:'Plan, Do, Check, Act', quando:'Quando se quer melhorar um processo de forma iterativa e controlada.', como:'Planeje → Execute → Verifique → Padronize o que funcionou.', campos:[{secao:'PLAN — Planejar',itens:[{label:'Problema',tipo:'textarea',ph:'Descreva...'},{label:'Meta',tipo:'text',ph:'Meta'},{label:'Plano de Ação',tipo:'textarea',ph:'Ações planejadas...'}]},{secao:'DO — Executar',itens:[{label:'Ações Executadas',tipo:'textarea',ph:'O que foi feito...'},{label:'Data',tipo:'date',ph:''}]},{secao:'CHECK — Verificar',itens:[{label:'Resultados',tipo:'textarea',ph:'Resultados obtidos...'},{label:'Meta Atingida?',tipo:'text',ph:'Sim / Não / Parcial'}]},{secao:'ACT — Agir',itens:[{label:'Padronização',tipo:'textarea',ph:'Como padronizar...'},{label:'Próximos Passos',tipo:'textarea',ph:'Próxima iteração...'}]}] },
+    { id:'ishikawa', cls:'ishikawa', icon:'🐟', nome:'Ishikawa (Espinha de Peixe)', desc:'Diagrama de causas raiz — 6M', quando:'Quando se precisa identificar causas raiz de um problema complexo.', como:'Categorize as causas em Método, Máquina, Mão de obra, Material, Meio Ambiente e Medição.', campos:[{secao:'Problema (Efeito)',itens:[{label:'Descrição do Problema',tipo:'textarea',ph:'O problema que você analisa...'}]},{secao:'6M — Causas',itens:[{label:'Método',tipo:'textarea',ph:'Causas relacionadas ao método...'},{label:'Máquina',tipo:'textarea',ph:'Causas relacionadas à máquina...'},{label:'Mão de Obra',tipo:'textarea',ph:'Causas relacionadas às pessoas...'},{label:'Material',tipo:'textarea',ph:'Causas relacionadas ao material...'},{label:'Meio Ambiente',tipo:'textarea',ph:'Causas ambientais...'},{label:'Medição',tipo:'textarea',ph:'Causas de medição...'}]},{secao:'Causa Raiz',itens:[{label:'Causa Raiz Principal',tipo:'textarea',ph:'Causa raiz...'},{label:'Plano de Ação',tipo:'textarea',ph:'Como resolver...'}]}] },
+    { id:'dmaic', cls:'dmaic', icon:'⚡', nome:'DMAIC', desc:'Define, Measure, Analyze, Improve, Control', quando:'Quando se quer aplicar Six Sigma para redução de defeitos/variação.', como:'Siga as 5 fases: Definir escopo → Medir baseline → Analisar causas → Melhorar → Controlar.', campos:[{secao:'DEFINE',itens:[{label:'Project Charter',tipo:'textarea',ph:'Descrição do projeto...'},{label:'Escopo',tipo:'textarea',ph:'Dentro/fora do escopo...'}]},{secao:'MEASURE',itens:[{label:'Métricas Atuais',tipo:'textarea',ph:'Dados do processo...'},{label:'Baseline',tipo:'text',ph:'Ex: 15% defeitos'}]},{secao:'ANALYZE',itens:[{label:'Causas Raiz',tipo:'textarea',ph:'Análise das causas...'}]},{secao:'IMPROVE',itens:[{label:'Soluções',tipo:'textarea',ph:'O que foi feito...'},{label:'Resultado',tipo:'text',ph:'Ex: 3% defeitos'}]},{secao:'CONTROL',itens:[{label:'Plano de Controle',tipo:'textarea',ph:'Como manter resultados...'}]}] },
+    { id:'masp', cls:'masp', icon:'🔍', nome:'MASP', desc:'Método de Análise e Solução de Problemas', quando:'Quando se precisa de uma metodologia estruturada e completa para resolver problemas.', como:'Siga os 8 passos: Identificação → Observação → Análise → Plano → Ação → Verificação → Padronização → Conclusão.', campos:[{secao:'MASP — 8 Passos',itens:[{label:'1. Identificação do Problema',tipo:'textarea',ph:'Descreva o problema...'},{label:'2. Observação',tipo:'textarea',ph:'Dados coletados...'},{label:'3. Análise de Causa',tipo:'textarea',ph:'Causas identificadas...'},{label:'4. Plano de Ação',tipo:'textarea',ph:'Ações planejadas...'},{label:'5. Ação',tipo:'textarea',ph:'O que foi executado...'},{label:'6. Verificação',tipo:'textarea',ph:'Resultados verificados...'},{label:'7. Padronização',tipo:'textarea',ph:'Como padronizar...'},{label:'8. Conclusão',tipo:'textarea',ph:'Lições aprendidas...'}]}] },
+    { id:'swot', cls:'swot', icon:'🎯', nome:'Análise SWOT', desc:'Forças, Fraquezas, Oportunidades, Ameaças', quando:'Na fase de diagnóstico de um projeto, produto ou situação estratégica.', como:'Mapeie o ambiente interno (Forças/Fraquezas) e externo (Oportunidades/Ameaças).', campos:[{secao:'Ambiente Interno',itens:[{label:'Forças (Strengths)',tipo:'textarea',ph:'O que temos de bom...'},{label:'Fraquezas (Weaknesses)',tipo:'textarea',ph:'O que pode melhorar...'}]},{secao:'Ambiente Externo',itens:[{label:'Oportunidades (Opportunities)',tipo:'textarea',ph:'Oportunidades externas...'},{label:'Ameaças (Threats)',tipo:'textarea',ph:'Riscos e ameaças...'}]}] },
+  ];
+
+  let ecPastas = [];
+  let ecMateriais = [];
+  let ecPastaAtual = 'templates';
+  let ecCaminhoNavegacao = []; // [{id, nome}] hierarquia atual
+  let ecEditandoId = null;
+  let ecTplAtual = null;
+  let ecUploadPendente = null; // arquivo aguardando escolha de pasta
+  let ecAutoSaveTimer = null;
+
+  function renderEstudos() { renderECContent(); } // compatibilidade
+
+  function carregarDadosEC() {
+    ecPastas = projeto.ecPastas || [];
+    ecMateriais = projeto.ecMateriais || [];
+    renderECSidebar();
+    renderECContent();
   }
-  function abrirModalEstudo() {
-    document.getElementById('estudoTitulo').value = '';
-    document.getElementById('estudoMetodo').value = '';
-    document.getElementById('estudoConteudo').value = '';
-    document.getElementById('estudoResp').value = '';
-    document.getElementById('estudoData').value = new Date().toISOString().split('T')[0];
-    document.getElementById('estudoEditId').value = '';
-    document.getElementById('modalEstudo').classList.add('aberto');
+
+  // Folder tree picker
+  function _renderEcFolderPicker(wrapperId, hiddenId, selectedId, rootLabel) {
+    const wrap = document.getElementById(wrapperId);
+    if (!wrap) return;
+    const hidden = document.getElementById(hiddenId);
+    const sel = selectedId || '';
+
+    function buildRows(parentId, depth) {
+      let rows = '';
+      ecPastas.filter(p => (p.parentId||null) === (parentId||null)).forEach(p => {
+        const isSel = sel === p.id;
+        const indent = depth > 0
+          ? `<span style="display:inline-block;width:${depth * 14}px;flex-shrink:0"></span><span style="color:#cbd5e0;font-size:11px;margin-right:2px">&rdsh;</span>`
+          : '';
+        const esc = s => s.replace(/'/g, "\\'");
+        rows += `<button type="button" class="ec-fpick-item${isSel ? ' selected' : ''}" onclick="_ecFpickSelect('${esc(wrapperId)}','${esc(hiddenId)}','${esc(p.id)}',this)">
+          ${indent}<span style="color:#718096">📂</span><span style="margin-left:4px">${p.nome}</span>
+        </button>`;
+        rows += buildRows(p.id, depth + 1);
+      });
+      return rows;
+    }
+
+    const esc = s => s.replace(/'/g, "\\'");
+    const rootSel = sel === '' ? ' selected' : '';
+    wrap.innerHTML =
+      `<button type="button" class="ec-fpick-item${rootSel}" onclick="_ecFpickSelect('${esc(wrapperId)}','${esc(hiddenId)}','',this)">
+        <span style="color:#718096">📁</span><span style="margin-left:4px">${rootLabel || 'Sem pasta'}</span>
+      </button>` + buildRows(null, 0);
+
+    if (hidden) hidden.value = sel;
   }
-  function salvarEstudo() {
-    const titulo = document.getElementById('estudoTitulo').value.trim();
-    if (!titulo) { alert('Título obrigatório'); return; }
-    const id = document.getElementById('estudoEditId').value;
-    const dados = { id: id||Date.now(), titulo, metodo: document.getElementById('estudoMetodo').value, responsavel: document.getElementById('estudoResp').value, data: document.getElementById('estudoData').value, conteudo: document.getElementById('estudoConteudo').value };
-    if (id) { const idx = estudos.findIndex(e=>e.id==id); if(idx!==-1) estudos[idx]=dados; }
-    else estudos.unshift(dados);
-    projeto.estudosCaso = estudos;
-    salvarProjeto();
-    renderEstudos();
-    fecharModal('modalEstudo');
+
+  function _ecFpickSelect(wrapperId, hiddenId, val, btn) {
+    document.getElementById(wrapperId)?.querySelectorAll('.ec-fpick-item').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    const h = document.getElementById(hiddenId);
+    if (h) h.value = val;
   }
-  function renderEstudos() {
-    const lista = document.getElementById('estudosLista');
-    if (estudos.length === 0) { lista.innerHTML = '<div style="text-align:center;padding:20px;color:#a0aec0;font-size:13px">Nenhum estudo de caso criado ainda.</div>'; return; }
-    lista.innerHTML = estudos.map(e => `
-      <div class="estudo-item">
-        <div><div class="estudo-nome">${e.titulo}</div><div class="estudo-meta">${e.metodo||'—'} • ${e.responsavel||'—'} • ${formatarData(e.data)}</div></div>
-        <div style="display:flex;gap:6px">
-          <button onclick="editarEstudo(${e.id})" style="padding:4px 8px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px">✏️ Editar</button>
-          <button onclick="deletarEstudo(${e.id})" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:11px">🗑️</button>
+
+  // _ecPastaOpts mantida para usos internos (editor pasta select)
+  function _ecPastaOpts(selectedId) {
+    function buildOpts(parentId, depth) {
+      return ecPastas.filter(p => (p.parentId||null) === (parentId||null))
+        .map(p => `<option value="${p.id}" ${selectedId===p.id?'selected':''}>${' '.repeat(depth*2)}${depth>0?'&#x2514; ':''}${p.nome}</option>${buildOpts(p.id, depth+1)}`)
+        .join('');
+    }
+    return `<option value="">Sem pasta</option>` + buildOpts(null, 0);
+  }
+
+  function renderECSidebar() {
+    const sb = document.getElementById('ecPastasSidebar');
+    if (!sb) return;
+    const currentParentId = ecCaminhoNavegacao.length > 0 ? ecCaminhoNavegacao[ecCaminhoNavegacao.length-1].id : null;
+    let html = '';
+    // Breadcrumb se estiver dentro de alguma pasta
+    if (ecCaminhoNavegacao.length > 0) {
+      html += `<div class="ec-breadcrumb">
+        <button class="ec-bc-btn" onclick="ecVoltarPasta()">← Voltar</button>
+        <div class="ec-bc-path">${ecCaminhoNavegacao.map((it,idx) =>
+          `<span class="ec-bc-item" onclick="ecIrBreadcrumb(${idx})">${it.nome}</span>${idx < ecCaminhoNavegacao.length-1 ? ' › ' : ''}`
+        ).join('')}</div>
+      </div>`;
+    }
+    // Pastas no nível atual
+    const subPastas = ecPastas.filter(p => (p.parentId||null) === currentParentId);
+    html += subPastas.map(p => `
+      <button class="ec-pasta-btn ${ecPastaAtual===p.id?'active':''}" onclick="ecNavegarPasta('${p.id}','${p.nome.replace(/'/g,"\\'").replace(/\\/g,"\\\\")}')">
+        <span>📂 ${p.nome}</span>
+        <button class="ec-pasta-del" onclick="event.stopPropagation();deletarPastaEC('${p.id}')" title="Remover pasta">✕</button>
+      </button>`).join('');
+    sb.innerHTML = html;
+    const btnTpl = document.getElementById('ecBtnTemplates');
+    if (btnTpl) btnTpl.className = 'ec-pasta-btn' + (ecPastaAtual==='templates'?' active':'');
+  }
+
+  function selecionarPastaEC(id) {
+    // Usado apenas pelo botão "Templates e Ferramentas"
+    ecPastaAtual = id === 'templates' ? 'templates' : id;
+    ecCaminhoNavegacao = [];
+    ecEditandoId = null;
+    renderECSidebar();
+    renderECContent();
+  }
+
+  function ecNavegarPasta(id, nome) {
+    ecCaminhoNavegacao.push({ id, nome });
+    ecPastaAtual = id;
+    ecEditandoId = null;
+    renderECSidebar();
+    renderECContent();
+  }
+
+  function ecVoltarPasta() {
+    ecCaminhoNavegacao.pop();
+    const current = ecCaminhoNavegacao[ecCaminhoNavegacao.length-1];
+    ecPastaAtual = current ? current.id : 'templates';
+    ecEditandoId = null;
+    renderECSidebar();
+    renderECContent();
+  }
+
+  function ecIrBreadcrumb(idx) {
+    ecCaminhoNavegacao = ecCaminhoNavegacao.slice(0, idx+1);
+    ecPastaAtual = ecCaminhoNavegacao[idx].id;
+    ecEditandoId = null;
+    renderECSidebar();
+    renderECContent();
+  }
+
+  function renderECContent() {
+    const area = document.getElementById('ecAreaPrincipal');
+    if (!area) return;
+    if (ecEditandoId !== null) { renderECEditor(); return; }
+
+    const q = (document.getElementById('ecSearch')?.value || '').toLowerCase();
+    const showTemplates = ecPastaAtual === 'templates';
+
+    let materiaisFiltrados = ecMateriais.filter(m => {
+      if (ecPastaAtual !== 'templates' && m.pasta !== ecPastaAtual) return false;
+      if (q && !(m.titulo||'').toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    // toolbar: só busca + upload (como label); Novo Doc é item na lista
+    let html = `
+      <div class="ec-toolbar">
+        <input class="ec-search" type="text" id="ecSearch" placeholder="Buscar materiais..." oninput="renderECContent()" value="${q}">
+        <label class="btn-secondary" style="font-size:12px;padding:6px 12px;cursor:pointer;display:flex;align-items:center;gap:5px">
+          📎 Upload Arquivo<input type="file" id="ecFileInput" style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg" onchange="pedirPastaUpload(this)">
+        </label>
+      </div>`;
+
+    if (showTemplates) {
+      html += `<div class="ec-template-grid">
+          ${EC_TEMPLATES.filter(t => !q || t.nome.toLowerCase().includes(q)).map(t => `
+            <div class="ec-tpl-card ${t.cls}" onclick="abrirTemplateEC('${t.id}')">
+              <div class="ec-tpl-icon">${t.icon}</div>
+              <div class="ec-tpl-nome">${t.nome}</div>
+              <div class="ec-tpl-desc">${t.desc}</div>
+            </div>`).join('')}
+          ${!q ? `<div class="ec-tpl-card" onclick="pedirTituloNota()" style="background:white;border:2px dashed #c4b5fd;color:#6b46c1;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div class="ec-tpl-icon">📝</div>
+            <div class="ec-tpl-nome">Novo Documento</div>
+            <div class="ec-tpl-desc">Criar nota wiki</div>
+          </div>` : ''}
+        </div>`;
+    } else {
+      // Pasta do usuário: mostra materiais (sem card "Novo Documento", que fica nos Templates)
+      html += ``;
+
+      if (materiaisFiltrados.length === 0 && !q) {
+        html += `<div style="text-align:center;padding:24px;color:#a0aec0;font-size:13px;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+          <div style="font-size:32px;margin-bottom:6px">📄</div>Nenhum material nesta pasta ainda.
+        </div>`;
+      } else {
+        html += materiaisFiltrados.map(m => {
+          const pasta = ecPastas.find(p=>p.id===m.pasta);
+          const tipoIcon = m.tipo==='nota' ? '📝' : m.tipo==='template' ? (EC_TEMPLATES.find(t=>t.id===m.templateId)?.icon||'📋') : '📎';
+          const tipoLabel = m.tipo==='nota'?'Documento':(m.tipo==='template'?'Template Preenchido':'Arquivo');
+          return `<div class="ec-material-item" onclick="abrirMaterialEC('${m.id}')">
+            <div class="ec-material-icon">${tipoIcon}</div>
+            <div style="flex:1;min-width:0">
+              <div class="ec-material-nome">${m.titulo}</div>
+              <div class="ec-material-meta">${tipoLabel} ${pasta?'• '+pasta.nome:''} • ${formatarData(m.criado)}</div>
+            </div>
+            <div class="ec-material-acoes">
+              ${m.tipo!=='arquivo'?`<button class="ec-mat-btn" style="background:#f5f0ff;color:#2d1b69" onclick="event.stopPropagation();editarMaterialEC('${m.id}')">✏️ Editar</button>`:''}
+              <button class="ec-mat-btn" style="background:#fff5f5;color:#c53030" onclick="event.stopPropagation();deletarMaterialEC('${m.id}')">Remover</button>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    area.innerHTML = html;
+  }
+
+  // ===== TEMPLATE SYSTEM (full-screen, tables, SWOT, A3) =====
+  function _ecInitDados(tplId) {
+    const tb = (...cols) => ({ cols:[...cols], rows:[cols.map(()=>'')] });
+    const tbL = (...cols) => Object.assign(tb(...cols), {imagens:[],links:[]});
+    switch(tplId) {
+      case 'kaizen': return { titulo:'',area:'',responsavel:'',data:'',
+        problema:tb('Descrição','Impacto'), metaGeral:'', solucao:tb('Plano de Ação','Resultados') };
+      case 'a3': return { titulo:'',dono:'',data:'',
+        problema:tbL('Item','Detalhe'), contexto:tbL('Item','Detalhe'),
+        estadoAtual:tbL('Item','Dados'), metas:tbL('Meta','Indicador','Prazo'),
+        analises:tbL('Causa','Evidência'), planoAcoes:tbL('Ação','Responsável','Prazo','Status'),
+        reflexoes:tbL('Reflexão','Lição Aprendida') };
+      case '5w2h': return { projeto:'',responsavel:'',
+        tabela:tb('O Quê (WHAT)','Quem (WHO)','Quando (WHEN)','Onde (WHERE)','Por Quê (WHY)','Como (HOW)','Quanto (HOW MUCH)') };
+      case 'pdca': return { plan:tb('Problema','Meta','Ação Planejada'),
+        do:tb('Ação Executada','Responsável','Data'),
+        check:tb('Resultado Esperado','Resultado Obtido','Meta Atingida?'),
+        act:tb('Padronização','Próximos Passos') };
+      case 'ishikawa': return { problema:'',
+        causas:tb('Método','Máquina','Mão de Obra','Material','Meio Ambiente','Medição') };
+      case 'dmaic': return { projectCharter:'',escopo:'',
+        metrics:tb('Métrica','Baseline','Meta','Método'),
+        analyze:tbL('Causa Raiz','Evidência','Impacto'),
+        improve:tb('Solução','Ação','Responsável','Resultado'),
+        control:tb('O Quê Controlar','Como','Responsável','Frequência') };
+      case 'masp': return { tabela:tb('1. Identificação','2. Observação','3. Análise de Causa','4. Plano de Ação','5. Ação','6. Verificação','7. Padronização','8. Conclusão'), links:[] };
+      case 'swot': return { forcas:'',fraquezas:'',oportunidades:'',ameacas:'' };
+      default: return {};
+    }
+  }
+
+  // ===== Dynamic table HTML =====
+  function _ecDtbl(m, key) {
+    const tbl = m.dados && m.dados[key];
+    if (!tbl) return '';
+    const mid = m.id; const {cols,rows} = tbl;
+    const thead = '<thead><tr>' + cols.map((c,j) =>
+      `<th><div class="ec-dtbl-colname" contenteditable="true" oninput="_ecTblCol(${mid},'${key}',${j},this.textContent)">${c}</div><span class="ec-dtbl-delcol" onclick="_ecTblDelCol(${mid},'${key}',${j})" title="Remover">✕</span></th>`
+    ).join('') + `<th class="ec-dtbl-addcol" onclick="_ecTblAddCol(${mid},'${key}')" title="Nova coluna">+</th><th style="width:22px;border:none;background:none"></th></tr></thead>`;
+    const tbody = '<tbody>' + rows.map((row,i) =>
+      '<tr>' + cols.map((_,j) =>
+        `<td contenteditable="true" oninput="_ecTblCell(${mid},'${key}',${i},${j},this.innerHTML)">${row[j]||''}</td>`
+      ).join('') + `<td></td><td class="ec-dtbl-del" onclick="_ecTblDelRow(${mid},'${key}',${i})" title="Remover linha">✕</td></tr>`
+    ).join('') + '</tbody>';
+    return `<div class="ec-dtbl-wrap"><table class="ec-dtbl">${thead}${tbody}</table></div><button class="ec-dtbl-addrow" onclick="_ecTblAddRow(${mid},'${key}')">+ Linha</button>`;
+  }
+
+  function _ecTblCell(mid,key,row,col,val){const m=ecMateriais.find(m=>m.id==mid);if(m?.dados?.[key]?.rows?.[row])m.dados[key].rows[row][col]=val;ecAgendarAutoSave();}
+  function _ecTblCol(mid,key,col,name){const m=ecMateriais.find(m=>m.id==mid);if(m?.dados?.[key]?.cols)m.dados[key].cols[col]=name.trim()||('Col '+(col+1));ecAgendarAutoSave();}
+  function _ecTblAddRow(mid,key){const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key])return;m.dados[key].rows.push(m.dados[key].cols.map(()=>''));salvarDadosEC();renderECEditor();}
+  function _ecTblDelRow(mid,key,row){const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key]||m.dados[key].rows.length<=1)return;m.dados[key].rows.splice(row,1);salvarDadosEC();renderECEditor();}
+  function _ecTblAddCol(mid,key){const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key])return;m.dados[key].cols.push('Nova Coluna');m.dados[key].rows.forEach(r=>r.push(''));salvarDadosEC();renderECEditor();}
+  function _ecTblDelCol(mid,key,col){const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key]||m.dados[key].cols.length<=1)return;m.dados[key].cols.splice(col,1);m.dados[key].rows.forEach(r=>r.splice(col,1));salvarDadosEC();renderECEditor();}
+  function _ecDadosField(mid,key,val){const m=ecMateriais.find(m=>m.id==mid);if(m?.dados)m.dados[key]=val;ecAgendarAutoSave();}
+
+  // Image support for A3/DMAIC blocks
+  function _ecAddImg(mid,key,inputEl){const file=inputEl.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key])return;if(!m.dados[key].imagens)m.dados[key].imagens=[];m.dados[key].imagens.push({nome:file.name,base64:e.target.result});inputEl.value='';salvarDadosEC();renderECEditor();};reader.readAsDataURL(file);}
+  function _ecDelImg(mid,key,idx){const m=ecMateriais.find(m=>m.id==mid);if(m?.dados?.[key]?.imagens){m.dados[key].imagens.splice(idx,1);salvarDadosEC();renderECEditor();}}
+
+  // Link-to-material support
+  function _ecOpenLinkPicker(mid,key){
+    document.getElementById('ecLinkPickerMid').value=mid;
+    document.getElementById('ecLinkPickerKey').value=key;
+    document.getElementById('ecLinkPickerSearch').value='';
+    _ecLinkPickerFilter();
+    document.getElementById('modalECLinkPicker').classList.add('aberto');
+  }
+  function _ecLinkPickerFilter(){
+    const mid=document.getElementById('ecLinkPickerMid').value;
+    const key=document.getElementById('ecLinkPickerKey').value;
+    const q=(document.getElementById('ecLinkPickerSearch').value||'').toLowerCase();
+    const m=ecMateriais.find(x=>x.id==mid);
+    const existingLinks=(m?.dados?.[key]?.links)||[];
+    const candidates=ecMateriais.filter(x=>x.id!=mid&&x.tipo!=='arquivo'&&(!q||x.titulo.toLowerCase().includes(q)));
+    if(!candidates.length){
+      document.getElementById('ecLinkPickerBody').innerHTML='<p style="color:#a0aec0;font-size:12px;padding:10px;text-align:center">Nenhum material encontrado.</p>';return;
+    }
+    document.getElementById('ecLinkPickerBody').innerHTML=candidates.map(x=>{
+      const icon=x.tipo==='template'?(EC_TEMPLATES.find(t=>t.id===x.templateId)?.icon||'📋'):'📝';
+      const already=existingLinks.some(l=>l.id==x.id);
+      const pastaM=ecMateriais.find(f=>f.id==x.pasta&&f.tipo==='pasta');
+      const folder=pastaM?pastaM.titulo:'Raiz';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:'+(already?'default':'pointer')+';opacity:'+(already?.5:1)+'" '+(already?'':
+        'onmouseenter="this.style.background=\'#f5f0ff\'" onmouseleave="this.style.background=\'\'" onclick="_ecConfirmLink('+mid+',\''+key+'\','+x.id+')"')+'>'+
+        '<span style="font-size:16px">'+icon+'</span>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:12px;font-weight:600;color:#2d1b69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(x.titulo||'Sem título')+'</div>'+
+          '<div style="font-size:10px;color:#a0aec0">'+folder+'</div>'+
+        '</div>'+
+        '<span style="font-size:10px;'+(already?'color:#6b46c1;font-weight:700':'color:#a0aec0')+'">'+(already?'✓ Vinculado':'Vincular')+'</span>'+
+      '</div>';
+    }).join('');
+  }
+  function _ecConfirmLink(mid,key,linkedId){
+    const m=ecMateriais.find(x=>x.id==mid); if(!m?.dados) return;
+    if(!m.dados[key]) m.dados[key]={links:[]};
+    if(!m.dados[key].links) m.dados[key].links=[];
+    if(m.dados[key].links.some(l=>l.id==linkedId)) return;
+    const linked=ecMateriais.find(x=>x.id==linkedId); if(!linked) return;
+    const icon=linked.tipo==='template'?(EC_TEMPLATES.find(t=>t.id===linked.templateId)?.icon||'📋'):'📝';
+    m.dados[key].links.push({id:linkedId,titulo:linked.titulo||'Sem título',icon});
+    fecharModal('modalECLinkPicker');
+    salvarDadosEC(); renderECEditor();
+  }
+  function _ecDelLink(mid,key,idx){
+    const m=ecMateriais.find(x=>x.id==mid);
+    if(m?.dados?.[key]?.links){m.dados[key].links.splice(idx,1);salvarDadosEC();renderECEditor();}
+  }
+  function _ecLinksSection(m,key){
+    const mid=m.id; const links=(m.dados?.[key])||[];
+    const chips=links.map(function(l,i){return '<span style="display:inline-flex;align-items:center;gap:5px;background:#f5f0ff;color:#2d1b69;border:1px solid #e9d8fd;border-radius:20px;padding:3px 10px;font-size:11px;cursor:pointer" onclick="abrirMaterialEC('+l.id+')">'+l.icon+' '+(l.titulo||'Material')+'<button onclick="event.stopPropagation();_ecDelLink('+mid+',\''+key+'\','+i+')" style="background:none;border:none;color:#9f7aea;cursor:pointer;font-size:11px;margin-left:2px;line-height:1">✕</button></span>';}).join('');
+    return '<div style="margin-top:14px;border-top:1px solid #f0f2f5;padding-top:12px">'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+        '<span style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">🔗 Materiais Vinculados</span>'+
+        '<button style="font-size:10px;color:#276749;cursor:pointer;background:#f0fff4;padding:2px 8px;border-radius:4px;font-weight:600;border:1px solid #c6f6d5" onclick="_ecOpenLinkPicker('+mid+',\''+key+'\')">+ Vincular</button>'+
+      '</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+(chips||'<span style="font-size:11px;color:#cbd5e0">Nenhum material vinculado ainda</span>')+'</div>'+
+    '</div>';
+  }
+
+  // A3-style block (table + image strip + links)
+  function _ecBlock(m,key,label,spanFull) {
+    const mid=m.id;
+    const imgs=(m.dados?.[key]?.imagens)||[];
+    const links=(m.dados?.[key]?.links)||[];
+    const imgStrip = imgs.length
+      ? '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">' + imgs.map((img,i) =>
+          `<div style="position:relative"><img src="${img.base64}" style="max-width:110px;max-height:75px;border-radius:4px;border:1px solid #e2e8f0;cursor:pointer" title="${img.nome}" onclick="window.open(this.src)"><button onclick="_ecDelImg(${mid},'${key}',${i})" style="position:absolute;top:-5px;right:-5px;background:#c53030;color:white;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;line-height:1">✕</button></div>`
+        ).join('') + '</div>' : '';
+    const linkChips = links.map((l,i) =>
+      `<span style="display:inline-flex;align-items:center;gap:4px;background:#f5f0ff;color:#2d1b69;border:1px solid #e9d8fd;border-radius:20px;padding:2px 9px;font-size:11px;cursor:pointer" onclick="abrirMaterialEC(${l.id})">${l.icon} ${l.titulo||'Material'}<button onclick="event.stopPropagation();_ecDelLink(${mid},'${key}',${i})" style="background:none;border:none;color:#9f7aea;cursor:pointer;font-size:10px;margin-left:2px;line-height:1">✕</button></span>`
+    ).join('');
+    const linkStrip = `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">${linkChips}</div>`;
+    return `<div class="ec-a3-cell${spanFull?' ec-a3-span':''}">
+      <div class="ec-a3-hd"><span>${label}</span>
+        <div style="display:flex;gap:4px">
+          <label style="font-size:10px;color:#6b46c1;cursor:pointer;background:#ede9fe;padding:2px 7px;border-radius:4px;font-weight:600">📷 Img<input type="file" accept="image/*" style="display:none" onchange="_ecAddImg(${mid},'${key}',this)"></label>
+          <button style="font-size:10px;color:#276749;cursor:pointer;background:#f0fff4;padding:2px 7px;border-radius:4px;font-weight:600;border:none" onclick="_ecOpenLinkPicker(${mid},'${key}')">🔗 Vincular</button>
         </div>
-      </div>`).join('');
+      </div>
+      <div class="ec-a3-bd">${_ecDtbl(m,key)}${imgStrip}${linkStrip}</div>
+    </div>`;
   }
-  function editarEstudo(id) {
-    const e = estudos.find(e=>e.id===id);
-    if (!e) return;
-    document.getElementById('estudoTitulo').value = e.titulo;
-    document.getElementById('estudoMetodo').value = e.metodo||'';
-    document.getElementById('estudoResp').value = e.responsavel||'';
-    document.getElementById('estudoData').value = e.data||'';
-    document.getElementById('estudoConteudo').value = e.conteudo||'';
-    document.getElementById('estudoEditId').value = e.id;
-    document.getElementById('modalEstudo').classList.add('aberto');
+
+  // ===== Per-template body renderers =====
+  function _renderTplBody(m) {
+    if (!m.dados) m.dados = _ecInitDados(m.templateId);
+    const mid=m.id; const d=m.dados;
+    const sec=(lbl,html)=>`<div class="ec-tpl-sec"><div class="ec-tpl-sec-lbl">${lbl}</div>${html}</div>`;
+    const fld=(key,lbl,multi)=>`<div style="margin-bottom:8px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">${lbl}</label>${multi
+      ?`<textarea class="ec-tpl-field" rows="3" oninput="_ecDadosField(${mid},'${key}',this.value)">${d[key]||''}</textarea>`
+      :`<input class="ec-tpl-field" value="${String(d[key]||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}" oninput="_ecDadosField(${mid},'${key}',this.value)">`
+    }</div>`;
+    switch(m.templateId) {
+      case 'kaizen': return `
+        ${sec('Identificação',`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${fld('titulo','Título')}${fld('area','Área / Processo')}${fld('responsavel','Responsável')}${fld('data','Data')}</div>`)}
+        ${sec('Problema',_ecDtbl(m,'problema'))}
+        ${sec('Meta Geral',fld('metaGeral','Meta geral da ação Kaizen',true))}
+        ${sec('Solução',_ecDtbl(m,'solucao'))}`;
+      case 'a3': return `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">${fld('titulo','Título')}${fld('dono','Dono do Processo')}${fld('data','Data')}</div>
+        <div class="ec-a3-grid">
+          ${_ecBlock(m,'problema','🔴 Problema')}${_ecBlock(m,'contexto','📋 Contexto')}
+          ${_ecBlock(m,'estadoAtual','📊 Estado Atual')}${_ecBlock(m,'metas','🎯 Metas')}
+          ${_ecBlock(m,'analises','🔍 Análises')}${_ecBlock(m,'planoAcoes','✅ Plano / Ações')}
+          ${_ecBlock(m,'reflexoes','💡 Reflexões',true)}
+        </div>`;
+      case '5w2h': return `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">${fld('projeto','Projeto / Iniciativa')}${fld('responsavel','Responsável Geral')}</div>
+        ${_ecDtbl(m,'tabela')}`;
+      case 'pdca': return `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          ${sec('🔵 PLAN — Planejar',_ecDtbl(m,'plan'))}
+          ${sec('🟡 DO — Executar',_ecDtbl(m,'do'))}
+          ${sec('🟢 CHECK — Verificar',_ecDtbl(m,'check'))}
+          ${sec('🔴 ACT — Agir',_ecDtbl(m,'act'))}
+        </div>`;
+      case 'ishikawa': return `
+        ${sec('Problema (Efeito)',fld('problema','Descreva o problema que está sendo analisado',true))}
+        ${sec('6M — Causas por Categoria',_ecDtbl(m,'causas'))}`;
+      case 'dmaic': return `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">${fld('projectCharter','Project Charter',true)}${fld('escopo','Escopo (Dentro / Fora)',true)}</div>
+        ${sec('📏 MEASURE — Métricas',_ecDtbl(m,'metrics'))}
+        <div class="ec-tpl-sec"><div class="ec-tpl-sec-lbl">🔍 ANALYZE — Análise de Causas</div>${_ecBlock(m,'analyze','Análise de Causa Raiz')}</div>
+        ${sec('⚡ IMPROVE — Melhorias',_ecDtbl(m,'improve'))}
+        ${sec('🔒 CONTROL — Controles',_ecDtbl(m,'control'))}`;
+      case 'masp': return `
+        <p style="font-size:11px;color:#718096;margin-bottom:10px">Cada coluna = um passo do MASP. Adicione linhas para registrar evidências e ações em cada etapa.</p>
+        ${_ecDtbl(m,'tabela')}
+        ${_ecLinksSection(m,'links')}`;
+      case 'swot':
+        const swotHdr=`<div style="display:grid;grid-template-columns:1fr 1fr"><div style="padding:5px 14px;background:#276749;color:white;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-right:1.5px solid #2d1b69">Ambiente Interno</div><div style="padding:5px 14px;background:#c05621;color:white;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Ambiente Externo</div></div>`;
+        return `<div class="ec-swot-outer">${swotHdr}<div class="ec-swot-grid">
+          <div class="ec-swot-cell"><div class="ec-swot-lbl">💪 Forças (Strengths)</div><div class="ec-swot-area" contenteditable="true" oninput="_ecDadosField(${mid},'forcas',this.innerHTML)">${d.forcas||''}</div></div>
+          <div class="ec-swot-cell"><div class="ec-swot-lbl">⚠ Fraquezas (Weaknesses)</div><div class="ec-swot-area" contenteditable="true" oninput="_ecDadosField(${mid},'fraquezas',this.innerHTML)">${d.fraquezas||''}</div></div>
+          <div class="ec-swot-cell"><div class="ec-swot-lbl">🚀 Oportunidades (Opportunities)</div><div class="ec-swot-area" contenteditable="true" oninput="_ecDadosField(${mid},'oportunidades',this.innerHTML)">${d.oportunidades||''}</div></div>
+          <div class="ec-swot-cell"><div class="ec-swot-lbl">⚡ Ameaças (Threats)</div><div class="ec-swot-area" contenteditable="true" oninput="_ecDadosField(${mid},'ameacas',this.innerHTML)">${d.ameacas||''}</div></div>
+        </div></div>`;
+      default: return '<p style="color:#a0aec0">Template não encontrado.</p>';
+    }
   }
-  function deletarEstudo(id) {
-    if (!confirm('Deletar este estudo?')) return;
-    estudos = estudos.filter(e=>e.id!==id);
-    projeto.estudosCaso = estudos;
-    salvarProjeto();
-    renderEstudos();
+
+  function renderTemplateView(m) {
+    const area=document.getElementById('ecAreaPrincipal'); if(!area) return;
+    const tpl=EC_TEMPLATES.find(t=>t.id===m.templateId)||{};
+    if(!m.dados) m.dados=_ecInitDados(m.templateId);
+    area.innerHTML=`<div class="ec-tpl-view">
+      <div class="ec-tpl-view-top">
+        <span style="font-size:22px">${tpl.icon||'📋'}</span>
+        <input class="ec-editor-titulo" id="ecTplTitulo" value="${m.titulo.replace(/"/g,'&quot;')}" placeholder="Título..." oninput="ecAgendarAutoSave()" style="flex:1;border:none;outline:none;font-size:14px;font-weight:700;color:#1e2a4a;font-family:inherit">
+        <select id="ecEditorPasta" onchange="ecAgendarAutoSave()" style="font-size:11px;padding:4px 8px;border:1.5px solid #e2e8f0;border-radius:6px;outline:none">${_ecPastaOpts(m.pasta||'')}</select>
+        <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
+        <button class="btn-secondary" onclick="fecharEditorEC()" style="font-size:12px;padding:6px 12px">← Voltar</button>
+      </div>
+      ${tpl.quando?`<div style="display:flex;gap:16px;padding:8px 16px;background:#fafafa;border-bottom:1px solid #f0f2f5;font-size:11px;color:#718096;flex-wrap:wrap"><span><strong style="color:#2d1b69">⏱ Quando:</strong> ${tpl.quando}</span><span><strong style="color:#276749">🔧 Como:</strong> ${tpl.como}</span></div>`:''}
+      <div class="ec-tpl-view-body">${_renderTplBody(m)}</div>
+    </div>`;
+  }
+
+  function abrirTemplateEC(id) {
+    const tpl=EC_TEMPLATES.find(t=>t.id===id); if(!tpl) return;
+    const material={id:Date.now(),tipo:'template',templateId:id,titulo:tpl.nome,
+      pasta:ecPastaAtual!=='templates'?ecPastaAtual:null,
+      dados:_ecInitDados(id),criado:new Date().toISOString().split('T')[0]};
+    ecMateriais.unshift(material); salvarDadosEC(); editarMaterialEC(material.id);
+  }
+  function salvarMaterialTemplate(){} // deprecated
+
+
+  // ===== Upload de arquivo =====
+  function pedirPastaUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    // lê o arquivo, mas aguarda escolha de pasta
+    const reader = new FileReader();
+    reader.onload = e => {
+      ecUploadPendente = { base64: e.target.result, nome: file.name, tamanho: (file.size/1024).toFixed(0)+'KB' };
+      input.value = '';
+      document.getElementById('uploadECFilenome').textContent = file.name;
+      document.getElementById('uploadECFilesize').textContent = ecUploadPendente.tamanho + ' KB';
+      _renderEcFolderPicker('uploadECPastaWrap', 'uploadECPasta', ecPastaAtual !== 'templates' ? ecPastaAtual : '');
+      document.getElementById('modalUploadEC').classList.add('aberto');
+    };
+    reader.readAsDataURL(file);
+  }
+  function confirmarUploadEC() {
+    if (!ecUploadPendente) return;
+    const pasta = document.getElementById('uploadECPasta')?.value || null;
+    const material = { id: Date.now(), tipo:'arquivo', titulo: ecUploadPendente.nome, pasta: pasta||null, tamanho: ecUploadPendente.tamanho, base64: ecUploadPendente.base64, criado: new Date().toISOString().split('T')[0] };
+    ecMateriais.unshift(material);
+    ecUploadPendente = null;
+    salvarDadosEC();
+    fecharModal('modalUploadEC');
+    if (pasta) selecionarPastaEC(pasta);
+    else renderECContent();
+  }
+  function cancelarUploadEC() { ecUploadPendente = null; fecharModal('modalUploadEC'); }
+
+  // ===== Abre material =====
+  function abrirMaterialEC(id) {
+    const m = ecMateriais.find(m=>m.id==id);
+    if (!m) return;
+    if (m.tipo==='arquivo') {
+      const a = document.createElement('a'); a.href=m.base64; a.download=m.titulo; a.click(); return;
+    }
+    // nota e template → editor/view full-screen
+    editarMaterialEC(id);
+  }
+  function abrirTemplatePreenchidoEC(m) { editarMaterialEC(m.id); } // compat
+
+  // ===== Editor de notas =====
+  function pedirTituloNota() {
+    document.getElementById('novaNotaECTitulo').value = '';
+    _renderEcFolderPicker('novaNotaECPastaWrap', 'novaNotaECPasta', ecPastaAtual !== 'templates' ? ecPastaAtual : '');
+    document.getElementById('modalNovaNotaEC').classList.add('aberto');
+    setTimeout(() => document.getElementById('novaNotaECTitulo').focus(), 80);
+  }
+  function confirmarNovaNotaEC() {
+    const titulo = document.getElementById('novaNotaECTitulo').value.trim() || 'Nova Nota';
+    const pasta = document.getElementById('novaNotaECPasta')?.value || null;
+    fecharModal('modalNovaNotaEC');
+    const material = { id: Date.now(), tipo:'nota', titulo, conteudo:'', pasta: pasta||null, criado: new Date().toISOString().split('T')[0] };
+    ecMateriais.unshift(material);
+    salvarDadosEC();
+    editarMaterialEC(material.id);
+  }
+
+  function editarMaterialEC(id) {
+    ecEditandoId = id;
+    renderECEditor();
+  }
+
+  function renderECEditor() {
+    const m = ecMateriais.find(m=>m.id==ecEditandoId);
+    if (!m) { ecEditandoId=null; renderECContent(); return; }
+    if (m.tipo === 'template') { renderTemplateView(m); return; }
+    const area = document.getElementById('ecAreaPrincipal');
+    area.innerHTML = `
+      <div class="ec-editor-wrap">
+        <div class="ec-editor-header">
+          <input class="ec-editor-titulo" id="ecEditorTitulo" value="${m.titulo}" placeholder="Título do documento..." oninput="ecAgendarAutoSave()">
+          <select id="ecEditorPasta" style="font-size:12px;padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:6px;outline:none" onchange="ecAgendarAutoSave()">
+            ${_ecPastaOpts(m.pasta||'')}
+          </select>
+          <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
+          <button class="btn-secondary" onclick="fecharEditorEC()" style="font-size:12px;padding:6px 12px">← Voltar</button>
+        </div>
+        <div class="ec-editor-toolbar">
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('bold')" title="Negrito"><b>B</b></button>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('italic')" title="Itálico"><i>I</i></button>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('underline')" title="Sublinhado"><u>U</u></button>
+          <div style="width:1px;background:#e2e8f0;margin:0 4px;align-self:stretch"></div>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('insertUnorderedList')" title="Lista">• Lista</button>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('insertOrderedList')" title="Numerada">1. Lista</button>
+          <div style="width:1px;background:#e2e8f0;margin:0 4px;align-self:stretch"></div>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('justifyLeft')">⬅</button>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('justifyCenter')">☰</button>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('justifyRight')">➡</button>
+        </div>
+        <div class="ec-editor-body">
+          <div class="ec-editor-area" id="ecEditorArea" contenteditable="true" oninput="ecAgendarAutoSave()">${m.conteudo||''}</div>
+        </div>
+      </div>`;
+  }
+
+  function fmtEC(cmd, val) { document.execCommand(cmd, false, val||null); document.getElementById('ecEditorArea')?.focus(); }
+
+  function ecAgendarAutoSave() {
+    const ind = document.getElementById('ecAutoSaveIndicator');
+    if (ind) { ind.textContent = 'Salvando...'; ind.style.color = '#a0aec0'; }
+    clearTimeout(ecAutoSaveTimer);
+    ecAutoSaveTimer = setTimeout(_ecAutoSalvar, 1500);
+  }
+
+  async function _ecAutoSalvar() {
+    const m = ecMateriais.find(m=>m.id==ecEditandoId);
+    if (!m) return;
+    if (m.tipo === 'template') {
+      // dados já atualizados em memória via _ecDadosField/_ecTblCell etc.
+      const titulo = document.getElementById('ecTplTitulo')?.value;
+      const pasta  = document.getElementById('ecEditorPasta')?.value;
+      if (titulo?.trim()) m.titulo = titulo;
+      if (pasta !== undefined) m.pasta = pasta || null;
+    } else {
+      const titulo = document.getElementById('ecEditorTitulo')?.value;
+      const conteudo = document.getElementById('ecEditorArea')?.innerHTML;
+      const pasta = document.getElementById('ecEditorPasta')?.value;
+      if (titulo !== undefined) m.titulo = titulo || m.titulo;
+      if (conteudo !== undefined) m.conteudo = conteudo;
+      if (pasta !== undefined) m.pasta = pasta || null;
+    }
+    const ok = await salvarProjeto(); // chama direto para não duplicar o indicador da sidebar
+    const ind = document.getElementById('ecAutoSaveIndicator');
+    if (ind) {
+      if (ok) { ind.textContent = 'Salvo ✓'; ind.style.color = '#48bb78'; setTimeout(()=>{ if(ind) ind.textContent=''; }, 2000); }
+      else { ind.textContent = '⚠ Erro'; ind.style.color = '#e53e3e'; }
+    }
+  }
+
+  function fecharEditorEC() {
+    clearTimeout(ecAutoSaveTimer);
+    _ecAutoSalvar(); // salva estado final antes de fechar
+    ecEditandoId = null;
+    renderECContent();
+  }
+
+  function cancelarEditorEC() {
+    clearTimeout(ecAutoSaveTimer);
+    ecEditandoId = null;
+    renderECContent();
+  }
+
+  function deletarMaterialEC(id) {
+    if (!confirm('Remover este material?')) return;
+    ecMateriais = ecMateriais.filter(m=>m.id!=id);
+    salvarDadosEC();
+    renderECContent();
+  }
+
+  // ===== Pastas EC =====
+  function criarPastaEC() {
+    document.getElementById('novaPastaECNome').value = '';
+    const currentParentId = ecCaminhoNavegacao.length > 0 ? ecCaminhoNavegacao[ecCaminhoNavegacao.length-1].id : '';
+    _renderEcFolderPicker('novaPastaECParentWrap', 'novaPastaECParent', currentParentId, 'Raíz (nível principal)');
+    document.getElementById('modalNovaPastaEC').classList.add('aberto');
+    setTimeout(() => document.getElementById('novaPastaECNome').focus(), 80);
+  }
+
+  function confirmarNovaPastaEC() {
+    const nome = document.getElementById('novaPastaECNome').value.trim();
+    if (!nome) return;
+    const parentId = document.getElementById('novaPastaECParent')?.value || null;
+    ecPastas.push({ id: 'pasta_'+Date.now(), nome, parentId: parentId||null });
+    salvarDadosEC();
+    fecharModal('modalNovaPastaEC');
+    renderECSidebar();
+    // Atualiza o select de pasta no editor (sem fechar o doc aberto)
+    const pastaSelect = document.getElementById('ecEditorPasta');
+    if (pastaSelect) {
+      const val = pastaSelect.value;
+      pastaSelect.innerHTML = _ecPastaOpts(val);
+    }
+  }
+  function deletarPastaEC(id) {
+    if (!confirm('Remover esta pasta? Materiais e subpastas ficam sem pasta.')) return;
+    ecMateriais.forEach(m => { if (m.pasta===id) m.pasta=null; });
+    ecPastas.forEach(p => { if ((p.parentId||null)===id) p.parentId=null; }); // re-parent filhos para raiz
+    ecPastas = ecPastas.filter(p=>p.id!==id);
+    if (ecPastaAtual===id) {
+      ecCaminhoNavegacao.pop();
+      const current = ecCaminhoNavegacao[ecCaminhoNavegacao.length-1];
+      ecPastaAtual = current ? current.id : 'templates';
+    }
+    salvarDadosEC();
+    renderECSidebar();
+    renderECContent();
+  }
+
+  async function salvarDadosEC() {
+    const st = document.getElementById('ecSaveStatus');
+    if (st) { st.textContent = 'Salvando...'; st.style.color = '#a0aec0'; }
+    const ok = await salvarProjeto();
+    if (st) {
+      if (ok) { st.textContent = 'Salvo ✓'; st.style.color = '#48bb78'; setTimeout(()=>{ if(st) st.textContent=''; }, 2500); }
+      else { st.textContent = '⚠ Erro ao salvar'; st.style.color = '#e53e3e'; }
+    }
   }
 
   // ===== WBS =====
@@ -1025,6 +1757,7 @@
     const n = { id: Date.now(), nome, nivel, x: 50 + wbsNodes.filter(n=>n.nivel===nivel).length * 200, y: nivel * 120 + 40 };
     wbsNodes.push(n);
     renderWBS();
+    agendarSalvarProjeto();
   }
   function renderWBS() {
     const canvas = document.getElementById('wbsCanvas');
@@ -1102,6 +1835,7 @@
   function adicionarTarefaGantt() {
     cronograma.push({ id:Date.now(), nome:'Nova Tarefa', responsavel:'', inicio:'', fim:'', pct:0 });
     renderGantt();
+    agendarSalvarProjeto();
   }
   function renderGantt() {
     const tbody = document.getElementById('ganttTbody');
@@ -1109,13 +1843,13 @@
     empty.style.display = cronograma.length===0?'block':'none';
     tbody.innerHTML = cronograma.map((t,i) => `
       <tr>
-        <td><input value="${t.nome}" onchange="cronograma[${i}].nome=this.value" style="border:none;font-size:12px;font-weight:600;color:#1e2a4a;background:none;outline:none;width:100%"></td>
-        <td><input value="${t.responsavel}" onchange="cronograma[${i}].responsavel=this.value" placeholder="—" style="border:none;font-size:11px;color:#718096;background:none;outline:none;width:80px"></td>
-        <td><input type="date" value="${t.inicio}" onchange="cronograma[${i}].inicio=this.value" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px"></td>
-        <td><input type="date" value="${t.fim}" onchange="cronograma[${i}].fim=this.value" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px"></td>
-        <td><input type="number" value="${t.pct}" min="0" max="100" onchange="cronograma[${i}].pct=parseInt(this.value)||0;renderGantt()" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px;width:50px">%</td>
+        <td><input value="${t.nome}" onchange="cronograma[${i}].nome=this.value;agendarSalvarProjeto()" style="border:none;font-size:12px;font-weight:600;color:#1e2a4a;background:none;outline:none;width:100%"></td>
+        <td><input value="${t.responsavel}" onchange="cronograma[${i}].responsavel=this.value;agendarSalvarProjeto()" placeholder="—" style="border:none;font-size:11px;color:#718096;background:none;outline:none;width:80px"></td>
+        <td><input type="date" value="${t.inicio}" onchange="cronograma[${i}].inicio=this.value;agendarSalvarProjeto()" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px"></td>
+        <td><input type="date" value="${t.fim}" onchange="cronograma[${i}].fim=this.value;agendarSalvarProjeto()" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px"></td>
+        <td><input type="number" value="${t.pct}" min="0" max="100" onchange="cronograma[${i}].pct=parseInt(this.value)||0;renderGantt();agendarSalvarProjeto()" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px;width:50px">%</td>
         <td><div class="gantt-bar-container"><div class="gantt-bar" style="width:${t.pct}%">${t.pct>10?t.pct+'%':''}</div></div></td>
-        <td><button onclick="cronograma.splice(${i},1);renderGantt()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+        <td><button onclick="cronograma.splice(${i},1);renderGantt();agendarSalvarProjeto()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
       </tr>`).join('');
   }
 
@@ -1123,6 +1857,7 @@
   function adicionarRecurso() {
     recursos.push({ id:Date.now(), nome:'', categoria:'', qtd:'', custo:'', total:'', obs:'' });
     renderRecursos();
+    agendarSalvarProjeto();
   }
   function renderRecursos() {
     const tbody = document.getElementById('recursosTbody');
@@ -1130,13 +1865,13 @@
     empty.style.display = recursos.length===0?'block':'none';
     tbody.innerHTML = recursos.map((r,i) => `
       <tr>
-        <td><input value="${r.nome}" onchange="recursos[${i}].nome=this.value" style="border:none;font-size:12px;background:none;outline:none"></td>
-        <td><input value="${r.categoria}" onchange="recursos[${i}].categoria=this.value" style="border:none;font-size:12px;background:none;outline:none"></td>
+        <td><input value="${r.nome}" onchange="recursos[${i}].nome=this.value;agendarSalvarProjeto()" style="border:none;font-size:12px;background:none;outline:none"></td>
+        <td><input value="${r.categoria}" onchange="recursos[${i}].categoria=this.value;agendarSalvarProjeto()" style="border:none;font-size:12px;background:none;outline:none"></td>
         <td><input type="number" value="${r.qtd}" onchange="recursos[${i}].qtd=this.value;calcRecurso(${i})" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px;width:50px"></td>
         <td><input value="${r.custo}" onchange="recursos[${i}].custo=this.value;calcRecurso(${i})" placeholder="R$ 0,00" style="border:1px solid #e2e8f0;border-radius:4px;font-size:11px;padding:3px 5px;width:80px"></td>
         <td style="font-weight:600;color:#2d1b69">${r.total||'—'}</td>
-        <td><input value="${r.obs}" onchange="recursos[${i}].obs=this.value" style="border:none;font-size:11px;background:none;outline:none"></td>
-        <td><button onclick="recursos.splice(${i},1);renderRecursos()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+        <td><input value="${r.obs}" onchange="recursos[${i}].obs=this.value;agendarSalvarProjeto()" style="border:none;font-size:11px;background:none;outline:none"></td>
+        <td><button onclick="recursos.splice(${i},1);renderRecursos();agendarSalvarProjeto()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
       </tr>`).join('');
     atualizarTotalRecursos();
   }
@@ -1146,6 +1881,7 @@
     const c = parseFloat((r.custo||'').replace(/[^0-9,.]/g,'').replace(',','.'))||0;
     recursos[i].total = (q*c).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
     renderRecursos();
+    agendarSalvarProjeto();
   }
   function atualizarTotalRecursos() {
     let total = 0;
@@ -1157,6 +1893,7 @@
   function adicionarRiscoDetalhado() {
     riscosDetalhados.push({ id:Date.now(), nome:'', categoria:'', prob:'Médio', impacto:'Médio', nivel:'Médio', resposta:'', responsavel:'' });
     renderRiscosDetalhados();
+    agendarSalvarProjeto();
   }
   function renderRiscosDetalhados() {
     const tbody = document.getElementById('riscosDetalhadosTbody');
@@ -1165,14 +1902,14 @@
     const cores = { 'Alto':'background:#fff5f5;color:#c53030', 'Médio':'background:#fffaf0;color:#c05621', 'Baixo':'background:#f0fff4;color:#276749' };
     tbody.innerHTML = riscosDetalhados.map((r,i) => `
       <tr>
-        <td><input value="${r.nome}" onchange="riscosDetalhados[${i}].nome=this.value" style="border:none;font-size:12px;background:none;outline:none"></td>
-        <td><input value="${r.categoria}" onchange="riscosDetalhados[${i}].categoria=this.value" style="border:none;font-size:12px;background:none;outline:none"></td>
-        <td><select onchange="riscosDetalhados[${i}].prob=this.value" style="padding:3px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${r.prob==='Alto'?'selected':''}>Alto</option><option ${r.prob==='Médio'?'selected':''}>Médio</option><option ${r.prob==='Baixo'?'selected':''}>Baixo</option></select></td>
-        <td><select onchange="riscosDetalhados[${i}].impacto=this.value" style="padding:3px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${r.impacto==='Alto'?'selected':''}>Alto</option><option ${r.impacto==='Médio'?'selected':''}>Médio</option><option ${r.impacto==='Baixo'?'selected':''}>Baixo</option></select></td>
+        <td><input value="${r.nome}" onchange="riscosDetalhados[${i}].nome=this.value;agendarSalvarProjeto()" style="border:none;font-size:12px;background:none;outline:none"></td>
+        <td><input value="${r.categoria}" onchange="riscosDetalhados[${i}].categoria=this.value;agendarSalvarProjeto()" style="border:none;font-size:12px;background:none;outline:none"></td>
+        <td><select onchange="riscosDetalhados[${i}].prob=this.value;agendarSalvarProjeto()" style="padding:3px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${r.prob==='Alto'?'selected':''}>Alto</option><option ${r.prob==='Médio'?'selected':''}>Médio</option><option ${r.prob==='Baixo'?'selected':''}>Baixo</option></select></td>
+        <td><select onchange="riscosDetalhados[${i}].impacto=this.value;agendarSalvarProjeto()" style="padding:3px;font-size:11px;border:1px solid #e2e8f0;border-radius:4px"><option ${r.impacto==='Alto'?'selected':''}>Alto</option><option ${r.impacto==='Médio'?'selected':''}>Médio</option><option ${r.impacto==='Baixo'?'selected':''}>Baixo</option></select></td>
         <td><span class="badge" style="${cores[r.nivel]||cores['Médio']};padding:3px 8px;border-radius:4px;font-size:11px">${r.nivel}</span></td>
-        <td><input value="${r.resposta}" onchange="riscosDetalhados[${i}].resposta=this.value" style="border:none;font-size:11px;background:none;outline:none"></td>
-        <td><input value="${r.responsavel}" onchange="riscosDetalhados[${i}].responsavel=this.value" style="border:none;font-size:11px;background:none;outline:none"></td>
-        <td><button onclick="riscosDetalhados.splice(${i},1);renderRiscosDetalhados()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+        <td><input value="${r.resposta}" onchange="riscosDetalhados[${i}].resposta=this.value;agendarSalvarProjeto()" style="border:none;font-size:11px;background:none;outline:none"></td>
+        <td><input value="${r.responsavel}" onchange="riscosDetalhados[${i}].responsavel=this.value;agendarSalvarProjeto()" style="border:none;font-size:11px;background:none;outline:none"></td>
+        <td><button onclick="riscosDetalhados.splice(${i},1);renderRiscosDetalhados();agendarSalvarProjeto()" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
       </tr>`).join('');
   }
 
@@ -1182,6 +1919,7 @@
     if (!nome) return;
     qualidade.push({ id:Date.now(), nome, itens:[] });
     renderQualidade();
+    agendarSalvarProjeto();
   }
   function renderQualidade() {
     const lista = document.getElementById('qualidadeLista');
@@ -1192,12 +1930,12 @@
           <div style="font-size:13px;font-weight:700;color:#1e2a4a">${cl.nome}</div>
           <div style="display:flex;gap:6px">
             <button onclick="adicionarItemChecklist(${ci})" style="padding:3px 8px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px">+ Item</button>
-            <button onclick="qualidade.splice(${ci},1);renderQualidade()" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:11px">✕</button>
+            <button onclick="qualidade.splice(${ci},1);renderQualidade();agendarSalvarProjeto()" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:11px">✕</button>
           </div>
         </div>
         ${cl.itens.map((item,ii) => `
           <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0f2f5">
-            <input type="checkbox" ${item.checked?'checked':''} onchange="qualidade[${ci}].itens[${ii}].checked=this.checked;renderQualidade()" style="accent-color:#2d1b69">
+            <input type="checkbox" ${item.checked?'checked':''} onchange="qualidade[${ci}].itens[${ii}].checked=this.checked;renderQualidade();agendarSalvarProjeto()" style="accent-color:#2d1b69">
             <span style="font-size:12px;color:#1e2a4a;${item.checked?'text-decoration:line-through;color:#a0aec0':''}">${item.nome}</span>
             <button onclick="qualidade[${ci}].itens.splice(${ii},1);renderQualidade()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#c53030;font-size:11px">✕</button>
           </div>`).join('')}
@@ -1208,6 +1946,7 @@
     if (!nome) return;
     qualidade[ci].itens.push({ nome, checked:false });
     renderQualidade();
+    agendarSalvarProjeto();
   }
 
   // ===== CHANGE REQUEST =====
@@ -1284,7 +2023,7 @@
   function salvarAnotacoes() {
     if (!projeto.execucao) projeto.execucao = {};
     projeto.execucao.anotacoes = document.getElementById('execAnotacoes').value;
-    salvarProjeto();
+    agendarSalvarProjeto();
   }
 
   // ===== ENCERRAMENTO =====
@@ -1327,6 +2066,20 @@
   }
 
   // ===== SALVAR PROJETO =====
+  let _salvarProjetoTimer = null;
+  function agendarSalvarProjeto() {
+    const ind = document.getElementById('projSaveIndicator');
+    if (ind) { ind.textContent = ''; }
+    clearTimeout(_salvarProjetoTimer);
+    _salvarProjetoTimer = setTimeout(async () => {
+      const ok = await salvarProjeto();
+      if (ind) {
+        if (ok) { ind.textContent = 'Salvo ✓'; ind.style.color='#48bb78'; setTimeout(()=>{ if(ind)ind.textContent=''; },2000); }
+        else { ind.textContent = '⚠ Erro'; ind.style.color='#e53e3e'; }
+      }
+    }, 1200);
+  }
+
   async function salvarProjeto() {
     try {
       projeto.escopo = { nodes: wbsNodes, conexoes: wbsConexoes };
@@ -1335,12 +2088,16 @@
       projeto.riscos = riscosDetalhados;
       projeto.qualidade = { checklists: qualidade };
       projeto.execucao = { documentos: execDocumentos, anotacoes: document.getElementById('execAnotacoes')?.value||'' };
-      await fetch(`/api/projetos/${projetoId}`, {
+      projeto.ecPastas = ecPastas;
+      projeto.ecMateriais = ecMateriais;
+      const res = await fetch(`/api/projetos/${projetoId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
         body: JSON.stringify(projeto)
       });
-    } catch(err) { console.error('Erro ao salvar:', err); }
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return true;
+    } catch(err) { console.error('Erro ao salvar:', err); return false; }
   }
 
   // ===== EXPORT PDF =====
@@ -1514,5 +2271,6 @@ function copiarPixBloqueio(codigo) {
   setInterval(carregarNotificacoes, 60000);
 </script>
   <script src="/global.js"></script>
+<script src="perfil-modal.js"></script>
 </body>
 </html>

@@ -42,8 +42,7 @@
   </div>
   <div class="right-panel">
     <div class="card">
-      <h2>Bem-vindo de volta!</h2>
-      <p>Entre com suas credenciais para acessar o sistema.</p>
+      <h2>Boas vindas à sua Central de Controle Operacional</h2>
       <div class="erro" id="erro"></div>
       <div class="sucesso" id="sucesso"></div>
       <div class="form-group">
@@ -62,7 +61,7 @@
     </div>
   </div>
   <script>
-    if (localStorage.getItem('token')) window.location.href = '/dashboard';
+    if (localStorage.getItem('token')) window.location.href = '/overview';
 
     async function login() {
       const email = document.getElementById('email').value;
@@ -80,7 +79,7 @@
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuario', JSON.stringify(data.usuario));
         sucesso.textContent = 'Login realizado! Redirecionando...'; sucesso.style.display = 'block';
-        setTimeout(() => window.location.href = '/dashboard', 1000);
+        setTimeout(() => window.location.href = '/overview', 1000);
       } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
       finally { btn.disabled = false; btn.textContent = 'Entrar'; }
     }

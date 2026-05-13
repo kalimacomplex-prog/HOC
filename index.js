@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const crypto = require('crypto');
 const fetch = require('node-fetch');
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
 
@@ -15,6 +17,19 @@ app.use('/api/webhook/asaas', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(express.static('public'));
+
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadsDir),
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      cb(null, Date.now() + '-' + Math.round(Math.random() * 1e6) + ext);
+    }
+  }),
+  limits: { fileSize: 30 * 1024 * 1024 }
+});
 
 // ==================== HELPERS UTILITÁRIOS ====================
 
@@ -131,7 +146,7 @@ const usuarioSchema = new mongoose.Schema({
   tokenConfirmacao: { type: String, default: null },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   permissoes: {
-    overview:       { acessar: { type: Boolean, default: true },  editar:    { type: Boolean, default: false } },
+    overview:       { acessar: { type: Boolean, default: true },  editar: { type: Boolean, default: false }, aprovar: { type: Boolean, default: false } },
     ideiasLivres:   { acessar: { type: Boolean, default: true },  criar:     { type: Boolean, default: true },  aprovar:   { type: Boolean, default: false } },
     gestaoMetas:    { acessar: { type: Boolean, default: true },  editar:    { type: Boolean, default: false } },
     gestaoProjetos: { acessar: { type: Boolean, default: true },  criar:     { type: Boolean, default: false }, editar:    { type: Boolean, default: false } },
@@ -171,7 +186,9 @@ const projetoSchema = new mongoose.Schema({
   cronograma: { type: Array, default: [] }, recursos: { type: Object, default: {} }, riscos: { type: Array, default: [] },
   qualidade: { type: Object, default: {} }, changeRequests: { type: Array, default: [] }, execucao: { type: Object, default: {} },
   encerramento: { type: Object, default: {} }, sprints: { type: Array, default: [] }, backlog: { type: Array, default: [] },
-  retrospectivas: { type: Array, default: [] }, criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
+  retrospectivas: { type: Array, default: [] },
+  ecPastas: { type: Array, default: [] }, ecMateriais: { type: Array, default: [] },
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
 });
 const Projeto = mongoose.model('Projeto', projetoSchema);
 
@@ -216,6 +233,9 @@ const wikiSchema = new mongoose.Schema({
   pastaId: { type: Number, default: null },
   tipo: { type: String, default: 'wiki' },
   urlExterno: { type: String, default: null },
+  nomeArquivo: { type: String, default: null },
+  grupoId: { type: mongoose.Schema.Types.ObjectId, default: null },
+  ativo: { type: Boolean, default: false },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
@@ -226,7 +246,8 @@ const licencaSchema = new mongoose.Schema({
   nome: { type: String, required: true }, categoria: { type: String, default: '' }, fornecedor: { type: String, default: '' },
   unidade: { type: String, default: '' }, responsavel: { type: String, default: '' }, responsavelEmail: { type: String, default: '' },
   dataEmissao: { type: String, default: '' }, validade: { type: String, default: '' }, quantidade: { type: String, default: '' },
-  custo: { type: Number, default: 0 }, status: { type: String, default: 'Ativa', enum: ['Ativa', 'Vencendo', 'Vencida', 'Em Renovação'] },
+  custo: { type: Number, default: 0 }, custoUnitario: { type: Number, default: 0 }, frequencia: { type: String, default: 'Mensal' },
+  status: { type: String, default: 'Ativa', enum: ['Ativa', 'Vencendo', 'Vencida', 'Em Renovação'] },
   penalidade: { type: String, default: '' }, alertaDias: { type: Number, default: 30 }, observacoes: { type: String, default: '' },
   documentos: [{ nome: { type: String }, tipo: { type: String }, tamanho: { type: Number }, base64: { type: String } }],
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
@@ -455,7 +476,7 @@ app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', '
 app.get('/confirmar-email', (req, res) => res.sendFile(path.join(__dirname, 'public', 'confirmar-email.html')));
 app.get('/recuperar-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'recuperar-senha.html')));
 app.get('/redefinir-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'redefinir-senha.html')));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+app.get('/dashboard', (req, res) => res.redirect('/overview'));
 app.get('/overview', (req, res) => res.sendFile(path.join(__dirname, 'public', 'overview.html')));
 app.get('/gestao-metas', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-metas.html')));
 app.get('/ideias-livres', (req, res) => res.sendFile(path.join(__dirname, 'public', 'ideias-livres.html')));
@@ -1059,6 +1080,11 @@ app.put('/api/notificacoes/ler-todas', authMiddleware, async (req, res) => {
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+app.delete('/api/notificacoes', authMiddleware, async (req, res) => {
+  try { await Notificacao.deleteMany({ empresa: req.usuario.empresa }); res.json({ ok: true }); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 app.delete('/api/notificacoes/:id', authMiddleware, async (req, res) => {
   try { await Notificacao.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ ok: true }); }
   catch (err) { res.status(500).json({ erro: err.message }); }
@@ -1100,6 +1126,22 @@ app.put('/api/perfil/senha', authMiddleware, async (req, res) => {
     const hash = await bcrypt.hash(novaSenha, 10);
     await Usuario.findByIdAndUpdate(req.usuario.id, { senha: hash });
     res.json({ mensagem: 'Senha alterada com sucesso!' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/perfil/email', authMiddleware, async (req, res) => {
+  try {
+    const { novoEmail, senha } = req.body;
+    if (!novoEmail || !senha) return res.status(400).json({ erro: 'Preencha todos os campos.' });
+    if (!validarEmail(novoEmail)) return res.status(400).json({ erro: 'E-mail inválido.' });
+    const usuario = await Usuario.findById(req.usuario.id);
+    if (!usuario) return res.status(404).json({ erro: 'Usuário não encontrado' });
+    const senhaCorreta = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaCorreta) return res.status(400).json({ erro: 'Senha incorreta.' });
+    const emailExiste = await Usuario.findOne({ email: novoEmail, _id: { $ne: req.usuario.id } });
+    if (emailExiste) return res.status(400).json({ erro: 'E-mail já em uso por outro usuário.' });
+    await Usuario.findByIdAndUpdate(req.usuario.id, { email: novoEmail });
+    res.json({ mensagem: 'E-mail alterado com sucesso!' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
@@ -1204,7 +1246,11 @@ app.post('/api/projetos', authMiddleware, verificarAssinatura, permGestaoProjeto
 });
 app.put('/api/projetos/:id', authMiddleware, verificarAssinatura, permGestaoProjetos('editar'), async (req, res) => {
   try {
-    const projeto = await Projeto.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
+    const projeto = await Projeto.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { $set: { ...req.body, atualizadoEm: new Date() } },
+      { new: true, strict: false }
+    );
     if (!projeto) return res.status(404).json({ erro: 'Projeto não encontrado' });
     res.json(projeto);
   } catch (err) { res.status(400).json({ erro: err.message }); }
@@ -1300,15 +1346,30 @@ app.get('/api/pastas', authMiddleware, async (req, res) => {
 
 app.post('/api/pastas', authMiddleware, async (req, res) => {
   try {
-    const { nome } = req.body;
+    const { nome, parentId } = req.body;
     if (!nome?.trim()) return res.status(400).json({ erro: 'Nome obrigatório.' });
-    const novaPasta = { id: Date.now(), nome: nome.trim(), criadoEm: new Date() };
+    const novaPasta = { id: Date.now(), nome: nome.trim(), parentId: parentId || null, criadoEm: new Date() };
     await Overview.findOneAndUpdate(
       { empresa: req.usuario.empresa },
       { $push: { pastas: novaPasta }, atualizadoEm: new Date() },
       { upsert: true }
     );
     res.status(201).json(novaPasta);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/pastas/:id', authMiddleware, async (req, res) => {
+  try {
+    const pastaId = parseInt(req.params.id);
+    const { nome, parentId } = req.body;
+    const overview = await Overview.findOne({ empresa: req.usuario.empresa });
+    if (!overview) return res.status(404).json({ erro: 'Não encontrado.' });
+    const pasta = overview.pastas.find(p => p.id === pastaId);
+    if (!pasta) return res.status(404).json({ erro: 'Pasta não encontrada.' });
+    if (nome !== undefined) pasta.nome = nome.trim();
+    if (parentId !== undefined) pasta.parentId = parentId === null ? null : parseInt(parentId);
+    await overview.save();
+    res.json(pasta);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
@@ -1331,6 +1392,13 @@ app.put('/api/overview', authMiddleware, verificarAssinatura, permOverview('edit
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
+// ==================== UPLOAD DE ARQUIVOS ====================
+
+app.post('/api/uploads', authMiddleware, upload.single('arquivo'), (req, res) => {
+  if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado.' });
+  res.json({ url: '/uploads/' + req.file.filename, nomeOriginal: req.file.originalname, tamanho: req.file.size });
+});
+
 // ==================== WIKIS ====================
 
 app.get('/api/wikis', authMiddleware, verificarAssinatura, async (req, res) => {
@@ -1339,11 +1407,38 @@ app.get('/api/wikis', authMiddleware, verificarAssinatura, async (req, res) => {
 });
 app.post('/api/wikis', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    const wiki = await Wiki.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    const id = new mongoose.Types.ObjectId();
+    const grupoId = req.body.grupoId ? new mongoose.Types.ObjectId(req.body.grupoId) : id;
+    const isFirst = !req.body.grupoId;
+    const wiki = await Wiki.create({ _id: id, ...req.body, grupoId, ativo: isFirst, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
     await criarNotificacao(req.usuario.empresa, `Novo Wiki: ${wiki.titulo}`, `O wiki foi criado.`, 'info', '📄', '/overview');
     res.status(201).json(wiki);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
+app.get('/api/wikis/:id/versoes', authMiddleware, async (req, res) => {
+  try {
+    const wiki = await Wiki.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!wiki) return res.status(404).json({ erro: 'Não encontrado.' });
+    const grupoId = wiki.grupoId || wiki._id;
+    const versoes = await Wiki.find({
+      empresa: req.usuario.empresa,
+      $or: [{ grupoId }, { _id: grupoId, grupoId: null }]
+    }).sort({ criadoEm: 1 }).select('_id titulo versao status responsavel criadoEm grupoId ativo');
+    res.json(versoes);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.put('/api/wikis/:id/ativar', authMiddleware, async (req, res) => {
+  try {
+    const wiki = await Wiki.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!wiki) return res.status(404).json({ erro: 'Não encontrado.' });
+    const grupoId = wiki.grupoId || wiki._id;
+    await Wiki.updateMany({ empresa: req.usuario.empresa, $or: [{ grupoId }, { _id: grupoId }] }, { ativo: false });
+    await Wiki.findByIdAndUpdate(req.params.id, { ativo: true });
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 app.put('/api/wikis/:id', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
     const wiki = await Wiki.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });

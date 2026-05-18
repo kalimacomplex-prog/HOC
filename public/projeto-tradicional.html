@@ -643,17 +643,17 @@
       <!-- EAP Canvas -->
       <div id="subtab-escopo" style="margin:-20px;display:flex;flex-direction:column;height:calc(100vh - 170px);min-height:520px">
         <!-- EAP Action bar (TAP pattern) -->
-        <div id="eapAcoes" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px;background:white;border-bottom:1px solid #f0f2f5;flex-shrink:0">
+        <div class="tap-acoes" id="eapAcoes">
           <span id="eapStatusBadge"></span>
           <span id="eapVersaoBadge" style="font-size:11px;color:#718096"></span>
           <div style="flex:1"></div>
-          <button id="eapBtnEditar" onclick="eapToggleEditMode()" style="font-size:12px;padding:7px 14px;background:#f5f0ff;color:#2d1b69;border:1.5px solid #e9d8fd;border-radius:6px;cursor:pointer;font-weight:600">✏️ Editar</button>
-          <button id="eapBtnAddCard" onclick="eapAddCard()" style="display:none;font-size:12px;padding:7px 14px;background:#2d1b69;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">+ Card</button>
-          <button id="eapBtnConectar" onclick="eapToggleConnect()" style="display:none;font-size:12px;padding:7px 14px;background:#f5f0ff;color:#6b46c1;border:1.5px solid #e9d8fd;border-radius:6px;cursor:pointer;font-weight:600">🔗 Conectar</button>
-          <button id="eapBtnNovaVersao" onclick="eapNovaVersao()" style="display:none;font-size:12px;padding:7px 14px;background:#f7fafc;color:#4a5568;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;font-weight:600">📋 Nova Versão</button>
-          <button id="eapBtnSolicitar" onclick="eapSolicitarAprovacao()" style="display:none;font-size:12px;padding:7px 14px;background:#f0fff4;color:#276749;border:1.5px solid #c6f6d5;border-radius:6px;cursor:pointer;font-weight:600">📤 Solicitar Aprovação</button>
-          <button id="eapBtnAprovar" onclick="eapAprovar()" style="display:none;font-size:12px;padding:7px 14px;background:#276749;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">✅ Aprovar</button>
-          <button id="eapBtnHistorico" onclick="toggleEscopoHistorico()" style="font-size:12px;padding:7px 14px;background:#f7fafc;color:#4a5568;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;font-weight:600">🕒 Histórico</button>
+          <button class="btn-secondary" id="eapBtnEditar" onclick="eapToggleEditMode()" style="font-size:12px;padding:7px 14px">✏️ Editar</button>
+          <button class="btn-secondary" id="eapBtnAddCard" onclick="eapAddCard()" style="display:none;font-size:12px;padding:7px 14px">+ Card</button>
+          <button class="btn-secondary" id="eapBtnConectar" onclick="eapToggleConnect()" style="display:none;font-size:12px;padding:7px 14px">🔗 Conectar</button>
+          <button class="btn-secondary" id="eapBtnNovaVersao" onclick="eapNovaVersao()" style="display:none;font-size:12px;padding:7px 14px">📋 Nova Versão</button>
+          <button class="btn-secondary" id="eapBtnSolicitar" onclick="eapSolicitarAprovacao()" style="display:none;font-size:12px;padding:7px 14px">📤 Solicitar Aprovação</button>
+          <button class="btn-primary" id="eapBtnAprovar" onclick="eapAprovar()" style="display:none;font-size:12px;padding:7px 14px;background:#276749;border-color:#276749">✅ Aprovar</button>
+          <button class="btn-secondary" id="eapBtnHistorico" onclick="toggleEscopoHistorico()" style="font-size:12px;padding:7px 14px">🕒 Histórico</button>
         </div>
         <!-- Canvas + History panel wrapper -->
         <div style="display:flex;flex:1;min-height:0;overflow:hidden">
@@ -3729,7 +3729,7 @@
     if (!panel) return;
     panel.style.display = panel.style.display === 'none' ? '' : 'none';
     const btn = document.getElementById('eapBtnHistorico');
-    if (btn) { const open = panel.style.display !== 'none'; btn.style.background = open ? '#2d1b69' : '#f7fafc'; btn.style.color = open ? 'white' : '#4a5568'; btn.style.borderColor = open ? '#2d1b69' : '#e2e8f0'; }
+    if (btn) { const open = panel.style.display !== 'none'; btn.style.background = open ? '#f5f0ff' : ''; btn.style.color = open ? '#6b46c1' : ''; }
     if (panel.style.display !== 'none') eapRenderHistorico();
   }
 
@@ -3777,9 +3777,8 @@
       else {
         btnEditar.style.display = '';
         btnEditar.textContent = _eapEditMode ? '👁️ Visualizar' : '✏️ Editar';
-        btnEditar.style.background = _eapEditMode ? '#2d1b69' : '#f5f0ff';
-        btnEditar.style.color = _eapEditMode ? 'white' : '#2d1b69';
-        btnEditar.style.borderColor = _eapEditMode ? '#2d1b69' : '#e9d8fd';
+        btnEditar.style.background = _eapEditMode ? '#f5f0ff' : '';
+        btnEditar.style.color = _eapEditMode ? '#6b46c1' : '';
       }
     }
     const btnAdd  = document.getElementById('eapBtnAddCard');
@@ -3796,9 +3795,9 @@
     if (btnConn) {
       btnConn.style.display = canEdit ? '' : 'none';
       const active = _eapConnecting;
-      btnConn.style.background  = active ? '#2d1b69' : '#f5f0ff';
-      btnConn.style.color       = active ? 'white'   : '#6b46c1';
-      btnConn.style.borderColor = active ? '#2d1b69' : '#e9d8fd';
+      btnConn.style.background = active ? '#2d1b69' : '';
+      btnConn.style.color      = active ? 'white'   : '';
+      btnConn.style.borderColor= active ? '#2d1b69' : '';
     }
   }
 

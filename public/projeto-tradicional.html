@@ -3765,19 +3765,23 @@
   function eapRenderToolbar() {
     const v = escopoGetVersao(); if (!v) return;
     const aprovado = v.status==='aprovado', pendente = v.status==='pendente_aprovacao', rascunho = v.status==='rascunho';
-    const badgeMap = { rascunho:'background:#f0f2f5;color:#4a5568', pendente_aprovacao:'background:#fffaf0;color:#c05621', aprovado:'background:#f0fff4;color:#276749' };
-    const labelMap = { rascunho:'📝 Rascunho', pendente_aprovacao:'⏳ Aguardando Aprovação', aprovado:`✅ Aprovado por ${v.aprovadoPor||''}` };
     const badge = document.getElementById('eapStatusBadge');
-    if (badge) badge.innerHTML = `<span style="${badgeMap[v.status]};padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700">${labelMap[v.status]}</span>`;
+    if (badge) {
+      if (!rascunho) {
+        const bMap = { pendente_aprovacao:'background:#fffaf0;color:#c05621', aprovado:'background:#f0fff4;color:#276749' };
+        const lMap = { pendente_aprovacao:'⏳ Aguardando Aprovação', aprovado:'✅ Aprovado por '+(v.aprovadoPor||'') };
+        badge.innerHTML = '<span style="'+(bMap[v.status]||'')+';padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700">'+(lMap[v.status]||'')+'</span>';
+      } else { badge.innerHTML = ''; }
+    }
     const btnAdd  = document.getElementById('eapBtnAddCard');
     const btnSolic = document.getElementById('eapBtnSolicitar');
     const btnAprov = document.getElementById('eapBtnAprovar');
     const btnNova  = document.getElementById('eapBtnNovaVersao');
+    const btnVT   = document.getElementById('eapBtnViewToggle');
     if (btnAdd)  btnAdd.style.display  = (rascunho && !_eapViewMode) ? '' : 'none';
     if (btnNova) btnNova.style.display = aprovado ? '' : 'none';
     if (btnSolic) btnSolic.style.display = rascunho ? '' : 'none';
     if (btnAprov) btnAprov.style.display = pendente ? '' : 'none';
-    const btnVT = document.getElementById('eapBtnViewToggle');
     if (btnVT) {
       btnVT.style.display = rascunho ? '' : 'none';
       btnVT.textContent = _eapViewMode ? '✏️ Modo Edição' : '👁️ Modo Visualização';
@@ -3785,12 +3789,6 @@
       btnVT.style.color = _eapViewMode ? '#276749' : '#6b46c1';
       btnVT.style.borderColor = _eapViewMode ? '#c6f6d5' : '#e9d8fd';
     }
-    const badge = document.getElementById('eapStatusBadge');
-    if (badge && !rascunho) {
-      const badgeMap = { pendente_aprovacao:'background:#fffaf0;color:#c05621', aprovado:'background:#f0fff4;color:#276749' };
-      const labelMap = { pendente_aprovacao:'⏳ Aguardando Aprovação', aprovado:`✅ Aprovado por ${v.aprovadoPor||''}` };
-      badge.innerHTML = `<span style="${badgeMap[v.status]||''};padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700">${labelMap[v.status]||''}</span>`;
-    } else if (badge) { badge.innerHTML = ''; }
   }
   function _eapEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 

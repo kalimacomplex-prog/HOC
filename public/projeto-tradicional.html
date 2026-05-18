@@ -642,36 +642,34 @@
 
       <!-- EAP Canvas -->
       <div id="subtab-escopo" style="margin:-20px;height:calc(100vh - 170px);min-height:520px;display:flex;flex-direction:column">
-        <div class="ec-layout" style="flex:1;height:100%;min-height:0">
-          <!-- Sidebar: versões -->
-          <div class="ec-sidebar">
-            <div class="ec-sidebar-header">
-              <span>VERSÕES</span>
-              <button id="eapBtnNovaVersao" onclick="eapNovaVersao()" style="display:none;padding:3px 8px;background:#f0f2f5;border:none;border-radius:4px;font-size:11px;cursor:pointer;color:#4a5568;font-weight:600">+ Nova</button>
+        <!-- Toolbar -->
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:white;border-bottom:1px solid #f0f2f5;flex-wrap:wrap;flex-shrink:0">
+          <button id="eapBtnAddCard" onclick="eapAddCard()" style="font-size:12px;padding:5px 12px;background:#2d1b69;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">+ Card</button>
+          <span id="eapStatusBadge"></span>
+          <div style="flex:1"></div>
+          <button id="eapBtnNovaVersao" onclick="eapNovaVersao()" style="display:none;font-size:12px;padding:5px 12px;background:#f0f2f5;color:#4a5568;border:none;border-radius:6px;cursor:pointer;font-weight:600">📋 Nova Versão</button>
+          <button id="eapBtnSolicitar" onclick="eapSolicitarAprovacao()" style="font-size:12px;padding:5px 12px;background:#f0fff4;color:#276749;border:1.5px solid #c6f6d5;border-radius:6px;cursor:pointer;font-weight:600">📤 Solicitar Aprovação</button>
+          <button id="eapBtnAprovar" onclick="eapAprovar()" style="display:none;font-size:12px;padding:5px 12px;background:#276749;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">✅ Aprovar</button>
+          <button id="eapBtnHistorico" onclick="toggleEscopoHistorico()" style="font-size:12px;padding:5px 12px;background:#f7fafc;color:#4a5568;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;font-weight:600">🕒 Histórico</button>
+        </div>
+        <!-- Canvas + History panel wrapper -->
+        <div style="display:flex;flex:1;min-height:0;overflow:hidden;align-items:flex-start">
+          <div id="eapCanvas" style="flex:1;position:relative;overflow:auto;background:#f0f2f5;min-height:0;height:100%">
+            <div id="eapCanvasInner" style="position:relative;min-width:2000px;min-height:1000px">
+              <svg id="eapSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
+              <div id="eapConnBtns" style="position:absolute;top:0;left:0;pointer-events:none;z-index:5"></div>
             </div>
-            <div class="ec-sidebar-body" id="eapVersoesSidebar"></div>
+            <div id="eapEmpty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+              <div style="text-align:center;color:#a0aec0;font-size:13px"><div style="font-size:36px;margin-bottom:10px">📋</div>Clique em <b>+ Card</b> para adicionar o primeiro bloco do EAP</div>
+            </div>
           </div>
-          <!-- Área principal: toolbar + canvas -->
-          <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden">
-            <!-- Toolbar -->
-            <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:white;border-bottom:1px solid #f0f2f5;flex-wrap:wrap;flex-shrink:0">
-              <button id="eapBtnAddCard" onclick="eapAddCard()" style="font-size:12px;padding:5px 12px;background:#2d1b69;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">+ Card</button>
-              <button id="eapBtnConectar" onclick="eapToggleConnect()" style="font-size:12px;padding:5px 12px;background:#f5f0ff;color:#6b46c1;border:1.5px solid #e9d8fd;border-radius:6px;cursor:pointer;font-weight:600">🔗 Conectar</button>
-              <span id="eapStatusBadge"></span>
-              <div style="flex:1"></div>
-              <button id="eapBtnSolicitar" onclick="eapSolicitarAprovacao()" style="font-size:12px;padding:5px 12px;background:#f0fff4;color:#276749;border:1.5px solid #c6f6d5;border-radius:6px;cursor:pointer;font-weight:600">📤 Solicitar Aprovação</button>
-              <button id="eapBtnAprovar" onclick="eapAprovar()" style="display:none;font-size:12px;padding:5px 12px;background:#276749;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">✅ Aprovar</button>
+          <!-- Histórico de versões (TAP pattern) -->
+          <div class="versao-historia" id="eapHistoricoPanel" style="display:none;width:240px;flex-shrink:0;background:#f8fafc;border-radius:0 0 8px 8px;border-left:1.5px solid #e2e8f0;overflow:hidden;height:100%;overflow-y:auto">
+            <div style="padding:10px 14px;font-size:12px;font-weight:700;color:#1e2a4a;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#f8fafc;z-index:1">
+              <span>Histórico de Versões</span>
+              <button onclick="toggleEscopoHistorico()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#a0aec0;line-height:1">×</button>
             </div>
-            <!-- Canvas -->
-            <div id="eapCanvas" style="flex:1;position:relative;overflow:auto;background:#f0f2f5;min-height:0">
-              <div id="eapCanvasInner" style="position:relative;min-width:2000px;min-height:1000px">
-                <svg id="eapSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
-                <div id="eapConnBtns" style="position:absolute;top:0;left:0;pointer-events:none;z-index:5"></div>
-              </div>
-              <div id="eapEmpty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
-                <div style="text-align:center;color:#a0aec0;font-size:13px"><div style="font-size:36px;margin-bottom:10px">📋</div>Clique em <b>+ Card</b> para adicionar o primeiro bloco do EAP</div>
-              </div>
-            </div>
+            <div id="eapVersoesSidebar"></div>
           </div>
         </div>
       </div>
@@ -1553,8 +1551,7 @@
   let escopoVersoes = [];
   let escopoVersaoId = null;
   let _eapDragging = null;
-  let _eapConnecting = false;
-  let _eapConnectSrc = null;
+  let _eapDotDrag = null;
   let _eapAutoSaveTimer = null;
   let cronograma = [];
   let recursos = [];
@@ -3707,12 +3704,12 @@
       const v = _eapNovaVersaoObj([], [], 1);
       escopoVersoes = [v]; escopoVersaoId = v.id;
     }
-    _eapConnecting = false; _eapConnectSrc = null; _eapDragging = null;
+    _eapDotDrag = null; _eapDragging = null;
     eapRenderAll();
   }
 
   function escopoGetVersao() { return escopoVersoes.find(v => v.id == escopoVersaoId); }
-  function escopoMudarVersao(id) { _eapConnecting=false; _eapConnectSrc=null; escopoVersaoId=id; eapRenderAll(); }
+  function escopoMudarVersao(id) { escopoVersaoId=id; eapRenderAll(); }
 
 
 
@@ -3724,20 +3721,30 @@
     const icon = { rascunho:'📝', pendente_aprovacao:'⏳', aprovado:'✅' };
     body.innerHTML = [...escopoVersoes].reverse().map(v => {
       const ativo = v.id == escopoVersaoId;
-      const bgActive = ativo ? 'background:#f0edff;border-left:3px solid #7c3aed' : 'border-left:3px solid transparent';
-      return `<div class="ec-pasta-btn${ativo?' ativo':''}" onclick="escopoMudarVersao('${v.id}')" style="flex-direction:column;align-items:flex-start;padding:10px 12px;cursor:pointer">
+      const bg = ativo ? 'background:#f0edff;' : '';
+      const bl = ativo ? 'border-left:3px solid #7c3aed;' : 'border-left:3px solid transparent;';
+      return `<div onclick="escopoMudarVersao('${v.id}')" style="padding:10px 14px;cursor:pointer;${bg}${bl}border-bottom:1px solid #f0f2f5;transition:background .12s">
         <div style="display:flex;align-items:center;gap:6px">
-          <span>${icon[v.status]||'📝'}</span>
+          <span style="font-size:13px">${icon[v.status]||'📝'}</span>
           <span style="font-size:12px;font-weight:700;flex:1;color:${ativo?'#2d1b69':'#1e2a4a'}">Versão ${v.versao}</span>
-          ${v.status==='aprovado'?'<span style="font-size:9px;color:#276749;font-weight:700;background:#f0fff4;padding:1px 5px;border-radius:3px">IMUTÁVEL</span>':''}
+          ${v.status==='aprovado'?'<span style="font-size:9px;color:#276749;font-weight:700;background:#f0fff4;padding:1px 5px;border-radius:3px">OK</span>':''}
         </div>
-        <div style="font-size:10px;color:#a0aec0;margin-top:3px;padding-left:22px">${v.criadoEm||''}</div>
-        ${v.aprovadoPor?`<div style="font-size:10px;color:#276749;padding-left:22px">✓ ${v.aprovadoPor}</div>`:''}
-        ${v.solicitadoPara&&v.status==='pendente_aprovacao'?`<div style="font-size:10px;color:#c05621;padding-left:22px">→ ${v.solicitadoPara}</div>`:''}
+        <div style="font-size:10px;color:#a0aec0;margin-top:3px;padding-left:20px">${v.criadoEm||''}</div>
+        ${v.aprovadoPor?`<div style="font-size:10px;color:#276749;padding-left:20px">✓ ${v.aprovadoPor}</div>`:''}
+        ${v.solicitadoPara&&v.status==='pendente_aprovacao'?`<div style="font-size:10px;color:#c05621;padding-left:20px">→ ${v.solicitadoPara}</div>`:''}
       </div>`;
     }).join('');
   }
 
+  function toggleEscopoHistorico() {
+    const panel = document.getElementById('eapHistoricoPanel');
+    if (!panel) return;
+    const open = panel.style.display === 'none';
+    panel.style.display = open ? '' : 'none';
+    const btn = document.getElementById('eapBtnHistorico');
+    if (btn) { btn.style.background = open ? '#2d1b69' : '#f7fafc'; btn.style.color = open ? 'white' : '#4a5568'; btn.style.borderColor = open ? '#2d1b69' : '#e2e8f0'; }
+    if (open) eapRenderSidebar();
+  }
   function eapRenderToolbar() {
     const v = escopoGetVersao(); if (!v) return;
     const aprovado = v.status==='aprovado', pendente = v.status==='pendente_aprovacao', rascunho = v.status==='rascunho';
@@ -3745,14 +3752,12 @@
     const labelMap = { rascunho:'📝 Rascunho', pendente_aprovacao:'⏳ Aguardando Aprovação', aprovado:`✅ Aprovado por ${v.aprovadoPor||''}` };
     const badge = document.getElementById('eapStatusBadge');
     if (badge) badge.innerHTML = `<span style="${badgeMap[v.status]};padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700">${labelMap[v.status]}</span>`;
-    const btnAdd = document.getElementById('eapBtnAddCard');
-    const btnConn = document.getElementById('eapBtnConectar');
+    const btnAdd  = document.getElementById('eapBtnAddCard');
     const btnSolic = document.getElementById('eapBtnSolicitar');
     const btnAprov = document.getElementById('eapBtnAprovar');
-    const btnNova = document.getElementById('eapBtnNovaVersao');
-    if (btnAdd) btnAdd.style.display = rascunho ? '' : 'none';
+    const btnNova  = document.getElementById('eapBtnNovaVersao');
+    if (btnAdd)  btnAdd.style.display  = rascunho ? '' : 'none';
     if (btnNova) btnNova.style.display = aprovado ? '' : 'none';
-    if (btnConn) { btnConn.style.display = rascunho ? '' : 'none'; btnConn.style.background = _eapConnecting ? '#2d1b69' : '#f5f0ff'; btnConn.style.color = _eapConnecting ? 'white' : '#6b46c1'; btnConn.style.borderColor = _eapConnecting ? '#2d1b69' : '#e9d8fd'; }
     if (btnSolic) btnSolic.style.display = rascunho ? '' : 'none';
     if (btnAprov) btnAprov.style.display = pendente ? '' : 'none';
   }
@@ -3766,7 +3771,7 @@
         <div style="font-size:13px;font-weight:600;color:#1e2a4a;white-space:pre-wrap;min-height:22px">${_eapEsc(b.titulo||'')}</div>
         ${b.responsavel&&b.showResp?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid #f0f2f5;font-size:11px;color:#718096">👤 ${_eapEsc(b.responsavel)}</div>`:''}
       </div></div>`;
-    return `<div class="eap-card" id="eap-c-${id}" style="left:${x}px;top:${y}px" onclick="eapCardClick(${id})">
+    return `<div class="eap-card" id="eap-c-${id}" style="left:${x}px;top:${y}px">
       <div class="eap-card-handle" onmousedown="eapStartDrag(${id},event)">
         <span style="letter-spacing:1px">⠿</span>
         <span style="flex:1"></span>
@@ -3783,6 +3788,8 @@
       <div class="eap-card-footer">
         <button id="eap-rb-${id}" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();_eapToggleResp(${id})" style="font-size:10px;color:#a0aec0;background:none;border:none;cursor:pointer;padding:2px 4px">${b.showResp?'– Responsável':'+ Responsável'}</button>
       </div>
+      <div class="eap-dot" style="right:-6px;top:50%;transform:translateY(-50%)" onmousedown="event.stopPropagation();eapDotDragStart(event,${id})" title="Arraste para conectar"></div>
+      <div class="eap-dot" style="bottom:-6px;left:50%;transform:translateX(-50%)" onmousedown="event.stopPropagation();eapDotDragStart(event,${id})" title="Arraste para conectar"></div>
     </div>`;
   }
 
@@ -3796,7 +3803,6 @@
     const connBtns = document.getElementById('eapConnBtns');
     if (connBtns) connBtns.innerHTML = '';
     const canvas = document.getElementById('eapCanvas');
-    if (canvas) canvas.style.cursor = _eapConnecting ? 'crosshair' : 'default';
     if (!v || !v.blocos.length) {
       if (empty) empty.style.display = 'flex';
       if (document.getElementById('eapSvg')) document.getElementById('eapSvg').innerHTML = '';
@@ -3846,7 +3852,6 @@
 
   function eapStartDrag(id, e) {
     const v = escopoGetVersao(); if (!v||v.status!=='rascunho') return;
-    if (_eapConnecting) { eapCardClick(id); return; }
     const b = v.blocos.find(x=>x.id==id); if (!b) return;
     const canvas = document.getElementById('eapCanvas');
     const rect = canvas.getBoundingClientRect();
@@ -3854,29 +3859,49 @@
     e.preventDefault(); e.stopPropagation();
   }
 
-  function eapCardClick(id) {
-    if (!_eapConnecting) return;
-    if (!_eapConnectSrc) {
-      _eapConnectSrc = id;
-      document.querySelectorAll('.eap-card').forEach(c=>c.classList.remove('connect-source'));
-      const el = document.getElementById('eap-c-'+id); if (el) el.classList.add('connect-source');
-    } else if (_eapConnectSrc != id) {
-      const v = escopoGetVersao(); if (!v) return;
-      const dup = v.conexoes.some(c=>(c.de==_eapConnectSrc&&c.para==id)||(c.de==id&&c.para==_eapConnectSrc));
-      if (!dup) { v.conexoes.push({id:Date.now(),de:_eapConnectSrc,para:id}); eapAgendarSave(); }
-      document.querySelectorAll('.eap-card').forEach(c=>c.classList.remove('connect-source'));
-      _eapConnectSrc=null; _eapConnecting=false;
-      eapRenderSvg(); eapRenderToolbar();
-    }
+
+  function eapDotDragStart(e, fromId) {
+    e.preventDefault();
+    const v = escopoGetVersao(); if (!v || v.status !== 'rascunho') return;
+    const canvas = document.getElementById('eapCanvas');
+    const rect = canvas.getBoundingClientRect();
+    const srcEl = document.getElementById('eap-c-' + fromId);
+    const srcRect = srcEl ? srcEl.getBoundingClientRect() : rect;
+    _eapDotDrag = {
+      fromId,
+      x1: srcRect.left - rect.left + canvas.scrollLeft + srcRect.width / 2,
+      y1: srcRect.top  - rect.top  + canvas.scrollTop  + srcRect.height / 2,
+      x2: e.clientX - rect.left + canvas.scrollLeft,
+      y2: e.clientY - rect.top  + canvas.scrollTop,
+    };
+    // highlight source
+    if (srcEl) srcEl.classList.add('eap-conn-src');
+    _eapDrawTempLine();
   }
 
-  function eapToggleConnect() {
-    const v = escopoGetVersao(); if (!v||v.status!=='rascunho') return;
-    _eapConnecting = !_eapConnecting; _eapConnectSrc = null;
-    document.querySelectorAll('.eap-card').forEach(c=>c.classList.remove('connect-source'));
-    eapRenderToolbar();
-    const canvas = document.getElementById('eapCanvas');
-    if (canvas) canvas.style.cursor = _eapConnecting ? 'crosshair' : 'default';
+  function _eapDrawTempLine() {
+    const svg = document.getElementById('eapSvg'); if (!svg || !_eapDotDrag) return;
+    let tl = document.getElementById('eap-tmp-line');
+    if (!tl) {
+      // ensure defs/marker exist
+      if (!svg.querySelector('#eap-arrow')) {
+        const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+        const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
+        marker.setAttribute('id','eap-arrow'); marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','8');
+        marker.setAttribute('refX','7'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
+        const mp = document.createElementNS('http://www.w3.org/2000/svg','path');
+        mp.setAttribute('d','M0,0 L0,6 L8,3 z'); mp.setAttribute('fill','#a78bfa');
+        marker.appendChild(mp); defs.appendChild(marker); svg.insertBefore(defs, svg.firstChild);
+      }
+      tl = document.createElementNS('http://www.w3.org/2000/svg','line');
+      tl.id = 'eap-tmp-line';
+      tl.setAttribute('stroke','#a78bfa'); tl.setAttribute('stroke-width','2'); tl.setAttribute('stroke-dasharray','6 3');
+      tl.setAttribute('marker-end','url(#eap-arrow)'); tl.setAttribute('pointer-events','none');
+      svg.appendChild(tl);
+    }
+    const d = _eapDotDrag;
+    tl.setAttribute('x1', d.x1); tl.setAttribute('y1', d.y1);
+    tl.setAttribute('x2', d.x2); tl.setAttribute('y2', d.y2);
   }
 
   function eapDeleteConn(id) {
@@ -3964,6 +3989,14 @@
 
   // EAP drag via document events
   document.addEventListener('mousemove', e => {
+    if (_eapDotDrag) {
+      const canvas=document.getElementById('eapCanvas'); if(!canvas) return;
+      const rect=canvas.getBoundingClientRect();
+      _eapDotDrag.x2 = e.clientX - rect.left + canvas.scrollLeft;
+      _eapDotDrag.y2 = e.clientY - rect.top  + canvas.scrollTop;
+      _eapDrawTempLine();
+      return;
+    }
     if (!_eapDragging) return;
     const canvas=document.getElementById('eapCanvas'); if(!canvas) return;
     const rect=canvas.getBoundingClientRect();
@@ -3974,7 +4007,29 @@
     if(el){el.style.left=x+'px';el.style.top=y+'px';}
     eapRenderSvg();
   });
-  document.addEventListener('mouseup', ()=>{ if(_eapDragging){eapAgendarSave();_eapDragging=null;} });
+  document.addEventListener('mouseup', e => {
+    if (_eapDotDrag) {
+      // remove temp line
+      const tl=document.getElementById('eap-tmp-line'); if(tl) tl.remove();
+      // find target card
+      const fromId = _eapDotDrag.fromId;
+      _eapDotDrag = null;
+      document.querySelectorAll('.eap-card').forEach(c=>c.classList.remove('eap-conn-src'));
+      // detect drop target
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const cardEl = el ? el.closest('.eap-card') : null;
+      if (cardEl) {
+        const toId = parseInt(cardEl.id.replace('eap-c-',''));
+        if (toId && toId !== fromId) {
+          const v = escopoGetVersao(); if (!v) return;
+          const dup = v.conexoes.some(c=>(c.de==fromId&&c.para==toId)||(c.de==toId&&c.para==fromId));
+          if (!dup) { v.conexoes.push({id:Date.now(),de:fromId,para:toId}); eapAgendarSave(); eapRenderSvg(); }
+        }
+      }
+      return;
+    }
+    if(_eapDragging){eapAgendarSave();_eapDragging=null;}
+  });
 
   // ===== GANTT =====
   function adicionarTarefaGantt() {

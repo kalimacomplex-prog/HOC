@@ -645,6 +645,7 @@
         <!-- Toolbar -->
         <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:white;border-bottom:1px solid #f0f2f5;flex-wrap:wrap;flex-shrink:0">
           <button id="eapBtnAddCard" onclick="eapAddCard()" style="font-size:12px;padding:5px 12px;background:#2d1b69;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">+ Card</button>
+          <button id="eapBtnViewToggle" onclick="eapToggleViewMode()" style="font-size:12px;padding:5px 12px;background:#f5f0ff;color:#6b46c1;border:1.5px solid #e9d8fd;border-radius:6px;cursor:pointer;font-weight:600">👁️ Modo Visualização</button>
           <span id="eapStatusBadge"></span>
           <div style="flex:1"></div>
           <button id="eapBtnNovaVersao" onclick="eapNovaVersao()" style="display:none;font-size:12px;padding:5px 12px;background:#f0f2f5;color:#4a5568;border:none;border-radius:6px;cursor:pointer;font-weight:600">📋 Nova Versão</button>
@@ -655,7 +656,7 @@
         <!-- Canvas + History panel wrapper -->
         <div style="display:flex;flex:1;min-height:0;overflow:hidden;align-items:flex-start">
           <div id="eapCanvas" style="flex:1;position:relative;overflow:auto;background:#f0f2f5;min-height:0;height:100%">
-            <div id="eapCanvasInner" style="position:relative;min-width:2000px;min-height:1000px">
+            <div id="eapCanvasInner" style="position:relative;min-width:max(100%,1400px);min-height:max(100%,700px)">
               <svg id="eapSvg" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
               <div id="eapConnBtns" style="position:absolute;top:0;left:0;pointer-events:none;z-index:5"></div>
             </div>
@@ -1552,6 +1553,7 @@
   let escopoVersaoId = null;
   let _eapDragging = null;
   let _eapDotDrag = null;
+  let _eapViewMode = false;
   let _eapAutoSaveTimer = null;
   let cronograma = [];
   let recursos = [];
@@ -1904,6 +1906,7 @@
     if (descEl) {
       if (source === 'cr') descEl.textContent = 'Selecione o usuário que deverá aprovar este Change Request.';
       else if (source === 'termoEnc') descEl.textContent = 'Selecione o usuário que deverá aprovar o Termo de Encerramento.';
+      else if (source === 'eap') descEl.textContent = 'Selecione o usuário que deverá aprovar este EAP (Escopo do Projeto).';
       else descEl.textContent = 'Selecione o usuário que deverá aprovar este TAP.';
     }
     fetch('/api/usuarios', { headers:{'Authorization':'Bearer '+localStorage.getItem('token')} })
@@ -1924,6 +1927,15 @@
     if (!sel) { alert('Selecione um usuário.'); return; }
     const destinatario = sel.value;
     let titulo, mensagem, icone;
+    if (_solicitarAprovSource === 'eap') {
+      const v=escopoGetVersao(); if(!v) return;
+      v.status='pendente_aprovacao'; v.solicitadoEm=new Date().toISOString().split('T')[0]; v.solicitadoPara=destinatario;
+      projeto.escopoVersoes=escopoVersoes; agendarSalvarProjeto();
+      fecharModal('modalSolicitarAprov'); eapRenderAll();
+      const t=document.createElement('div'); t.style.cssText='position:fixed;bottom:24px;right:24px;background:#276749;color:white;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18)';
+      t.textContent='📤 Aprovação solicitada'; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
+      return;
+    }
     if (_solicitarAprovSource === 'cr') {
       const cr = changeRequests.find(c => c.id == _solicitarAprovCRId);
       if (!cr) return;
@@ -3704,7 +3716,7 @@
       const v = _eapNovaVersaoObj([], [], 1);
       escopoVersoes = [v]; escopoVersaoId = v.id;
     }
-    _eapDotDrag = null; _eapDragging = null;
+    _eapDotDrag = null; _eapDragging = null; _eapViewMode = false;
     eapRenderAll();
   }
 
@@ -3714,6 +3726,11 @@
 
 
   function eapRenderAll() { eapRenderSidebar(); eapRenderToolbar(); eapRenderCanvas(); }
+
+  function eapToggleViewMode() {
+    _eapViewMode = !_eapViewMode;
+    eapRenderAll();
+  }
 
   function eapRenderSidebar() {
     const body = document.getElementById('eapVersoesSidebar');
@@ -3756,10 +3773,24 @@
     const btnSolic = document.getElementById('eapBtnSolicitar');
     const btnAprov = document.getElementById('eapBtnAprovar');
     const btnNova  = document.getElementById('eapBtnNovaVersao');
-    if (btnAdd)  btnAdd.style.display  = rascunho ? '' : 'none';
+    if (btnAdd)  btnAdd.style.display  = (rascunho && !_eapViewMode) ? '' : 'none';
     if (btnNova) btnNova.style.display = aprovado ? '' : 'none';
     if (btnSolic) btnSolic.style.display = rascunho ? '' : 'none';
     if (btnAprov) btnAprov.style.display = pendente ? '' : 'none';
+    const btnVT = document.getElementById('eapBtnViewToggle');
+    if (btnVT) {
+      btnVT.style.display = rascunho ? '' : 'none';
+      btnVT.textContent = _eapViewMode ? '✏️ Modo Edição' : '👁️ Modo Visualização';
+      btnVT.style.background = _eapViewMode ? '#f0fff4' : '#f5f0ff';
+      btnVT.style.color = _eapViewMode ? '#276749' : '#6b46c1';
+      btnVT.style.borderColor = _eapViewMode ? '#c6f6d5' : '#e9d8fd';
+    }
+    const badge = document.getElementById('eapStatusBadge');
+    if (badge && !rascunho) {
+      const badgeMap = { pendente_aprovacao:'background:#fffaf0;color:#c05621', aprovado:'background:#f0fff4;color:#276749' };
+      const labelMap = { pendente_aprovacao:'⏳ Aguardando Aprovação', aprovado:`✅ Aprovado por ${v.aprovadoPor||''}` };
+      badge.innerHTML = `<span style="${badgeMap[v.status]||''};padding:4px 10px;border-radius:5px;font-size:11px;font-weight:700">${labelMap[v.status]||''}</span>`;
+    } else if (badge) { badge.innerHTML = ''; }
   }
   function _eapEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -3798,7 +3829,7 @@
     const inner = document.getElementById('eapCanvasInner');
     const empty = document.getElementById('eapEmpty');
     if (!inner) return;
-    const readOnly = !v || v.status !== 'rascunho';
+    const readOnly = !v || v.status !== 'rascunho' || _eapViewMode;
     inner.querySelectorAll('.eap-card').forEach(c => c.remove());
     const connBtns = document.getElementById('eapConnBtns');
     if (connBtns) connBtns.innerHTML = '';
@@ -3813,15 +3844,40 @@
     eapRenderSvg();
   }
 
+  function _eapClipEdge(cx, cy, w, h, tx, ty) {
+    const dx = tx - cx, dy = ty - cy;
+    if (!dx && !dy) return {x:cx, y:cy};
+    const hw = w/2, hh = h/2;
+    const s = Math.min(hw/Math.abs(dx||1e-9), hh/Math.abs(dy||1e-9));
+    return { x: cx + dx*s, y: cy + dy*s };
+  }
+
+  function _eapBezierPath(x1,y1,x2,y2) {
+    const dx = Math.abs(x2-x1), dy = Math.abs(y2-y1);
+    const curve = Math.max(50, (dx > dy ? dx : dy) * 0.4);
+    let cp1x, cp1y, cp2x, cp2y;
+    if (dx >= dy) { // horizontal bias
+      cp1x = x1 + (x2>x1?curve:-curve); cp1y = y1;
+      cp2x = x2 - (x2>x1?curve:-curve); cp2y = y2;
+    } else {         // vertical bias
+      cp1x = x1; cp1y = y1 + (y2>y1?curve:-curve);
+      cp2x = x2; cp2y = y2 - (y2>y1?curve:-curve);
+    }
+    return `M${x1},${y1} C${cp1x},${cp1y} ${cp2x},${cp2y} ${x2},${y2}`;
+  }
+
   function eapRenderSvg() {
     const v = escopoGetVersao();
     const svg = document.getElementById('eapSvg');
     const connBtns = document.getElementById('eapConnBtns');
     if (!svg) return;
+    // keep temp line
+    const tmp = document.getElementById('eap-tmp-line');
     svg.innerHTML = '';
+    if (tmp) svg.appendChild(tmp);
     if (connBtns) connBtns.innerHTML = '';
     if (!v || !v.conexoes.length) return;
-    const readOnly = v.status !== 'rascunho';
+    const readOnly = v.status !== 'rascunho' || _eapViewMode;
     // Arrow marker
     const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
     const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
@@ -3829,29 +3885,33 @@
     marker.setAttribute('refX','7'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
     const mp = document.createElementNS('http://www.w3.org/2000/svg','path');
     mp.setAttribute('d','M0,0 L0,6 L8,3 z'); mp.setAttribute('fill','#a78bfa');
-    marker.appendChild(mp); defs.appendChild(marker); svg.appendChild(defs);
+    marker.appendChild(mp); defs.appendChild(marker); svg.insertBefore(defs, svg.firstChild);
     v.conexoes.forEach(c => {
-      const src = v.blocos.find(b=>b.id==c.de), dst = v.blocos.find(b=>b.id==c.para);
-      if (!src||!dst) return;
-      const srcEl = document.getElementById('eap-c-'+c.de), dstEl = document.getElementById('eap-c-'+c.para);
-      const sw = srcEl ? srcEl.offsetWidth : 190, sh = srcEl ? srcEl.offsetHeight : 80;
-      const dw = dstEl ? dstEl.offsetWidth : 190, dh = dstEl ? dstEl.offsetHeight : 80;
-      const x1=src.x+sw/2, y1=src.y+sh/2, x2=dst.x+dw/2, y2=dst.y+dh/2;
-      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',x1); line.setAttribute('y1',y1); line.setAttribute('x2',x2); line.setAttribute('y2',y2);
-      line.setAttribute('stroke','#a78bfa'); line.setAttribute('stroke-width','2'); line.setAttribute('marker-end','url(#eap-arrow)');
-      svg.appendChild(line);
+      const sb = v.blocos.find(b=>b.id==c.de), db = v.blocos.find(b=>b.id==c.para);
+      if (!sb||!db) return;
+      const sEl=document.getElementById('eap-c-'+c.de), dEl=document.getElementById('eap-c-'+c.para);
+      const sw=sEl?sEl.offsetWidth:190, sh=sEl?sEl.offsetHeight:90;
+      const dw=dEl?dEl.offsetWidth:190, dh=dEl?dEl.offsetHeight:90;
+      const scx=sb.x+sw/2, scy=sb.y+sh/2;
+      const dcx=db.x+dw/2, dcy=db.y+dh/2;
+      const sp = _eapClipEdge(scx,scy,sw,sh,dcx,dcy);
+      const dp = _eapClipEdge(dcx,dcy,dw,dh,scx,scy);
+      const pathEl = document.createElementNS('http://www.w3.org/2000/svg','path');
+      pathEl.setAttribute('d', _eapBezierPath(sp.x,sp.y,dp.x,dp.y));
+      pathEl.setAttribute('stroke','#a78bfa'); pathEl.setAttribute('stroke-width','2');
+      pathEl.setAttribute('fill','none'); pathEl.setAttribute('marker-end','url(#eap-arrow)');
+      svg.appendChild(pathEl);
       if (!readOnly && connBtns) {
-        const btn = document.createElement('button');
-        btn.style.cssText = `position:absolute;left:${(x1+x2)/2}px;top:${(y1+y2)/2}px;transform:translate(-50%,-50%);pointer-events:all;background:white;border:1.5px solid #e2e8f0;border-radius:50%;width:18px;height:18px;cursor:pointer;color:#c53030;font-size:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.12);font-weight:700;padding:0;z-index:6`;
+        const mx=(sp.x+dp.x)/2, my=(sp.y+dp.y)/2;
+        const btn=document.createElement('button');
+        btn.style.cssText=`position:absolute;left:${mx}px;top:${my}px;transform:translate(-50%,-50%);pointer-events:all;background:white;border:1.5px solid #e2e8f0;border-radius:50%;width:18px;height:18px;cursor:pointer;color:#c53030;font-size:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.12);font-weight:700;padding:0;z-index:6`;
         btn.textContent='✕'; btn.title='Remover conexão'; btn.onclick=()=>eapDeleteConn(c.id);
         connBtns.appendChild(btn);
       }
     });
   }
-
   function eapStartDrag(id, e) {
-    const v = escopoGetVersao(); if (!v||v.status!=='rascunho') return;
+    const v = escopoGetVersao(); if (!v||v.status!=='rascunho'||_eapViewMode) return;
     const b = v.blocos.find(x=>x.id==id); if (!b) return;
     const canvas = document.getElementById('eapCanvas');
     const rect = canvas.getBoundingClientRect();
@@ -3862,7 +3922,7 @@
 
   function eapDotDragStart(e, fromId) {
     e.preventDefault();
-    const v = escopoGetVersao(); if (!v || v.status !== 'rascunho') return;
+    const v = escopoGetVersao(); if (!v || v.status !== 'rascunho' || _eapViewMode) return;
     const canvas = document.getElementById('eapCanvas');
     const rect = canvas.getBoundingClientRect();
     const srcEl = document.getElementById('eap-c-' + fromId);
@@ -3881,27 +3941,26 @@
 
   function _eapDrawTempLine() {
     const svg = document.getElementById('eapSvg'); if (!svg || !_eapDotDrag) return;
+    if (!svg.querySelector('#eap-arrow')) { eapRenderSvg(); } // ensure marker exists
     let tl = document.getElementById('eap-tmp-line');
     if (!tl) {
-      // ensure defs/marker exist
-      if (!svg.querySelector('#eap-arrow')) {
-        const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
-        const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
-        marker.setAttribute('id','eap-arrow'); marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','8');
-        marker.setAttribute('refX','7'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
-        const mp = document.createElementNS('http://www.w3.org/2000/svg','path');
-        mp.setAttribute('d','M0,0 L0,6 L8,3 z'); mp.setAttribute('fill','#a78bfa');
-        marker.appendChild(mp); defs.appendChild(marker); svg.insertBefore(defs, svg.firstChild);
-      }
-      tl = document.createElementNS('http://www.w3.org/2000/svg','line');
+      tl = document.createElementNS('http://www.w3.org/2000/svg','path');
       tl.id = 'eap-tmp-line';
       tl.setAttribute('stroke','#a78bfa'); tl.setAttribute('stroke-width','2'); tl.setAttribute('stroke-dasharray','6 3');
-      tl.setAttribute('marker-end','url(#eap-arrow)'); tl.setAttribute('pointer-events','none');
+      tl.setAttribute('fill','none'); tl.setAttribute('marker-end','url(#eap-arrow)'); tl.setAttribute('pointer-events','none');
       svg.appendChild(tl);
     }
     const d = _eapDotDrag;
-    tl.setAttribute('x1', d.x1); tl.setAttribute('y1', d.y1);
-    tl.setAttribute('x2', d.x2); tl.setAttribute('y2', d.y2);
+    // clip start to source card edge
+    const srcEl = document.getElementById('eap-c-' + d.fromId);
+    const v = escopoGetVersao();
+    const sb = v && v.blocos.find(b=>b.id==d.fromId);
+    let x1=d.x1, y1=d.y1;
+    if (sb && srcEl) {
+      const sp = _eapClipEdge(sb.x+srcEl.offsetWidth/2, sb.y+srcEl.offsetHeight/2, srcEl.offsetWidth, srcEl.offsetHeight, d.x2, d.y2);
+      x1=sp.x; y1=sp.y;
+    }
+    tl.setAttribute('d', _eapBezierPath(x1, y1, d.x2, d.y2));
   }
 
   function eapDeleteConn(id) {
@@ -3911,7 +3970,7 @@
   }
 
   function eapAddCard() {
-    const v = escopoGetVersao(); if (!v||v.status!=='rascunho') return;
+    const v = escopoGetVersao(); if (!v||v.status!=='rascunho'||_eapViewMode) return;
     const canvas = document.getElementById('eapCanvas');
     const x = Math.round((canvas?canvas.scrollLeft:0) + 120 + Math.random()*60);
     const y = Math.round((canvas?canvas.scrollTop:0) + 100 + Math.random()*60);
@@ -3963,8 +4022,7 @@
 
   function eapSolicitarAprovacao() {
     const v=escopoGetVersao(); if(!v||v.status!=='rascunho') return;
-    document.getElementById('escopoAprovNome').value=v.solicitadoPara||'';
-    document.getElementById('modalEscopoAprov').classList.add('aberto');
+    _abrirUserPickerAprov('eap');
   }
 
   function escopoConfirmarSolicitar() {

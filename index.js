@@ -559,6 +559,28 @@ const agenteRoboSchema = new mongoose.Schema({
 }, { strict: false });
 const AgenteRobo = mongoose.model('AgenteRobo', agenteRoboSchema);
 
+const maquinaSchema = new mongoose.Schema({
+  nome:            { type: String, required: true },
+  machineId:       { type: String, required: true },
+  machineKey:      { type: String, default: '' },
+  grupo:           { type: String, default: '' },
+  descricao:       { type: String, default: '' },
+  capacidadeMaxima:{ type: Number, default: 4 },
+  status:          { type: String, default: 'offline', enum: ['online','offline','busy','maintenance'] },
+  cpu:             { type: Number, default: 0 },
+  ram:             { type: Number, default: 0 },
+  robosAtivos:     { type: Number, default: 0 },
+  robosAtivosList: { type: Array, default: [] },
+  ultimoHeartbeat: { type: Date, default: null },
+  maintenanceMode: { type: Boolean, default: false },
+  ativo:           { type: Boolean, default: true },
+  empresa:         { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoPor:       { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
+  criadoEm:        { type: Date, default: Date.now },
+  atualizadoEm:    { type: Date, default: Date.now }
+}, { strict: false });
+const Maquina = mongoose.model('Maquina', maquinaSchema);
+
 const credencialSchema = new mongoose.Schema({
   nome: { type: String, required: true }, tipo: { type: String, default: 'API Key' },
   proprietario: { type: String, default: '' }, valor: { type: String, default: '' },
@@ -2218,6 +2240,177 @@ app.post('/api/robos/agentes/:id/heartbeat', async (req, res) => {
     res.json({ ok: true });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
+
+// ==================== MÁQUINAS ====================
+
+app.get('/api/maquinas', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const lista = await Maquina.find({ empresa: req.usuario.empresa, ativo: true }).sort({ criadoEm: -1 }).select('-machineKey');
+    res.json(lista);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.post('/api/maquinas', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const machineKey = crypto.randomUUID();
+    const maquina = await Maquina.create({
+      ...req.body, machineKey,
+      empresa: req.usuario.empresa, criadoPor: req.usuario.id
+    });
+    res.status(201).json({ ...maquina.toObject() }); // key included only on creation
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.put('/api/maquinas/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const { machineKey, ...updates } = req.body;
+    const maquina = await Maquina.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { ...updates, atualizadoEm: new Date() },
+      { new: true }
+    ).select('-machineKey');
+    if (!maquina) return res.status(404).json({ erro: 'Máquina não encontrada' });
+    res.json(maquina);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.delete('/api/maquinas/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    await Maquina.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ativo: false });
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.post('/api/maquinas/:id/manutencao', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const maquina = await Maquina.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!maquina) return res.status(404).json({ erro: 'Não encontrada' });
+    const modo = !maquina.maintenanceMode;
+    const novoStatus = modo ? 'maintenance' : (maquina.ultimoHeartbeat && (Date.now() - new Date(maquina.ultimoHeartbeat)) < 90000 ? 'online' : 'offline');
+    await Maquina.findByIdAndUpdate(maquina._id, { maintenanceMode: modo, status: novoStatus });
+    res.json({ maintenanceMode: modo, status: novoStatus });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Gera config.json para download do agent — inclui machineKey
+app.get('/api/maquinas/:id/agent-config', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const maquina = await Maquina.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!maquina) return res.status(404).json({ erro: 'Máquina não encontrada' });
+    res.json({
+      server: process.env.BASE_URL || 'http://localhost:3000',
+      workspace: req.usuario.empresa.toString(),
+      machineKey: maquina.machineKey,
+      machineId: maquina.machineId
+    });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Heartbeat — chamado pelo agent.py a cada 20s (autenticado por machineKey no body)
+app.post('/api/maquinas/heartbeat', async (req, res) => {
+  try {
+    const { machineKey, cpu, ram, robosAtivos, robosAtivosList } = req.body;
+    if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
+    const maquina = await Maquina.findOne({ machineKey, ativo: true });
+    if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
+    const ativos = robosAtivos || 0;
+    const status = maquina.maintenanceMode ? 'maintenance'
+      : ativos >= (maquina.capacidadeMaxima || 4) ? 'busy'
+      : 'online';
+    await Maquina.findByIdAndUpdate(maquina._id, {
+      cpu: cpu || 0, ram: ram || 0,
+      robosAtivos: ativos, robosAtivosList: robosAtivosList || [],
+      ultimoHeartbeat: new Date(), status
+    });
+    // Retorna comandos pendentes (execuções criadas para esta máquina ainda não iniciadas)
+    const pendentes = await ExecucaoRobo.find({
+      maquina: maquina.machineId,
+      status: 'em_execucao',
+      comandoEnviado: { $ne: true }
+    }).limit(3);
+    // Marca como enviados
+    if (pendentes.length) {
+      await ExecucaoRobo.updateMany(
+        { _id: { $in: pendentes.map(e => e._id) } },
+        { comandoEnviado: true }
+      );
+    }
+    const roboIds = [...new Set(pendentes.map(e => e.roboId?.toString()).filter(Boolean))];
+    const robos = roboIds.length
+      ? await (async () => { const R = require('mongoose').model('Robot'); return R.find({ _id: { $in: roboIds } }); })().catch(() => [])
+      : [];
+    const roboMap = Object.fromEntries(robos.map(r => [r._id.toString(), r]));
+    const commands = pendentes.map(e => {
+      const robo = roboMap[e.roboId?.toString()] || {};
+      return {
+        execId: e._id,
+        command: robo.comandoExecucao || '',
+        tipo: robo.ambiente || 'local',
+        webhookUrl: robo.webhookUrl || '',
+        webhookPayload: robo.webhookPayload || {},
+        gitUrl: robo.gitUrl || '',
+        gitBranch: robo.gitBranch || 'main',
+        timeout: robo.timeout || 30
+      };
+    });
+    res.json({ ok: true, status, commands });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Log de execução — postado pelo robô em execução (autenticado por machineKey)
+app.post('/api/robos/execucoes/:id/logs', async (req, res) => {
+  try {
+    const { machineKey, message, status } = req.body;
+    if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
+    const maquina = await Maquina.findOne({ machineKey, ativo: true });
+    if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
+    const updates = { $push: { logs: { message: message || '', status: status || 'info', time: new Date() } } };
+    if (status === 'success') Object.assign(updates, { $set: { status: 'concluido', finalizadoEm: new Date() } });
+    if (status === 'error')   Object.assign(updates, { $set: { status: 'erro', finalizadoEm: new Date() } });
+    await ExecucaoRobo.findByIdAndUpdate(req.params.id, updates);
+    if (status === 'success' || status === 'error') {
+      await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: -1 } });
+    }
+    res.json({ ok: true });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Status de interrupção — consultado pelo agent.py para saber se deve parar
+app.get('/api/robos/execucoes/:id/status', async (req, res) => {
+  try {
+    const machineKey = req.headers['x-machine-key'];
+    if (!machineKey) return res.status(400).json({ erro: 'x-machine-key header obrigatório' });
+    const maquina = await Maquina.findOne({ machineKey, ativo: true });
+    if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
+    const exec = await ExecucaoRobo.findById(req.params.id).select('status motivoInterrupcao');
+    if (!exec) return res.status(404).json({ erro: 'Não encontrada' });
+    res.json({ status: exec.status, motivo: exec.motivoInterrupcao });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Credencial por nome — consumida pelo robô em execução
+app.get('/api/credenciais/:nome/valor', async (req, res) => {
+  try {
+    const machineKey = req.headers['x-machine-key'];
+    if (!machineKey) return res.status(400).json({ erro: 'x-machine-key header obrigatório' });
+    const maquina = await Maquina.findOne({ machineKey, ativo: true });
+    if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
+    const cred = await Credencial.findOne({ nome: req.params.nome, empresa: maquina.empresa });
+    if (!cred) return res.status(404).json({ erro: 'Credencial não encontrada' });
+    res.json({ nome: cred.nome, campos: cred.campos || { valor: cred.valor } });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Job: marcar offline máquinas sem heartbeat há mais de 90s (roda a cada 30s)
+setInterval(async () => {
+  try {
+    const cutoff = new Date(Date.now() - 90000);
+    await Maquina.updateMany(
+      { ultimoHeartbeat: { $lt: cutoff }, status: { $nin: ['offline', 'maintenance'] }, ativo: true },
+      { status: 'offline', robosAtivos: 0, robosAtivosList: [] }
+    );
+  } catch (e) { /* silent */ }
+}, 30000);
 
 // ==================== CREDENCIAIS ====================
 

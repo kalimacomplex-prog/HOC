@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -66,25 +66,26 @@
     .modo-aviso { padding: 8px 14px; background: #f5f0ff; border-radius: 6px; font-size: 12px; color: #2d1b69; font-weight: 500; margin-bottom: 14px; display: none; }
     .modo-aviso.ativo { display: block; }
     .bowler-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: auto; }
-    .bowler-table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 11px; }
-    .bowler-table th { padding: 9px 7px; text-align: center; background: #2d1b69; color: white; font-weight: 600; font-size: 10px; white-space: nowrap; border: 1px solid #3d2b89; }
-    .bowler-table th.col-info { text-align: left; min-width: 110px; }
-    .bowler-table th.mes-header { background: #3d2b89; }
-    .bowler-table th.sub-header { background: #4d3b99; font-size: 9px; font-weight: 500; }
-    .bowler-table td { padding: 7px; border: 1px solid #e2e8f0; text-align: center; vertical-align: middle; }
-    .bowler-table td.col-info { text-align: left; padding: 7px 10px; font-size: 12px; }
-    .categoria-row td { background: #f5f0ff; font-weight: 700; color: #2d1b69; font-size: 11px; padding: 7px 10px; }
+    .bowler-table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 11px; }
+    .bowler-table th { padding: 8px 6px; text-align: center; background: #2d1b69; color: white; font-weight: 600; font-size: 10px; white-space: nowrap; border: 1px solid #3d2b89; }
+    .bowler-table th.col-info { text-align: left; min-width: 100px; }
+    .bowler-table th.mes-header { background: #3d2b89; min-width: 54px; }
+    .bowler-table td { padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; vertical-align: middle; }
+    .bowler-table td.col-info { text-align: left; padding: 6px 10px; font-size: 11px; }
+    .categoria-row td { background: #f5f0ff; font-weight: 700; color: #2d1b69; font-size: 11px; padding: 6px 10px; }
+    .row-label { font-size: 10px; font-weight: 700; white-space: nowrap; padding: 4px 8px !important; min-width: 64px; background: #f5f0ff !important; color: #5a3ea1; }
+    .cell-resultado { font-size: 10px !important; font-weight: 700; }
     .cell-verde { background: #f0fff4 !important; color: #276749; font-weight: 700; }
     .cell-amarelo { background: #fffaf0 !important; color: #c05621; font-weight: 700; }
     .cell-vermelho { background: #fff5f5 !important; color: #c53030; font-weight: 700; }
-    .cell-input { width: 38px; border: 1px solid #2d1b69; border-radius: 3px; padding: 2px; text-align: center; font-size: 11px; background: white; }
+    .cell-input { width: 42px; border: 1px solid #2d1b69; border-radius: 3px; padding: 2px; text-align: center; font-size: 11px; background: white; }
     .cell-edit { background: #faf5ff !important; }
-    .estrutura-input { width: 100%; border: 1px solid #2d1b69; border-radius: 3px; padding: 3px 5px; font-size: 11px; background: white; }
+    .estrutura-input { width: 100%; border: 1px solid #2d1b69; border-radius: 3px; padding: 3px 5px; font-size: 11px; background: white; box-sizing: border-box; }
     .bowler-legenda { display: flex; gap: 16px; padding: 10px 14px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 11px; }
     .legenda-item { display: flex; align-items: center; gap: 5px; }
     .legenda-cor { width: 10px; height: 10px; border-radius: 2px; }
-    .btn-add-row { width: 100%; padding: 8px; background: #f8fafc; border: 1.5px dashed #e2e8f0; border-radius: 0 0 8px 8px; color: #718096; font-size: 12px; cursor: pointer; }
-    .btn-add-row:hover { background: #f0f2f5; color: #2d1b69; border-color: #2d1b69; }
+    .btn-add-indicador { padding: 7px 16px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 0.02em; }
+    .btn-add-indicador:hover { background: #3d2b89; }
   </style>
 </head>
 <body>
@@ -95,41 +96,28 @@
     <span class="logo-text">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview
-    </a>
-    <a class="menu-item" href="/operacoes">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações
-    </a>
-    <a class="menu-item active" href="/gestao-metas">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas
-    </a>
-    <a class="menu-item" href="/ideias-livres">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres
-    </a>
-    <a class="menu-item" href="#">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos
-    </a>
-    <a class="menu-item" href="/gestao-projetos">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos
-    </a>
-    <a class="menu-item" href="/gestao-licencas">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças
-    </a>
-    <a class="menu-item" href="/plano-usuarios">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários
-    </a>
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
+    <a class="menu-item active" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
+    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/robos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M9 11V7a3 3 0 016 0v4"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>Robôs</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="btn-sair" onclick="sair()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair
-    </button>
+    <details class="sidebar-sistema" id="sistemaMenu">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items">
+        <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
+        <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
+        <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+      </div>
+    </details>
   </div>
 </div>
 
 <div class="main">
-  <div class="header">
-    <div style="font-size:15px;font-weight:700;color:#1e2a4a">GESTÃO DE RESULTADOS</div>
+  <div class="header" style="justify-content:flex-end">
     <div class="header-right">
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
@@ -140,13 +128,12 @@
           <div class="notif-drop-header">
             <span class="notif-drop-titulo">🔔 Notificações</span>
             <div class="notif-drop-acoes">
-              <button class="btn-ler-todas" onclick="lerTodas()">Marcar todas como lidas</button>
+              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button>
             </div>
           </div>
           <div class="notif-lista" id="notifLista">
             <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
           </div>
-          <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
         </div>
       </div>
       <div class="header-user">
@@ -170,45 +157,56 @@
     <!-- TENDÊNCIAS -->
     <div id="tab-tendencias">
 
-      <!-- Filtros minimalistas -->
-      <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center">
-        <select class="filtro-select" id="filtroArea" onchange="atualizarTendencias()"><option value="todos">Todas as Áreas</option></select>
-        <select class="filtro-select" id="filtroCategoria" onchange="atualizarTendencias()"><option value="todas">Todas as Categorias</option></select>
-        <select class="filtro-select" id="filtroIndicador" onchange="atualizarTendencias()"><option value="todos">Todos os Indicadores</option></select>
+      <!-- Topo: exportar (direita) + filtro de período -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+        <button onclick="exportarPDF()" style="padding:7px 16px;background:#1e2a4a;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">📄 Exportar PDF</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
         <select class="filtro-select" id="filtroPeriodo" onchange="atualizarTendencias()">
           <option value="3">Últimos 3 meses</option>
           <option value="6">Últimos 6 meses</option>
           <option value="12">Ano atual</option>
           <option value="24">Último ano</option>
         </select>
-        <button onclick="exportarPDF()" style="margin-left:auto;padding:7px 16px;background:#1e2a4a;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">📄 Exportar PDF</button>
       </div>
 
-      <!-- Rankings no TOPO -->
-      <div class="rankings-grid" style="margin-bottom:20px">
-        <div class="ranking-card"><div class="ranking-titulo">🏆 Top 5 Melhores Indicadores</div><div id="rankingMelhores"></div></div>
-        <div class="ranking-card"><div class="ranking-titulo">⚠️ Top 5 Piores Indicadores</div><div id="rankingPiores"></div></div>
+      <!-- 5 Cards de resumo -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px">
+        <div class="meta-card">
+          <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:10px">🏆 Top 3 Melhores</div>
+          <div id="cardTop3Melhores"></div>
+        </div>
+        <div class="meta-card">
+          <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:10px">⚠️ Top 3 Piores</div>
+          <div id="cardTop3Piores"></div>
+        </div>
+        <div class="meta-card">
+          <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:10px">🏢 Top 3 Deptos.</div>
+          <div id="cardTop3Deptos"></div>
+        </div>
+        <div class="meta-card">
+          <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:10px">📂 Top 3 Categorias</div>
+          <div id="cardTop3Cats"></div>
+        </div>
+        <div class="meta-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+          <div style="font-size:28px;margin-bottom:6px">🎯</div>
+          <div style="font-size:32px;font-weight:700;color:#1e2a4a;line-height:1" id="cardPctGeral">—</div>
+          <div style="font-size:11px;color:#718096;margin-top:6px">Metas Atingidas</div>
+          <div style="font-size:10px;color:#a0aec0;margin-top:2px" id="cardPctGeralSub"></div>
+        </div>
       </div>
 
-      <!-- Cards de resumo -->
-      <div class="cards-grid" style="margin-bottom:20px">
-        <div class="meta-card"><div class="meta-card-icon">🎯</div><div class="meta-card-valor" id="cardAtingimento">—</div><div class="meta-card-label">Atingimento Médio</div></div>
-        <div class="meta-card"><div class="meta-card-icon">✅</div><div class="meta-card-valor" id="cardMetas">—</div><div class="meta-card-label">Metas Atingidas</div></div>
-        <div class="meta-card"><div class="meta-card-icon">🏆</div><div class="meta-card-valor" id="cardMelhor">—</div><div class="meta-card-label" id="cardMelhorLabel">Melhor Indicador</div></div>
-        <div class="meta-card"><div class="meta-card-icon">⚠️</div><div class="meta-card-valor" id="cardPior">—</div><div class="meta-card-label" id="cardPiorLabel">Pior Indicador</div></div>
-      </div>
-
-      <!-- Gráfico largura total -->
-      <div class="grafico-card" style="margin-bottom:20px">
-        <div class="grafico-titulo" style="margin-bottom:12px">Meta vs Resultado</div>
-        <canvas id="graficoEvolucao" height="80"></canvas>
-      </div>
-
-      <!-- Destaques + Recomendações -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">
-        <div class="destaque-card"><div class="destaque-titulo">💡 Recomendações</div><div id="recomendacoes"></div></div>
-        <div class="destaque-card"><div class="destaque-titulo">📊 Por Departamento</div><div id="destaquesDeptos"></div></div>
-        <div class="destaque-card"><div class="destaque-titulo">⭐ Top Categorias</div><div id="destaqueCategorias"></div></div>
+      <!-- Gráfico com filtros acima -->
+      <div style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#f4f6f9;border-radius:8px 8px 0 0;border:1px solid #e2e8f0;border-bottom:none;flex-wrap:wrap">
+          <span style="font-size:11px;font-weight:700;color:#718096;margin-right:4px;white-space:nowrap">Evolução Meta vs Resultado —</span>
+          <select class="filtro-select" id="filtroArea" onchange="renderGrafico()"><option value="todos">Todas as Áreas</option></select>
+          <select class="filtro-select" id="filtroCategoria" onchange="renderGrafico()"><option value="todas">Todas as Categorias</option></select>
+          <select class="filtro-select" id="filtroIndicador" onchange="renderGrafico()"><option value="todos">Todos os Indicadores</option></select>
+        </div>
+        <div class="grafico-card" style="border-radius:0 0 10px 10px">
+          <canvas id="graficoEvolucao" height="80"></canvas>
+        </div>
       </div>
 
     </div>
@@ -224,6 +222,7 @@
         <div class="bowler-acoes">
           <button class="btn-modo" id="btnEditarResultados" onclick="ativarModo('resultados')">✏️ Edição de Resultados</button>
           <button class="btn-modo" id="btnEditarEstrutura" onclick="ativarModo('estrutura')">⚙️ Edição de Estrutura</button>
+          <button class="btn-add-indicador" id="btnAddLinha" style="display:none" onclick="abrirModalLinha()">+ Novo Indicador</button>
           <button class="btn-salvar-bowler" id="btnSalvar" onclick="salvarBowler()">💾 Salvar</button>
           <button class="btn-cancelar-modo" id="btnCancelar" onclick="cancelarModo()">✕ Cancelar</button>
         </div>
@@ -231,13 +230,7 @@
       <div class="modo-aviso" id="modoAviso"></div>
       <div class="bowler-wrap">
         <table class="bowler-table" id="bowlerTable"></table>
-        <div class="bowler-legenda">
-          <div class="legenda-item"><div class="legenda-cor" style="background:#68d391"></div> Acima de 90%</div>
-          <div class="legenda-item"><div class="legenda-cor" style="background:#f6ad55"></div> 70% a 90%</div>
-          <div class="legenda-item"><div class="legenda-cor" style="background:#fc8181"></div> Abaixo de 70%</div>
-        </div>
       </div>
-      <button class="btn-add-row" id="btnAddLinha" style="display:none" onclick="abrirModalLinha()">+ Adicionar Indicador</button>
     </div>
   </div>
 </div>
@@ -249,12 +242,33 @@
       <span class="modal-titulo">Novo Indicador</span>
       <button class="btn-fechar" onclick="fecharModal('modalLinha')">×</button>
     </div>
-    <div class="form-group"><label>Categoria</label><select id="novaCategoria"><option value="">Selecione...</option></select></div>
-    <div class="form-group"><label>Nova Categoria (opcional)</label><input type="text" id="novaCategoriaInput" placeholder="Digite para criar nova"></div>
+    <div class="form-group">
+      <label>Categoria *</label>
+      <input list="listaCategorias" id="novaCategoria" placeholder="Selecione ou digite nova categoria" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none">
+      <datalist id="listaCategorias"></datalist>
+    </div>
     <div class="form-group"><label>Nome do Indicador *</label><input type="text" id="novoIndicador" placeholder="Ex: Taxa de Conversão"></div>
     <div class="form-group"><label>Fórmula / Fonte</label><input type="text" id="novaFormula" placeholder="Ex: Vendas / Leads"></div>
     <div class="form-group"><label>Área Responsável</label><input type="text" id="novaArea" placeholder="Ex: Vendas"></div>
     <div class="form-group"><label>Periodicidade</label><select id="novaPeriodicidade"><option>Mensal</option><option>Trimestral</option><option>Semestral</option><option>Anual</option></select></div>
+    <div class="form-group">
+      <label>Tipo de Meta</label>
+      <div style="display:flex;gap:20px;margin-top:6px">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer"><input type="radio" name="tipoMeta" value="fixa" id="radioMetaFixa" checked onchange="toggleMetaFixa()"> Fixa</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer"><input type="radio" name="tipoMeta" value="variavel" onchange="toggleMetaFixa()"> Variável</label>
+      </div>
+    </div>
+    <div class="form-group" id="grupoValorMeta">
+      <label>Valor da Meta (fixo para todos os meses)</label>
+      <input type="number" id="valorMetaFixa" placeholder="Ex: 100">
+    </div>
+    <div class="form-group">
+      <label>Sentido do Indicador</label>
+      <div style="display:flex;gap:20px;margin-top:6px">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer"><input type="radio" name="sentidoMeta" value="positiva" checked> ↑ Positivo (maior = melhor)</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:normal;cursor:pointer"><input type="radio" name="sentidoMeta" value="negativa"> ↓ Negativo (menor = melhor)</label>
+      </div>
+    </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalLinha')">Cancelar</button>
       <button class="btn-confirmar" onclick="adicionarLinha()">Adicionar</button>
@@ -313,7 +327,7 @@
   async function carregarBowler() {
     try {
       const res = await fetch(`/api/bowler/${anoAtual}`, { headers: HEADERS });
-      if (res.status === 401) { window.location.href = '/'; return; }
+      if (res.status === 401) { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; return; }
       const data = await res.json();
       if (data && data.dados && data.dados.length > 0) {
         bowlerData = data.dados;
@@ -345,64 +359,114 @@
     await carregarBowler();
   }
 
-  function getCor(plan, act) {
-    if (!plan || !act || parseFloat(plan) === 0) return '';
-    const pct = (parseFloat(act) / parseFloat(plan)) * 100;
-    if (pct >= 90) return 'cell-verde';
-    if (pct >= 70) return 'cell-amarelo';
-    return 'cell-vermelho';
+  function getCor(row, plan, act) {
+    if (plan === '' || plan === null || plan === undefined) return '';
+    if (act  === '' || act  === null || act  === undefined) return '';
+    const p = parseFloat(plan), a = parseFloat(act);
+    if (isNaN(p) || isNaN(a)) return '';
+    if (row.sentidoMeta === 'negativa') {
+      return a <= p ? 'cell-verde' : 'cell-vermelho';
+    } else {
+      return a >= p ? 'cell-verde' : 'cell-vermelho';
+    }
   }
 
   function renderBowler() {
     const table = document.getElementById('bowlerTable');
     const cats = [...new Set(bowlerData.map(r => r.categoria))];
+    const totalCols = 4 + 1 + MESES.length;
     let html = `<thead><tr>
       <th class="col-info" rowspan="2">Indicador</th>
       <th class="col-info" rowspan="2">Fórmula/Fonte</th>
       <th class="col-info" rowspan="2">Área responsável</th>
-      <th class="col-info" rowspan="2">Periodicidade</th>
-      ${MESES.map(m=>`<th class="mes-header" colspan="2">${m}</th>`).join('')}
-    </tr><tr>
-      ${MESES.map(()=>`<th class="sub-header">Plan</th><th class="sub-header">Act</th>`).join('')}
+      <th class="col-info" rowspan="2">Period.</th>
+      <th rowspan="2" style="min-width:68px;background:#2d1b69;border:1px solid #3d2b89"></th>
+      ${MESES.map(m=>`<th class="mes-header">${m}</th>`).join('')}
     </tr></thead><tbody>`;
 
     cats.forEach(cat => {
-      html += `<tr class="categoria-row"><td colspan="${4+MESES.length*2}">Categoria: ${cat}</td></tr>`;
-      bowlerData.filter(r => r.categoria === cat).forEach((row) => {
+      if (modoEdicao === 'estrutura') {
+        html += `<tr class="categoria-row"><td colspan="${totalCols}">Categoria:&nbsp;
+          <input class="estrutura-input" style="width:200px;display:inline-block" value="${cat}"
+            onblur="renomearCategoria('${cat}', this.value)">
+        </td></tr>`;
+      } else {
+        html += `<tr class="categoria-row"><td colspan="${totalCols}">Categoria: ${cat}</td></tr>`;
+      }
+
+      bowlerData.filter(r => r.categoria === cat).forEach(row => {
         const gi = bowlerData.indexOf(row);
+        const sentido = row.sentidoMeta || 'positiva';
+
         if (modoEdicao === 'estrutura') {
           html += `<tr>
-            <td class="col-info cell-edit"><input class="estrutura-input" value="${row.indicador}" onchange="bowlerData[${gi}].indicador=this.value"></td>
-            <td class="col-info cell-edit"><input class="estrutura-input" value="${row.formula}" onchange="bowlerData[${gi}].formula=this.value"></td>
-            <td class="col-info cell-edit"><input class="estrutura-input" value="${row.area}" onchange="bowlerData[${gi}].area=this.value"></td>
-            <td class="col-info cell-edit"><input class="estrutura-input" value="${row.periodicidade}" onchange="bowlerData[${gi}].periodicidade=this.value"></td>
-            ${row.meses.map((m,mi)=>`<td>${m.plan||''}</td><td>${m.act||''}</td>`).join('')}
-            <td><button onclick="removerLinha(${gi})" style="background:#fff5f5;border:none;border-radius:3px;cursor:pointer;padding:2px 5px;color:#c53030;font-size:11px">✕</button></td>
+            <td class="col-info cell-edit" rowspan="2"><input class="estrutura-input" value="${row.indicador}" onchange="bowlerData[${gi}].indicador=this.value"></td>
+            <td class="col-info cell-edit" rowspan="2"><input class="estrutura-input" value="${row.formula}" onchange="bowlerData[${gi}].formula=this.value"></td>
+            <td class="col-info cell-edit" rowspan="2"><input class="estrutura-input" value="${row.area}" onchange="bowlerData[${gi}].area=this.value"></td>
+            <td class="col-info cell-edit" rowspan="2" style="min-width:110px">
+              <select class="estrutura-input" onchange="bowlerData[${gi}].periodicidade=this.value">
+                ${['Mensal','Trimestral','Semestral','Anual'].map(p=>`<option${p===row.periodicidade?' selected':''}>${p}</option>`).join('')}
+              </select>
+              <select class="estrutura-input" style="margin-top:4px" onchange="bowlerData[${gi}].sentidoMeta=this.value">
+                <option value="positiva"${sentido==='positiva'?' selected':''}>↑ Positivo</option>
+                <option value="negativa"${sentido==='negativa'?' selected':''}>↓ Negativo</option>
+              </select>
+              <button onclick="removerLinha(${gi})" style="margin-top:5px;width:100%;background:#fff5f5;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;padding:3px 0;color:#c53030;font-size:10px;font-weight:600">✕ Remover</button>
+            </td>
+            <td class="row-label">Meta</td>
+            ${row.meses.map((m,mi)=>`<td class="cell-edit" style="background:#f5f0ff"><input class="cell-input" value="${m.plan||''}" onchange="bowlerData[${gi}].meses[${mi}].plan=this.value"></td>`).join('')}
+          </tr><tr>
+            <td class="row-label">Resultado</td>
+            ${row.meses.map(m=>`<td class="cell-resultado" style="text-align:center;color:#718096">${m.act||''}</td>`).join('')}
           </tr>`;
         } else if (modoEdicao === 'resultados') {
           html += `<tr>
-            <td class="col-info">${row.indicador}</td>
-            <td class="col-info">${row.formula}</td>
-            <td class="col-info">${row.area}</td>
-            <td class="col-info">${row.periodicidade}</td>
-            ${row.meses.map((m,mi)=>`
-              <td class="cell-edit"><input class="cell-input" value="${m.plan||''}" onchange="bowlerData[${gi}].meses[${mi}].plan=this.value"></td>
-              <td class="cell-edit ${getCor(m.plan,m.act)}"><input class="cell-input" value="${m.act||''}" onchange="bowlerData[${gi}].meses[${mi}].act=this.value"></td>
-            `).join('')}
+            <td class="col-info" rowspan="2">${row.indicador}</td>
+            <td class="col-info" rowspan="2">${formatFormula(row.formula)}</td>
+            <td class="col-info" rowspan="2">${row.area}</td>
+            <td class="col-info" rowspan="2">${row.periodicidade}</td>
+            <td class="row-label">Meta</td>
+            ${row.meses.map((m,mi)=>`<td style="background:#f5f0ff;font-size:10px;color:#5a3ea1;text-align:center">${m.plan||'—'}</td>`).join('')}
+          </tr><tr>
+            <td class="row-label">Resultado</td>
+            ${row.meses.map((m,mi)=>`<td class="cell-edit cell-resultado ${getCor(row,m.plan,m.act)}"><input class="cell-input" value="${m.act||''}" onchange="bowlerData[${gi}].meses[${mi}].act=this.value"></td>`).join('')}
           </tr>`;
         } else {
           html += `<tr>
-            <td class="col-info">${row.indicador}</td>
-            <td class="col-info">${row.formula}</td>
-            <td class="col-info">${row.area}</td>
-            <td class="col-info">${row.periodicidade}</td>
-            ${row.meses.map(m=>`<td>${m.plan||''}</td><td class="${getCor(m.plan,m.act)}">${m.act||''}</td>`).join('')}
+            <td class="col-info" rowspan="2">${row.indicador}</td>
+            <td class="col-info" rowspan="2">${formatFormula(row.formula)}</td>
+            <td class="col-info" rowspan="2">${row.area}</td>
+            <td class="col-info" rowspan="2">${row.periodicidade}</td>
+            <td class="row-label">Meta</td>
+            ${row.meses.map(m=>`<td style="background:#f9f7ff;font-size:10px;color:#7c5cbf;text-align:center">${m.plan||'—'}</td>`).join('')}
+          </tr><tr>
+            <td class="row-label">Resultado</td>
+            ${row.meses.map(m=>`<td class="cell-resultado ${getCor(row,m.plan,m.act)}" style="text-align:center">${m.act||''}</td>`).join('')}
           </tr>`;
         }
       });
     });
     html += '</tbody>';
     table.innerHTML = html;
+  }
+
+  function formatFormula(val) {
+    if (!val) return '';
+    if (/^https?:\/\//i.test(val.trim())) {
+      return `<a href="${val.trim()}" target="_blank" rel="noopener" style="color:#2d1b69;font-size:11px;text-decoration:underline;font-weight:600">🔗 Abrir link</a>`;
+    }
+    return val;
+  }
+
+  function renomearCategoria(catAntiga, catNova) {
+    catNova = catNova.trim();
+    if (!catNova || catNova === catAntiga) return;
+    bowlerData.forEach(r => { if (r.categoria === catAntiga) r.categoria = catNova; });
+  }
+
+  function toggleMetaFixa() {
+    const fixa = document.getElementById('radioMetaFixa').checked;
+    document.getElementById('grupoValorMeta').style.display = fixa ? 'block' : 'none';
   }
 
   function ativarModo(modo) {
@@ -414,7 +478,7 @@
     document.getElementById('btnAddLinha').style.display = modo==='estrutura' ? 'block' : 'none';
     const aviso = document.getElementById('modoAviso');
     aviso.classList.add('ativo');
-    aviso.textContent = modo==='resultados' ? '✏️ Modo Edição: edite os valores de Planejado e Realizado' : '⚙️ Modo Estrutura: edite nome, fórmula, área e periodicidade';
+    aviso.textContent = modo==='resultados' ? '✏️ Modo Edição de Resultados: edite os valores realizados de cada mês' : '⚙️ Modo Estrutura: edite nome, fórmula, área, categoria e sentido do indicador. Use "+ Novo Indicador" para adicionar.';
     renderBowler();
   }
 
@@ -437,20 +501,35 @@
 
   function abrirModalLinha() {
     const cats = [...new Set(bowlerData.map(r => r.categoria))];
-    const sel = document.getElementById('novaCategoria');
-    sel.innerHTML = '<option value="">Selecione...</option>' + cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    document.getElementById('listaCategorias').innerHTML = cats.map(c=>`<option value="${c}">`).join('');
+    document.getElementById('novaCategoria').value = '';
     document.getElementById('novoIndicador').value = '';
     document.getElementById('novaFormula').value = '';
     document.getElementById('novaArea').value = '';
-    document.getElementById('novaCategoriaInput').value = '';
+    document.getElementById('valorMetaFixa').value = '';
+    document.getElementById('radioMetaFixa').checked = true;
+    document.querySelector('input[name="sentidoMeta"][value="positiva"]').checked = true;
+    document.getElementById('grupoValorMeta').style.display = 'block';
     document.getElementById('modalLinha').classList.add('aberto');
   }
 
   function adicionarLinha() {
-    const cat = document.getElementById('novaCategoriaInput').value.trim() || document.getElementById('novaCategoria').value;
+    const cat = document.getElementById('novaCategoria').value.trim();
     const indicador = document.getElementById('novoIndicador').value.trim();
     if (!cat || !indicador) { alert('Categoria e Indicador obrigatórios.'); return; }
-    bowlerData.push({ categoria:cat, indicador, formula:document.getElementById('novaFormula').value.trim()||'Fórmula/Fonte', area:document.getElementById('novaArea').value.trim()||'Área responsável', periodicidade:document.getElementById('novaPeriodicidade').value, meses:MESES.map(()=>({plan:'',act:''})) });
+    const tipoMeta = document.querySelector('input[name="tipoMeta"]:checked').value;
+    const sentidoMeta = document.querySelector('input[name="sentidoMeta"]:checked').value;
+    const planFixo = tipoMeta === 'fixa' ? (document.getElementById('valorMetaFixa').value.trim() || '') : '';
+    bowlerData.push({
+      categoria: cat,
+      indicador,
+      formula: document.getElementById('novaFormula').value.trim() || 'Fórmula/Fonte',
+      area: document.getElementById('novaArea').value.trim() || 'Área responsável',
+      periodicidade: document.getElementById('novaPeriodicidade').value,
+      tipoMeta,
+      sentidoMeta,
+      meses: MESES.map(() => ({ plan: planFixo, act: '' }))
+    });
     fecharModal('modalLinha');
     renderBowler();
   }
@@ -468,6 +547,20 @@
     const mesAtual = new Date().getMonth();
     if (fPeriodo === 24) return Array.from({length:12}, (_,i) => i);
     return Array.from({length: fPeriodo}, (_,i) => (mesAtual - fPeriodo + 1 + i + 12) % 12);
+  }
+
+  function getDadosGerais() {
+    const mesesIdx = getMesesIdx();
+    const todos = [];
+    bowlerData.forEach(row => {
+      mesesIdx.forEach(mi => {
+        const m = row.meses[mi];
+        if (!m) return;
+        const pct = calcularPct(m.plan, m.act);
+        if (pct !== null) todos.push({ indicador:row.indicador, area:row.area, categoria:row.categoria, pct, mi });
+      });
+    });
+    return { rows: bowlerData, mesesIdx, todos };
   }
 
   function getDadosFiltrados() {
@@ -492,23 +585,55 @@
     return { rows, mesesIdx, todos };
   }
 
+  function renderMiniLista(containerId, items) {
+    const el = document.getElementById(containerId);
+    if (!items.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:11px">Sem dados</div>'; return; }
+    const cor = pct => pct >= 90 ? '#38a169' : pct >= 70 ? '#d69e2e' : '#e53e3e';
+    el.innerHTML = items.map((item, i) => `
+      <div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #f0f2f5">
+        <span style="font-size:10px;color:#a0aec0;min-width:18px">#${i+1}</span>
+        <span style="flex:1;font-size:11px;color:#1e2a4a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.nome}">${item.nome}</span>
+        <span style="font-size:11px;font-weight:700;color:${cor(item.pct)}">${item.pct.toFixed(0)}%</span>
+      </div>`).join('');
+  }
+
   function atualizarTendencias() {
     atualizarFiltros();
-    const { todos } = getDadosFiltrados();
+    const { todos } = getDadosGerais();
     if (todos.length === 0) {
-      ['cardAtingimento','cardMetas','cardMelhor','cardPior'].forEach(id => document.getElementById(id).textContent = 'Sem dados');
+      ['cardTop3Melhores','cardTop3Piores','cardTop3Deptos','cardTop3Cats'].forEach(id =>
+        document.getElementById(id).innerHTML = '<div style="color:#a0aec0;font-size:11px">Sem dados</div>');
+      document.getElementById('cardPctGeral').textContent = '—';
+      document.getElementById('cardPctGeralSub').textContent = '';
       renderRecomendacoes([]); renderRankings([]); renderDestaques([]); renderGrafico(); return;
     }
-    const media     = todos.reduce((s,i) => s + i.pct, 0) / todos.length;
-    const atingidas = todos.filter(i => i.pct >= 90).length;
-    const melhor    = todos.reduce((a,b) => a.pct > b.pct ? a : b);
-    const pior      = todos.reduce((a,b) => a.pct < b.pct ? a : b);
-    document.getElementById('cardAtingimento').textContent = media.toFixed(0) + '%';
-    document.getElementById('cardMetas').textContent = `${atingidas}/${todos.length}`;
-    document.getElementById('cardMelhor').textContent = melhor.pct.toFixed(0) + '%';
-    document.getElementById('cardMelhorLabel').textContent = melhor.indicador;
-    document.getElementById('cardPior').textContent = pior.pct.toFixed(0) + '%';
-    document.getElementById('cardPiorLabel').textContent = pior.indicador;
+
+    const agrupar = (campo) => {
+      const por = {};
+      todos.forEach(i => {
+        const k = i[campo];
+        if (!por[k]) por[k] = { nome: k, vals: [] };
+        por[k].vals.push(i.pct);
+      });
+      return Object.values(por)
+        .map(g => ({ nome: g.nome, pct: g.vals.reduce((a,b) => a+b, 0) / g.vals.length }))
+        .sort((a,b) => b.pct - a.pct);
+    };
+
+    const listaInd  = agrupar('indicador');
+    const listaArea = agrupar('area');
+    const listaCat  = agrupar('categoria');
+
+    renderMiniLista('cardTop3Melhores', listaInd.slice(0, 3));
+    renderMiniLista('cardTop3Piores',   [...listaInd].reverse().slice(0, 3));
+    renderMiniLista('cardTop3Deptos',   listaArea.slice(0, 3));
+    renderMiniLista('cardTop3Cats',     listaCat.slice(0, 3));
+
+    const atingiram = listaInd.filter(i => i.pct >= 90).length;
+    const pctGeral  = (atingiram / listaInd.length * 100).toFixed(0);
+    document.getElementById('cardPctGeral').textContent = pctGeral + '%';
+    document.getElementById('cardPctGeralSub').textContent = `${atingiram} de ${listaInd.length} indicadores`;
+
     renderRecomendacoes(todos); renderRankings(todos); renderDestaques(todos); renderGrafico();
   }
 
@@ -695,7 +820,7 @@
       <div class="box"><div class="box-t">📊 Por Departamento</div>${getHTML('destaquesDeptos')}</div>
       <div class="box"><div class="box-t">⭐ Top Categorias</div>${getHTML('destaqueCategorias')}</div>
     </div>
-    </body></html>`);
+</body></html>`);
     w.document.close();
     setTimeout(() => { w.print(); }, 700);
     btn.textContent = '📄 Exportar PDF'; btn.disabled = false;

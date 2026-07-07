@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -17,17 +17,16 @@
     .btn-lic-add { background: white; color: #2d1b69; }
     .btn-lic-add:hover { background: #f0f2f5; }
 
-    .resumo-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
+    .resumo-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 20px; }
     .resumo-card { background: white; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .resumo-card-val { font-size: 26px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
-    .resumo-card-lbl { font-size: 11px; color: #718096; }
-    .resumo-card-sub { font-size: 12px; font-weight: 600; margin-top: 4px; }
+    .resumo-card-lbl { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+    .resumo-card-val { font-size: 26px; font-weight: 700; color: #1e2a4a; }
     .sub-verde { color: #38a169; }
     .sub-amarelo { color: #c05621; }
     .sub-vermelho { color: #c53030; }
 
     .lic-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-    .lic-search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; padding: 8px 14px; }
+    .lic-search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; padding: 6px 14px; }
     .lic-search input { border: none; outline: none; font-size: 13px; color: #1e2a4a; width: 100%; font-family: inherit; }
     .lic-search svg { width: 14px; height: 14px; color: #a0aec0; flex-shrink: 0; }
     .btn-mais-filtros { padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; color: #4a5568; display: flex; align-items: center; gap: 5px; }
@@ -135,27 +134,30 @@
     <span class="logo-text">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
     <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/robos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M9 11V7a3 3 0 016 0v4"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>Robôs</a>
     <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
     <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
     <a class="menu-item active" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
-    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+    <details class="sidebar-sistema" id="sistemaMenu">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items">
+        <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
+        <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
+        <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+      </div>
+    </details>
   </div>
 </div>
 
 <div class="main">
   <div id="bannerAssinatura" style="display:none"></div>
   <div class="header">
-    <div class="header-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Buscar...">
-    </div>
+    <div></div>
     <div class="header-right">
       
     <div class="notif-wrap" id="notifWrap">
@@ -167,13 +169,12 @@
           <div class="notif-drop-header">
             <span class="notif-drop-titulo">🔔 Notificações</span>
             <div class="notif-drop-acoes">
-              <button class="btn-ler-todas" onclick="lerTodas()">Marcar todas como lidas</button>
+              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button>
             </div>
           </div>
           <div class="notif-lista" id="notifLista">
             <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
           </div>
-          <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
         </div>
       </div>
       
@@ -192,8 +193,7 @@
         <p>Controle de licenças, custos e renovações</p>
       </div>
       <div class="lic-hero-acoes">
-        <button class="btn-lic btn-lic-outline ativo" id="btnTabela" onclick="mudarVista('tabela')">📋 Tabela</button>
-        <button class="btn-lic btn-lic-outline" id="btnRelatorio" onclick="mudarVista('relatorio')">📊 Relatório</button>
+        <button class="btn-lic btn-lic-outline" id="btnRelatorio" onclick="exportarCSV()">📊 Exportar CSV</button>
         <button class="btn-lic btn-lic-outline" onclick="abrirAlertas()">🔔 Alertas</button>
         <button class="btn-lic btn-lic-add" onclick="abrirModalLicenca()">+ Adicionar Licença</button>
       </div>
@@ -201,11 +201,12 @@
 
     <!-- RESUMO -->
     <div class="resumo-grid">
-      <div class="resumo-card"><div class="resumo-card-val" id="resTotal">0</div><div class="resumo-card-lbl">Total de Licenças</div></div>
-      <div class="resumo-card"><div class="resumo-card-val" id="resAtivas">0</div><div class="resumo-card-lbl">Ativas</div><div class="resumo-card-sub sub-verde" id="resAtivasLbl">🟢 ativas</div></div>
-      <div class="resumo-card"><div class="resumo-card-val" id="resVencendo">0</div><div class="resumo-card-lbl">Vencendo em 30 dias</div><div class="resumo-card-sub sub-amarelo">⚠️ atenção</div></div>
-      <div class="resumo-card"><div class="resumo-card-val" id="resMensal">—</div><div class="resumo-card-lbl">Custo Mensal</div></div>
-      <div class="resumo-card"><div class="resumo-card-val" id="resAnual">—</div><div class="resumo-card-lbl">Custo Anual</div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Total de Licenças</div><div class="resumo-card-val" id="resTotal">0</div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Ativas</div><div class="resumo-card-val" id="resAtivas">0</div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Vencendo em 30 dias</div><div class="resumo-card-val" id="resVencendo">0</div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Vencidas</div><div class="resumo-card-val" id="resVencidas">0</div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Custo Mensal</div><div class="resumo-card-val" id="resMensal">—</div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Custo Anual</div><div class="resumo-card-val" id="resAnual">—</div></div>
     </div>
 
     <!-- VISTA TABELA -->
@@ -240,9 +241,9 @@
         <table class="lic-table">
           <thead>
             <tr>
-              <th>Nome</th><th>Categoria</th><th>Unidade/Filial</th><th>Fornecedor</th>
-              <th>Data Emissão</th><th>Validade</th><th>Custo</th>
-              <th>Penalidade</th><th>Status</th><th>Responsável</th>
+              <th>Nome</th><th>Categoria</th><th>Fornecedor</th><th>Qtd.</th>
+              <th>Validade</th><th>Custo Unit.</th><th>Custo Total</th><th>Freq.</th>
+              <th>Penalidade</th><th>Status</th>
               <th>Detalhes</th><th>Ações</th>
             </tr>
           </thead>
@@ -253,14 +254,6 @@
       </div>
     </div>
 
-    <!-- VISTA RELATÓRIO -->
-    <div id="vistaRelatorio" class="relatorio-view">
-      <div class="rel-header">
-        <div style="font-size:15px;font-weight:700;color:#1e2a4a">📊 Relatório de Licenças</div>
-        <button class="btn-exportar" onclick="exportarRelatorio()">⬇️ Exportar PDF</button>
-      </div>
-      <div id="relatorioConteudo"></div>
-    </div>
   </div>
 </div>
 
@@ -293,8 +286,14 @@
       <div class="form-grid-3">
         <div class="form-group"><label>Data de Emissão</label><input type="date" class="form-control" id="licDataEmissao"></div>
         <div class="form-group"><label>Data de Validade</label><input type="date" class="form-control" id="licValidade"></div>
-        <div class="form-group"><label>Quantidade</label><input type="text" class="form-control" id="licQuantidade" placeholder="Ex: 50 usuários"></div>
-        <div class="form-group"><label>Custo Mensal (R$)</label><input type="number" class="form-control" id="licCusto" placeholder="0,00" min="0" step="0.01"></div>
+        <div class="form-group"><label>Quantidade</label><input type="text" class="form-control" id="licQuantidade" placeholder="Ex: 50" oninput="atualizarCustoTotal()"></div>
+        <div class="form-group"><label>Custo Unitário (R$)</label><input type="number" class="form-control" id="licCustoUnitario" placeholder="0,00" min="0" step="0.01" oninput="atualizarCustoTotal()"></div>
+        <div class="form-group"><label>Frequência</label>
+          <select class="form-control" id="licFrequencia" onchange="atualizarCustoTotal()">
+            <option value="Mensal">Mensal</option><option value="Trimestral">Trimestral</option><option value="Semestral">Semestral</option><option value="Anual">Anual</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Custo Total (R$)</label><input type="text" class="form-control" id="licCustoTotal" readonly placeholder="—" style="background:#f8fafc;color:#718096;cursor:default"></div>
         <div class="form-group"><label>Status</label>
           <select class="form-control" id="licStatus">
             <option>Ativa</option><option>Vencendo</option><option>Vencida</option><option>Em Renovação</option>
@@ -389,7 +388,7 @@
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
-  let licencas = [], documentosTemp = [], vistaAtual = 'tabela';
+  let licencas = [], documentosTemp = [];
 
   // ===== UTILS =====
   function fmtMoeda(v) { return 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -398,7 +397,7 @@
   function fmtValidade(validade, status) {
     const dias = diasParaVencer(validade);
     if (dias === null) return '<span class="val-ok">—</span>';
-    if (status === 'Vencida' || dias < 0) return `<span class="val-vencida">${fmtData(validade)}<br>Vencida há ${Math.abs(dias)} dias 🔴</span>`;
+    if (status === 'Vencida' || dias < 0) return `<span class="val-vencida">${fmtData(validade)}</span>`;
     if (dias <= 30) return `<span class="val-vencendo">${fmtData(validade)}<br>Em ${dias} dias ⚠️</span>`;
     return `<span class="val-ok">${fmtData(validade)}</span>`;
   }
@@ -413,11 +412,34 @@
   async function carregarLicencas() {
     try {
       const res = await fetch('/api/licencas', { headers: HEADERS });
-      if (res.status === 401) { window.location.href = '/'; return; }
+      if (res.status === 401) { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; return; }
       licencas = await res.json();
       renderResumo();
       renderLicencas();
     } catch(err) { console.error(err); }
+  }
+
+  // ===== CUSTO HELPERS =====
+  function parseQtd(qtdStr) { const n = parseFloat(qtdStr); return (isNaN(n) || n <= 0) ? 1 : n; }
+  const FREQ_DIV = { Mensal:1, Trimestral:3, Semestral:6, Anual:12 };
+  function getCustoMensal(l) {
+    if (parseFloat(l.custoUnitario) > 0) {
+      const total = parseFloat(l.custoUnitario) * parseQtd(l.quantidade);
+      return total / (FREQ_DIV[l.frequencia] || 1);
+    }
+    return parseFloat(l.custo) || 0;
+  }
+  function getCustoTotal(l) {
+    if (parseFloat(l.custoUnitario) > 0) {
+      return parseFloat(l.custoUnitario) * parseQtd(l.quantidade);
+    }
+    return parseFloat(l.custo) || 0;
+  }
+  function atualizarCustoTotal() {
+    const unit = parseFloat(document.getElementById('licCustoUnitario').value) || 0;
+    const qtd = parseQtd(document.getElementById('licQuantidade').value);
+    const total = unit * qtd;
+    document.getElementById('licCustoTotal').value = total > 0 ? parseFloat(total.toFixed(2)).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '';
   }
 
   // ===== RESUMO =====
@@ -425,11 +447,12 @@
     const total = licencas.length;
     const ativas = licencas.filter(l => l.status === 'Ativa').length;
     const vencendo = licencas.filter(l => { const d = diasParaVencer(l.validade); return d !== null && d >= 0 && d <= 30 && l.status !== 'Vencida'; }).length;
-    const custoMensal = licencas.reduce((s, l) => s + (parseFloat(l.custo) || 0), 0);
+    const vencidas = licencas.filter(l => l.status === 'Vencida' || (diasParaVencer(l.validade) !== null && diasParaVencer(l.validade) < 0)).length;
+    const custoMensal = licencas.reduce((s, l) => s + getCustoMensal(l), 0);
     document.getElementById('resTotal').textContent = total;
     document.getElementById('resAtivas').textContent = ativas;
-    document.getElementById('resAtivasLbl').textContent = `🟢 ${ativas} ativa${ativas !== 1 ? 's' : ''}`;
     document.getElementById('resVencendo').textContent = vencendo;
+    document.getElementById('resVencidas').textContent = vencidas;
     document.getElementById('resMensal').textContent = fmtMoeda(custoMensal);
     document.getElementById('resAnual').textContent = fmtMoeda(custoMensal * 12);
   }
@@ -438,25 +461,30 @@
   function renderLicencas(lista) {
     const tbody = document.getElementById('licencasBody');
     const dados = lista !== undefined ? lista : getLicencasFiltradas();
-    if (dados.length === 0) { tbody.innerHTML = `<tr><td colspan="12" class="empty-state"><div style="font-size:32px;margin-bottom:10px">📄</div><div>Nenhuma licença encontrada.</div><div style="font-size:12px;margin-top:6px">Clique em "+ Adicionar Licença" para começar!</div></td></tr>`; return; }
-    tbody.innerHTML = dados.map(l => `
+    if (dados.length === 0) { tbody.innerHTML = `<tr><td colspan="14" class="empty-state"><div style="font-size:32px;margin-bottom:10px">📄</div><div>Nenhuma licença encontrada.</div><div style="font-size:12px;margin-top:6px">Clique em "+ Adicionar Licença" para começar!</div></td></tr>`; return; }
+    tbody.innerHTML = dados.map(l => {
+      const custoUnit = parseFloat(l.custoUnitario) || (parseFloat(l.custo) || 0);
+      const custoTotal = getCustoTotal(l);
+      const freq = l.frequencia || (l.custo ? 'Mensal' : '');
+      return `
       <tr>
         <td><div class="lic-nome">${l.nome}</div></td>
         <td><span class="lic-cat">${CAT_ICON[l.categoria]||'📄'} ${l.categoria||'—'}</span></td>
-        <td>${l.unidade||'—'}</td>
         <td>${l.fornecedor||'—'}</td>
-        <td>${fmtData(l.dataEmissao)}</td>
+        <td>${l.quantidade||'—'}</td>
         <td>${fmtValidade(l.validade, l.status)}</td>
-        <td>${l.custo ? fmtMoeda(l.custo)+'/mês' : '—'}</td>
+        <td>${custoUnit ? fmtMoeda(custoUnit) : '—'}</td>
+        <td>${custoTotal ? fmtMoeda(custoTotal) : '—'}</td>
+        <td>${freq||'—'}</td>
         <td>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${PEN_ICON[l.penalidade]||''} ${l.penalidade}</span>` : '—'}</td>
         <td><span class="status-badge ${STATUS_CLASS[l.status]||'status-ativa'}">${STATUS_ICON[l.status]||''} ${l.status||'Ativa'}</span></td>
-        <td>${l.responsavel||'—'}</td>
         <td><button class="btn-acao btn-acao-det" onclick="verDetalhes('${l._id}')" title="Ver detalhes">👁️</button></td>
         <td style="display:flex;gap:4px">
           <button class="btn-acao btn-acao-edit" onclick="editarLicenca('${l._id}')" title="Editar">✏️</button>
           <button class="btn-acao btn-acao-del" onclick="deletarLicenca('${l._id}')" title="Excluir">🗑️</button>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
   }
 
   function getLicencasFiltradas() {
@@ -515,14 +543,14 @@
   function abrirModalLicenca() {
     document.getElementById('licEditId').value = '';
     document.getElementById('modalLicTitulo').textContent = 'Nova Licença';
-    ['licNome','licFornecedor','licUnidade','licResponsavel','licResponsavelEmail','licQuantidade','licObservacoes'].forEach(id => document.getElementById(id).value = '');
+    ['licNome','licFornecedor','licUnidade','licResponsavel','licResponsavelEmail','licQuantidade','licObservacoes','licCustoUnitario','licCustoTotal'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('licCategoria').value = '';
     document.getElementById('licPenalidade').value = '';
     document.getElementById('licStatus').value = 'Ativa';
+    document.getElementById('licFrequencia').value = 'Mensal';
     document.getElementById('licAlertaDias').value = 30;
     document.getElementById('licDataEmissao').value = '';
     document.getElementById('licValidade').value = '';
-    document.getElementById('licCusto').value = '';
     documentosTemp = [];
     renderUploadLista();
     document.getElementById('modalLicenca').classList.add('aberto');
@@ -542,8 +570,10 @@
     document.getElementById('licDataEmissao').value = l.dataEmissao || '';
     document.getElementById('licValidade').value = l.validade || '';
     document.getElementById('licQuantidade').value = l.quantidade || '';
-    document.getElementById('licCusto').value = l.custo || '';
+    document.getElementById('licCustoUnitario').value = l.custoUnitario !== undefined ? l.custoUnitario : (l.custo || '');
+    document.getElementById('licFrequencia').value = l.frequencia || 'Mensal';
     document.getElementById('licStatus').value = l.status || 'Ativa';
+    atualizarCustoTotal();
     document.getElementById('licPenalidade').value = l.penalidade || '';
     document.getElementById('licAlertaDias').value = l.alertaDias || 30;
     document.getElementById('licObservacoes').value = l.observacoes || '';
@@ -565,7 +595,8 @@
       dataEmissao: document.getElementById('licDataEmissao').value,
       validade: document.getElementById('licValidade').value,
       quantidade: document.getElementById('licQuantidade').value.trim(),
-      custo: parseFloat(document.getElementById('licCusto').value) || 0,
+      custoUnitario: parseFloat(document.getElementById('licCustoUnitario').value) || 0,
+      frequencia: document.getElementById('licFrequencia').value,
       status: document.getElementById('licStatus').value,
       penalidade: document.getElementById('licPenalidade').value,
       alertaDias: parseInt(document.getElementById('licAlertaDias').value) || 30,
@@ -595,6 +626,9 @@
     try {
       const res = await fetch(`/api/licencas/${id}`, { headers: HEADERS });
       const l = await res.json();
+      const detCustoUnit = parseFloat(l.custoUnitario) || (parseFloat(l.custo) || 0);
+      const detCustoTotal = getCustoTotal(l);
+      const detFreq = l.frequencia || (l.custo ? 'Mensal' : '—');
       document.getElementById('detConteudo').innerHTML = `
         <div class="det-grid">
           <div class="det-item"><label>Nome</label><span>${l.nome}</span></div>
@@ -602,10 +636,12 @@
           <div class="det-item"><label>Fornecedor</label><span>${l.fornecedor||'—'}</span></div>
           <div class="det-item"><label>Unidade / Filial</label><span>${l.unidade||'—'}</span></div>
           <div class="det-item"><label>Quantidade</label><span>${l.quantidade||'—'}</span></div>
-          <div class="det-item"><label>Custo Mensal</label><span>${l.custo ? fmtMoeda(l.custo)+'/mês' : '—'}</span></div>
           <div class="det-item"><label>Data de Emissão</label><span>${fmtData(l.dataEmissao)}</span></div>
           <div class="det-item"><label>Data de Validade</label><span>${fmtData(l.validade)}</span></div>
           <div class="det-item"><label>Status</label><span class="status-badge ${STATUS_CLASS[l.status]||''}">${STATUS_ICON[l.status]||''} ${l.status||'—'}</span></div>
+          <div class="det-item"><label>Custo Unitário</label><span>${detCustoUnit ? fmtMoeda(detCustoUnit) : '—'}</span></div>
+          <div class="det-item"><label>Custo Total</label><span>${detCustoTotal ? fmtMoeda(detCustoTotal) : '—'}</span></div>
+          <div class="det-item"><label>Frequência</label><span>${detFreq}</span></div>
           <div class="det-item"><label>Penalidade</label><span>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${PEN_ICON[l.penalidade]||''} ${l.penalidade}</span>` : '—'}</span></div>
           <div class="det-item"><label>Responsável</label><span>${l.responsavel||'—'}</span></div>
           <div class="det-item"><label>Email Responsável</label><span>${l.responsavelEmail||'—'}</span></div>
@@ -676,73 +712,35 @@
     alert('Alertas salvos com sucesso!');
   }
 
-  // ===== VISTA =====
-  function mudarVista(vista) {
-    vistaAtual = vista;
-    document.getElementById('vistaTabela').style.display = vista === 'tabela' ? 'block' : 'none';
-    document.getElementById('vistaRelatorio').classList.toggle('ativo', vista === 'relatorio');
-    document.getElementById('btnTabela').classList.toggle('ativo', vista === 'tabela');
-    document.getElementById('btnRelatorio').classList.toggle('ativo', vista === 'relatorio');
-    if (vista === 'relatorio') renderRelatorio();
+  // ===== EXPORTAR CSV =====
+  function exportarCSV() {
+    const headers = ['Nome','Categoria','Unidade/Filial','Fornecedor','Quantidade','Data Emissão','Validade','Custo Unitário (R$)','Custo Total (R$)','Frequência','Penalidade','Status','Responsável','Email Responsável','Observações'];
+    const rows = licencas.map(l => [
+      l.nome||'',
+      l.categoria||'',
+      l.unidade||'',
+      l.fornecedor||'',
+      l.quantidade||'',
+      l.dataEmissao||'',
+      l.validade||'',
+      parseFloat(l.custoUnitario)||parseFloat(l.custo)||0,
+      getCustoTotal(l).toFixed(2),
+      l.frequencia||(l.custo?'Mensal':''),
+      l.penalidade||'',
+      l.status||'',
+      l.responsavel||'',
+      l.responsavelEmail||'',
+      l.observacoes||''
+    ].map(v => `"${String(v).replace(/"/g,'""')}"`));
+    const csv = [headers.map(h => `"${h}"`).join(';'), ...rows.map(r => r.join(';'))].join('\r\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `licencas_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
-
-  function renderRelatorio() {
-    const total = licencas.length;
-    const custoMensal = licencas.reduce((s,l) => s + (parseFloat(l.custo)||0), 0);
-    const porStatus = {};
-    const porCat = {};
-    licencas.forEach(l => {
-      porStatus[l.status] = (porStatus[l.status]||0) + 1;
-      porCat[l.categoria||'Outros'] = (porCat[l.categoria||'Outros']||0) + 1;
-    });
-    document.getElementById('relatorioConteudo').innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
-        <div style="background:white;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
-          <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:12px">📊 Por Status</div>
-          ${Object.entries(porStatus).map(([s,c]) => `
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span class="status-badge ${STATUS_CLASS[s]||'status-ativa'}">${STATUS_ICON[s]||''} ${s}</span>
-              <strong style="font-size:13px">${c} licença${c!==1?'s':''}</strong>
-            </div>`).join('') || '<div style="color:#a0aec0;font-size:12px">Sem dados</div>'}
-        </div>
-        <div style="background:white;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
-          <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:12px">📁 Por Categoria</div>
-          ${Object.entries(porCat).map(([c,n]) => `
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:12px;color:#4a5568">${CAT_ICON[c]||'📄'} ${c}</span>
-              <strong style="font-size:13px">${n}</strong>
-            </div>`).join('') || '<div style="color:#a0aec0;font-size:12px">Sem dados</div>'}
-        </div>
-      </div>
-      <div style="background:white;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
-        <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:14px">📋 Todas as Licenças</div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead><tr style="background:#f8fafc">
-            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">NOME</th>
-            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">FORNECEDOR</th>
-            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">VALIDADE</th>
-            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">CUSTO/MÊS</th>
-            <th style="padding:8px;text-align:left;border-bottom:1.5px solid #e2e8f0;color:#718096;font-size:11px">STATUS</th>
-          </tr></thead>
-          <tbody>
-            ${licencas.map(l => `<tr>
-              <td style="padding:8px;border-bottom:1px solid #f0f2f5;font-weight:600">${l.nome}</td>
-              <td style="padding:8px;border-bottom:1px solid #f0f2f5">${l.fornecedor||'—'}</td>
-              <td style="padding:8px;border-bottom:1px solid #f0f2f5">${fmtData(l.validade)}</td>
-              <td style="padding:8px;border-bottom:1px solid #f0f2f5">${l.custo ? fmtMoeda(l.custo) : '—'}</td>
-              <td style="padding:8px;border-bottom:1px solid #f0f2f5"><span class="status-badge ${STATUS_CLASS[l.status]||''}">${STATUS_ICON[l.status]||''} ${l.status||'—'}</span></td>
-            </tr>`).join('')}
-            <tr style="background:#f8fafc;font-weight:700">
-              <td colspan="3" style="padding:10px;text-align:right;color:#718096">TOTAL:</td>
-              <td style="padding:10px;color:#1e2a4a">${fmtMoeda(custoMensal)}/mês</td>
-              <td style="padding:10px;color:#1e2a4a">${fmtMoeda(custoMensal*12)}/ano</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>`;
-  }
-
-  function exportarRelatorio() { window.print(); }
 
   function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
   document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
@@ -911,5 +909,6 @@ function copiarPixBloqueio(codigo) {
   setInterval(carregarNotificacoes, 60000);
 </script>
   <script src="/global.js"></script>
+<script src="perfil-modal.js"></script>
 </body>
 </html>

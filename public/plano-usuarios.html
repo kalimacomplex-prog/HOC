@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -128,27 +128,30 @@
     <span class="logo-text">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
     <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/robos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M9 11V7a3 3 0 016 0v4"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>Robôs</a>
     <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-
     <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
     <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
-    <a class="menu-item active" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+    <details class="sidebar-sistema" id="sistemaMenu">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items">
+        <a class="menu-item" id="sidebarPlanos" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
+        <a class="menu-item" id="sidebarUsuarios" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
+        <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+      </div>
+    </details>
   </div>
 </div>
 
 <div class="main">
   <div id="bannerAssinatura" style="display:none"></div>
   <div class="header">
-    <div class="header-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Buscar...">
-    </div>
+    <div></div>
     <div class="header-right">
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
@@ -158,12 +161,11 @@
         <div class="notif-dropdown" id="notifDropdown">
           <div class="notif-drop-header">
             <span class="notif-drop-titulo">🔔 Notificações</span>
-            <div class="notif-drop-acoes"><button class="btn-ler-todas" onclick="lerTodas()">Marcar todas como lidas</button></div>
+            <div class="notif-drop-acoes"><button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button></div>
           </div>
           <div class="notif-lista" id="notifLista">
             <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
           </div>
-          <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
         </div>
       </div>
       <div class="header-user">
@@ -174,13 +176,6 @@
   </div>
 
   <div class="content" id="conteudo">
-    <div class="page-title">Plano e Usuários</div>
-    <div class="breadcrumb">Home > Plano e Usuários</div>
-
-    <div class="tabs">
-      <button class="tab active" onclick="mudarTab('usuarios', this)">👥 Usuários</button>
-      <button class="tab" onclick="mudarTab('assinatura', this)">💳 Assinatura</button>
-    </div>
 
     <!-- ===== ABA USUÁRIOS ===== -->
     <div id="tab-usuarios">
@@ -262,13 +257,11 @@
     <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="conviteSucesso"></div>
     <div class="form-group"><label>Nome</label><input type="text" id="conviteNome" placeholder="Nome completo"></div>
     <div class="form-group"><label>Email *</label><input type="email" id="conviteEmail" placeholder="email@empresa.com"></div>
-    <div class="mestre-row">
-      <div><div class="toggle-label" style="font-weight:600">Usuário Mestre</div><div class="toggle-desc">Acesso total ao sistema — ignora permissões abaixo</div></div>
-      <label class="toggle"><input type="checkbox" id="conviteMestre" onchange="toggleMestreConvite()"><span class="toggle-slider"></span></label>
-    </div>
+    <div class="form-group"><label>Perfil</label><select id="convitePerfil" onchange="onConvitePerfilChange()"><option>Usuário</option><option>Admin</option></select></div>
     <div id="permissoesConvite">
       <div class="perm-titulo">Permissões por Módulo</div>
       <div id="permModulosConvite"></div>
+      <div id="permFuturasConvite"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalConvite')">Cancelar</button>
@@ -287,16 +280,12 @@
     <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="editarErro"></div>
     <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="editarSucesso"></div>
     <input type="hidden" id="editarId">
-    <div class="form-group"><label>Nome</label><input type="text" id="editarNome"></div>
-    <div class="form-group"><label>Perfil</label><select id="editarPerfil"><option>Usuário</option><option>Gerente</option><option>Admin</option></select></div>
+    <div class="form-group"><label>Perfil</label><select id="editarPerfil" onchange="onEditarPerfilChange()"><option>Usuário</option><option>Admin</option></select></div>
     <div class="form-group"><label>Status</label><select id="editarStatus"><option>Ativo</option><option>Pendente</option><option>Inativo</option></select></div>
-    <div class="mestre-row">
-      <div><div class="toggle-label" style="font-weight:600">Usuário Mestre</div><div class="toggle-desc">Acesso total ao sistema — ignora permissões abaixo</div></div>
-      <label class="toggle"><input type="checkbox" id="editarMestre" onchange="toggleMestreEditar()"><span class="toggle-slider"></span></label>
-    </div>
     <div id="permissoesEditar">
       <div class="perm-titulo">Permissões por Módulo</div>
       <div id="editarPermModulos"></div>
+      <div id="editarPermFuturas"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalEditar')">Cancelar</button>
@@ -491,6 +480,19 @@
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
 
+  // Detectar tab pela URL e isolar conteúdo conforme entrada
+  function aplicarTabURL() {
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    const isAssinatura = tab === 'assinatura';
+    document.getElementById('sidebarPlanos').classList.toggle('active', isAssinatura);
+    document.getElementById('sidebarUsuarios').classList.toggle('active', !isAssinatura);
+    if (isAssinatura) {
+      document.getElementById('tab-usuarios').style.display = 'none';
+      document.getElementById('tab-assinatura').style.display = 'block';
+      carregarAssinatura();
+    }
+  }
+
   if (usuario.perfil !== 'Admin') {
     document.getElementById('conteudo').innerHTML = `<div class="acesso-negado"><h2>🔒 Acesso Restrito</h2><p>Apenas administradores podem acessar esta página.</p></div>`;
   }
@@ -506,16 +508,18 @@
 
   // ===== DEFINIÇÃO DOS MÓDULOS =====
   const MODULOS = [
-    { id: 'overview',       nome: '🏠 Overview',          acoes: ['acessar', 'editar'] },
-    { id: 'ideiasLivres',   nome: '💡 Ideias Livres',      acoes: ['acessar', 'criar', 'aprovar'] },
-    { id: 'gestaoMetas',    nome: '🎯 Gestão de Metas',    acoes: ['acessar', 'editar'] },
-    { id: 'gestaoProjetos', nome: '📁 Gestão de Projetos', acoes: ['acessar', 'criar', 'editar'] },
-    { id: 'gestaoLicencas', nome: '📋 Gestão de Licenças', acoes: ['acessar', 'criar', 'editar'] },
-    { id: 'operacoes',      nome: '⚙️ Operações',          acoes: ['acessar', 'criar', 'editar'] },
-    { id: 'planoUsuarios',  nome: '👥 Plano e Usuários',   acoes: ['acessar', 'gerenciar'] },
+    { id: 'overview',       nome: '🏠 Nivelamento de Conhecimento', acoes: ['acessar', 'editar', 'aprovar'] },
+    { id: 'ideiasLivres',   nome: '💡 Ideias Livres',               acoes: ['acessar', 'criar', 'aprovar'] },
+    { id: 'gestaoMetas',    nome: '🎯 Gestão de Metas e Resultados', acoes: ['acessar', 'editar'] },
+    { id: 'gestaoProjetos', nome: '📁 Gestão de Projetos',           acoes: ['acessar', 'criar', 'editar'] },
+    { id: 'gestaoLicencas', nome: '📋 Gestão de Licenças',           acoes: ['acessar', 'criar', 'editar'] },
+    { id: 'operacoes',      nome: '⚙️ Operações',                    acoes: ['acessar', 'criar', 'editar'] },
+    { id: 'planoUsuarios',  nome: '👥 Usuários e Permissões',        acoes: ['acessar', 'gerenciar'] },
   ];
 
-  const LABELS_ACAO = { acessar: 'Acessar', editar: 'Editar', criar: 'Criar', aprovar: 'Aprovar', gerenciar: 'Gerenciar' };
+  const LABELS_ACAO = { acessar: 'Acessar', editar: 'Editar', criar: 'Criar', aprovar: 'Aprovar Wikis', gerenciar: 'Adicionar/Remover Usuários' };
+  // Override label por módulo+ação
+  const LABEL_OVERRIDE = { 'ideiasLivres_aprovar': 'Aprovar Ideias', 'overview_aprovar': 'Aprovar Wikis' };
 
   // ===== RENDERIZAR MÓDULOS DE PERMISSÃO =====
   function renderPermModulos(containerId, permissoes, prefix) {
@@ -532,15 +536,33 @@
               const onChange = acao === 'acessar'
                 ? `onchange="bloquearSemAcesso('${prefix}','${m.id}',this)"`
                 : `onchange="sincronizarAcessar('${prefix}','${m.id}',this)"`;
+              const labelAcao = LABEL_OVERRIDE[`${m.id}_${acao}`] || LABELS_ACAO[acao];
               return `<label class="perm-acao">
                 <input type="checkbox" id="${prefix}_${m.id}_${acao}" ${checked} ${onChange}>
-                ${LABELS_ACAO[acao]}
+                ${labelAcao}
               </label>`;
             }).join('')}
           </div>
         </div>
       </div>`;
     }).join('');
+  }
+
+  function renderPermFuturas(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const futuras = [
+      { nome: '📁 Gestão de Projetos — Aprovações', descricao: 'TAP, Orçamento, Prazo, Mudanças Solicitadas, Encerramento e dispensa de mudanças' },
+      { nome: '⚙️ Edição do Fluxo de Valor', descricao: 'Permissão para criar e editar o Fluxo de Valor em Operações' },
+      { nome: '🚀 Funcionalidades Avançadas de Projetos', descricao: 'Ativar módulos e configurações avançadas de Gestão de Projetos' },
+    ];
+    container.innerHTML = `<div style="margin-top:12px;border-top:1px dashed #e2e8f0;padding-top:10px">
+      <div style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🔒 Permissões Futuras <span style="background:#f0f2f5;color:#718096;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;vertical-align:middle">Em breve</span></div>
+      ${futuras.map(f => `<div class="perm-modulo" style="opacity:0.5">
+        <div class="perm-modulo-header" style="display:flex;align-items:center;justify-content:space-between">${f.nome}<span style="font-size:10px;background:#e2e8f0;color:#718096;padding:1px 6px;border-radius:8px">Em breve</span></div>
+        <div class="perm-modulo-body"><div style="font-size:11px;color:#718096">${f.descricao}</div></div>
+      </div>`).join('')}
+    </div>`;
   }
 
   // Se marcar uma ação, garantir que "acessar" também fica marcado
@@ -600,7 +622,7 @@
   async function carregarUsuarios() {
     try {
       const res = await fetch('/api/usuarios', { headers: HEADERS });
-      if (res.status === 401) { window.location.href = '/'; return; }
+      if (res.status === 401) { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; return; }
       const usuarios = await res.json();
       const tbody = document.getElementById('tabelaUsuarios');
       if (!usuarios.length) {
@@ -610,17 +632,26 @@
       tbody.innerHTML = usuarios.map(u => {
         const permStr = encodeURIComponent(JSON.stringify(u.permissoes || {}));
         return `<tr>
-          <td><strong>${u.nome}</strong>${u.usuarioMestre ? ' <span style="font-size:10px;background:#f5f0ff;color:#2d1b69;padding:1px 6px;border-radius:3px;font-weight:700">Mestre</span>' : ''}</td>
+          <td><strong>${u.nome}</strong></td>
           <td>${u.email}</td>
           <td>${u.perfil}</td>
           <td><span class="badge ${u.status.toLowerCase()}">${u.status}</span></td>
           <td>
             <button class="btn-acao btn-editar" onclick="abrirModalEditar('${u._id}','${u.nome}','${u.perfil}','${u.status}',${u.usuarioMestre},'${permStr}')">✏️ Editar</button>
-            <button class="btn-acao btn-deletar" onclick="deletarUsuario('${u._id}','${u.nome}')">🗑️</button>
+            <button class="btn-acao btn-deletar" onclick="deletarUsuario('${u._id}','${u.nome}')">Remover</button>
           </td>
         </tr>`;
       }).join('');
     } catch(err) { console.error(err); }
+  }
+
+  function onConvitePerfilChange() {
+    const isAdmin = document.getElementById('convitePerfil').value === 'Admin';
+    const section = document.getElementById('permissoesConvite');
+    section.style.opacity = isAdmin ? '0.4' : '1';
+    section.style.pointerEvents = isAdmin ? 'none' : 'auto';
+    if (isAdmin) definirTodasPermissoes('conv', true);
+    else renderPermModulos('permModulosConvite', permissoesPadrao, 'conv');
   }
 
   function abrirModalConvite() {
@@ -628,52 +659,38 @@
     document.getElementById('conviteSucesso').style.display = 'none';
     document.getElementById('conviteNome').value = '';
     document.getElementById('conviteEmail').value = '';
-    document.getElementById('conviteMestre').checked = false;
+    document.getElementById('convitePerfil').value = 'Usuário';
     document.getElementById('permissoesConvite').style.opacity = '1';
     document.getElementById('permissoesConvite').style.pointerEvents = 'auto';
     renderPermModulos('permModulosConvite', permissoesPadrao, 'conv');
+    renderPermFuturas('permFuturasConvite');
     document.getElementById('modalConvite').classList.add('aberto');
-  }
-
-  function toggleMestreConvite() {
-    const mestre = document.getElementById('conviteMestre').checked;
-    const section = document.getElementById('permissoesConvite');
-    section.style.opacity = mestre ? '0.4' : '1';
-    section.style.pointerEvents = mestre ? 'none' : 'auto';
-    if (mestre) definirTodasPermissoes('conv', true);
-    else renderPermModulos('permModulosConvite', permissoesPadrao, 'conv');
   }
 
   function abrirModalEditar(id, nome, perfil, status, usuarioMestre, permEnc) {
     let permissoes = {};
     try { permissoes = JSON.parse(decodeURIComponent(permEnc)); } catch(e) {}
     document.getElementById('editarId').value = id;
-    document.getElementById('editarNome').value = nome;
-    document.getElementById('editarPerfil').value = perfil;
+    document.getElementById('editarPerfil').value = perfil === 'Gerente' ? 'Usuário' : perfil;
     document.getElementById('editarStatus').value = status;
-    document.getElementById('editarMestre').checked = usuarioMestre === true || usuarioMestre === 'true';
     document.getElementById('editarErro').style.display = 'none';
     document.getElementById('editarSucesso').style.display = 'none';
     renderPermModulos('editarPermModulos', permissoes, 'edit');
-    // Se mestre, desativar seção de permissões
-    const section = document.getElementById('permissoesEditar');
-    if (usuarioMestre === true || usuarioMestre === 'true') {
-      section.style.opacity = '0.4';
-      section.style.pointerEvents = 'none';
-      definirTodasPermissoes('edit', true);
-    } else {
-      section.style.opacity = '1';
-      section.style.pointerEvents = 'auto';
-    }
+    renderPermFuturas('editarPermFuturas');
+    const isAdmin = perfil === 'Admin' || usuarioMestre === true || usuarioMestre === 'true';
+    setPermissoesEditar(isAdmin);
     document.getElementById('modalEditar').classList.add('aberto');
   }
 
-  function toggleMestreEditar() {
-    const mestre = document.getElementById('editarMestre').checked;
+  function setPermissoesEditar(isAdmin) {
     const section = document.getElementById('permissoesEditar');
-    section.style.opacity = mestre ? '0.4' : '1';
-    section.style.pointerEvents = mestre ? 'none' : 'auto';
-    if (mestre) definirTodasPermissoes('edit', true);
+    section.style.opacity = isAdmin ? '0.4' : '1';
+    section.style.pointerEvents = isAdmin ? 'none' : 'auto';
+    if (isAdmin) definirTodasPermissoes('edit', true);
+  }
+
+  function onEditarPerfilChange() {
+    setPermissoesEditar(document.getElementById('editarPerfil').value === 'Admin');
   }
 
   function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
@@ -684,7 +701,8 @@
   async function enviarConvite() {
     const email = document.getElementById('conviteEmail').value.trim();
     const nome = document.getElementById('conviteNome').value.trim();
-    const usuarioMestre = document.getElementById('conviteMestre').checked;
+    const perfil = document.getElementById('convitePerfil').value;
+    const usuarioMestre = perfil === 'Admin';
     const btn = document.getElementById('btnEnviar');
     const erro = document.getElementById('conviteErro');
     const sucesso = document.getElementById('conviteSucesso');
@@ -695,7 +713,7 @@
     try {
       const res = await fetch('/api/convites', {
         method: 'POST', headers: HEADERS,
-        body: JSON.stringify({ nome, email, usuarioMestre, permissoes })
+        body: JSON.stringify({ nome, email, perfil, usuarioMestre, permissoes })
       });
       const data = await res.json();
       if (!res.ok) { erro.textContent = data.erro || 'Erro ao enviar convite.'; erro.style.display = 'block'; return; }
@@ -708,21 +726,19 @@
 
   async function salvarEdicao() {
     const id = document.getElementById('editarId').value;
-    const nome = document.getElementById('editarNome').value.trim();
     const perfil = document.getElementById('editarPerfil').value;
     const status = document.getElementById('editarStatus').value;
-    const usuarioMestre = document.getElementById('editarMestre').checked;
+    const usuarioMestre = perfil === 'Admin';
     const permissoes = lerPermModulos('edit');
     const btn = document.getElementById('btnSalvar');
     const erro = document.getElementById('editarErro');
     const sucesso = document.getElementById('editarSucesso');
     erro.style.display = 'none'; sucesso.style.display = 'none';
-    if (!nome) { erro.textContent = 'Nome é obrigatório.'; erro.style.display = 'block'; return; }
     btn.disabled = true; btn.textContent = 'Salvando...';
     try {
       const res = await fetch(`/api/usuarios/${id}`, {
         method: 'PUT', headers: HEADERS,
-        body: JSON.stringify({ nome, perfil, status, usuarioMestre, permissoes })
+        body: JSON.stringify({ perfil, status, usuarioMestre, permissoes })
       });
       const data = await res.json();
       if (!res.ok) { erro.textContent = data.erro || 'Erro ao salvar.'; erro.style.display = 'block'; return; }
@@ -1333,9 +1349,11 @@
 
   // INIT
   carregarUsuarios();
+  aplicarTabURL();
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
   <script src="/global.js"></script>
+<script src="perfil-modal.js"></script>
 </body>
 </html>

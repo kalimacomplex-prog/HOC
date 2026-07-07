@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -72,12 +72,41 @@
     .modo-conexao-aviso { padding: 8px 14px; background: #f0fff4; border-radius: 6px; font-size: 12px; color: #276749; display: none; margin-bottom: 12px; }
     .modo-conexao-aviso.ativo { display: block; }
     .org-node.selecionado-conexao { border-color: #38a169; box-shadow: 0 0 0 3px rgba(56,161,105,0.3); }
+    .conn-del-btn { opacity: 0; transition: opacity 0.15s; }
+    .org-container:hover .conn-del-btn { opacity: 0.45; }
+    .conn-del-btn:hover { opacity: 1 !important; }
     .bib-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-    .pasta-sidebar-btn { display: block; width: 100%; text-align: left; padding: 8px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #718096; margin-bottom: 3px; transition: all 0.2s; }
+    .bib-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
+    .pasta-sidebar-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 7px 8px 7px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #718096; margin-bottom: 2px; transition: all 0.2s; gap: 4px; }
     .pasta-sidebar-btn:hover { background: #f8fafc; color: #1e2a4a; }
+    .pasta-sidebar-btn:hover .pasta-acoes { opacity: 1; }
     .pasta-sidebar-btn.active { background: #f5f0ff; color: #2d1b69; font-weight: 700; }
+    .pasta-acoes { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+    .pasta-acao-btn { background: none; border: none; cursor: pointer; padding: 1px 3px; border-radius: 3px; font-size: 10px; color: #a0aec0; line-height: 1; }
+    .pasta-acao-btn:hover { background: #e2e8f0; color: #4a5568; }
+    .pasta-children { padding-left: 12px; border-left: 1.5px solid #e2e8f0; margin-left: 10px; }
     .bib-search { flex: 1; min-width: 200px; padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
     .bib-search:focus { border-color: #2d1b69; }
+    .upload-drop-zone { border: 2px dashed #e2e8f0; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; color: #a0aec0; font-size: 13px; }
+    .upload-drop-zone:hover, .upload-drop-zone.drag-over { border-color: #2d1b69; background: #f5f0ff; color: #2d1b69; }
+    .bib-explorer { padding: 8px; }
+    .bib-breadcrumb { display: flex; align-items: center; gap: 4px; padding: 8px 10px; font-size: 11px; color: #718096; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; margin-bottom: 6px; }
+    .bib-breadcrumb span { cursor: pointer; color: #2d1b69; font-weight: 600; }
+    .bib-breadcrumb span:hover { text-decoration: underline; }
+    .bib-breadcrumb .sep { color: #cbd5e0; cursor: default; }
+    .pasta-explorer-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; color: #4a5568; transition: all 0.15s; margin-bottom: 2px; gap: 4px; }
+    .pasta-explorer-item:hover { background: #f8fafc; color: #1e2a4a; }
+    .pasta-explorer-item:hover .pasta-acoes { opacity: 1; }
+    .pasta-explorer-item.active { background: #f5f0ff; color: #2d1b69; font-weight: 700; }
+    .versao-historia { background: #f8fafc; border-radius: 8px; border: 1.5px solid #e2e8f0; overflow: hidden; display: none; width: 280px; flex-shrink: 0; align-self: flex-start; max-height: calc(100vh - 220px); overflow-y: auto; }
+    .versao-historia.aberto { display: block; }
+    .versao-historia-header { padding: 10px 14px; font-size: 12px; font-weight: 700; color: #1e2a4a; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+    .versao-historia-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #f0f2f5; font-size: 12px; color: #4a5568; }
+    .versao-historia-item:last-child { border-bottom: none; }
+    .versao-historia-item.atual { background: #f0fff4; }
+    .editor-area[contenteditable="false"] { background: #f8fafc; color: #718096; cursor: not-allowed; }
+    .toolbar-select { padding: 4px 6px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 12px; color: #4a5568; background: white; cursor: pointer; outline: none; }
+    .toolbar-sep { width: 1px; background: #e2e8f0; margin: 0 2px; align-self: stretch; }
     .wiki-table { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
     .wiki-tag { display: inline-block; padding: 2px 7px; background: #f0f2f5; color: #4a5568; border-radius: 4px; font-size: 11px; margin-right: 3px; }
     .versao-badge { display: inline-block; padding: 2px 7px; background: #f0f2f5; color: #4a5568; border-radius: 4px; font-size: 11px; font-weight: 600; }
@@ -85,11 +114,24 @@
     .wiki-editor.active { display: block; }
     .editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f2f5; }
     .editor-titulo-input { font-size: 18px; font-weight: 700; color: #1e2a4a; border: none; outline: none; flex: 1; margin-right: 16px; font-family: inherit; }
-    .editor-toolbar { display: flex; gap: 3px; padding: 6px; background: #f8fafc; border-radius: 6px 6px 0 0; border: 1.5px solid #e2e8f0; border-bottom: none; flex-wrap: wrap; }
+    .editor-toolbar { display: flex; gap: 3px; padding: 6px; background: #f8fafc; border-radius: 6px; border: 1.5px solid #e2e8f0; flex-wrap: wrap; margin-bottom: 8px; }
     .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #4a5568; }
     .toolbar-btn:hover { background: #e2e8f0; }
-    .editor-area { min-height: 250px; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 0 0 6px 6px; outline: none; font-size: 13px; line-height: 1.7; color: #1e2a4a; }
-    .editor-area:focus { border-color: #2d1b69; }
+    .editor-wrap { background: #dde3e8; padding: 24px 20px; border-radius: 6px; min-height: 400px; overflow-y: auto; }
+    .editor-area { min-height: 600px; padding: 56px 72px; border: none; outline: none; font-size: 13px; line-height: 1.8; color: #1e2a4a; background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.12); width: 100%; max-width: 720px; margin: 0 auto; display: block; }
+    .editor-area:focus { outline: none; }
+    .editor-area[contenteditable="false"] { cursor: default; }
+    .editor-area ul, .editor-area ol { padding-left: 24px; margin: 4px 0; }
+    .editor-area ul { list-style-type: disc; }
+    .editor-area ol { list-style-type: decimal; }
+    .editor-area li { margin: 2px 0; }
+    .editor-area ul ul, .editor-area ol ol, .editor-area ul ol, .editor-area ol ul { padding-left: 24px; margin: 2px 0; }
+    .editor-area h1 { font-size: 24px; font-weight: 700; margin: 0 0 12px; color: #1e2a4a; }
+    .editor-area h2 { font-size: 19px; font-weight: 700; margin: 20px 0 8px; color: #1e2a4a; }
+    .editor-area h3 { font-size: 16px; font-weight: 700; margin: 16px 0 6px; color: #1e2a4a; }
+    .editor-area h4 { font-size: 14px; font-weight: 700; margin: 12px 0 4px; color: #1e2a4a; }
+    .editor-area p { margin: 0 0 8px; }
+    .editor-area pre { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 10px 14px; font-size: 12px; overflow-x: auto; }
     .editor-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
     .oraculo-wrap { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .oraculo-hero { text-align: center; margin-bottom: 28px; }
@@ -112,6 +154,54 @@
     .chat-input { flex: 1; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; }
     .chat-send { padding: 8px 16px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.5; }
     .oraculo-aviso { text-align: center; margin-top: 12px; padding: 8px; background: #fffaf0; border-radius: 6px; font-size: 12px; color: #c05621; }
+
+    /* ===== OVERVIEW UX ===== */
+    .header-search { display: none; }
+    .header-right { margin-left: auto; }
+    .section-bloco { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid #edf2f7; }
+    .section-header { display: flex; align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1.5px solid #f0f2f5; }
+    .section-icon { width: 32px; height: 32px; border-radius: 8px; background: #f5f0ff; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .section-titulo-text { font-size: 11px; font-weight: 700; color: #1e2a4a; text-transform: uppercase; letter-spacing: 0.9px; }
+    .timeline-rich-toolbar { display: flex; gap: 3px; padding: 6px; background: #f8fafc; border-radius: 6px 6px 0 0; border: 1.5px solid #e2e8f0; border-bottom: none; flex-wrap: wrap; }
+    .timeline-rich-editor { min-height: 90px; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 0 0 6px 6px; outline: none; font-size: 13px; line-height: 1.7; color: #1e2a4a; font-family: inherit; }
+    .timeline-rich-editor:focus { border-color: #2d1b69; }
+    .timeline-rich-editor:empty:before { content: attr(placeholder); color: #a0aec0; pointer-events: none; }
+    .timeline-desc a { color: #2d1b69; text-decoration: underline; }
+    .timeline-desc ul, .timeline-desc ol { padding-left: 18px; margin: 4px 0; }
+    .btn-add-timeline { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f5f0ff; color: #2d1b69; border: 1.5px solid #d6bcfa; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-left: auto; }
+    .btn-add-timeline:hover { background: #ede9ff; }
+    .mvv-grid { margin-bottom: 0; }
+    .esg-card { border: 1px solid #edf2f7; }
+    .timeline-item { cursor: default; }
+    .timeline-item:hover .timeline-del { opacity: 1; }
+    .timeline-del { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: #c53030; cursor: pointer; font-size: 12px; padding: 0 4px; }
+    .timeline-edit { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: #2d1b69; cursor: pointer; font-size: 12px; padding: 0 4px; }
+    .timeline-item:hover .timeline-edit { opacity: 1; }
+    .rich-toolbar { display: none; gap: 3px; padding: 5px; background: #f8fafc; border-radius: 6px 6px 0 0; border: 1.5px solid #e2e8f0; border-bottom: none; flex-wrap: wrap; margin-top: 8px; }
+    .rich-editor { min-height: 60px; padding: 8px 10px; border: 1.5px solid transparent; border-radius: 6px; outline: none; font-size: 13px; line-height: 1.7; color: #1e2a4a; font-family: inherit; }
+    .rich-toolbar + .rich-editor { border-radius: 0 0 6px 6px; border-top: none; }
+    .rich-editor[contenteditable="true"] { border-color: #e2e8f0; cursor: text; }
+    .rich-editor[contenteditable="true"]:focus { border-color: #2d1b69; }
+    .rich-editor:empty:before { content: attr(placeholder); color: #a0aec0; pointer-events: none; }
+    .rich-editor ul, .rich-editor ol,
+    .timeline-rich-editor ul, .timeline-rich-editor ol,
+    .timeline-desc ul, .timeline-desc ol { padding-left: 20px; margin: 4px 0; list-style-position: outside; }
+    .rich-editor ul, .timeline-rich-editor ul, .timeline-desc ul { list-style-type: disc; }
+    .rich-editor ol, .timeline-rich-editor ol, .timeline-desc ol { list-style-type: decimal; }
+    .rich-editor a, .timeline-desc a { color: #2d1b69; text-decoration: underline; }
+    .edit-barra-global { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
+    .dep-sidebar-row { display:flex; align-items:center; justify-content:space-between; padding:7px 8px; border-radius:6px; cursor:pointer; transition:all 0.2s; margin-bottom:2px; }
+    .dep-sidebar-row:hover { background:#f8fafc; }
+    .dep-sidebar-row:hover .dep-row-acoes { opacity:1; }
+    .dep-sidebar-row.active { background:#f5f0ff; }
+    .dep-row-acoes { display:flex; gap:2px; opacity:0; transition:opacity 0.2s; flex-shrink:0; }
+    .conn-handle { position:absolute; width:12px; height:12px; background:white; border:2px solid; border-radius:50%; cursor:crosshair; opacity:0; transition:opacity 0.15s; z-index:10; }
+    .org-node:hover .conn-handle { opacity:1; }
+    .org-container { overflow:visible !important; }
+    .org-nome-wrap { position:relative; }
+    .org-nome-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1.5px solid #e2e8f0; border-top:none; border-radius:0 0 6px 6px; max-height:160px; overflow-y:auto; display:none; z-index:200; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .org-nome-item { padding:8px 12px; cursor:pointer; border-bottom:1px solid #f0f2f5; }
+    .org-nome-item:hover { background:#f8fafc; }
   </style>
 </head>
 <body>
@@ -122,17 +212,23 @@
     <span class="logo-text">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item active" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Overview</a>
+    <a class="menu-item active" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
     <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas</a>
+    <a class="menu-item" href="/robos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M9 11V7a3 3 0 016 0v4"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>Robôs</a>
     <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Permissionamentos</a>
-    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
     <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
-    <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Plano e Usuários</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+    <details class="sidebar-sistema" id="sistemaMenu">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items">
+        <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
+        <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
+        <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+      </div>
+    </details>
   </div>
 </div>
 
@@ -153,13 +249,12 @@
           <div class="notif-drop-header">
             <span class="notif-drop-titulo">🔔 Notificações</span>
             <div class="notif-drop-acoes">
-              <button class="btn-ler-todas" onclick="lerTodas()">Marcar todas como lidas</button>
+              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button>
             </div>
           </div>
           <div class="notif-lista" id="notifLista">
             <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
           </div>
-          <div class="notif-drop-footer"><a href="/gestao-licencas">Ver gestão de licenças →</a></div>
         </div>
       </div>
       <div class="header-user">
@@ -170,8 +265,7 @@
   </div>
 
   <div class="content">
-    <div class="page-title">Overview</div>
-    <div class="breadcrumb">Home > Overview</div>
+    <div class="page-title" style="text-transform:uppercase;letter-spacing:0.5px">Overview</div>
 
     <div class="tabs">
       <button class="tab active" onclick="mudarTab('visao-geral', this)">Visão Geral</button>
@@ -182,80 +276,160 @@
 
     <!-- VISÃO GERAL -->
     <div class="tab-content active" id="tab-visao-geral">
-      <div class="sobre-card">
-        <div class="sobre-header">
-          <span class="sobre-titulo">Sobre a Empresa</span>
-          <div>
-            <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()" style="font-size:12px;padding:6px 12px">✏️ Editar</button>
-            <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none;font-size:12px;padding:6px 12px">💾 Salvar</button>
-          </div>
+
+      <div class="edit-barra-global">
+        <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()" style="font-size:12px;padding:6px 12px">✏️ Editar</button>
+        <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none;font-size:12px;padding:6px 12px">💾 Salvar</button>
+      </div>
+
+      <!-- SOBRE A EMPRESA -->
+      <div class="section-bloco">
+        <div class="section-header">
+          <div class="section-icon">🏢</div>
+          <span class="section-titulo-text">Sobre a Empresa</span>
         </div>
         <div class="info-grid">
-          <div class="info-item"><div class="info-label">Definição</div><div class="info-value" id="val-definicao">Clique em Editar para adicionar.</div><textarea class="info-textarea" id="inp-definicao" style="display:none" placeholder="Descreva sua empresa..."></textarea></div>
+          <div class="info-item"><div class="info-label">Resumo</div><div class="info-value" id="val-definicao">Clique em Editar para adicionar.</div><textarea class="info-textarea" id="inp-definicao" style="display:none" placeholder="Descreva sua empresa..."></textarea></div>
           <div class="info-item"><div class="info-label">Data de Fundação</div><div class="info-value" id="val-fundacao">—</div><input type="text" class="info-input" id="inp-fundacao" style="display:none" placeholder="Ex: 12/03/2020"></div>
           <div class="info-item"><div class="info-label">Setor de Atuação</div><div class="info-value" id="val-setor">—</div><input type="text" class="info-input" id="inp-setor" style="display:none" placeholder="Ex: Tecnologia da Informação"></div>
           <div class="info-item"><div class="info-label">Site / Contato</div><div class="info-value" id="val-site">—</div><input type="text" class="info-input" id="inp-site" style="display:none" placeholder="Ex: www.empresa.com.br"></div>
         </div>
-      </div>
-
-      <div class="mvv-grid">
-        <div class="mvv-card">
-          <div class="mvv-titulo">🎯 Missão</div>
-          <div class="mvv-texto" id="val-missao">Clique em Editar para adicionar.</div>
-          <textarea class="mvv-textarea" id="inp-missao" style="display:none" placeholder="Nossa missão é..."></textarea>
-        </div>
-        <div class="mvv-card" style="border-top-color:#38a169">
-          <div class="mvv-titulo" style="color:#38a169">👁️ Visão</div>
-          <div class="mvv-texto" id="val-visao">Clique em Editar para adicionar.</div>
-          <textarea class="mvv-textarea" id="inp-visao" style="display:none" placeholder="Nossa visão é..."></textarea>
-        </div>
-        <div class="mvv-card" style="border-top-color:#6b46c1">
-          <div class="mvv-titulo" style="color:#6b46c1">💎 Valores</div>
-          <div class="mvv-texto" id="val-valores">Clique em Editar para adicionar.</div>
-          <textarea class="mvv-textarea" id="inp-valores" style="display:none" placeholder="Nossos valores são..."></textarea>
+        <div id="customCamposContainer"></div>
+        <div id="btnNovaCatWrap" style="display:none;margin-top:16px;padding-top:14px;border-top:1px dashed #e2e8f0">
+          <button onclick="abrirModalNovaCategoria()" style="font-size:12px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:600">+ Nova Categoria</button>
         </div>
       </div>
 
-      <div class="sobre-card">
-        <div class="sobre-header"><span class="sobre-titulo">📅 História</span></div>
+      <!-- MISSÃO, VISÃO E VALORES -->
+      <div class="section-bloco">
+        <div class="section-header">
+          <div class="section-icon" style="background:#f0fff4">🎯</div>
+          <span class="section-titulo-text">Missão, Visão e Valores</span>
+        </div>
+        <div class="mvv-grid">
+          <div class="mvv-card">
+            <div class="mvv-titulo">🎯 Missão</div>
+            <div class="rich-toolbar" id="tb-missao" style="display:none;margin-top:8px">
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','bold')" title="Negrito"><b>B</b></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','italic')" title="Itálico"><i>I</i></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','insertUnorderedList')" title="Lista">• Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','insertOrderedList')" title="Numerada">1. Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-missao')" title="Link">🔗</button>
+            </div>
+            <div class="mvv-texto rich-editor" id="val-missao" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossa missão é...">Clique em Editar para adicionar.</div>
+          </div>
+          <div class="mvv-card" style="border-top-color:#38a169">
+            <div class="mvv-titulo" style="color:#38a169">👁️ Visão</div>
+            <div class="rich-toolbar" id="tb-visao" style="display:none;margin-top:8px">
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','bold')" title="Negrito"><b>B</b></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','italic')" title="Itálico"><i>I</i></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','insertUnorderedList')" title="Lista">• Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','insertOrderedList')" title="Numerada">1. Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-visao')" title="Link">🔗</button>
+            </div>
+            <div class="mvv-texto rich-editor" id="val-visao" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossa visão é...">Clique em Editar para adicionar.</div>
+          </div>
+          <div class="mvv-card" style="border-top-color:#6b46c1">
+            <div class="mvv-titulo" style="color:#6b46c1">💎 Valores</div>
+            <div class="rich-toolbar" id="tb-valores" style="display:none;margin-top:8px">
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','bold')" title="Negrito"><b>B</b></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','italic')" title="Itálico"><i>I</i></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','insertUnorderedList')" title="Lista">• Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','insertOrderedList')" title="Numerada">1. Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-valores')" title="Link">🔗</button>
+            </div>
+            <div class="mvv-texto rich-editor" id="val-valores" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossos valores são...">Clique em Editar para adicionar.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTÓRIA -->
+      <div class="section-bloco">
+        <div class="section-header">
+          <div class="section-icon" style="background:#fff8f0">📅</div>
+          <span class="section-titulo-text">História</span>
+          <button class="btn-add-timeline" id="btnAddTimeline" onclick="abrirModalTimeline()" style="display:none">+ Adicionar Marco</button>
+        </div>
         <div class="timeline" id="timeline"><p style="color:#a0aec0;font-size:13px">Nenhum marco histórico adicionado ainda.</p></div>
-        <button class="btn-add-timeline" id="btnAddTimeline" onclick="abrirModalTimeline()">+ Adicionar Marco</button>
       </div>
 
-      <div class="sobre-card">
-        <div class="sobre-header"><span class="sobre-titulo">🌱 Highlights ESG</span></div>
+      <!-- HIGHLIGHTS ESG -->
+      <div class="section-bloco">
+        <div class="section-header">
+          <div class="section-icon" style="background:#f0fff4">🌱</div>
+          <span class="section-titulo-text">Highlights ESG</span>
+        </div>
         <div class="esg-grid">
-          <div class="esg-card"><div class="esg-badge esg-e">E — Ambiental</div><div class="esg-texto" id="val-esg-e">Clique em Editar para adicionar.</div><textarea class="esg-textarea" id="inp-esg-e" style="display:none" placeholder="Iniciativas ambientais..."></textarea></div>
-          <div class="esg-card"><div class="esg-badge esg-s">S — Social</div><div class="esg-texto" id="val-esg-s">Clique em Editar para adicionar.</div><textarea class="esg-textarea" id="inp-esg-s" style="display:none" placeholder="Iniciativas sociais..."></textarea></div>
-          <div class="esg-card"><div class="esg-badge esg-g">G — Governança</div><div class="esg-texto" id="val-esg-g">Clique em Editar para adicionar.</div><textarea class="esg-textarea" id="inp-esg-g" style="display:none" placeholder="Práticas de governança..."></textarea></div>
+          <div class="esg-card">
+            <div class="esg-badge esg-e">E — Ambiental</div>
+            <div class="rich-toolbar" id="tb-esg-e" style="display:none">
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','bold')"><b>B</b></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','italic')"><i>I</i></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','insertUnorderedList')">• Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','insertOrderedList')">1. Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-e')">🔗</button>
+            </div>
+            <div class="esg-texto rich-editor" id="val-esg-e" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Iniciativas ambientais...">Clique em Editar para adicionar.</div>
+          </div>
+          <div class="esg-card">
+            <div class="esg-badge esg-s">S — Social</div>
+            <div class="rich-toolbar" id="tb-esg-s" style="display:none">
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','bold')"><b>B</b></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','italic')"><i>I</i></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','insertUnorderedList')">• Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','insertOrderedList')">1. Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-s')">🔗</button>
+            </div>
+            <div class="esg-texto rich-editor" id="val-esg-s" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Iniciativas sociais...">Clique em Editar para adicionar.</div>
+          </div>
+          <div class="esg-card">
+            <div class="esg-badge esg-g">G — Governança</div>
+            <div class="rich-toolbar" id="tb-esg-g" style="display:none">
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','bold')"><b>B</b></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','italic')"><i>I</i></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','insertUnorderedList')">• Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','insertOrderedList')">1. Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-g')">🔗</button>
+            </div>
+            <div class="esg-texto rich-editor" id="val-esg-g" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Práticas de governança...">Clique em Editar para adicionar.</div>
+          </div>
         </div>
       </div>
+
     </div>
 
     <!-- NOSSO TIME -->
     <div class="tab-content" id="tab-nosso-time">
-      <div class="time-toolbar">
-        <div class="deps-lista" id="listaDeps"><button class="dep-btn active" onclick="selecionarDep(this,'todos')">Todos os Departamentos</button></div>
-        <div class="time-acoes">
-          <div style="display:flex;align-items:center;gap:4px;background:white;border:1.5px solid #e2e8f0;border-radius:6px;padding:3px 8px">
-            <button onclick="ajustarZoom(-1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#718096;padding:0 2px;line-height:1" title="Diminuir">−</button>
-            <span id="zoomLabel" style="font-size:11px;font-weight:600;color:#4a5568;min-width:32px;text-align:center">100%</span>
-            <button onclick="ajustarZoom(1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#718096;padding:0 2px;line-height:1" title="Aumentar">+</button>
+      <div style="display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start">
+        <!-- Sidebar Departamentos -->
+        <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;position:sticky;top:72px">
+          <div style="padding:12px 14px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:12px;font-weight:700;color:#1e2a4a">DEPARTAMENTOS</span>
+            <button onclick="abrirModalDep()" style="padding:3px 7px;background:#f0f2f5;border:none;border-radius:4px;font-size:11px;cursor:pointer;color:#4a5568;font-weight:600">+ Novo</button>
           </div>
-          <button class="btn-secondary" onclick="toggleModoConexao()" id="btnConexao" style="font-size:12px;padding:6px 12px">🔗 Conectar</button>
-          <button class="btn-secondary" onclick="abrirModalDep()" style="font-size:12px;padding:6px 12px">+ Novo Departamento</button>
-          <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px;padding:6px 12px">+ Membro</button>
+          <div id="depsSidebar" style="padding:8px">
+            <div style="padding:12px 10px;font-size:12px;color:#a0aec0;text-align:center">Nenhum departamento</div>
+          </div>
         </div>
-      </div>
-      <div class="modo-conexao-aviso" id="modoConexaoAviso">🔗 Modo conexão ativo — clique em dois membros para conectá-los. Clique em "Conectar" novamente para sair.</div>
-      <div class="modo-conexao-aviso" id="modoConexaoAviso">🔗 Modo conexão ativo — clique em dois membros para conectá-los. Clique em "Conectar" para sair.</div>
-      <div class="org-container">
-        <div class="org-canvas" id="orgCanvas">
-          <svg class="org-svg" id="orgSvg"></svg>
-          <div class="org-empty" id="orgEmpty" style="display:flex">
-            <div style="font-size:40px">👥</div>
-            <div style="font-size:14px;color:#a0aec0">Nenhum membro adicionado ainda</div>
-            <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px">+ Adicionar Membro</button>
+        <!-- Canvas -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:12px">
+            <div style="display:flex;align-items:center;gap:4px;background:white;border:1.5px solid #e2e8f0;border-radius:6px;padding:3px 8px">
+              <button onclick="ajustarZoom(-1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#718096;padding:0 2px;line-height:1" title="Diminuir">−</button>
+              <span id="zoomLabel" style="font-size:11px;font-weight:600;color:#4a5568;min-width:32px;text-align:center">100%</span>
+              <button onclick="ajustarZoom(1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#718096;padding:0 2px;line-height:1" title="Aumentar">+</button>
+            </div>
+            <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px;padding:6px 12px">+ Membro</button>
+          </div>
+          <div class="org-container">
+            <div class="org-canvas" id="orgCanvas">
+              <svg class="org-svg" id="orgSvg"></svg>
+              <div class="org-empty" id="orgEmpty" style="display:flex">
+                <div style="font-size:40px">👥</div>
+                <div style="font-size:14px;color:#a0aec0">Nenhum membro adicionado ainda</div>
+                <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px">+ Adicionar Membro</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -265,30 +439,28 @@
     <div class="tab-content" id="tab-biblioteca">
       <div id="bibLista">
         <div style="display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start">
-          <!-- Sidebar Pastas -->
-          <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;position:sticky;top:0">
-            <div style="padding:12px 14px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between">
+          <!-- Sidebar Pastas (Explorer) -->
+          <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;position:sticky;top:72px">
+            <div style="padding:10px 14px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between">
               <span style="font-size:12px;font-weight:700;color:#1e2a4a">PASTAS</span>
               <button onclick="criarPasta()" style="padding:3px 7px;background:#f0f2f5;border:none;border-radius:4px;font-size:11px;cursor:pointer;color:#4a5568;font-weight:600">+ Nova</button>
             </div>
-            <div id="pastasSidebar" style="padding:8px">
-              <button class="pasta-sidebar-btn active" onclick="selecionarPasta(this,null)">📁 Todos os documentos</button>
-            </div>
+            <div id="pastasSidebar" class="bib-explorer"></div>
           </div>
           <!-- Conteúdo -->
           <div>
             <div class="bib-header">
               <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()">
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <select id="filtroStatus" onchange="filtrarWikis()" style="padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;background:white">
-                  <option value="">Todos os Status</option>
-                  <option value="Rascunho">Rascunho</option>
-                  <option value="Aprovado">Aprovado</option>
-                  <option value="Pendente">Pendente</option>
-                </select>
-                <button class="btn-secondary" onclick="novoDocExterno()" style="font-size:12px;padding:6px 10px">🔗 Doc. Externo</button>
-                <button class="btn-primary" onclick="novoWiki()" style="font-size:12px;padding:6px 12px">+ Novo Wiki</button>
-              </div>
+              <select id="filtroStatus" onchange="filtrarWikis()" style="padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;background:white">
+                <option value="">Todos os Status</option>
+                <option value="Rascunho">Rascunho</option>
+                <option value="Aprovado">Aprovado</option>
+                <option value="Pendente">Pendente</option>
+              </select>
+            </div>
+            <div class="bib-toolbar">
+              <button class="btn-secondary" onclick="novoDocExterno()" style="font-size:12px;padding:6px 10px">📎 Doc. Externo</button>
+              <button class="btn-primary" onclick="novoWiki()" style="font-size:12px;padding:6px 12px">+ Novo Wiki</button>
             </div>
             <div class="wiki-table">
               <table>
@@ -302,29 +474,60 @@
       <div class="wiki-editor" id="wikiEditor">
         <div class="editor-header">
           <input class="editor-titulo-input" id="editorTitulo" type="text" placeholder="Título do Wiki...">
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
             <button class="btn-secondary" onclick="fecharEditor()" style="font-size:12px">← Voltar</button>
-            <button class="btn-primary" onclick="salvarWiki()" style="font-size:12px">💾 Salvar</button>
-            <button class="btn-primary" onclick="aprovarWiki()" style="background:#38a169;font-size:12px">✓ Aprovar</button>
+            <button class="btn-secondary" id="btnHistorico" onclick="toggleHistorico()" style="font-size:12px">🕐 Versões</button>
+            <button class="btn-secondary" id="btnNovaVersao" onclick="novaVersaoWiki()" style="font-size:12px;display:none">+ Nova Versão</button>
+            <button class="btn-secondary" onclick="exportarPDF()" style="font-size:12px">📄 PDF</button>
+            <span id="autoSaveIndicator" style="font-size:11px;color:#a0aec0;min-width:60px;text-align:right"></span>
+            <button class="btn-primary" id="btnAprovarWiki" onclick="aprovarWiki()" style="background:#38a169;font-size:12px;display:none">✓ Aprovar</button>
           </div>
         </div>
         <div class="editor-meta">
           <div><label>Tags</label><input type="text" id="editorTags" placeholder="Ex: RH, Políticas"></div>
           <div><label>Responsável</label><input type="text" id="editorResponsavel" placeholder="Nome do responsável"></div>
         </div>
-        <div style="margin-top:14px">
-          <div class="editor-toolbar">
-            <button class="toolbar-btn" onclick="fmt('bold')"><b>B</b></button>
-            <button class="toolbar-btn" onclick="fmt('italic')"><i>I</i></button>
-            <button class="toolbar-btn" onclick="fmt('underline')"><u>U</u></button>
-            <button class="toolbar-btn" onclick="fmt('formatBlock','h2')">H2</button>
-            <button class="toolbar-btn" onclick="fmt('formatBlock','p')">P</button>
-            <button class="toolbar-btn" onclick="fmt('insertUnorderedList')">• Lista</button>
-            <button class="toolbar-btn" onclick="fmt('insertOrderedList')">1. Lista</button>
+        <div style="display:flex;gap:16px;margin-top:14px;align-items:flex-start">
+          <div style="flex:1;min-width:0">
+            <div class="editor-toolbar">
+              <select class="toolbar-select" id="fmtBlockSelect" onmousedown="salvarSelecao()" onchange="fmtBlock(this.value)" title="Estilo do bloco">
+                <option value="p">Parágrafo</option>
+                <option value="h1">Título 1</option>
+                <option value="h2">Título 2</option>
+                <option value="h3">Título 3</option>
+                <option value="h4">Título 4</option>
+                <option value="pre">Código</option>
+              </select>
+              <div class="toolbar-sep"></div>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('bold')" title="Negrito"><b>B</b></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('italic')" title="Itálico"><i>I</i></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('underline')" title="Sublinhado"><u>U</u></button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('strikeThrough')" title="Tachado" style="text-decoration:line-through">S</button>
+              <div class="toolbar-sep"></div>
+              <label title="Cor do texto" style="display:flex;align-items:center;cursor:pointer;padding:2px 4px;border-radius:4px">
+                <span style="font-size:11px;margin-right:3px;color:#4a5568">A</span>
+                <input type="color" id="editorColor" value="#000000" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;background:none" onchange="fmt('foreColor',this.value)" title="Cor do texto">
+              </label>
+              <div class="toolbar-sep"></div>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('insertUnorderedList')" title="Lista com marcadores">• Lista</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('insertOrderedList')" title="Lista numerada">1. Lista</button>
+              <div class="toolbar-sep"></div>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyLeft')" title="Alinhar à esquerda">⬅</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyCenter')" title="Centralizar">☰</button>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyRight')" title="Alinhar à direita">➡</button>
+            </div>
+            <div class="editor-wrap">
+              <div class="editor-area" id="editorArea" contenteditable="true"></div>
+            </div>
           </div>
-          <div class="editor-area" id="editorArea" contenteditable="true"></div>
+          <div class="versao-historia" id="versaoHistoria">
+            <div class="versao-historia-header">
+              <span>Histórico de Versões</span>
+              <button onclick="toggleHistorico()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#a0aec0">×</button>
+            </div>
+            <div id="versaoHistoriaBody"></div>
+          </div>
         </div>
-        <div id="versoesList"></div>
       </div>
     </div>
 
@@ -359,11 +562,31 @@
 
 <!-- Modal Timeline -->
 <div class="modal-overlay" id="modalTimeline">
-  <div class="modal">
+  <div class="modal" style="max-width:520px">
     <div class="modal-header"><span class="modal-titulo">Adicionar Marco Histórico</span><button class="btn-fechar" onclick="fecharModal('modalTimeline')">×</button></div>
     <div class="form-group"><label>Ano</label><input type="text" id="timelineAno" placeholder="Ex: 2020"></div>
-    <div class="form-group"><label>Descrição</label><textarea id="timelineDesc" rows="3" placeholder="Descreva o marco..."></textarea></div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <div class="timeline-rich-toolbar">
+        <button class="toolbar-btn" onmousedown="event.preventDefault();fmtTimeline('bold')" title="Negrito"><b>B</b></button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault();fmtTimeline('italic')" title="Itálico"><i>I</i></button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault();fmtTimeline('insertUnorderedList')" title="Lista">• Lista</button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault();fmtTimeline('insertOrderedList')" title="Lista numerada">1. Lista</button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLinkTimeline()" title="Link">🔗 Link</button>
+      </div>
+      <div class="timeline-rich-editor" id="timelineDescEditor" contenteditable="true" onkeydown="_ovRichKeydown(event)" placeholder="Descreva o marco histórico..."></div>
+    </div>
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalTimeline')">Cancelar</button><button class="btn-confirmar" onclick="adicionarTimeline()">Adicionar</button></div>
+  </div>
+</div>
+
+<!-- Modal Nova Categoria -->
+<div class="modal-overlay" id="modalNovaCategoria">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><span class="modal-titulo">Nova Categoria</span><button class="btn-fechar" onclick="fecharModal('modalNovaCategoria')">×</button></div>
+    <div class="form-group"><label>Nome da Categoria</label><input type="text" id="novaCatLabel" placeholder="Ex: Número de Funcionários"></div>
+    <div class="form-group"><label>Valor</label><input type="text" id="novaCatValue" placeholder="Ex: 150 colaboradores"></div>
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalNovaCategoria')">Cancelar</button><button class="btn-confirmar" onclick="confirmarNovaCategoria()">Adicionar</button></div>
   </div>
 </div>
 
@@ -380,12 +603,26 @@
 <div class="modal-overlay" id="modalMembro">
   <div class="modal">
     <div class="modal-header"><span class="modal-titulo" id="modalMembroTitulo">Novo Membro</span><button class="btn-fechar" onclick="fecharModal('modalMembro')">×</button></div>
-    <div class="form-group"><label>Nome *</label><input type="text" id="membroNome" placeholder="Nome completo"></div>
+    <div class="form-group org-nome-wrap">
+      <label>Nome *</label>
+      <input type="text" id="membroNome" placeholder="Nome completo ou buscar usuário cadastrado..." autocomplete="off" oninput="filtrarUsuariosDropdown()">
+      <div class="org-nome-dropdown" id="membroNomeDropdown"></div>
+    </div>
     <div class="form-group"><label>Cargo / Função *</label><input type="text" id="membroCargo" placeholder="Ex: Desenvolvedor Sênior"></div>
     <div class="form-group"><label>Departamento</label><select id="membroDep"><option value="">Selecione...</option></select></div>
     <div class="form-group"><label>Email</label><input type="email" id="membroEmail" placeholder="email@empresa.com"></div>
     <input type="hidden" id="membroEditId">
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalMembro')">Cancelar</button><button class="btn-confirmar" onclick="salvarMembro()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Editar Departamento -->
+<div class="modal-overlay" id="modalEditDep">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><span class="modal-titulo">Editar Departamento</span><button class="btn-fechar" onclick="fecharModal('modalEditDep')">×</button></div>
+    <div class="form-group"><label>Nome do Departamento</label><input type="text" id="editDepNome" placeholder="Ex: Tecnologia, RH..." onkeypress="if(event.key==='Enter')confirmarEditarDep()"></div>
+    <input type="hidden" id="editDepId">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalEditDep')">Cancelar</button><button class="btn-confirmar" onclick="confirmarEditarDep()">Salvar</button></div>
   </div>
 </div>
 
@@ -401,6 +638,12 @@
       <label>Nome da Pasta *</label>
       <input type="text" id="novaPastaNome" placeholder="Ex: Políticas, RH, TI..." onkeypress="if(event.key==='Enter')confirmarNovaPasta()">
     </div>
+    <div class="form-group">
+      <label>Pasta pai (opcional)</label>
+      <select id="novaPastaParent" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;background:white">
+        <option value="">— Raiz (sem pasta pai) —</option>
+      </select>
+    </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalNovaPasta')">Cancelar</button>
       <button class="btn-confirmar" onclick="confirmarNovaPasta()">✓ Criar Pasta</button>
@@ -408,11 +651,36 @@
   </div>
 </div>
 
+<!-- Modal Renomear/Mover Pasta -->
+<div class="modal-overlay" id="modalEditPasta">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <span class="modal-titulo">✏️ Editar Pasta</span>
+      <button class="btn-fechar" onclick="fecharModal('modalEditPasta')">×</button>
+    </div>
+    <input type="hidden" id="editPastaId">
+    <div class="form-group">
+      <label>Nome *</label>
+      <input type="text" id="editPastaNome" onkeypress="if(event.key==='Enter')confirmarEditPasta()">
+    </div>
+    <div class="form-group">
+      <label>Mover para dentro de</label>
+      <select id="editPastaParent" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;background:white">
+        <option value="">— Raiz —</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalEditPasta')">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarEditPasta()">✓ Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Doc Externo -->
 <div class="modal-overlay" id="modalDocExterno">
-  <div class="modal" style="max-width:440px">
+  <div class="modal" style="max-width:460px">
     <div class="modal-header">
-      <span class="modal-titulo">🔗 Adicionar Documento Externo</span>
+      <span class="modal-titulo">📎 Adicionar Documento</span>
       <button class="btn-fechar" onclick="fecharModal('modalDocExterno')">×</button>
     </div>
     <div class="form-group">
@@ -420,12 +688,15 @@
       <input type="text" id="docExternoTitulo" placeholder="Ex: Manual de Onboarding">
     </div>
     <div class="form-group">
-      <label>URL *</label>
-      <input type="url" id="docExternoUrl" placeholder="https://docs.google.com/...">
+      <label>Arquivo *</label>
+      <div class="upload-drop-zone" id="docUploadZone" onclick="document.getElementById('docExternoArquivo').click()">
+        <div id="docUploadLabel">Clique para selecionar ou arraste o arquivo aqui<br><span style="font-size:11px;margin-top:4px;display:block">PDF, DOCX, XLSX, PNG, JPG — até 30 MB</span></div>
+      </div>
+      <input type="file" id="docExternoArquivo" style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.txt,.csv,.zip" onchange="atualizarLabelArquivo()">
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalDocExterno')">Cancelar</button>
-      <button class="btn-confirmar" onclick="confirmarDocExterno()">✓ Adicionar</button>
+      <button class="btn-confirmar" id="btnConfirmarDoc" onclick="confirmarDocExterno()">✓ Adicionar</button>
     </div>
   </div>
 </div>
@@ -466,11 +737,13 @@
   let modoEdicao = false;
   const campos = ['definicao','fundacao','setor','site','missao','visao','valores','esg-e','esg-s','esg-g'];
   let timelineData = [];
+  let customCampos = [];
+  let timelineEditIdx = null;
 
   async function carregarInfo() {
     try {
       const res = await fetch('/api/overview', { headers: HEADERS });
-      if (res.status === 401) { window.location.href = '/'; return; }
+      if (res.status === 401) { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; return; }
       const data = await res.json();
       if (!data) return;
       const info = data.info || {};
@@ -480,13 +753,14 @@
       if (info.fundacao) { document.getElementById('val-fundacao').textContent = info.fundacao; }
       if (info.setor) { document.getElementById('val-setor').textContent = info.setor; }
       if (info.site) { document.getElementById('val-site').textContent = info.site; }
-      if (mvv.missao) { document.getElementById('val-missao').textContent = mvv.missao; }
-      if (mvv.visao) { document.getElementById('val-visao').textContent = mvv.visao; }
-      if (mvv.valores) { document.getElementById('val-valores').textContent = mvv.valores; }
-      if (esg.e) { document.getElementById('val-esg-e').textContent = esg.e; }
-      if (esg.s) { document.getElementById('val-esg-s').textContent = esg.s; }
-      if (esg.g) { document.getElementById('val-esg-g').textContent = esg.g; }
+      if (mvv.missao) { document.getElementById('val-missao').innerHTML = mvv.missao; }
+      if (mvv.visao) { document.getElementById('val-visao').innerHTML = mvv.visao; }
+      if (mvv.valores) { document.getElementById('val-valores').innerHTML = mvv.valores; }
+      if (esg.e) { document.getElementById('val-esg-e').innerHTML = esg.e; }
+      if (esg.s) { document.getElementById('val-esg-s').innerHTML = esg.s; }
+      if (esg.g) { document.getElementById('val-esg-g').innerHTML = esg.g; }
       if (data.timeline) { timelineData = data.timeline; renderTimeline(); }
+      if (info.customCampos) { customCampos = info.customCampos; renderCustomCampos(); }
     } catch(err) { console.error(err); }
   }
 
@@ -500,24 +774,38 @@
       else { val.style.display='block'; inp.style.display='none'; }
     });
     ['missao','visao','valores'].forEach(c => {
-      const val = document.getElementById('val-' + c);
-      const inp = document.getElementById('inp-' + c);
-      if (!val || !inp) return;
-      if (modoEdicao) { inp.value = val.textContent === 'Clique em Editar para adicionar.' ? '' : val.textContent; val.style.display='none'; inp.style.display='block'; }
-      else { val.style.display='block'; inp.style.display='none'; }
+      const editor = document.getElementById('val-' + c);
+      const tb = document.getElementById('tb-' + c);
+      if (!editor) return;
+      if (modoEdicao) {
+        if (editor.textContent.trim() === 'Clique em Editar para adicionar.') editor.innerHTML = '';
+        editor.contentEditable = 'true';
+        if (tb) tb.style.display = 'flex';
+      } else {
+        editor.contentEditable = 'false';
+        if (!editor.innerHTML.trim()) editor.innerHTML = 'Clique em Editar para adicionar.';
+        if (tb) tb.style.display = 'none';
+      }
     });
     ['esg-e','esg-s','esg-g'].forEach(c => {
-      const val = document.getElementById('val-' + c);
-      const inp = document.getElementById('inp-' + c);
-      if (!val || !inp) return;
-      if (modoEdicao) { inp.value = val.textContent === 'Clique em Editar para adicionar.' ? '' : val.textContent; val.style.display='none'; inp.style.display='block'; }
-      else { val.style.display='block'; inp.style.display='none'; }
+      const editor = document.getElementById('val-' + c);
+      const tb = document.getElementById('tb-' + c);
+      if (!editor) return;
+      if (modoEdicao) {
+        if (editor.textContent.trim() === 'Clique em Editar para adicionar.') editor.innerHTML = '';
+        editor.contentEditable = 'true';
+        if (tb) tb.style.display = 'flex';
+      } else {
+        editor.contentEditable = 'false';
+        if (!editor.innerHTML.trim()) editor.innerHTML = 'Clique em Editar para adicionar.';
+        if (tb) tb.style.display = 'none';
+      }
     });
     document.getElementById('btnEditar').style.display = modoEdicao ? 'none' : 'inline-block';
     document.getElementById('btnSalvar').style.display = modoEdicao ? 'inline-block' : 'none';
     document.getElementById('btnAddTimeline').style.display = modoEdicao ? 'flex' : 'none';
-    document.querySelectorAll('.mvv-textarea,.esg-textarea').forEach(el => el.style.display = modoEdicao ? 'block' : 'none');
-    document.querySelectorAll('.mvv-texto,.esg-texto').forEach(el => el.style.display = modoEdicao ? 'none' : 'block');
+    document.getElementById('btnNovaCatWrap').style.display = modoEdicao ? 'block' : 'none';
+    renderCustomCampos();
   }
 
   async function salvarInfo() {
@@ -526,72 +814,194 @@
       const inp = document.getElementById('inp-' + c);
       if (val && inp) val.textContent = inp.value || (c==='fundacao'||c==='setor'||c==='site' ? '—' : 'Clique em Editar para adicionar.');
     });
-    ['missao','visao','valores'].forEach(c => {
-      const val = document.getElementById('val-' + c);
-      const inp = document.getElementById('inp-' + c);
-      if (val && inp) val.textContent = inp.value || 'Clique em Editar para adicionar.';
-    });
-    ['esg-e','esg-s','esg-g'].forEach(c => {
-      const val = document.getElementById('val-' + c);
-      const inp = document.getElementById('inp-' + c);
-      if (val && inp) val.textContent = inp.value || 'Clique em Editar para adicionar.';
-    });
+    customCampos = customCampos.map((c, i) => ({ label: c.label, value: document.getElementById('inp-custom-' + i)?.value ?? c.value }));
     const payload = {
-      info: { definicao: document.getElementById('inp-definicao').value, fundacao: document.getElementById('inp-fundacao').value, setor: document.getElementById('inp-setor').value, site: document.getElementById('inp-site').value },
-      mvv: { missao: document.getElementById('inp-missao').value, visao: document.getElementById('inp-visao').value, valores: document.getElementById('inp-valores').value },
-      esg: { e: document.getElementById('inp-esg-e').value, s: document.getElementById('inp-esg-s').value, g: document.getElementById('inp-esg-g').value },
+      info: { definicao: document.getElementById('inp-definicao').value, fundacao: document.getElementById('inp-fundacao').value, setor: document.getElementById('inp-setor').value, site: document.getElementById('inp-site').value, customCampos },
+      mvv: { missao: document.getElementById('val-missao').innerHTML, visao: document.getElementById('val-visao').innerHTML, valores: document.getElementById('val-valores').innerHTML },
+      esg: { e: document.getElementById('val-esg-e').innerHTML, s: document.getElementById('val-esg-s').innerHTML, g: document.getElementById('val-esg-g').innerHTML },
       timeline: timelineData
     };
     try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify(payload) }); } catch(err) { console.error(err); }
     toggleEdicao();
   }
 
-  function abrirModalTimeline() { document.getElementById('modalTimeline').classList.add('aberto'); }
+  function fmtRich(id, cmd) { document.getElementById(id).focus(); document.execCommand(cmd, false, null); }
+  function _ovRichKeydown(e) {
+    if (e.key === 'Tab') { e.preventDefault(); document.execCommand(e.shiftKey ? 'outdent' : 'indent'); }
+  }
+  function inserirLink(id) {
+    const url = prompt('URL do link:');
+    if (!url) return;
+    const texto = prompt('Texto do link:') || url;
+    document.getElementById(id).focus();
+    document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${texto}</a>`);
+  }
+
+  function fmtTimeline(cmd) { fmtRich('timelineDescEditor', cmd); }
+  function inserirLinkTimeline() { inserirLink('timelineDescEditor'); }
+
+  function abrirModalTimeline() {
+    timelineEditIdx = null;
+    document.getElementById('timelineAno').value = '';
+    document.getElementById('timelineDescEditor').innerHTML = '';
+    document.querySelector('#modalTimeline .modal-titulo').textContent = 'Adicionar Marco Histórico';
+    document.querySelector('#modalTimeline .btn-confirmar').textContent = 'Adicionar';
+    document.getElementById('modalTimeline').classList.add('aberto');
+    setTimeout(() => document.getElementById('timelineAno').focus(), 100);
+  }
+
+  function editarTimeline(idx) {
+    timelineEditIdx = idx;
+    const item = timelineData[idx];
+    document.getElementById('timelineAno').value = item.ano;
+    document.getElementById('timelineDescEditor').innerHTML = item.desc;
+    document.querySelector('#modalTimeline .modal-titulo').textContent = 'Editar Marco Histórico';
+    document.querySelector('#modalTimeline .btn-confirmar').textContent = 'Salvar';
+    document.getElementById('modalTimeline').classList.add('aberto');
+    setTimeout(() => document.getElementById('timelineAno').focus(), 100);
+  }
 
   async function adicionarTimeline() {
     const ano = document.getElementById('timelineAno').value.trim();
-    const desc = document.getElementById('timelineDesc').value.trim();
-    if (!ano || !desc) return;
-    timelineData.push({ ano, desc });
+    const desc = document.getElementById('timelineDescEditor').innerHTML.trim();
+    if (!ano || !desc || desc === '<br>') return;
+    if (timelineEditIdx !== null) {
+      timelineData[timelineEditIdx] = { ano, desc };
+    } else {
+      timelineData.push({ ano, desc });
+    }
     timelineData.sort((a,b) => a.ano - b.ano);
+    timelineEditIdx = null;
     renderTimeline();
-    document.getElementById('timelineAno').value = '';
-    document.getElementById('timelineDesc').value = '';
     fecharModal('modalTimeline');
+    try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ timeline: timelineData }) }); } catch(err) { console.error(err); }
+  }
+
+  async function removerTimeline(idx) {
+    timelineData.splice(idx, 1);
+    renderTimeline();
     try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ timeline: timelineData }) }); } catch(err) { console.error(err); }
   }
 
   function renderTimeline() {
     const container = document.getElementById('timeline');
     if (timelineData.length === 0) { container.innerHTML = '<p style="color:#a0aec0;font-size:13px">Nenhum marco histórico adicionado ainda.</p>'; return; }
-    container.innerHTML = timelineData.map(item => `
+    container.innerHTML = timelineData.map((item, i) => `
       <div class="timeline-item">
         <div class="timeline-dot"></div>
-        <div class="timeline-ano">${item.ano}</div>
-        <div class="timeline-desc">${item.desc}</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="flex:1">
+            <div class="timeline-ano">${item.ano}</div>
+            <div class="timeline-desc">${item.desc}</div>
+          </div>
+          <div style="display:flex;gap:2px;opacity:0;transition:opacity 0.2s" class="timeline-acoes">
+            <button class="timeline-edit" onclick="editarTimeline(${i})" title="Editar" style="opacity:1">✎</button>
+            <button class="timeline-del" onclick="removerTimeline(${i})" title="Remover" style="opacity:1">✕</button>
+          </div>
+        </div>
       </div>`).join('');
+    container.querySelectorAll('.timeline-item').forEach(item => {
+      item.addEventListener('mouseenter', () => item.querySelector('.timeline-acoes').style.opacity = '1');
+      item.addEventListener('mouseleave', () => item.querySelector('.timeline-acoes').style.opacity = '0');
+    });
+  }
+
+  // ===== CATEGORIAS CUSTOMIZADAS =====
+  function renderCustomCampos() {
+    const container = document.getElementById('customCamposContainer');
+    if (!container || customCampos.length === 0) { if (container) container.innerHTML = ''; return; }
+    container.innerHTML = '<div class="info-grid" style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f2f5">' +
+      customCampos.map((c, i) => `
+        <div class="info-item">
+          <div class="info-label" style="display:flex;align-items:center;justify-content:space-between">
+            ${c.label}
+            ${modoEdicao ? `<button onclick="removerCategoria(${i})" style="color:#c53030;background:none;border:none;cursor:pointer;font-size:11px;padding:0;margin-left:4px">✕</button>` : ''}
+          </div>
+          <div class="info-value" id="val-custom-${i}" ${modoEdicao ? 'style="display:none"' : ''}>${c.value || '—'}</div>
+          <input type="text" class="info-input" id="inp-custom-${i}" ${modoEdicao ? '' : 'style="display:none"'} value="${c.value || ''}" placeholder="Valor...">
+        </div>`).join('') +
+      '</div>';
+  }
+
+  function abrirModalNovaCategoria() {
+    document.getElementById('novaCatLabel').value = '';
+    document.getElementById('novaCatValue').value = '';
+    document.getElementById('modalNovaCategoria').classList.add('aberto');
+    setTimeout(() => document.getElementById('novaCatLabel').focus(), 100);
+  }
+
+  function confirmarNovaCategoria() {
+    const label = document.getElementById('novaCatLabel').value.trim();
+    const value = document.getElementById('novaCatValue').value.trim();
+    if (!label) return;
+    customCampos.push({ label, value });
+    renderCustomCampos();
+    fecharModal('modalNovaCategoria');
+  }
+
+  function removerCategoria(idx) {
+    customCampos.splice(idx, 1);
+    renderCustomCampos();
   }
 
   // ===== NOSSO TIME — API =====
   const DEP_CORES = ['#2d1b69','#38a169','#3b5bdb','#e53e3e','#d69e2e','#00b5d8'];
-  let departamentos = [], membros = [], conexoes = [], depAtivo = 'todos';
-  let dragging = null, dragOffset = { x:0, y:0 }, modoConexao = false, conexaoSelecionado = null;
-  let zoomNivel = 4; // índice no array de tamanhos
+  let departamentos = [], membros = [], conexoes = [], depAtivo = null;
+  let dragging = null, dragOffset = { x:0, y:0 };
+  let conectandoDe = null; // { memberId, side }
+  let usuariosCadastrados = [], usuariosFiltrados = [];
+  let zoomNivel = 4;
   const ZOOM_NIVEIS = [60, 80, 100, 120, 140, 180];
   const ZOOM_LABELS = ['60%', '80%', '100%', '120%', '140%', '180%'];
-  const ZOOM_LARGURAS = [100, 130, 180, 200, 220, 260]; // largura do card em px
+  const ZOOM_LARGURAS = [100, 130, 180, 200, 220, 260];
 
   function ajustarZoom(delta) {
     zoomNivel = Math.max(0, Math.min(ZOOM_NIVEIS.length - 1, zoomNivel + delta));
     document.getElementById('zoomLabel').textContent = ZOOM_LABELS[zoomNivel];
     renderOrganograma();
   }
-
   function getLarguraCard() { return ZOOM_LARGURAS[zoomNivel]; }
   function getFontScale() { return ZOOM_NIVEIS[zoomNivel] / 100; }
-
   function getDepIdx(depId) { return departamentos.findIndex(d => d.id == depId); }
-  function getDepCor(depId) { const idx = getDepIdx(depId); return DEP_CORES[idx % DEP_CORES.length] || '#2d1b69'; }
+  function getDepCor(depId) { const idx = getDepIdx(depId); return idx >= 0 ? DEP_CORES[idx % DEP_CORES.length] : '#2d1b69'; }
+
+  async function carregarUsuariosCadastrados() {
+    try {
+      const res = await fetch('/api/usuarios', { headers: HEADERS });
+      if (res.ok) usuariosCadastrados = await res.json();
+    } catch(e) {}
+  }
+
+  function filtrarUsuariosDropdown() {
+    const q = document.getElementById('membroNome').value.toLowerCase().trim();
+    const dd = document.getElementById('membroNomeDropdown');
+    if (!q || usuariosCadastrados.length === 0) { dd.style.display = 'none'; return; }
+    usuariosFiltrados = usuariosCadastrados.filter(u =>
+      u.nome.toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q)
+    ).slice(0, 6);
+    if (usuariosFiltrados.length === 0) { dd.style.display = 'none'; return; }
+    dd.style.display = 'block';
+    dd.innerHTML = usuariosFiltrados.map((u, i) => `
+      <div class="org-nome-item" onmousedown="selecionarUsuarioCadastrado(${i})">
+        <div style="font-size:13px;font-weight:600;color:#1e2a4a">${u.nome}</div>
+        <div style="font-size:11px;color:#718096">${u.cargo||'Sem cargo'}${u.email ? ' · ' + u.email : ''}</div>
+      </div>`).join('');
+  }
+
+  function selecionarUsuarioCadastrado(i) {
+    const u = usuariosFiltrados[i];
+    document.getElementById('membroNome').value = u.nome;
+    document.getElementById('membroCargo').value = u.cargo || '';
+    document.getElementById('membroEmail').value = u.email || '';
+    document.getElementById('membroNomeDropdown').style.display = 'none';
+  }
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.org-nome-wrap')) {
+      const dd = document.getElementById('membroNomeDropdown');
+      if (dd) dd.style.display = 'none';
+    }
+  });
 
   async function carregarOrg() {
     try {
@@ -601,52 +1011,96 @@
         departamentos = data.organograma.departamentos || [];
         membros = data.organograma.membros || [];
         conexoes = data.organograma.conexoes || [];
-        renderDepButtons();
+        renderDepSidebar();
         renderOrganograma();
       }
     } catch(err) { console.error(err); }
+    carregarUsuariosCadastrados();
   }
 
   async function salvarOrg() {
     try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ organograma: { departamentos, membros, conexoes } }) }); } catch(err) { console.error(err); }
   }
 
-  function iniciarConexao(id, e) {
+  // ===== DEPARTAMENTOS =====
+  function abrirModalDep() { document.getElementById('depNome').value=''; document.getElementById('modalDep').classList.add('aberto'); setTimeout(()=>document.getElementById('depNome').focus(),100); }
+
+  async function adicionarDep() {
+    const nome = document.getElementById('depNome').value.trim();
+    if (!nome) return;
+    departamentos.push({ id: Date.now(), nome });
+    renderDepSidebar();
+    fecharModal('modalDep');
+    await salvarOrg();
+  }
+
+  function editarDep(depId, e) {
     e.stopPropagation();
-    if (!modoConexao) {
-      // Ativar modo conexão automaticamente
-      modoConexao = true;
-      const aviso = document.getElementById('modoConexaoAviso');
-      const btn = document.getElementById('btnConexao');
-      if (aviso) { aviso.classList.add('ativo'); aviso.textContent = '🔗 Clique em "Conectar" em outro membro para criar a ligação. Ou clique em "Conectar" na toolbar para sair.'; }
-      if (btn) { btn.style.background='#f0fff4'; btn.style.color='#276749'; btn.style.borderColor='#9ae6b4'; btn.textContent='✅ Conectando...'; }
-    }
-    if (!conexaoSelecionado) {
-      conexaoSelecionado = id;
-      document.getElementById('node-'+id)?.classList.add('selecionado-conexao');
-    } else {
-      clicarMembro(id);
-    }
+    const dep = departamentos.find(d => d.id == depId);
+    if (!dep) return;
+    document.getElementById('editDepId').value = depId;
+    document.getElementById('editDepNome').value = dep.nome;
+    document.getElementById('modalEditDep').classList.add('aberto');
+    setTimeout(() => document.getElementById('editDepNome').focus(), 100);
   }
 
-  function selecionarDep(btn, dep) { document.querySelectorAll('.dep-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); depAtivo=dep; renderOrganograma(); }
-  function abrirModalDep() { document.getElementById('depNome').value=''; document.getElementById('modalDep').classList.add('aberto'); }
-  async function adicionarDep() { const nome=document.getElementById('depNome').value.trim(); if(!nome)return; departamentos.push({id:Date.now(),nome}); renderDepButtons(); fecharModal('modalDep'); await salvarOrg(); }
+  async function confirmarEditarDep() {
+    const id = document.getElementById('editDepId').value;
+    const nome = document.getElementById('editDepNome').value.trim();
+    if (!nome) return;
+    const dep = departamentos.find(d => d.id == id);
+    if (dep) { dep.nome = nome; await salvarOrg(); renderDepSidebar(); renderOrganograma(); }
+    fecharModal('modalEditDep');
+  }
 
-  function renderDepButtons() {
-    const lista = document.getElementById('listaDeps');
-    lista.innerHTML = '<button class="dep-btn active" onclick="selecionarDep(this,\'todos\')">Todos os Departamentos</button>';
-    departamentos.forEach((dep,i) => { lista.innerHTML += `<button class="dep-btn" onclick="selecionarDep(this,'${dep.id}')" style="border-color:${DEP_CORES[i%DEP_CORES.length]};color:${DEP_CORES[i%DEP_CORES.length]}">${dep.nome}</button>`; });
+  async function deletarDep(depId, e) {
+    e.stopPropagation();
+    const dep = departamentos.find(d => d.id == depId);
+    if (!dep || !confirm(`Remover departamento "${dep.nome}"?\nOs membros não serão deletados.`)) return;
+    departamentos = departamentos.filter(d => d.id != depId);
+    membros.forEach(m => { if (m.depId == depId) m.depId = ''; });
+    if (depAtivo == depId) depAtivo = null;
+    await salvarOrg();
+    renderDepSidebar();
+    renderOrganograma();
+  }
+
+  function selecionarDepSidebar(depId) {
+    depAtivo = (depAtivo == depId) ? null : depId;
+    renderDepSidebar();
+    renderOrganograma();
+  }
+
+  function renderDepSidebar() {
+    const sidebar = document.getElementById('depsSidebar');
+    if (!sidebar) return;
     const sel = document.getElementById('membroDep');
-    sel.innerHTML = '<option value="">Selecione...</option>';
-    departamentos.forEach(dep => { sel.innerHTML += `<option value="${dep.id}">${dep.nome}</option>`; });
+    if (sel) { sel.innerHTML = '<option value="">Selecione...</option>'; departamentos.forEach(dep => { sel.innerHTML += `<option value="${dep.id}">${dep.nome}</option>`; }); }
+    if (departamentos.length === 0) { sidebar.innerHTML = '<div style="padding:12px 10px;font-size:12px;color:#a0aec0;text-align:center">Nenhum departamento</div>'; return; }
+    sidebar.innerHTML = departamentos.map((dep, i) => {
+      const cor = DEP_CORES[i % DEP_CORES.length];
+      const isActive = depAtivo == dep.id;
+      return `<div class="dep-sidebar-row${isActive ? ' active' : ''}" onclick="selecionarDepSidebar(${dep.id})">
+        <span style="font-size:12px;font-weight:500;color:${cor};flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">● ${dep.nome}</span>
+        <div class="dep-row-acoes">
+          <button onclick="editarDep(${dep.id},event)" style="background:#f0f2f5;border:none;border-radius:4px;cursor:pointer;padding:2px 4px;font-size:10px" title="Renomear">✏️</button>
+          <button onclick="deletarDep(${dep.id},event)" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:2px 4px;font-size:10px" title="Remover">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
   }
 
+  // ===== MEMBROS =====
   function abrirModalMembro(id) {
     document.getElementById('modalMembroTitulo').textContent = id ? 'Editar Membro' : 'Novo Membro';
-    document.getElementById('membroEditId').value = id||'';
-    if (id) { const m=membros.find(m=>m.id==id); if(m){document.getElementById('membroNome').value=m.nome;document.getElementById('membroCargo').value=m.cargo;document.getElementById('membroDep').value=m.depId||'';document.getElementById('membroEmail').value=m.email||'';} }
-    else { document.getElementById('membroNome').value='';document.getElementById('membroCargo').value='';document.getElementById('membroDep').value='';document.getElementById('membroEmail').value=''; }
+    document.getElementById('membroEditId').value = id || '';
+    document.getElementById('membroNomeDropdown').style.display = 'none';
+    if (id) {
+      const m = membros.find(m => m.id == id);
+      if (m) { document.getElementById('membroNome').value=m.nome; document.getElementById('membroCargo').value=m.cargo; document.getElementById('membroDep').value=m.depId||''; document.getElementById('membroEmail').value=m.email||''; }
+    } else {
+      document.getElementById('membroNome').value=''; document.getElementById('membroCargo').value=''; document.getElementById('membroDep').value=''; document.getElementById('membroEmail').value='';
+    }
     document.getElementById('modalMembro').classList.add('aberto');
   }
 
@@ -669,169 +1123,203 @@
     renderOrganograma();
   }
 
-  function toggleModoConexao() {
-    modoConexao = !modoConexao;
-    conexaoSelecionado = null;
-    const aviso = document.getElementById('modoConexaoAviso');
-    const btn = document.getElementById('btnConexao');
-    if (aviso) aviso.classList.toggle('ativo', modoConexao);
-    if (btn) {
-      btn.style.background = modoConexao ? '#f0fff4' : '';
-      btn.style.color = modoConexao ? '#276749' : '';
-      btn.style.borderColor = modoConexao ? '#9ae6b4' : '';
-      btn.textContent = modoConexao ? '✅ Conectando...' : '🔗 Conectar';
+  // ===== CONEXÕES MIRO-STYLE (click-to-connect) =====
+  function getHandlePos(rect, canvasRect, side) {
+    const l = rect.left - canvasRect.left, t = rect.top - canvasRect.top;
+    const w = rect.width, h = rect.height;
+    switch(side) {
+      case 'top':    return { x: l + w/2, y: t };
+      case 'right':  return { x: l + w,   y: t + h/2 };
+      case 'bottom': return { x: l + w/2, y: t + h };
+      case 'left':   return { x: l,       y: t + h/2 };
+      default:       return { x: l + w/2, y: t + h/2 };
     }
-    document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
   }
 
-  async function clicarMembro(id) {
-    if (!modoConexao) return;
-    if (!conexaoSelecionado) { conexaoSelecionado=id; document.getElementById('node-'+id)?.classList.add('selecionado-conexao'); }
-    else {
-      if (conexaoSelecionado!==id) {
-        const jaExiste=conexoes.find(c=>(c.de==conexaoSelecionado&&c.para==id)||(c.de==id&&c.para==conexaoSelecionado));
-        if (jaExiste) conexoes=conexoes.filter(c=>!((c.de==conexaoSelecionado&&c.para==id)||(c.de==id&&c.para==conexaoSelecionado)));
-        else conexoes.push({de:conexaoSelecionado,para:id});
-        await salvarOrg();
-        renderOrganograma();
+  // L-bend quando eixos perpendiculares, Z-bend quando paralelos
+  function buildOrthogonalPath(x1, y1, fromSide, x2, y2, toSide) {
+    const r = 8;
+    const dx = x2 - x1, dy = y2 - y1;
+    if (Math.abs(dx) < 4 && Math.abs(dy) < 4) {
+      return { d: `M${x1},${y1} L${x2},${y2}`, mx: (x1+x2)/2, my: (y1+y2)/2 };
+    }
+    const isHorizExit = fromSide === 'left' || fromSide === 'right' ||
+                        (!fromSide && Math.abs(dx) >= Math.abs(dy));
+    const isHorizEntry = toSide === 'left' || toSide === 'right';
+    const isVertEntry  = toSide === 'top'  || toSide === 'bottom';
+
+    // Eixos perpendiculares → L-bend (1 curva)
+    if ((isHorizExit && isVertEntry) || (!isHorizExit && isHorizEntry)) {
+      if (isHorizExit) {
+        if (Math.abs(dy) < 4) return { d: `M${x1},${y1} H${x2}`, mx: (x1+x2)/2, my: y1 };
+        const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
+        const cr = Math.min(r, Math.abs(dx)/2, Math.abs(dy)/2);
+        const d = `M${x1},${y1} H${x2-signX*cr} Q${x2},${y1} ${x2},${y1+signY*cr} V${y2}`;
+        return { d, mx: x2, my: (y1+y2)/2 };
+      } else {
+        if (Math.abs(dx) < 4) return { d: `M${x1},${y1} V${y2}`, mx: x1, my: (y1+y2)/2 };
+        const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
+        const cr = Math.min(r, Math.abs(dy)/2, Math.abs(dx)/2);
+        const d = `M${x1},${y1} V${y2-signY*cr} Q${x1},${y2} ${x1+signX*cr},${y2} H${x2}`;
+        return { d, mx: (x1+x2)/2, my: y2 };
       }
-      conexaoSelecionado=null;
-      document.querySelectorAll('.org-node').forEach(n=>n.classList.remove('selecionado-conexao'));
+    }
+
+    // Eixos paralelos → Z-bend (2 curvas)
+    if (isHorizExit) {
+      if (Math.abs(dy) < 4) return { d: `M${x1},${y1} H${x2}`, mx: (x1+x2)/2, my: y1 };
+      const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
+      const mid = fromSide === 'right' ? Math.max((x1+x2)/2, x1+28) :
+                  fromSide === 'left'  ? Math.min((x1+x2)/2, x1-28) : (x1+x2)/2;
+      const er = Math.min(r, Math.abs(mid-x1)/2, Math.abs(dy)/2);
+      const d = `M${x1},${y1} H${mid-signX*er} Q${mid},${y1} ${mid},${y1+signY*er} V${y2-signY*er} Q${mid},${y2} ${mid+signX*er},${y2} H${x2}`;
+      return { d, mx: mid, my: (y1+y2)/2 };
+    } else {
+      if (Math.abs(dx) < 4) return { d: `M${x1},${y1} V${y2}`, mx: x1, my: (y1+y2)/2 };
+      const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
+      const mid = fromSide === 'bottom' ? Math.max((y1+y2)/2, y1+28) :
+                  fromSide === 'top'    ? Math.min((y1+y2)/2, y1-28) : (y1+y2)/2;
+      const er = Math.min(r, Math.abs(mid-y1)/2, Math.abs(dx)/2);
+      const d = `M${x1},${y1} V${mid-signY*er} Q${x1},${mid} ${x1+signX*er},${mid} H${x2-signX*er} Q${x2},${mid} ${x2},${mid+signY*er} V${y2}`;
+      return { d, mx: (x1+x2)/2, my: mid };
     }
   }
+
+  function getAutoEntryPoint(rPARA, canvasRect, fromX, fromY) {
+    const l = rPARA.left - canvasRect.left, t = rPARA.top - canvasRect.top;
+    const cx = l + rPARA.width/2, cy = t + rPARA.height/2;
+    const dx = cx - fromX, dy = cy - fromY;
+    if (Math.abs(dy) >= Math.abs(dx)) {
+      return dy > 0 ? { x: cx, y: t, side: 'top' } : { x: cx, y: t + rPARA.height, side: 'bottom' };
+    } else {
+      return dx > 0 ? { x: l, y: cy, side: 'left' } : { x: l + rPARA.width, y: cy, side: 'right' };
+    }
+  }
+
+  function iniciarConexaoHandle(memberId, side, e) {
+    e.stopPropagation();
+    if (conectandoDe) {
+      if (conectandoDe.memberId === memberId) {
+        // Cancel: clicked same source handle again
+        conectandoDe = null;
+        document.getElementById('conn-temp')?.remove();
+        document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+      } else {
+        // Complete connection to this node
+        const { memberId: fromId, side: fromSide } = conectandoDe;
+        conectandoDe = null;
+        document.getElementById('conn-temp')?.remove();
+        document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+        const jaExiste = conexoes.find(c => (c.de==fromId&&c.para==memberId)||(c.de==memberId&&c.para==fromId));
+        if (!jaExiste) {
+          conexoes.push({ de: fromId, para: memberId, fromSide, toSide: side });
+          salvarOrg().then(() => renderOrganograma());
+        }
+      }
+      return;
+    }
+    // Start new connection
+    conectandoDe = { memberId, side };
+    document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+    document.getElementById('node-' + memberId)?.classList.add('selecionado-conexao');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && conectandoDe) {
+      conectandoDe = null;
+      document.getElementById('conn-temp')?.remove();
+      document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+    }
+  });
 
   function renderConexoes() {
     const svg = document.getElementById('orgSvg');
     svg.innerHTML = '';
-
-    // Marcador de seta
+    document.querySelectorAll('.conn-del-btn').forEach(el => el.remove());
     const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
     const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
-    marker.setAttribute('id','arrowhead');
-    marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','6');
+    marker.setAttribute('id','arrowhead'); marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','6');
     marker.setAttribute('refX','7'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
     const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    poly.setAttribute('points','0 0, 8 3, 0 6');
-    poly.setAttribute('fill','#2d1b69');
+    poly.setAttribute('points','0 0, 8 3, 0 6'); poly.setAttribute('fill','#2d1b69');
     marker.appendChild(poly); defs.appendChild(marker); svg.appendChild(defs);
 
-    // Só renderizar membros visíveis no departamento ativo
-    const membrosVisiveis = depAtivo === 'todos'
-      ? membros
-      : membros.filter(m => m.depId == depAtivo);
+    const membrosVisiveis = depAtivo ? membros.filter(m => m.depId == depAtivo) : membros;
     const idsVisiveis = new Set(membrosVisiveis.map(m => m.id));
-
-    const W = getLarguraCard();
-    const fScale = getFontScale();
+    const canvas = document.getElementById('orgCanvas');
+    const canvasRect = canvas.getBoundingClientRect();
 
     conexoes.forEach(c => {
-      // Só desenhar se AMBOS os membros estão visíveis
       if (!idsVisiveis.has(c.de) || !idsVisiveis.has(c.para)) return;
-
-      const de = membros.find(m => m.id == c.de);
-      const para = membros.find(m => m.id == c.para);
-      if (!de || !para) return;
-
-      // Pegar posição real do node no DOM
-      const nodeDE = document.getElementById('node-' + de.id);
-      const nodePARA = document.getElementById('node-' + para.id);
+      const nodeDE = document.getElementById('node-' + c.de);
+      const nodePARA = document.getElementById('node-' + c.para);
       if (!nodeDE || !nodePARA) return;
-
-      const canvas = document.getElementById('orgCanvas');
-      const canvasRect = canvas.getBoundingClientRect();
       const rDE = nodeDE.getBoundingClientRect();
       const rPARA = nodePARA.getBoundingClientRect();
-
-      // Coordenadas relativas ao canvas
-      const deLeft = rDE.left - canvasRect.left;
-      const deTop = rDE.top - canvasRect.top;
-      const deW = rDE.width;
-      const deH = rDE.height;
-
-      const paraLeft = rPARA.left - canvasRect.left;
-      const paraTop = rPARA.top - canvasRect.top;
-      const paraW = rPARA.width;
-      const paraH = rPARA.height;
-
-      // Centros
-      const cx1 = deLeft + deW / 2;
-      const cy1 = deTop + deH / 2;
-      const cx2 = paraLeft + paraW / 2;
-      const cy2 = paraTop + paraH / 2;
-
-      const dx = cx2 - cx1;
-      const dy = cy2 - cy1;
-
-      // Ponto de saída e entrada nas bordas dos cards
-      let x1, y1, x2, y2;
-      if (Math.abs(dy) >= Math.abs(dx)) {
-        if (dy > 0) {
-          x1 = cx1; y1 = deTop + deH;
-          x2 = cx2; y2 = paraTop + 2;
-        } else {
-          x1 = cx1; y1 = deTop;
-          x2 = cx2; y2 = paraTop + paraH - 2;
-        }
+      let x1, y1;
+      if (c.fromSide) {
+        const pos = getHandlePos(rDE, canvasRect, c.fromSide);
+        x1 = pos.x; y1 = pos.y;
       } else {
-        if (dx > 0) {
-          x1 = deLeft + deW; y1 = cy1;
-          x2 = paraLeft + 2; y2 = cy2;
-        } else {
-          x1 = deLeft; y1 = cy1;
-          x2 = paraLeft + paraW - 2; y2 = cy2;
-        }
+        const deL = rDE.left-canvasRect.left, deT = rDE.top-canvasRect.top;
+        const paL = rPARA.left-canvasRect.left, paT = rPARA.top-canvasRect.top;
+        const cx1=deL+rDE.width/2, cy1=deT+rDE.height/2, cx2=paL+rPARA.width/2, cy2=paT+rPARA.height/2;
+        const dx=cx2-cx1, dy=cy2-cy1;
+        if (Math.abs(dy)>=Math.abs(dx)) { x1=cx1; y1=dy>0?deT+rDE.height:deT; }
+        else { y1=cy1; x1=dx>0?deL+rDE.width:deL; }
       }
-
-      // Curva suave
-      const distH = Math.abs(x2 - x1);
-      const distV = Math.abs(y2 - y1);
-      let cp1x, cp1y, cp2x, cp2y;
-
-      if (Math.abs(dy) >= Math.abs(dx)) {
-        // Conexão vertical — curva horizontal
-        const offset = Math.min(distV * 0.5, 80);
-        cp1x = x1; cp1y = y1 + (dy > 0 ? offset : -offset);
-        cp2x = x2; cp2y = y2 + (dy > 0 ? -offset : offset);
+      let entry;
+      if (c.toSide) {
+        const pos = getHandlePos(rPARA, canvasRect, c.toSide);
+        entry = { x: pos.x, y: pos.y, side: c.toSide };
       } else {
-        // Conexão horizontal — curva vertical
-        const offset = Math.min(distH * 0.5, 80);
-        cp1x = x1 + (dx > 0 ? offset : -offset); cp1y = y1;
-        cp2x = x2 + (dx > 0 ? -offset : offset); cp2y = y2;
+        entry = getAutoEntryPoint(rPARA, canvasRect, x1, y1);
       }
-
+      const { d, mx, my } = buildOrthogonalPath(x1, y1, c.fromSide || null, entry.x, entry.y, entry.side);
       const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d', `M${x1},${y1} C${cp1x},${cp1y} ${cp2x},${cp2y} ${x2},${y2}`);
-      path.setAttribute('fill', 'none');
-      path.setAttribute('stroke', '#2d1b69');
-      path.setAttribute('stroke-width', '1.5');
-      path.setAttribute('stroke-opacity', '0.6');
-      path.setAttribute('marker-end', 'url(#arrowhead)');
+      path.setAttribute('d', d); path.setAttribute('fill','none');
+      path.setAttribute('stroke','#2d1b69'); path.setAttribute('stroke-width','1.5');
+      path.setAttribute('stroke-opacity','0.65'); path.setAttribute('marker-end','url(#arrowhead)');
       svg.appendChild(path);
+
+      const btn = document.createElement('div');
+      btn.className = 'conn-del-btn';
+      btn.style.cssText = `position:absolute;left:${mx-9}px;top:${my-9}px;width:18px;height:18px;background:white;border:1.5px solid #e2e8f0;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:#c53030;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,0.12);`;
+      btn.title = 'Remover conexão';
+      btn.textContent = '×';
+      btn.addEventListener('click', async ev => {
+        ev.stopPropagation();
+        conexoes = conexoes.filter(x => !(x.de == c.de && x.para == c.para));
+        await salvarOrg();
+        renderOrganograma();
+      });
+      canvas.appendChild(btn);
     });
   }
 
   function renderOrganograma() {
     const canvas = document.getElementById('orgCanvas'), empty = document.getElementById('orgEmpty');
-    const filtrados = depAtivo === 'todos' ? membros : membros.filter(m => m.depId == depAtivo);
+    const filtrados = depAtivo ? membros.filter(m => m.depId == depAtivo) : membros;
     document.querySelectorAll('.org-node').forEach(n => n.remove());
     if (filtrados.length === 0) { empty.style.display = 'flex'; renderConexoes(); return; }
     empty.style.display = 'none';
-
-    const W = getLarguraCard();
-    const fScale = getFontScale();
-    const pad = fScale < 0.8 ? '8px' : '14px';
+    const W = getLarguraCard(), fScale = getFontScale(), pad = fScale < 0.8 ? '8px' : '14px';
 
     filtrados.forEach(m => {
       const cor = getDepCor(m.depId), dep = departamentos.find(d => d.id == m.depId);
       const nomes = m.nome.trim().split(' ');
-      const primeiro = nomes[0];
-      const ultimo = nomes.length > 1 ? nomes[nomes.length - 1] : '';
-      const meio = nomes.length > 2 ? nomes.slice(1, -1).join(' ') : '';
-      const nomeHtml = `<strong>${primeiro}</strong>${meio ? ' ' + meio : ''}<strong>${ultimo ? ' ' + ultimo : ''}</strong>`;
-
+      const primeiro = nomes[0], ultimo = nomes.length > 1 ? nomes[nomes.length-1] : '', meio = nomes.length > 2 ? nomes.slice(1,-1).join(' ') : '';
+      const nomeHtml = `<strong>${primeiro}</strong>${meio ? ' '+meio : ''}<strong>${ultimo ? ' '+ultimo : ''}</strong>`;
+      const avatarSize = Math.round(44 * fScale);
+      const avatarMb = fScale < 0.8 ? 3 : 6;
       const fotoHtml = m.foto
-        ? `<img src="${m.foto}" style="width:${Math.round(44*fScale)}px;height:${Math.round(44*fScale)}px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:0 auto ${fScale<0.8?3:6}px;display:block">`
-        : '';
+        ? `<img src="${m.foto}" style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:block">`
+        : `<div style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;background:#edf2f7;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:flex;align-items:center;justify-content:center">
+            <svg viewBox="0 0 24 24" width="${Math.round(22*fScale)}" height="${Math.round(22*fScale)}" fill="none">
+              <circle cx="12" cy="8" r="4" fill="#a0aec0"/>
+              <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" fill="#a0aec0"/>
+            </svg>
+          </div>`;
 
       const node = document.createElement('div');
       node.className = 'org-node';
@@ -839,6 +1327,10 @@
       node.style.cssText = `left:${m.x}px;top:${m.y}px;width:${W}px;border-color:${cor};text-align:center;padding:${pad};position:absolute`;
 
       node.innerHTML = `
+        <div class="conn-handle" style="top:-6px;left:50%;transform:translateX(-50%);border-color:${cor}" onclick="iniciarConexaoHandle(${m.id},'top',event)" title="Conectar"></div>
+        <div class="conn-handle" style="right:-6px;top:50%;transform:translateY(-50%);border-color:${cor}" onclick="iniciarConexaoHandle(${m.id},'right',event)" title="Conectar"></div>
+        <div class="conn-handle" style="bottom:-6px;left:50%;transform:translateX(-50%);border-color:${cor}" onclick="iniciarConexaoHandle(${m.id},'bottom',event)" title="Conectar"></div>
+        <div class="conn-handle" style="left:-6px;top:50%;transform:translateY(-50%);border-color:${cor}" onclick="iniciarConexaoHandle(${m.id},'left',event)" title="Conectar"></div>
         <div class="org-node-actions" style="position:absolute;top:5px;right:5px;display:flex;gap:2px;opacity:0;transition:opacity 0.2s">
           <button class="org-node-btn edit" onclick="abrirModalMembro(${m.id});event.stopPropagation()" title="Editar">✏️</button>
           <button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()" title="Remover">🗑️</button>
@@ -848,15 +1340,12 @@
         <div style="font-size:${Math.round(11*fScale)}px;color:${cor};font-weight:600;margin-bottom:2px">${m.cargo}</div>
         ${dep && fScale >= 0.8 ? `<div style="font-size:${Math.round(10*fScale)}px;color:#718096">${dep.nome}</div>` : ''}
         ${m.email && fScale >= 1.0 ? `<div style="font-size:${Math.round(10*fScale)}px;color:#a0aec0;margin-top:1px">${m.email}</div>` : ''}
-        ${fScale >= 0.7 ? `<div style="margin-top:${fScale<0.8?4:7}px;border-top:1px solid #f0f2f5;padding-top:4px">
-          <button onclick="iniciarConexao(${m.id},event)" style="padding:2px 7px;background:#f5f0ff;color:#2d1b69;border:1px solid #e9d8fd;border-radius:4px;font-size:${Math.round(10*fScale)}px;cursor:pointer;font-weight:600">🔗</button>
-        </div>` : ''}
       `;
 
-      node.addEventListener('click', () => clicarMembro(m.id));
-      canvas.appendChild(node);
+      node.addEventListener('mouseenter', () => { node.querySelector('.org-node-actions').style.opacity = '1'; });
+      node.addEventListener('mouseleave', () => { node.querySelector('.org-node-actions').style.opacity = '0'; });
       node.addEventListener('mousedown', e => {
-        if (e.target.tagName === 'BUTTON' || modoConexao) return;
+        if (e.target.classList.contains('conn-handle') || e.target.tagName === 'BUTTON' || conectandoDe) return;
         dragging = { node, membro: m };
         const rect = node.getBoundingClientRect();
         dragOffset.x = e.clientX - rect.left;
@@ -864,26 +1353,59 @@
         node.classList.add('dragging');
         e.preventDefault();
       });
+      canvas.appendChild(node);
     });
-    // Aguardar o browser renderizar os nodes antes de desenhar as setas
     requestAnimationFrame(() => renderConexoes());
   }
 
   document.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const r = document.getElementById('orgCanvas').getBoundingClientRect();
-    const x = Math.max(0, e.clientX - r.left - dragOffset.x);
-    const y = Math.max(0, e.clientY - r.top - dragOffset.y);
-    dragging.node.style.left = x + 'px';
-    dragging.node.style.top = y + 'px';
-    dragging.membro.x = x;
-    dragging.membro.y = y;
-    requestAnimationFrame(() => renderConexoes());
+    if (conectandoDe) {
+      const canvas = document.getElementById('orgCanvas');
+      if (!canvas) return;
+      const r = canvas.getBoundingClientRect();
+      const curX = e.clientX - r.left, curY = e.clientY - r.top;
+      const fromNode = document.getElementById('node-' + conectandoDe.memberId);
+      if (fromNode) {
+        const fr = fromNode.getBoundingClientRect();
+        const { x: x1, y: y1 } = getHandlePos(fr, r, conectandoDe.side);
+        const svg = document.getElementById('orgSvg');
+        let temp = document.getElementById('conn-temp');
+        if (!temp) {
+          temp = document.createElementNS('http://www.w3.org/2000/svg','path');
+          temp.id = 'conn-temp';
+          temp.setAttribute('fill','none'); temp.setAttribute('stroke','#2d1b69');
+          temp.setAttribute('stroke-width','1.5'); temp.setAttribute('stroke-dasharray','5,3');
+          temp.setAttribute('stroke-opacity','0.5');
+          svg.appendChild(temp);
+        }
+        temp.setAttribute('d', buildOrthogonalPath(x1, y1, conectandoDe.side, curX, curY).d);
+      }
+    }
+    if (dragging) {
+      const r = document.getElementById('orgCanvas').getBoundingClientRect();
+      const x = Math.max(0, e.clientX - r.left - dragOffset.x);
+      const y = Math.max(0, e.clientY - r.top - dragOffset.y);
+      dragging.node.style.left = x + 'px'; dragging.node.style.top = y + 'px';
+      dragging.membro.x = x; dragging.membro.y = y;
+      requestAnimationFrame(() => renderConexoes());
+    }
   });
-  document.addEventListener('mouseup',async()=>{if(dragging){dragging.node.classList.remove('dragging');await salvarOrg();dragging=null;}});
+
+  document.addEventListener('mouseup', async e => {
+    if (dragging) { dragging.node.classList.remove('dragging'); await salvarOrg(); dragging = null; }
+  });
+
+  // Cancela conexão ao clicar fora dos cards
+  document.addEventListener('click', e => {
+    if (conectandoDe && !e.target.closest('.org-node')) {
+      conectandoDe = null;
+      document.getElementById('conn-temp')?.remove();
+      document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+    }
+  }, true);
 
   // ===== PASTAS =====
-  let pastas = [], pastaAtiva = null;
+  let pastas = [], pastaAtiva = null, caminhoNavegacao = [];
 
   async function carregarPastas() {
     try {
@@ -894,19 +1416,32 @@
     finally { carregarWikis(); }
   }
 
+  function _popularSelectPastas(selectId, excluirId) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Raiz —</option>';
+    pastas.filter(p => p.id !== excluirId).forEach(p => {
+      sel.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
+    });
+  }
+
   function criarPasta() {
     document.getElementById('novaPastaNome').value = '';
+    _popularSelectPastas('novaPastaParent', null);
+    document.getElementById('novaPastaParent').value = pastaAtiva || '';
     document.getElementById('modalNovaPasta').classList.add('aberto');
     setTimeout(() => document.getElementById('novaPastaNome').focus(), 100);
   }
 
   async function confirmarNovaPasta() {
     const nome = document.getElementById('novaPastaNome').value.trim();
+    const parentIdRaw = document.getElementById('novaPastaParent').value;
+    const parentId = parentIdRaw ? parseInt(parentIdRaw) : null;
     if (!nome) return;
     try {
       const res = await fetch('/api/pastas', {
         method: 'POST', headers: HEADERS,
-        body: JSON.stringify({ nome })
+        body: JSON.stringify({ nome, parentId })
       });
       const novaPasta = await res.json();
       pastas.push(novaPasta);
@@ -915,35 +1450,113 @@
     } catch(e) { console.error(e); }
   }
 
+  function abrirEditPasta(id, e) {
+    e.stopPropagation();
+    const p = pastas.find(p => p.id === id);
+    if (!p) return;
+    document.getElementById('editPastaId').value = id;
+    document.getElementById('editPastaNome').value = p.nome;
+    _popularSelectPastas('editPastaParent', id);
+    document.getElementById('editPastaParent').value = p.parentId || '';
+    document.getElementById('modalEditPasta').classList.add('aberto');
+    setTimeout(() => document.getElementById('editPastaNome').focus(), 100);
+  }
+
+  async function confirmarEditPasta() {
+    const id = parseInt(document.getElementById('editPastaId').value);
+    const nome = document.getElementById('editPastaNome').value.trim();
+    const parentIdRaw = document.getElementById('editPastaParent').value;
+    const parentId = parentIdRaw ? parseInt(parentIdRaw) : null;
+    if (!nome) return;
+    try {
+      await fetch(`/api/pastas/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ nome, parentId }) });
+      const p = pastas.find(p => p.id === id);
+      if (p) { p.nome = nome; p.parentId = parentId; }
+      renderPastasSidebar();
+      renderWikis();
+      fecharModal('modalEditPasta');
+    } catch(e) { console.error(e); }
+  }
+
   function renderPastasSidebar() {
     const sidebar = document.getElementById('pastasSidebar');
     if (!sidebar) return;
-    sidebar.innerHTML = `<button class="pasta-sidebar-btn ${pastaAtiva===null?'active':''}" onclick="selecionarPasta(this,null)">📁 Todos os documentos</button>`;
-    pastas.forEach(p => {
-      sidebar.innerHTML += `
-        <button class="pasta-sidebar-btn ${pastaAtiva===p.id?'active':''}" onclick="selecionarPasta(this,${p.id})" style="display:flex;align-items:center;justify-content:space-between;gap:4px">
-          <span>📂 ${p.nome}</span>
-          <span onclick="removerPasta(${p.id},event)" style="color:#a0aec0;cursor:pointer;font-size:12px;padding:0 2px;flex-shrink:0" title="Remover pasta">×</span>
-        </button>`;
+    const parentId = pastaAtiva;
+    const subpastas = pastas.filter(p => (p.parentId || null) === (parentId || null));
+
+    // Breadcrumb
+    let breadcrumb = `<div class="bib-breadcrumb">`;
+    breadcrumb += `<span onclick="navegarPasta(null,'')">🏠</span>`;
+    caminhoNavegacao.forEach((item, i) => {
+      breadcrumb += `<span class="sep">›</span><span onclick="irBreadcrumb(${i})">${item.nome}</span>`;
     });
+    breadcrumb += `</div>`;
+
+    // Pastas do nível atual
+    let itens = '';
+    if (subpastas.length === 0 && caminhoNavegacao.length === 0) {
+      itens = `<div style="padding:20px 10px;text-align:center;color:#a0aec0;font-size:12px">Nenhuma pasta criada.<br>Clique em <strong>+ Nova</strong> para começar.</div>`;
+    } else {
+      itens = subpastas.map(p => `
+        <div class="pasta-explorer-item" onclick="navegarPasta(${p.id},'${p.nome.replace(/'/g,"\\'")}')">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">📂 ${p.nome}</span>
+          <span class="pasta-acoes">
+            <span class="pasta-acao-btn" onclick="abrirEditPasta(${p.id},event)" title="Renomear / Mover">✏️</span>
+            <span class="pasta-acao-btn" onclick="removerPasta(${p.id},event)" title="Remover">×</span>
+          </span>
+        </div>`).join('');
+    }
+
+    // Botão voltar se não estiver na raiz
+    const btnVoltar = pastaAtiva !== null
+      ? `<div onclick="voltarPasta()" style="display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:#718096;margin-bottom:4px" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">&larr; Voltar</div>`
+      : '';
+
+    sidebar.innerHTML = breadcrumb + btnVoltar + itens;
   }
 
-  function selecionarPasta(btn, id) {
-    pastaAtiva = id;
-    document.querySelectorAll('.pasta-sidebar-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  function navegarPasta(id, nome) {
+    if (id === null) {
+      // Ir para raiz
+      pastaAtiva = null;
+      caminhoNavegacao = [];
+    } else {
+      // Navegar para subpasta
+      pastaAtiva = id;
+      caminhoNavegacao.push({ id, nome });
+    }
+    renderPastasSidebar();
     filtrarWikis();
+  }
+
+  function voltarPasta() {
+    caminhoNavegacao.pop();
+    pastaAtiva = caminhoNavegacao.length > 0 ? caminhoNavegacao[caminhoNavegacao.length - 1].id : null;
+    renderPastasSidebar();
+    filtrarWikis();
+  }
+
+  function irBreadcrumb(idx) {
+    caminhoNavegacao = caminhoNavegacao.slice(0, idx + 1);
+    pastaAtiva = caminhoNavegacao.length > 0 ? caminhoNavegacao[caminhoNavegacao.length - 1].id : null;
+    renderPastasSidebar();
+    filtrarWikis();
+  }
+
+  function selecionarPasta(id) {
+    navegarPasta(id, '');
   }
 
   async function removerPasta(id, e) {
     e.stopPropagation();
-    if (!confirm('Remover esta pasta? Os wikis dentro dela não serão deletados.')) return;
+    if (!confirm('Remover esta pasta? Os documentos dentro dela não serão deletados.')) return;
     try {
       await fetch(`/api/pastas/${id}`, { method: 'DELETE', headers: HEADERS });
       wikis.forEach(w => { if (w.pastaId === id) w.pastaId = null; });
+      pastas.filter(p => p.parentId === id).forEach(p => p.parentId = null);
       pastas = pastas.filter(p => p.id !== id);
-      if (pastaAtiva === id) pastaAtiva = null;
-      renderPastasSidebar();
+      if (pastaAtiva === id) voltarPasta();
+      else renderPastasSidebar();
       filtrarWikis();
     } catch(e) { console.error(e); }
   }
@@ -959,38 +1572,136 @@
     } catch(err) { console.error(err); }
   }
 
+  function _atualizarBotoesEditor(wiki) {
+    const aprovado = wiki?.status === 'Aprovado';
+    const area = document.getElementById('editorArea');
+    const btnAprovar = document.getElementById('btnAprovarWiki');
+    const btnNovaVersao = document.getElementById('btnNovaVersao');
+    if (aprovado) {
+      area.contentEditable = 'false';
+      if (btnAprovar) btnAprovar.style.display = 'none';
+      if (btnNovaVersao) btnNovaVersao.style.display = '';
+    } else {
+      area.contentEditable = 'true';
+      if (btnAprovar) btnAprovar.style.display = wiki ? '' : 'none';
+      if (btnNovaVersao) btnNovaVersao.style.display = 'none';
+    }
+  }
+
   function novoWiki() {
     wikiEditando = null;
     document.getElementById('editorTitulo').value='';
     document.getElementById('editorTags').value='';
     document.getElementById('editorResponsavel').value='';
     document.getElementById('editorArea').innerHTML='';
-    document.getElementById('versoesList').innerHTML='';
+    document.getElementById('versaoHistoria').classList.remove('aberto');
+    document.getElementById('versaoHistoriaBody').innerHTML='';
+    _atualizarBotoesEditor(null);
     document.getElementById('bibLista').style.display='none';
     document.getElementById('wikiEditor').classList.add('active');
   }
 
-  function fecharEditor() { document.getElementById('wikiEditor').classList.remove('active'); document.getElementById('bibLista').style.display='block'; wikiEditando=null; }
+  function fecharEditor() {
+    document.getElementById('wikiEditor').classList.remove('active');
+    document.getElementById('bibLista').style.display='block';
+    document.getElementById('versaoHistoria').classList.remove('aberto');
+    wikiEditando=null;
+  }
 
-  async function salvarWiki() {
+  let _autoSaveTimer = null;
+  function _agendarAutoSave() {
+    const area = document.getElementById('editorArea');
+    if (!area || area.contentEditable === 'false') return;
+    if (_autoSaveTimer) clearTimeout(_autoSaveTimer);
+    const ind = document.getElementById('autoSaveIndicator');
+    if (ind) ind.textContent = '';
+    _autoSaveTimer = setTimeout(_autoSalvar, 2000);
+  }
+
+  async function _autoSalvar() {
     const titulo = document.getElementById('editorTitulo').value.trim();
-    if (!titulo) { alert('Título obrigatório'); return; }
-    const dados = { titulo, conteudo: document.getElementById('editorArea').innerHTML, tags: document.getElementById('editorTags').value.trim(), responsavel: document.getElementById('editorResponsavel').value.trim(), status: 'Rascunho', versao: 'v1.0', pastaId: wikiEditando ? wikis.find(w=>w._id===wikiEditando)?.pastaId : pastaAtiva };
+    if (!titulo) return;
+    const area = document.getElementById('editorArea');
+    if (area.contentEditable === 'false') return;
+    const ind = document.getElementById('autoSaveIndicator');
+    if (ind) ind.textContent = 'Salvando...';
+    const wiki = wikiEditando ? wikis.find(w=>w._id===wikiEditando) : null;
+    const dados = {
+      titulo,
+      conteudo: area.innerHTML,
+      tags: document.getElementById('editorTags').value.trim(),
+      responsavel: document.getElementById('editorResponsavel').value.trim(),
+      status: wiki?.status || 'Rascunho',
+      versao: wiki?.versao || 'v1.0',
+      pastaId: wiki?.pastaId ?? pastaAtiva
+    };
     try {
       if (wikiEditando) {
-        const wiki = wikis.find(w=>w._id===wikiEditando);
-        if (wiki) { dados.versao = 'v'+(parseInt(wiki.versao.replace('v',''))+1)+'.0'; dados.status = wiki.status; await fetch(`/api/wikis/${wikiEditando}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) }); }
-      } else { await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) }); }
+        await fetch(`/api/wikis/${wikiEditando}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+      } else {
+        const res = await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+        const novo = await res.json();
+        wikiEditando = novo._id;
+      }
       await carregarWikis();
-      fecharEditor();
-    } catch(err) { console.error(err); }
+      const wikiAtual = wikis.find(w=>w._id===wikiEditando);
+      _atualizarBotoesEditor(wikiAtual || null);
+      if (ind) { ind.textContent = 'Salvo'; setTimeout(() => { if (ind) ind.textContent = ''; }, 2000); }
+    } catch(err) { if (ind) ind.textContent = 'Erro'; console.error(err); }
+  }
+
+  async function salvarWiki() { await _autoSalvar(); }
+
+  function exportarPDF() {
+    const titulo = document.getElementById('editorTitulo').value || 'Documento';
+    const conteudo = document.getElementById('editorArea').innerHTML;
+    const win = window.open('', '_blank');
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${titulo}</title><style>
+      @page{margin:0;size:A4}
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'Segoe UI',sans-serif;font-size:13px;line-height:1.8;color:#1e2a4a;padding:15mm 20mm}
+      h1{font-size:24px;font-weight:700;margin:0 0 12px}
+      h2{font-size:19px;font-weight:700;margin:20px 0 8px}
+      h3{font-size:16px;font-weight:700;margin:16px 0 6px}
+      h4{font-size:14px;font-weight:700;margin:12px 0 4px}
+      p{margin:0 0 8px}
+      ul,ol{padding-left:24px;margin:6px 0}
+      li{margin:3px 0}
+      pre{background:#f8f8f8;padding:12px;border-radius:4px;font-size:12px;margin:8px 0;overflow-x:auto}
+    </style></head><body>${conteudo}</body></html>`);
+    win.document.close();
+    setTimeout(() => win.print(), 400);
   }
 
   async function aprovarWiki() {
     if (!wikiEditando) { alert('Salve primeiro.'); return; }
+    if (!confirm('Aprovar este wiki? Após aprovado ele ficará imutável.')) return;
     await fetch(`/api/wikis/${wikiEditando}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({status:'Aprovado'}) });
     await carregarWikis();
-    alert('Wiki aprovado!');
+    const wiki = wikis.find(w=>w._id===wikiEditando);
+    _atualizarBotoesEditor(wiki || null);
+  }
+
+  async function novaVersaoWiki(id) {
+    const srcId = id || wikiEditando;
+    const wiki = wikis.find(w=>w._id===srcId);
+    if (!wiki) return;
+    if (!confirm(`Criar nova versão de "${wiki.titulo}"? A versão atual ficará preservada no histórico.`)) return;
+    // Busca todas as versões para pegar o número mais alto real
+    let ultimaNum = parseFloat(wiki.versao.replace('v','')) || 1;
+    try {
+      const rv = await fetch(`/api/wikis/${srcId}/versoes`, { headers: HEADERS });
+      const versoes = await rv.json();
+      if (Array.isArray(versoes) && versoes.length > 0) {
+        ultimaNum = versoes.reduce((max, v) => { const n = parseFloat(v.versao.replace('v',''))||0; return n > max ? n : max; }, 0);
+      }
+    } catch(e) {}
+    const novaVersao = 'v' + (ultimaNum + 1).toFixed(1);
+    const dados = { titulo: wiki.titulo, conteudo: wiki.conteudo, tags: wiki.tags, responsavel: wiki.responsavel, status: 'Rascunho', versao: novaVersao, pastaId: wiki.pastaId, grupoId: wiki.grupoId || wiki._id };
+    const res = await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+    const nova = await res.json();
+    await carregarWikis();
+    editarWiki(nova._id);
   }
 
   function editarWiki(id) {
@@ -1001,25 +1712,119 @@
     document.getElementById('editorTags').value=wiki.tags||'';
     document.getElementById('editorResponsavel').value=wiki.responsavel||'';
     document.getElementById('editorArea').innerHTML=wiki.conteudo||'';
+    document.getElementById('versaoHistoria').classList.remove('aberto');
+    document.getElementById('versaoHistoriaBody').innerHTML='';
+    _atualizarBotoesEditor(wiki);
     document.getElementById('bibLista').style.display='none';
     document.getElementById('wikiEditor').classList.add('active');
   }
 
+  function _renderHistoricoBody(versoes) {
+    const statusCor = { 'Aprovado':'#276749', 'Rascunho':'#718096', 'Pendente':'#b7791f' };
+    const statusBg  = { 'Aprovado':'#f0fff4', 'Rascunho':'#f0f2f5', 'Pendente':'#fffbeb' };
+    const ativoVersao = versoes.find(v => v.ativo);
+    const ativoInfo = ativoVersao
+      ? `<div style="padding:8px 14px;background:#f0fff4;border-bottom:1px solid #c6f6d5;font-size:11px;color:#276749;font-weight:600;">✓ Versão ativa: ${ativoVersao.versao} — ${ativoVersao.responsavel||'—'}</div>`
+      : '';
+    document.getElementById('versaoHistoriaBody').innerHTML = ativoInfo + versoes.slice().reverse().map(v => {
+      const isAtual = v._id === wikiEditando;
+      const isAtivo = !!v.ativo;
+      return `<div class="versao-historia-item${isAtivo?' atual':''}">
+        <span style="font-weight:700;color:#2d1b69;min-width:36px">${v.versao}</span>
+        ${isAtivo ? '<span style="padding:1px 6px;background:#c6f6d5;color:#276749;border-radius:10px;font-size:10px;font-weight:700;flex-shrink:0">ATIVO</span>' : ''}
+        <span style="padding:2px 8px;border-radius:10px;font-size:11px;background:${statusBg[v.status]||'#f0f2f5'};color:${statusCor[v.status]||'#718096'}">${v.status}</span>
+        <span style="flex:1;color:#4a5568">${v.responsavel||'—'}</span>
+        <span style="color:#a0aec0;flex-shrink:0">${new Date(v.criadoEm).toLocaleDateString('pt-BR')}</span>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          ${!isAtual ? `<button onclick="editarWiki('${v._id}')" style="padding:2px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px">Abrir</button>` : ''}
+          ${!isAtivo ? `<button onclick="ativarVersao('${v._id}')" style="padding:2px 8px;background:#f0fff4;color:#276749;border:none;border-radius:4px;cursor:pointer;font-size:11px">Ativar</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function toggleHistorico() {
+    const panel = document.getElementById('versaoHistoria');
+    if (panel.classList.contains('aberto')) { panel.classList.remove('aberto'); return; }
+    if (!wikiEditando) {
+      document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#718096">Salve o documento antes de ver o histórico.</div>';
+      panel.classList.add('aberto');
+      return;
+    }
+    document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#718096">Carregando...</div>';
+    panel.classList.add('aberto');
+    try {
+      const res = await fetch(`/api/wikis/${wikiEditando}/versoes`, { headers: HEADERS });
+      const data = await res.json();
+      if (!res.ok) {
+        document.getElementById('versaoHistoriaBody').innerHTML = `<div style="padding:14px;font-size:12px;color:#c53030">Erro ao carregar: ${data.erro||res.status}</div>`;
+        return;
+      }
+      const versoes = Array.isArray(data) ? data : [];
+      if (versoes.length === 0) {
+        document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#718096">Nenhuma versão encontrada.</div>';
+        return;
+      }
+      _renderHistoricoBody(versoes);
+    } catch(e) {
+      document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#c53030">Erro de conexão.</div>';
+      console.error(e);
+    }
+  }
+
+  async function ativarVersao(id) {
+    try {
+      const res = await fetch(`/api/wikis/${id}/ativar`, { method: 'PUT', headers: HEADERS });
+      if (!res.ok) { const d = await res.json(); alert(d.erro || 'Erro ao ativar versão.'); return; }
+      await carregarWikis();
+      if (!wikiEditando) return;
+      const res2 = await fetch(`/api/wikis/${wikiEditando}/versoes`, { headers: HEADERS });
+      const versoes = await res2.json();
+      if (Array.isArray(versoes) && versoes.length > 0) _renderHistoricoBody(versoes);
+      document.getElementById('versaoHistoria').classList.add('aberto');
+    } catch(e) { console.error(e); }
+  }
+
   async function deletarWiki(id) {
-    if (!confirm('Deletar este wiki?')) return;
+    if (!confirm('Deletar este documento?')) return;
     await fetch(`/api/wikis/${id}`, { method:'DELETE', headers:HEADERS });
     await carregarWikis();
   }
 
+  function _descendantesPasta(id) {
+    const ids = new Set([id]);
+    let changed = true;
+    while (changed) {
+      changed = false;
+      pastas.forEach(p => { if (p.parentId && ids.has(p.parentId) && !ids.has(p.id)) { ids.add(p.id); changed = true; } });
+    }
+    return ids;
+  }
+
   function renderWikis(lista) {
-    const tbody = document.getElementById('wikisBody'), filtro = lista !== undefined ? lista : wikis;
-    if (filtro.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Nenhum documento nesta pasta.</td></tr>'; return; }
+    const tbody = document.getElementById('wikisBody');
+    let filtro = lista !== undefined ? lista : wikis;
+    // Deduplicate by grupoId — show only the ativo version per group (or latest if none ativo)
+    const grupos = new Map();
+    filtro.forEach(w => {
+      const gid = String(w.grupoId || w._id);
+      if (!grupos.has(gid)) { grupos.set(gid, w); return; }
+      const ex = grupos.get(gid);
+      if (w.ativo) { grupos.set(gid, w); }
+      else if (!ex.ativo && new Date(w.criadoEm) > new Date(ex.criadoEm)) { grupos.set(gid, w); }
+    });
+    filtro = Array.from(grupos.values());
+    if (filtro.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Nenhum documento encontrado.</td></tr>'; return; }
     const statusCor = { 'Aprovado':'badge-verde', 'Rascunho':'badge-cinza', 'Pendente':'badge-amarelo' };
     tbody.innerHTML = filtro.map(w => {
       const pasta = pastas.find(p => p.id === w.pastaId);
       const pastaOpts = pastas.map(p => `<option value="${p.id}" ${w.pastaId===p.id?'selected':''}>${p.nome}</option>`).join('');
+      const icone = w.tipo === 'externo' ? '📎' : '📝';
+      const linkDoc = w.urlExterno
+        ? `<a href="${w.urlExterno}" target="_blank" download="${w.nomeArquivo||''}" title="${w.nomeArquivo||'Abrir'}" style="font-size:11px;color:#2d1b69;margin-left:4px">⬇</a>`
+        : '';
       return `<tr>
-        <td><strong>${w.titulo}</strong>${w.urlExterno ? ` <a href="${w.urlExterno}" target="_blank" style="font-size:11px;color:#2d1b69">↗</a>` : ''}</td>
+        <td><span style="margin-right:4px">${icone}</span><strong>${w.titulo}</strong>${linkDoc}</td>
         <td>
           <select onchange="moverWikiPasta('${w._id}',this.value)" style="font-size:11px;padding:2px 4px;border:1px solid #e2e8f0;border-radius:4px;color:#718096;background:white;cursor:pointer">
             <option value="">Sem pasta</option>
@@ -1033,7 +1838,6 @@
         <td>${new Date(w.atualizadoEm||w.criadoEm).toLocaleDateString('pt-BR')}</td>
         <td style="white-space:nowrap">
           ${w.tipo !== 'externo' ? `<button onclick="editarWiki('${w._id}')" style="padding:4px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️</button>` : ''}
-          ${w.status === 'Aprovado' && w.tipo !== 'externo' ? `<button onclick="novaVersaoWiki('${w._id}')" style="padding:4px 8px;background:#f0fff4;color:#276749;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:2px" title="Nova Versão">📋</button>` : ''}
           <button onclick="deletarWiki('${w._id}')" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:2px">🗑️</button>
         </td>
       </tr>`;
@@ -1050,22 +1854,18 @@
     filtrarWikis();
   }
 
-  async function novaVersaoWiki(id) {
-    const wiki = wikis.find(w=>w._id===id);
-    if (!wiki) return;
-    if (!confirm(`Criar nova versão do wiki "${wiki.titulo}"?`)) return;
-    const novaVersao = 'v' + (parseFloat(wiki.versao.replace('v','')) + 1).toFixed(1);
-    const dados = { titulo: wiki.titulo, conteudo: wiki.conteudo, tags: wiki.tags, responsavel: wiki.responsavel, status: 'Rascunho', versao: novaVersao, pastaId: wiki.pastaId };
-    await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
-    await carregarWikis();
-    alert(`Nova versão ${novaVersao} criada!`);
-  }
-
   function filtrarWikis() {
     const q = document.getElementById('searchWiki').value.toLowerCase();
     const st = document.getElementById('filtroStatus')?.value || '';
+    if (pastaAtiva === null && !q && !st) {
+      renderWikis([]);
+      const tbody = document.getElementById('wikisBody');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Selecione uma pasta para ver os documentos.</td></tr>';
+      return;
+    }
     renderWikis(wikis.filter(w => {
       if (pastaAtiva !== null && w.pastaId !== pastaAtiva) return false;
+      if (pastaAtiva === null && !q && !st) return false;
       if (q && !w.titulo.toLowerCase().includes(q) && !(w.tags||'').toLowerCase().includes(q) && !(w.responsavel||'').toLowerCase().includes(q)) return false;
       if (st && w.status !== st) return false;
       return true;
@@ -1074,22 +1874,134 @@
 
   function novoDocExterno() {
     document.getElementById('docExternoTitulo').value = '';
-    document.getElementById('docExternoUrl').value = '';
+    document.getElementById('docExternoArquivo').value = '';
+    document.getElementById('docUploadLabel').innerHTML = 'Clique para selecionar ou arraste o arquivo aqui<br><span style="font-size:11px;margin-top:4px;display:block">PDF, DOCX, XLSX, PNG, JPG — até 30 MB</span>';
+    document.getElementById('docUploadZone').style.borderColor = '';
     document.getElementById('modalDocExterno').classList.add('aberto');
     setTimeout(() => document.getElementById('docExternoTitulo').focus(), 100);
   }
 
-  async function confirmarDocExterno() {
-    const titulo = document.getElementById('docExternoTitulo').value.trim();
-    const url = document.getElementById('docExternoUrl').value.trim();
-    if (!titulo || !url) { alert('Preencha título e URL.'); return; }
-    const dados = { titulo, conteudo: '', tags: '', responsavel: '', status: 'Aprovado', versao: 'v1.0', tipo: 'externo', urlExterno: url, pastaId: pastaAtiva };
-    await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
-    fecharModal('modalDocExterno');
-    carregarWikis();
+  function atualizarLabelArquivo() {
+    const input = document.getElementById('docExternoArquivo');
+    const label = document.getElementById('docUploadLabel');
+    if (input.files && input.files[0]) {
+      const f = input.files[0];
+      const mb = (f.size / 1024 / 1024).toFixed(1);
+      label.innerHTML = `📄 <strong>${f.name}</strong><br><span style="font-size:11px">${mb} MB</span>`;
+      document.getElementById('docUploadZone').style.borderColor = '#2d1b69';
+    }
   }
 
-  function fmt(cmd,val){document.execCommand(cmd,false,val||null);document.getElementById('editorArea').focus();}
+  async function confirmarDocExterno() {
+    const titulo = document.getElementById('docExternoTitulo').value.trim();
+    const input = document.getElementById('docExternoArquivo');
+    if (!titulo) { alert('Informe o título.'); return; }
+    if (!input.files || !input.files[0]) { alert('Selecione um arquivo.'); return; }
+    const btn = document.getElementById('btnConfirmarDoc');
+    btn.disabled = true; btn.textContent = 'Enviando...';
+    try {
+      const formData = new FormData();
+      formData.append('arquivo', input.files[0]);
+      const upRes = await fetch('/api/uploads', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData });
+      if (!upRes.ok) { alert('Erro ao enviar arquivo.'); return; }
+      const { url, nomeOriginal } = await upRes.json();
+      const dados = { titulo, conteudo: '', tags: '', responsavel: '', status: 'Aprovado', versao: 'v1.0', tipo: 'externo', urlExterno: url, nomeArquivo: nomeOriginal, pastaId: pastaAtiva };
+      await fetch('/api/wikis', { method: 'POST', headers: HEADERS, body: JSON.stringify(dados) });
+      fecharModal('modalDocExterno');
+      carregarWikis();
+    } catch(e) { alert('Erro ao adicionar documento.'); console.error(e); }
+    finally { btn.disabled = false; btn.textContent = '✓ Adicionar'; }
+  }
+
+  // Drag-and-drop na zona de upload
+  document.addEventListener('DOMContentLoaded', () => {
+    const zone = document.getElementById('docUploadZone');
+    if (!zone) return;
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) { const dt = new DataTransfer(); dt.items.add(file); document.getElementById('docExternoArquivo').files = dt.files; atualizarLabelArquivo(); }
+    });
+  });
+
+  let _selecaoSalva = null;
+  function salvarSelecao() {
+    const sel = window.getSelection();
+    if (sel.rangeCount) _selecaoSalva = sel.getRangeAt(0).cloneRange();
+  }
+  function restaurarSelecao() {
+    if (!_selecaoSalva) return;
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(_selecaoSalva);
+  }
+  function fmt(cmd, val) { document.execCommand(cmd, false, val||null); document.getElementById('editorArea').focus(); }
+  function fmtBlock(tag) {
+    restaurarSelecao();
+    document.execCommand('formatBlock', false, tag);
+    document.getElementById('editorArea').focus();
+  }
+
+  function _liAtual() {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return null;
+    let node = sel.anchorNode;
+    if (node && node.nodeType === 3) node = node.parentElement;
+    return node ? node.closest('li') : null;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const area = document.getElementById('editorArea');
+    if (!area) return;
+    area.addEventListener('input', _agendarAutoSave);
+    const tituloInput = document.getElementById('editorTitulo');
+    if (tituloInput) tituloInput.addEventListener('input', _agendarAutoSave);
+    const tagsInput = document.getElementById('editorTags');
+    if (tagsInput) tagsInput.addEventListener('input', _agendarAutoSave);
+    const respInput = document.getElementById('editorResponsavel');
+    if (respInput) respInput.addEventListener('input', _agendarAutoSave);
+    area.addEventListener('keydown', e => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const li = _liAtual();
+        if (li) {
+          if (e.shiftKey) document.execCommand('outdent');
+          else document.execCommand('indent');
+        } else {
+          document.execCommand('insertText', false, '    ');
+        }
+        return;
+      }
+      if (e.key === 'Enter') {
+        const li = _liAtual();
+        if (li && li.textContent.trim() === '') {
+          e.preventDefault();
+          const list = li.parentElement;
+          const p = document.createElement('p');
+          p.innerHTML = '<br>';
+          const parent = list.parentElement;
+          if (parent) {
+            parent.insertBefore(p, list.nextSibling);
+            li.remove();
+            if (list.children.length === 0) list.remove();
+            const range = document.createRange();
+            range.setStart(p, 0);
+            range.collapse(true);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+      }
+    });
+    area.addEventListener('keyup', () => {
+      const tag = document.queryCommandValue('formatBlock') || 'p';
+      const sel = document.getElementById('fmtBlockSelect');
+      if (sel) sel.value = tag.toLowerCase();
+    });
+  });
   function fecharModal(id){document.getElementById(id).classList.remove('aberto');}
   document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('aberto');});});
   function sair(){localStorage.removeItem('token');localStorage.removeItem('usuario');window.location.href='/';}
@@ -1099,6 +2011,29 @@
   renderTimeline();
   carregarOrg();
   carregarPastas();
+
+  // Canvas-level delegation for click-to-connect
+  document.getElementById('orgCanvas')?.addEventListener('click', async e => {
+    if (!conectandoDe) return;
+    if (e.target.classList.contains('conn-handle')) return;
+    if (e.target.classList.contains('conn-del-btn')) return;
+    if (e.target.closest('.org-node-actions')) return;
+    const targetNode = e.target.closest('.org-node');
+    if (!targetNode) return;
+    const toId = parseInt(targetNode.id.replace('node-', ''));
+    if (toId === conectandoDe.memberId) {
+      conectandoDe = null;
+      document.getElementById('conn-temp')?.remove();
+      document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+      return;
+    }
+    const { memberId: fromId, side: fromSide } = conectandoDe;
+    conectandoDe = null;
+    document.getElementById('conn-temp')?.remove();
+    document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
+    const jaExiste = conexoes.find(c => (c.de==fromId&&c.para==toId)||(c.de==toId&&c.para==fromId));
+    if (!jaExiste) { conexoes.push({ de: fromId, para: toId, fromSide }); await salvarOrg(); renderOrganograma(); }
+  });
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
@@ -1242,5 +2177,6 @@
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
+<script src="perfil-modal.js"></script>
 </body>
 </html>

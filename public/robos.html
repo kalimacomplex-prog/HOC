@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOC - Robôs</title>
+  <link rel="stylesheet" href="style-global.css">
+  <style>
+    .rbs-layout { display:flex; height:calc(100vh - 60px); overflow:hidden; }
+    .rbs-sub { width:200px; background:white; border-right:1px solid #e2e8f0; flex-shrink:0; display:flex; flex-direction:column; overflow-y:auto; }
+    .rbs-sub-header { padding:16px; border-bottom:1px solid #f0f2f5; }
+    .rbs-sub-title { font-size:13px; font-weight:700; color:#1e2a4a; margin-bottom:2px; }
+    .rbs-sub-sub { font-size:11px; color:#718096; }
+    .rbs-menu { padding:8px; }
+    .rbs-item { display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:7px; font-size:12px; font-weight:500; color:#718096; cursor:pointer; margin-bottom:2px; transition:all .2s; border:none; background:none; width:100%; text-align:left; }
+    .rbs-item:hover { background:#f5f0ff; color:#2d1b69; }
+    .rbs-item.active { background:#2d1b69; color:white; }
+    .rbs-item svg { width:15px; height:15px; flex-shrink:0; }
+    .rbs-group-label { font-size:10px; font-weight:700; color:#a0aec0; text-transform:uppercase; letter-spacing:.6px; padding:10px 10px 4px; }
+    .rbs-main { flex:1; overflow-y:auto; background:#f1f5f9; }
+    .panel { display:none; padding:28px; }
+    .panel.active { display:block; }
+    .rbs-card { background:white; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.06); padding:20px; }
+    .rbs-section-title { font-size:13px; font-weight:700; color:#1e2a4a; margin-bottom:4px; }
+    .rbs-section-sub { font-size:11px; color:#718096; margin-bottom:16px; }
+    .metric-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; margin-bottom:20px; }
+    .metric-card { background:white; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.06); padding:16px; border-left:4px solid #2d1b69; }
+    .metric-label { font-size:11px; font-weight:600; color:#718096; text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px; }
+    .metric-value { font-size:28px; font-weight:800; color:#1e2a4a; line-height:1; }
+    .metric-sub { font-size:11px; color:#718096; margin-top:4px; }
+    .metric-green { border-left-color:#38a169; } .metric-green .metric-value { color:#276749; }
+    .metric-red { border-left-color:#e53e3e; } .metric-red .metric-value { color:#c53030; }
+    .metric-amber { border-left-color:#d69e2e; } .metric-amber .metric-value { color:#b7791f; }
+    .metric-blue { border-left-color:#3b5bdb; } .metric-blue .metric-value { color:#2233a8; }
+    .top5-item { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid #f0f2f5; font-size:12px; }
+    .top5-item:last-child { border-bottom:none; }
+    .bar-row { margin-bottom:8px; }
+    .bar-label { display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-bottom:3px; }
+    .bar-track { background:#f0f2f5; border-radius:3px; height:6px; }
+    .bar-fill { border-radius:3px; height:6px; background:#2d1b69; transition:width .4s; }
+    .bar-green { background:#38a169; } .bar-amber { background:#d69e2e; } .bar-red { background:#e53e3e; }
+    /* Execuções */
+    .exec-toolbar { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+    .exec-filter { padding:7px 10px; border:1px solid #e2e8f0; border-radius:7px; font-size:12px; color:#4a5568; background:white; outline:none; }
+    .exec-filter:focus { border-color:#2d1b69; }
+    .exec-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .exec-table th { background:#f8fafc; padding:10px 12px; text-align:left; font-size:10px; font-weight:700; color:#718096; text-transform:uppercase; letter-spacing:.4px; border-bottom:1px solid #e2e8f0; white-space:nowrap; }
+    .exec-table td { padding:10px 12px; border-bottom:1px solid #f0f2f5; vertical-align:middle; }
+    .exec-table tr:hover td { background:#fafbff; }
+    .status-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:12px; font-size:10px; font-weight:700; white-space:nowrap; }
+    .st-em_execucao { background:#dbeafe; color:#1d4ed8; }
+    .st-concluido { background:#dcfce7; color:#166534; }
+    .st-erro { background:#fee2e2; color:#dc2626; }
+    .st-interrompido { background:#fef9c3; color:#854d0e; }
+    .st-nao_disparado { background:#f1f5f9; color:#64748b; }
+    .btn-xs { padding:3px 8px; border-radius:5px; font-size:10px; font-weight:600; cursor:pointer; border:1px solid; transition:all .15s; }
+    /* Robôs list */
+    .rbt-toolbar { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+    .rbt-row { display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid #f0f2f5; cursor:pointer; transition:background .15s; }
+    .rbt-row:hover { background:#fafbff; }
+    .rbt-row.selected { background:#f5f0ff; }
+    .rbt-icon { width:36px; height:36px; border-radius:8px; background:#f3e8ff; border:1.5px solid #c4b5fd; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .rbt-name { font-size:13px; font-weight:700; color:#1e2a4a; }
+    .rbt-meta { font-size:11px; color:#718096; margin-top:1px; }
+    .badge-sm { display:inline-flex; align-items:center; padding:1px 7px; border-radius:10px; font-size:10px; font-weight:600; margin-right:4px; }
+    .badge-local { background:#eff6ff; color:#1d4ed8; }
+    .badge-nuvem { background:#f0fff4; color:#276749; }
+    .badge-bg { background:#f5f3ff; color:#4f46e5; }
+    .badge-iface { background:#fff7ed; color:#c2410c; }
+    .badge-ativo { background:#dcfce7; color:#166534; }
+    .badge-inativo { background:#f1f5f9; color:#64748b; }
+    .badge-alta { background:#fee2e2; color:#dc2626; }
+    .badge-media { background:#fef9c3; color:#854d0e; }
+    .badge-baixa { background:#f0fdf4; color:#15803d; }
+    .prio-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:4px; }
+    .prio-alta { background:#dc2626; } .prio-media { background:#d69e2e; } .prio-baixa { background:#38a169; }
+    /* Drawer */
+    .rbs-drawer { position:fixed; top:0; right:0; width:600px; height:100vh; background:white; box-shadow:-4px 0 24px rgba(0,0,0,.12); z-index:1000; display:flex; flex-direction:column; transform:translateX(100%); transition:transform .25s ease; }
+    .rbs-drawer.open { transform:translateX(0); }
+    .drawer-header { padding:20px 24px 0; border-bottom:1px solid #e2e8f0; flex-shrink:0; }
+    .drawer-title { font-size:15px; font-weight:800; color:#1e2a4a; margin-bottom:4px; }
+    .drawer-close { position:absolute; top:16px; right:20px; background:none; border:none; cursor:pointer; color:#718096; font-size:20px; line-height:1; padding:4px; }
+    .drawer-tabs { display:flex; gap:0; overflow-x:auto; }
+    .drawer-tab { padding:10px 14px; font-size:12px; font-weight:600; color:#718096; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; background:none; border-top:none; border-left:none; border-right:none; }
+    .drawer-tab.active { color:#2d1b69; border-bottom-color:#2d1b69; }
+    .drawer-body { flex:1; overflow-y:auto; padding:20px 24px; }
+    .dtab { display:none; }
+    .dtab.active { display:block; }
+    /* Modal */
+    .rbs-modal { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2000; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .rbs-modal-box { background:white; border-radius:14px; width:100%; max-width:700px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+    .modal-header { padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .modal-title { font-size:15px; font-weight:800; color:#1e2a4a; }
+    .modal-body { flex:1; overflow-y:auto; padding:20px 24px; }
+    .modal-footer { padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; gap:8px; flex-shrink:0; }
+    .form-section { margin-bottom:20px; }
+    .form-section-title { font-size:11px; font-weight:700; color:#2d1b69; text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #e8ecf1; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+    .form-row.single { grid-template-columns:1fr; }
+    .form-row.triple { grid-template-columns:1fr 1fr 1fr; }
+    label { display:block; font-size:11px; font-weight:600; color:#4a5568; margin-bottom:4px; }
+    .form-ctrl { width:100%; padding:8px 10px; border:1.5px solid #e2e8f0; border-radius:7px; font-size:12px; color:#1e2a4a; outline:none; font-family:inherit; box-sizing:border-box; }
+    .form-ctrl:focus { border-color:#2d1b69; }
+    select.form-ctrl { cursor:pointer; }
+    textarea.form-ctrl { resize:vertical; min-height:70px; }
+    .form-hint { font-size:10px; color:#94a3b8; margin-top:3px; }
+    .btn-primary { padding:9px 18px; background:#2d1b69; color:white; border:none; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; }
+    .btn-primary:hover { background:#3d2b89; }
+    .btn-outline { padding:9px 18px; background:white; color:#4a5568; border:1.5px solid #e2e8f0; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; }
+    .btn-outline:hover { border-color:#2d1b69; color:#2d1b69; }
+    .btn-danger { padding:9px 18px; background:#fff5f5; color:#c53030; border:1.5px solid #fecaca; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; }
+    /* Schedule tags */
+    .sched-item { display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border-radius:7px; padding:8px 12px; margin-bottom:6px; font-size:12px; }
+    .sched-item-label { color:#4a5568; font-weight:500; }
+    .sched-item-del { background:none; border:none; color:#a0aec0; cursor:pointer; font-size:14px; }
+    /* Payload table */
+    .kv-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .kv-table th { background:#f8fafc; padding:7px 10px; text-align:left; font-size:10px; font-weight:700; color:#718096; text-transform:uppercase; border-bottom:1px solid #e2e8f0; }
+    .kv-table td { padding:5px 8px; border-bottom:1px solid #f0f2f5; }
+    .kv-table td input { width:100%; border:1px solid #e2e8f0; border-radius:4px; padding:5px 8px; font-size:12px; outline:none; }
+    .kv-table td input:focus { border-color:#2d1b69; }
+    /* Logs streaming */
+    .log-viewer { background:#0f172a; border-radius:8px; padding:12px 14px; font-family:monospace; font-size:11px; max-height:340px; overflow-y:auto; color:#94a3b8; }
+    .log-info { color:#94a3b8; } .log-aviso { color:#fbbf24; } .log-erro { color:#f87171; } .log-sucesso { color:#4ade80; }
+    /* Audit table */
+    .audit-table { width:100%; border-collapse:collapse; font-size:11px; }
+    .audit-table th { background:#f8fafc; padding:8px 10px; text-align:left; font-weight:700; color:#718096; border-bottom:1px solid #e2e8f0; text-transform:uppercase; font-size:10px; }
+    .audit-table td { padding:8px 10px; border-bottom:1px solid #f0f2f5; color:#4a5568; }
+    /* Toggle */
+    .toggle-wrap { display:flex; align-items:center; gap:8px; }
+    .toggle { appearance:none; width:36px; height:20px; background:#e2e8f0; border-radius:10px; position:relative; cursor:pointer; transition:background .2s; }
+    .toggle:checked { background:#2d1b69; }
+    .toggle::after { content:''; position:absolute; width:16px; height:16px; border-radius:50%; background:white; top:2px; left:2px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .toggle:checked::after { left:18px; }
+    .toggle-label { font-size:12px; color:#4a5568; }
+    /* Version rows */
+    .ver-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:7px; background:#f8fafc; margin-bottom:6px; font-size:12px; }
+    .ver-active { background:#f5f0ff; }
+    /* Filas */
+    .fila-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid #e2e8f0; border-radius:7px; margin-bottom:6px; font-size:12px; cursor:move; background:white; }
+    .fila-item.dragging { opacity:.5; }
+    /* Artifacts */
+    .artifact-item { display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid #e2e8f0; border-radius:7px; margin-bottom:6px; font-size:12px; background:white; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
+    <span class="logo-text">Business Manager</span>
+  </div>
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
+    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
+    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item active" href="/robos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M9 11V7a3 3 0 016 0v4"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>Robôs</a>
+    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
+    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
+    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+  </nav>
+  <div class="sidebar-footer">
+    <details class="sidebar-sistema" id="sistemaMenu">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items">
+        <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
+        <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
+        <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div class="main" style="padding:0;overflow:hidden">
+  <div id="bannerAssinatura" style="display:none"></div>
+  <div class="header" style="position:sticky;top:0;z-index:100">
+    <div class="header-right">
+      <div class="notif-wrap" id="notifWrap">
+        <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <span class="notif-badge cinza" id="notifBadge" style="display:none"></span>
+        </button>
+        <div class="notif-dropdown" id="notifDropdown">
+          <div class="notif-drop-header"><span class="notif-drop-titulo">🔔 Notificações</span><div class="notif-drop-acoes"><button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button></div></div>
+          <div class="notif-lista" id="notifLista"><div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div></div>
+        </div>
+      </div>
+      <div class="user-info" id="usuarioInfo"></div>
+    </div>
+  </div>
+
+  <div class="rbs-layout">
+    <!-- Sub-menu lateral -->
+    <div class="rbs-sub">
+      <div class="rbs-sub-header">
+        <div class="rbs-sub-title">🤖 Robôs</div>
+        <div class="rbs-sub-sub">Orquestração de automações</div>
+      </div>
+      <div class="rbs-menu">
+        <button class="rbs-item active" onclick="showPanel('resumo',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Resumo
+        </button>
+        <div class="rbs-group-label">Produção</div>
+        <button class="rbs-item" onclick="showPanel('execucoes',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Execuções
+        </button>
+        <button class="rbs-item" onclick="showPanel('robos',this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M9 11V7a3 3 0 016 0v4"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>Robôs
+        </button>
+      </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="rbs-main" id="rbsMain">
+
+      <!-- ===== RESUMO ===== -->
+      <div class="panel active" id="panel-resumo">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div>
+            <h2 style="font-size:16px;font-weight:800;color:#1e2a4a;margin:0 0 2px">Resumo Operacional</h2>
+            <p style="font-size:12px;color:#718096;margin:0">Métricas de automações em tempo real</p>
+          </div>
+          <button onclick="carregarMetricas()" style="padding:7px 14px;background:white;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-weight:600;color:#4a5568;cursor:pointer">↻ Atualizar</button>
+        </div>
+
+        <!-- Seção 1: Eficiência Operacional -->
+        <div style="font-size:12px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">📊 Métricas de Eficiência Operacional</div>
+        <div class="metric-grid" id="metricasEficiencia">
+          <div class="metric-card metric-green"><div class="metric-label">Taxa de Sucesso</div><div class="metric-value" id="mTaxaSucesso">—</div><div class="metric-sub">das execuções</div></div>
+          <div class="metric-card metric-red"><div class="metric-label">Total de Erros</div><div class="metric-value" id="mTotalErros">—</div><div class="metric-sub">execuções com falha</div></div>
+          <div class="metric-card metric-blue"><div class="metric-label">Em Execução</div><div class="metric-value" id="mEmExecucao">—</div><div class="metric-sub">robôs rodando agora</div></div>
+          <div class="metric-card metric-amber"><div class="metric-label">Total Execuções</div><div class="metric-value" id="mTotal">—</div><div class="metric-sub">históricas registradas</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div class="rbs-card">
+            <div class="rbs-section-title">🔴 Top 5 Robôs com mais Erros</div>
+            <div class="rbs-section-sub">Automações que precisam de atenção</div>
+            <div id="top5Erros"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:20px">Sem dados</div></div>
+          </div>
+          <div class="rbs-card">
+            <div class="rbs-section-title">⏱️ Tempo Médio de Execução</div>
+            <div class="rbs-section-sub">Por robô (em segundos)</div>
+            <div id="tempoMedio"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:20px">Sem dados</div></div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div class="rbs-card">
+            <div class="rbs-section-title">🎯 % Atingimento de SLA</div>
+            <div class="rbs-section-sub">Conclusão dentro do tempo ideal</div>
+            <div id="slaAtingimento"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:20px">Sem dados</div></div>
+          </div>
+          <div class="rbs-card">
+            <div class="rbs-section-title">💡 Economia de Horas (FTE Saved)</div>
+            <div class="rbs-section-sub">Automação vs tempo humano estimado</div>
+            <div id="fteSaved"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:20px">Sem dados</div></div>
+          </div>
+        </div>
+
+        <!-- Seção 2: Capacidade -->
+        <div style="font-size:12px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">🏗️ Métricas de Capacidade e Infraestrutura</div>
+        <div class="metric-grid" style="margin-bottom:20px">
+          <div class="metric-card metric-amber"><div class="metric-label">Fila de Espera (Backlog)</div><div class="metric-value" id="mBacklog">—</div><div class="metric-sub">execuções não disparadas</div></div>
+          <div class="metric-card" id="mAgentesCard"><div class="metric-label">Agentes Ativos</div><div class="metric-value" id="mAgentes">—</div><div class="metric-sub" id="mAgentesSub">verificando...</div></div>
+        </div>
+        <div class="rbs-card" style="margin-bottom:20px">
+          <div class="rbs-section-title">🖥️ Status dos Agentes</div>
+          <div class="rbs-section-sub">Máquinas disponíveis para execução</div>
+          <div id="agentesStatus"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Carregando...</div></div>
+        </div>
+
+        <!-- Seção 3: Negócio / ROI -->
+        <div style="font-size:12px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">💼 Métricas de Negócio e ROI</div>
+        <div class="rbs-card">
+          <div class="rbs-section-title">🏆 Volumetria por Departamento</div>
+          <div class="rbs-section-sub">Áreas que mais utilizam automação</div>
+          <div id="volumetria"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:20px">Sem dados</div></div>
+        </div>
+      </div>
+
+      <!-- ===== EXECUÇÕES ===== -->
+      <div class="panel" id="panel-execucoes">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <h2 style="font-size:16px;font-weight:800;color:#1e2a4a;margin:0 0 2px">Histórico de Execuções</h2>
+            <p style="font-size:12px;color:#718096;margin:0">Todas as execuções de robôs</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="execAutoRefreshLabel" style="font-size:10px;color:#94a3b8">Auto-atualiza em <span id="execCountdown">30</span>s</span>
+            <button onclick="carregarExecucoes()" style="padding:7px 14px;background:white;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-weight:600;color:#4a5568;cursor:pointer">↻ Atualizar</button>
+          </div>
+        </div>
+        <div class="exec-toolbar">
+          <input type="text" id="execFiltroNome" class="exec-filter" placeholder="🔍 Nome do robô..." oninput="filtrarExecucoes()" style="min-width:200px">
+          <select id="execFiltroStatus" class="exec-filter" onchange="filtrarExecucoes()">
+            <option value="">Todos os status</option>
+            <option value="em_execucao">Em execução</option>
+            <option value="concluido">Concluído</option>
+            <option value="erro">Erro</option>
+            <option value="interrompido">Interrompido</option>
+            <option value="nao_disparado">Não disparado</option>
+          </select>
+          <select id="execFiltroGatilho" class="exec-filter" onchange="filtrarExecucoes()">
+            <option value="">Todos os gatilhos</option>
+            <option value="manual">Manual</option>
+            <option value="schedule">Schedule</option>
+            <option value="webhook">Webhook</option>
+          </select>
+        </div>
+        <div class="rbs-card" style="padding:0;overflow:hidden">
+          <div style="overflow-x:auto">
+            <table class="exec-table">
+              <thead>
+                <tr>
+                  <th>Robô</th>
+                  <th>Status</th>
+                  <th>Máquina</th>
+                  <th>Gatilho</th>
+                  <th>Início</th>
+                  <th>Duração</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="execTableBody">
+                <tr><td colspan="7" style="text-align:center;padding:32px;color:#a0aec0">Carregando execuções...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ROBÔS ===== -->
+      <div class="panel" id="panel-robos">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <h2 style="font-size:16px;font-weight:800;color:#1e2a4a;margin:0 0 2px">Robôs Cadastrados</h2>
+            <p id="robosCount" style="font-size:12px;color:#718096;margin:0">Carregando...</p>
+          </div>
+          <button onclick="abrirModalRobo()" class="btn-primary">+ Novo Robô</button>
+        </div>
+        <div class="rbt-toolbar">
+          <input type="text" id="roboBusca" class="exec-filter" placeholder="🔍 Buscar robô..." oninput="filtrarRobos()" style="min-width:200px">
+          <select id="roboFiltroTag" class="exec-filter" onchange="filtrarRobos()">
+            <option value="">Todas as tags</option>
+          </select>
+          <select id="roboFiltroTipo" class="exec-filter" onchange="filtrarRobos()">
+            <option value="">Todos os tipos</option>
+            <option value="Background">Background</option>
+            <option value="Interface">Interface</option>
+          </select>
+          <select id="roboFiltroStatus" class="exec-filter" onchange="filtrarRobos()">
+            <option value="">Todos</option>
+            <option value="ativo">Ativos</option>
+            <option value="inativo">Inativos</option>
+          </select>
+        </div>
+        <div class="rbs-card" style="padding:0;overflow:hidden">
+          <div id="robosListHeader" style="display:grid;grid-template-columns:auto 1fr 90px 80px 90px 100px 100px;gap:0;padding:10px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px">
+            <span style="width:48px">Tipo</span>
+            <span>Robô</span>
+            <span>Ambiente</span>
+            <span>Prioridade</span>
+            <span>Status</span>
+            <span>Última exec</span>
+            <span style="text-align:right">Ações</span>
+          </div>
+          <div id="robosListBody"><div style="padding:40px;text-align:center;color:#a0aec0;font-size:13px">Carregando robôs...</div></div>
+        </div>
+      </div>
+
+    </div><!-- /rbs-main -->
+  </div><!-- /rbs-layout -->
+</div><!-- /main -->
+
+<!-- ===== DRAWER DETALHE DO ROBÔ ===== -->
+<div class="rbs-drawer" id="robotDrawer">
+  <div class="drawer-header">
+    <div style="display:flex;align-items:center;gap:10px;padding-bottom:12px">
+      <div id="drawerIcon" style="width:36px;height:36px;border-radius:8px;background:#f3e8ff;border:1.5px solid #c4b5fd;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
+      <div>
+        <div class="drawer-title" id="drawerTitle">—</div>
+        <div style="display:flex;gap:4px;margin-top:2px" id="drawerBadges"></div>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="fecharDrawer()">✕</button>
+    <div class="drawer-tabs">
+      <button class="drawer-tab active" onclick="showDrawerTab('dtExecucoes',this)">Execuções</button>
+      <button class="drawer-tab" onclick="showDrawerTab('dtFila',this)">Fila / API</button>
+      <button class="drawer-tab" onclick="showDrawerTab('dtArtifacts',this)">Artifacts</button>
+      <button class="drawer-tab" onclick="showDrawerTab('dtLogs',this)">Logs</button>
+      <button class="drawer-tab" onclick="showDrawerTab('dtAuditoria',this)">Auditoria</button>
+      <button class="drawer-tab" onclick="showDrawerTab('dtVersoes',this)">Versões</button>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <!-- Execuções -->
+    <div class="dtab active" id="dtExecucoes">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:12px;font-weight:600;color:#4a5568">Histórico de execuções deste robô</span>
+        <button onclick="executarRobo()" style="padding:6px 14px;background:#dcfce7;color:#166534;border:1px solid #86efac;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">▶ Executar Agora</button>
+      </div>
+      <div id="drawerExecucoes"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:24px">Carregando...</div></div>
+    </div>
+    <!-- Fila / API -->
+    <div class="dtab" id="dtFila">
+      <div style="margin-bottom:16px">
+        <div class="rbs-section-title">📋 Fila de Execução</div>
+        <div class="rbs-section-sub">Execuções pendentes — arraste para reordenar</div>
+        <div id="drawerFila"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem itens na fila</div></div>
+      </div>
+      <div style="margin-top:20px">
+        <div class="rbs-section-title">🔌 Interação via API</div>
+        <div class="rbs-section-sub">Endpoints para os robôs consumirem</div>
+        <div id="drawerApi"></div>
+      </div>
+    </div>
+    <!-- Artifacts -->
+    <div class="dtab" id="dtArtifacts">
+      <div class="rbs-section-title">📁 Arquivos Gerados</div>
+      <div class="rbs-section-sub">Faça download dos artifacts produzidos</div>
+      <div id="drawerArtifacts"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:24px">Sem artifacts disponíveis</div></div>
+    </div>
+    <!-- Logs -->
+    <div class="dtab" id="dtLogs">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div><div class="rbs-section-title">📡 Log em Tempo Real</div><div class="rbs-section-sub">Última execução deste robô</div></div>
+        <button onclick="carregarLogsRobo()" style="padding:5px 12px;background:white;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600">↻ Atualizar</button>
+      </div>
+      <div class="log-viewer" id="drawerLogs">Aguardando logs...</div>
+    </div>
+    <!-- Auditoria -->
+    <div class="dtab" id="dtAuditoria">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div><div class="rbs-section-title">🔍 Auditoria</div><div class="rbs-section-sub">Registro de alterações e disparos</div></div>
+        <button onclick="exportarAuditoria()" style="padding:6px 12px;background:white;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600">⬇ Exportar CSV</button>
+      </div>
+      <div id="drawerAuditoria"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:24px">Sem registros</div></div>
+    </div>
+    <!-- Versões -->
+    <div class="dtab" id="dtVersoes">
+      <div class="rbs-section-title">🚀 Controle de Versões</div>
+      <div class="rbs-section-sub">Versões do robô e qual está ativa</div>
+      <div id="drawerVersoes"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:24px">Sem versões cadastradas</div></div>
+    </div>
+  </div>
+</div>
+<div id="drawerOverlay" onclick="fecharDrawer()" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.3)"></div>
+
+<!-- ===== MODAL CRIAR / EDITAR ROBÔ ===== -->
+<div class="rbs-modal" id="roboModal" style="display:none">
+  <div class="rbs-modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Novo Robô</div>
+      <button onclick="fecharModal()" style="background:none;border:none;cursor:pointer;color:#718096;font-size:20px">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="roboForm" onsubmit="return false">
+        <!-- 1. Informações básicas -->
+        <div class="form-section">
+          <div class="form-section-title">Informações Básicas</div>
+          <div class="form-row">
+            <div><label>Nome do Robô *</label><input type="text" id="fNome" class="form-ctrl" placeholder="Ex: Extrator de Notas Fiscais"></div>
+            <div><label>Versão</label><input type="text" id="fVersao" class="form-ctrl" value="v1.0"></div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label>Tipo de Robô</label>
+              <select id="fTipo" class="form-ctrl">
+                <option value="Background">Background (sem tela)</option>
+                <option value="Interface">Interface (com tela/UI)</option>
+              </select>
+            </div>
+            <div>
+              <label>Ambiente de Disparo</label>
+              <select id="fAmbiente" class="form-ctrl" onchange="atualizarCamposAmbiente()">
+                <option value="local">Local (Agente instalado)</option>
+                <option value="nuvem">Nuvem (Webhook externo)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div><label>Descrição</label><textarea id="fDescricao" class="form-ctrl" placeholder="Descreva o que este robô faz..."></textarea></div>
+          </div>
+        </div>
+
+        <!-- 2. Vínculo -->
+        <div class="form-section" id="secaoVinculo">
+          <div class="form-section-title">Vínculo do Código</div>
+          <div id="camposLocal">
+            <div class="form-row">
+              <div>
+                <label>Tipo de Vínculo</label>
+                <select id="fVinculoTipo" class="form-ctrl" onchange="atualizarVinculo()">
+                  <option value="zip">Upload de .zip</option>
+                  <option value="git">Repositório Git</option>
+                </select>
+              </div>
+              <div id="campoZip">
+                <label>Arquivo .zip</label>
+                <input type="file" id="fZip" class="form-ctrl" accept=".zip" style="padding:6px">
+                <div class="form-hint">Deve conter o código Python e requirements.txt</div>
+              </div>
+            </div>
+            <div id="camposGit" style="display:none">
+              <div class="form-row">
+                <div><label>URL do Repositório</label><input type="text" id="fGitUrl" class="form-ctrl" placeholder="https://github.com/org/repo"></div>
+                <div><label>Branch</label><input type="text" id="fGitBranch" class="form-ctrl" value="main"></div>
+              </div>
+              <div class="form-hint" style="margin-top:-4px;margin-bottom:8px">O Agente fará git clone/pull automaticamente antes de executar</div>
+            </div>
+          </div>
+          <div id="camposNuvem" style="display:none">
+            <div class="form-row single">
+              <div><label>URL do Webhook</label><input type="text" id="fWebhookUrl" class="form-ctrl" placeholder="https://api.exemplo.com/webhook/disparar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Execução -->
+        <div class="form-section">
+          <div class="form-section-title">Configuração de Execução</div>
+          <div id="campoComando">
+            <div class="form-row single">
+              <div><label>Comando de Execução</label><input type="text" id="fComando" class="form-ctrl" placeholder="Ex: python main.py ou python bot.py --modo producao"></div>
+            </div>
+          </div>
+          <div id="campoPayload" style="display:none">
+            <label>Payload do Webhook (mapeamento de chaves)</label>
+            <div class="form-hint" style="margin-bottom:8px">Monte o JSON que será enviado no POST ao webhook</div>
+            <table class="kv-table" style="margin-bottom:8px">
+              <thead><tr><th>Chave</th><th>Valor</th><th></th></tr></thead>
+              <tbody id="payloadRows"></tbody>
+            </table>
+            <button type="button" onclick="addPayloadRow()" style="font-size:11px;padding:4px 10px;background:#f5f0ff;color:#4f46e5;border:1px solid #c4b5fd;border-radius:5px;cursor:pointer">+ Adicionar Campo</button>
+          </div>
+          <div class="form-row" style="margin-top:10px">
+            <div>
+              <label>requirements.txt</label>
+              <textarea id="fRequirements" class="form-ctrl" placeholder="requests==2.31.0&#10;pandas>=2.0" style="min-height:60px"></textarea>
+            </div>
+            <div>
+              <label>Cache de Dependências (Venv)</label>
+              <select id="fVenvCache" class="form-ctrl">
+                <option value="cache">Usar cache (mais rápido)</option>
+                <option value="sempre">Sempre reinstalar</option>
+              </select>
+              <div class="form-hint">Cache preserva o venv entre execuções</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Classificação -->
+        <div class="form-section">
+          <div class="form-section-title">Classificação e SLA</div>
+          <div class="form-row triple">
+            <div><label>Tag</label><input type="text" id="fTag" class="form-ctrl" placeholder="Ex: financeiro"></div>
+            <div><label>Tempo Humano (min)</label><input type="number" id="fTempoManual" class="form-ctrl" placeholder="Ex: 30" min="0"></div>
+            <div><label>SLA Ideal (min)</label><input type="number" id="fSla" class="form-ctrl" placeholder="Ex: 5" min="0"></div>
+          </div>
+          <div class="form-row">
+            <div><label>Timeout (seg)</label><input type="number" id="fTimeout" class="form-ctrl" value="300" min="10" max="86400"></div>
+            <div>
+              <label>Prioridade</label>
+              <select id="fPrioridade" class="form-ctrl">
+                <option value="Alta">Alta — interrompe robôs de menor prioridade</option>
+                <option value="Media" selected>Média</option>
+                <option value="Baixa">Baixa</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row single">
+            <div>
+              <label>Áreas Beneficiadas (separadas por vírgula)</label>
+              <input type="text" id="fAreas" class="form-ctrl" placeholder="Ex: Financeiro, RH, Logística">
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Infraestrutura -->
+        <div class="form-section" id="secaoInfra">
+          <div class="form-section-title">Infraestrutura</div>
+          <div class="form-row single">
+            <div>
+              <label>Máquinas / Grupos permitidos (separados por vírgula)</label>
+              <input type="text" id="fMaquinas" class="form-ctrl" placeholder="Ex: PC-Bruno, Grupo-Financeiro">
+              <div class="form-hint">Deixe vazio para usar qualquer agente disponível. Preferência para o com menor carga.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Schedules -->
+        <div class="form-section">
+          <div class="form-section-title">Schedules de Disparo</div>
+          <div id="schedulesList" style="margin-bottom:10px"></div>
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;background:#f8fafc;border-radius:8px;padding:12px;border:1px solid #e2e8f0">
+            <div>
+              <label>Tipo</label>
+              <select id="schedTipo" class="form-ctrl" onchange="atualizarCamposSched()" style="width:160px">
+                <option value="manual">Sem schedule (manual)</option>
+                <option value="unico">Disparo único</option>
+                <option value="recorrente">Recorrente (Cron)</option>
+              </select>
+            </div>
+            <div id="schedCampoData" style="display:none">
+              <label>Data e Hora</label>
+              <input type="datetime-local" id="schedDataHora" class="form-ctrl">
+            </div>
+            <div id="schedCampoCron" style="display:none">
+              <label>Expressão Cron</label>
+              <input type="text" id="schedCron" class="form-ctrl" placeholder="Ex: 0 8 * * 1-5" style="width:200px">
+            </div>
+            <div id="schedCampoOpts" style="display:none">
+              <label>Opções</label>
+              <div style="display:flex;gap:10px;align-items:center;padding:8px 0">
+                <label class="toggle-wrap" style="margin:0"><input type="checkbox" id="schedFeriados" class="toggle"><span class="toggle-label">Executar em feriados</span></label>
+                <label class="toggle-wrap" style="margin:0"><input type="checkbox" id="schedFds" class="toggle"><span class="toggle-label">Executar nos fins de semana</span></label>
+              </div>
+            </div>
+            <button type="button" onclick="addSchedule()" style="padding:8px 12px;background:#2d1b69;color:white;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;height:36px">+ Adicionar</button>
+          </div>
+        </div>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <div style="flex:1" id="modalEditActions" style="display:none">
+        <button onclick="toggleAtivoRobo()" id="btnToggleAtivo" class="btn-danger">Desativar Robô</button>
+      </div>
+      <button onclick="fecharModal()" class="btn-outline">Cancelar</button>
+      <button onclick="salvarRobo()" class="btn-primary">Salvar Robô</button>
+    </div>
+  </div>
+</div>
+
+<script src="global.js"></script>
+<script>
+  const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') };
+
+  let robos = [], execucoes = [], _roboAtual = null, _execCountdown = 30, _countdownTimer = null;
+  let schedules = [], payloadRows = [];
+
+  // =================== NAVEGAÇÃO ===================
+  function showPanel(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.rbs-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (id === 'resumo') carregarMetricas();
+    if (id === 'execucoes') { carregarExecucoes(); iniciarCountdown(); }
+    if (id === 'robos') carregarRobos();
+    fecharDrawer();
+  }
+
+  // =================== MÉTRICAS ===================
+  async function carregarMetricas() {
+    try {
+      const r = await fetch('/api/robos/metricas', { headers: HEADERS });
+      if (!r.ok) return;
+      const d = await r.json();
+      document.getElementById('mTaxaSucesso').textContent = d.taxaSucesso + '%';
+      document.getElementById('mTotalErros').textContent = d.erros;
+      document.getElementById('mEmExecucao').textContent = d.emExecucao;
+      document.getElementById('mTotal').textContent = d.total;
+      document.getElementById('mBacklog').textContent = d.backlog;
+      // Agentes
+      const at = (d.agentes||[]).filter(a=>a.status==='conectado').length;
+      document.getElementById('mAgentes').textContent = at;
+      document.getElementById('mAgentesSub').textContent = `de ${d.agentes.length} configurados`;
+      // Top 5 erros
+      const t5el = document.getElementById('top5Erros');
+      if (d.top5Erros?.length) {
+        const max = d.top5Erros[0].erros;
+        t5el.innerHTML = d.top5Erros.map((x,i)=>`
+          <div class="top5-item">
+            <span style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:11px;font-weight:700;color:#a0aec0;width:16px">${i+1}</span>
+              <span style="font-size:12px;color:#1e2a4a">${_esc(x.nome)}</span>
+            </span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:80px;background:#f0f2f5;border-radius:3px;height:5px"><div style="width:${Math.round(x.erros/max*100)}%;background:#e53e3e;border-radius:3px;height:5px"></div></div>
+              <span style="font-size:11px;font-weight:700;color:#e53e3e">${x.erros}</span>
+            </div>
+          </div>`).join('');
+      } else t5el.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem erros registrados 🎉</div>';
+      // Tempo médio
+      const tmel = document.getElementById('tempoMedio');
+      if (d.tempoMedio?.length) {
+        tmel.innerHTML = d.tempoMedio.slice(0,5).map(x=>`
+          <div class="bar-row">
+            <div class="bar-label"><span>${_esc(x.nome)}</span><span>${x.media}s</span></div>
+            <div class="bar-track"><div class="bar-fill bar-blue" style="width:${Math.min(100,Math.round(x.media/Math.max(...d.tempoMedio.map(t=>t.media))*100))}%;background:#3b5bdb"></div></div>
+          </div>`).join('');
+      } else tmel.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem dados</div>';
+      // SLA
+      const slael = document.getElementById('slaAtingimento');
+      if (d.slaAtingimento?.length) {
+        slael.innerHTML = d.slaAtingimento.map(x=>`
+          <div class="bar-row">
+            <div class="bar-label"><span>${_esc(x.nome)}</span><span style="font-weight:700;color:${x.pct>=80?'#276749':x.pct>=50?'#b7791f':'#c53030'}">${x.pct}%</span></div>
+            <div class="bar-track"><div class="bar-fill ${x.pct>=80?'bar-green':x.pct>=50?'bar-amber':'bar-red'}" style="width:${x.pct}%"></div></div>
+          </div>`).join('');
+      } else slael.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Configure SLA nos robôs</div>';
+      // FTE Saved
+      const fteel = document.getElementById('fteSaved');
+      if (d.ftePorRobo?.length) {
+        fteel.innerHTML = d.ftePorRobo.map(x=>`
+          <div class="top5-item">
+            <span style="font-size:12px;color:#1e2a4a">${_esc(x.nome)}</span>
+            <span style="font-size:12px;font-weight:700;color:${x.pct>0?'#276749':'#c53030'}">${x.pct>0?'🚀 '+x.pct+'% mais rápido':'⚠️ '+Math.abs(x.pct)+'% mais lento'}</span>
+          </div>`).join('');
+      } else fteel.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Configure tempo manual nos robôs</div>';
+      // Volumetria
+      const volelems = document.getElementById('volumetria');
+      if (d.volumetria?.length) {
+        const maxV = d.volumetria[0].count;
+        volelems.innerHTML = d.volumetria.slice(0,8).map((x,i)=>`
+          <div class="bar-row">
+            <div class="bar-label">
+              <span style="display:flex;align-items:center;gap:6px"><span style="font-weight:700;color:${['#2d1b69','#38a169','#3b5bdb','#e53e3e','#d69e2e','#00b5d8','#7c3aed','#c05621'][i]}">${['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣'][i]}</span>${_esc(x.area)}</span>
+              <span style="font-weight:700">${x.count}</span>
+            </div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round(x.count/maxV*100)}%;background:${['#2d1b69','#38a169','#3b5bdb','#e53e3e','#d69e2e','#00b5d8','#7c3aed','#c05621'][i]}"></div></div>
+          </div>`).join('');
+      } else volelems.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Configure áreas beneficiadas nos robôs</div>';
+      // Agentes status
+      const agel = document.getElementById('agentesStatus');
+      if (d.agentes?.length) {
+        agel.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:8px">${d.agentes.map(a=>`
+          <div style="display:flex;align-items:center;gap:8px;background:#f8fafc;border-radius:8px;padding:10px 14px;border:1px solid #e2e8f0">
+            <div style="width:8px;height:8px;border-radius:50%;background:${a.status==='conectado'?'#38a169':'#e53e3e'}"></div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#1e2a4a">${_esc(a.nome)}</div>
+              <div style="font-size:10px;color:#718096">${a.robosAtivos}/${a.capacidadeMaxima} robôs · ${a.status==='conectado'?'Conectado':'Desconectado'}</div>
+            </div>
+          </div>`).join('')}</div>`;
+      } else agel.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Nenhum agente cadastrado ainda</div>';
+    } catch(e) { console.error(e); }
+  }
+
+  // =================== EXECUÇÕES ===================
+  async function carregarExecucoes() {
+    try {
+      const r = await fetch('/api/robos/execucoes', { headers: HEADERS });
+      if (!r.ok) return;
+      execucoes = await r.json();
+      filtrarExecucoes();
+    } catch(e) { console.error(e); }
+  }
+
+  function filtrarExecucoes() {
+    const nome = document.getElementById('execFiltroNome').value.toLowerCase();
+    const status = document.getElementById('execFiltroStatus').value;
+    const gatilho = document.getElementById('execFiltroGatilho').value;
+    const filtered = execucoes.filter(e =>
+      (!nome || (e.roboNome||'').toLowerCase().includes(nome)) &&
+      (!status || e.status === status) &&
+      (!gatilho || e.gatilho === gatilho)
+    );
+    renderExecucoes(filtered);
+  }
+
+  function renderExecucoes(list) {
+    const tb = document.getElementById('execTableBody');
+    if (!list.length) { tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#a0aec0">Nenhuma execução encontrada</td></tr>'; return; }
+    tb.innerHTML = list.map(e => {
+      const dur = e.duracao ? formatDur(e.duracao) : e.status==='em_execucao' ? '⏳' : '—';
+      return `<tr>
+        <td><div style="font-size:12px;font-weight:700;color:#1e2a4a">${_esc(e.roboNome||'—')}</div></td>
+        <td>${statusBadge(e.status)}${e.motivoInterrupcao?`<div style="font-size:10px;color:#718096;margin-top:2px" title="${_esc(e.motivoInterrupcao)}">ℹ ${_esc(e.motivoInterrupcao.slice(0,40))}${e.motivoInterrupcao.length>40?'...':''}</div>`:''}</td>
+        <td style="color:#4a5568">${_esc(e.maquina||'—')}</td>
+        <td><span style="font-size:11px;background:#f0f2f5;color:#4a5568;border-radius:4px;padding:2px 7px">${_esc(e.gatilho||'manual')}</span></td>
+        <td style="color:#64748b;white-space:nowrap">${e.iniciadoEm ? fmtDate(e.iniciadoEm) : fmtDate(e.criadoEm)}</td>
+        <td style="font-family:monospace;font-size:11px;color:#4a5568">${dur}</td>
+        <td>
+          <div style="display:flex;gap:4px;justify-content:flex-end">
+            ${e.status==='em_execucao'?`<button onclick="interromperExec('${e._id}')" class="btn-xs" style="background:#fef2f2;color:#dc2626;border-color:#fecaca">⏹ Parar</button>`:''}
+            ${e.status==='concluido'||e.status==='erro'?`<button onclick="reexecutarRoboPorNome('${e.roboId}')" class="btn-xs" style="background:#f0fdf4;color:#166534;border-color:#86efac">▶ Re-exec</button>`:''}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function iniciarCountdown() {
+    if (_countdownTimer) clearInterval(_countdownTimer);
+    _execCountdown = 30;
+    _countdownTimer = setInterval(() => {
+      _execCountdown--;
+      const el = document.getElementById('execCountdown');
+      if (el) el.textContent = _execCountdown;
+      if (_execCountdown <= 0) { carregarExecucoes(); _execCountdown = 30; }
+    }, 1000);
+  }
+
+  async function interromperExec(id) {
+    if (!confirm('Interromper esta execução?')) return;
+    const r = await fetch(`/api/robos/execucoes/${id}/interromper`, { method:'POST', headers:HEADERS, body:JSON.stringify({motivo:'Interrupção manual'}) });
+    if (r.ok) carregarExecucoes();
+  }
+
+  async function reexecutarRoboPorNome(roboId) {
+    if (!roboId) return;
+    const r = await fetch(`/api/robos/${roboId}/executar`, { method:'POST', headers:HEADERS, body:JSON.stringify({gatilho:'manual'}) });
+    if (r.ok) carregarExecucoes();
+  }
+
+  // =================== LISTA DE ROBÔS ===================
+  async function carregarRobos() {
+    try {
+      const r = await fetch('/api/robos', { headers: HEADERS });
+      if (!r.ok) return;
+      robos = await r.json();
+      document.getElementById('robosCount').textContent = `${robos.length} robô${robos.length!==1?'s':''} cadastrado${robos.length!==1?'s':''}`;
+      // Populate tag filter
+      const tags = [...new Set(robos.map(r=>r.tag).filter(Boolean))];
+      const sel = document.getElementById('roboFiltroTag');
+      sel.innerHTML = '<option value="">Todas as tags</option>' + tags.map(t=>`<option value="${_esc(t)}">${_esc(t)}</option>`).join('');
+      filtrarRobos();
+    } catch(e) { console.error(e); }
+  }
+
+  function filtrarRobos() {
+    const busca = document.getElementById('roboBusca').value.toLowerCase();
+    const tag = document.getElementById('roboFiltroTag').value;
+    const tipo = document.getElementById('roboFiltroTipo').value;
+    const statusF = document.getElementById('roboFiltroStatus').value;
+    const filtered = robos.filter(r =>
+      (!busca || (r.nome||'').toLowerCase().includes(busca) || (r.descricao||'').toLowerCase().includes(busca)) &&
+      (!tag || r.tag === tag) &&
+      (!tipo || r.tipo === tipo) &&
+      (!statusF || (statusF==='ativo'? r.ativo!==false : r.ativo===false))
+    );
+    renderRobosList(filtered);
+  }
+
+  function renderRobosList(list) {
+    const el = document.getElementById('robosListBody');
+    if (!list.length) { el.innerHTML = '<div style="padding:40px;text-align:center;color:#a0aec0;font-size:13px">Nenhum robô encontrado</div>'; return; }
+    el.innerHTML = list.map(r => {
+      const tipoEmoji = r.tipo === 'Interface' ? '🖥️' : '⚙️';
+      const ativo = r.ativo !== false;
+      const prioClass = (r.prioridade||'Media').toLowerCase();
+      const schedCount = (r.schedules||[]).filter(s=>s.tipo!=='manual'&&s.ativo!==false).length;
+      return `<div class="rbt-row" onclick="abrirDrawer('${r._id}')">
+        <div style="width:48px;flex-shrink:0">
+          <div class="rbt-icon" style="${!ativo?'filter:grayscale(1);opacity:.5':''}">${tipoEmoji}</div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="rbt-name">${_esc(r.nome)} <span style="font-size:10px;color:#94a3b8;font-weight:400">${_esc(r.versao||'')}</span></div>
+          <div class="rbt-meta">${r.tag?`<span class="badge-sm" style="background:#f5f3ff;color:#4f46e5">#${_esc(r.tag)}</span>`:''}${schedCount?`<span class="badge-sm" style="background:#eff6ff;color:#1d4ed8">📅 ${schedCount} schedule${schedCount>1?'s':''}</span>`:''}${_esc(r.descricao||'').slice(0,60)||''}</div>
+        </div>
+        <div style="width:90px;flex-shrink:0"><span class="badge-sm ${r.ambiente==='nuvem'?'badge-nuvem':'badge-local'}">${r.ambiente==='nuvem'?'☁️ Nuvem':'🖥️ Local'}</span></div>
+        <div style="width:80px;flex-shrink:0"><span class="prio-dot prio-${prioClass}"></span><span style="font-size:11px;color:#4a5568">${r.prioridade||'Média'}</span></div>
+        <div style="width:90px;flex-shrink:0"><span class="badge-sm ${ativo?'badge-ativo':'badge-inativo'}">${ativo?'● Ativo':'○ Inativo'}</span></div>
+        <div style="width:100px;flex-shrink:0;font-size:11px;color:#718096">${r.atualizadoEm?fmtDate(r.atualizadoEm):'—'}</div>
+        <div style="width:100px;flex-shrink:0;display:flex;gap:4px;justify-content:flex-end" onclick="event.stopPropagation()">
+          <button onclick="executarRoboById('${r._id}')" class="btn-xs" style="background:#f0fdf4;color:#166534;border-color:#86efac" title="Executar">▶</button>
+          <button onclick="abrirModalRobo('${r._id}')" class="btn-xs" style="background:#f5f0ff;color:#4f46e5;border-color:#c4b5fd" title="Editar">✏</button>
+          <button onclick="deletarRobo('${r._id}')" class="btn-xs" style="background:#fef2f2;color:#dc2626;border-color:#fecaca" title="Deletar">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function executarRoboById(id) {
+    const r = await fetch(`/api/robos/${id}/executar`, { method:'POST', headers:HEADERS, body:JSON.stringify({gatilho:'manual'}) });
+    const d = await r.json();
+    if (r.ok) {
+      alert(d.status==='nao_disparado'?'⚠️ Sem agentes disponíveis. Execução registrada como não disparada.':'✅ Robô disparado com sucesso!');
+    } else alert('Erro: ' + (d.erro||'desconhecido'));
+  }
+
+  async function deletarRobo(id) {
+    if (!confirm('Deletar este robô e todo o histórico de execuções?')) return;
+    await fetch(`/api/robos/${id}`, { method:'DELETE', headers:HEADERS });
+    carregarRobos();
+    if (_roboAtual?._id === id) fecharDrawer();
+  }
+
+  // =================== DRAWER ===================
+  async function abrirDrawer(id) {
+    _roboAtual = robos.find(r=>r._id===id);
+    if (!_roboAtual) return;
+    document.getElementById('drawerTitle').textContent = _roboAtual.nome;
+    document.getElementById('drawerBadges').innerHTML = `
+      <span class="badge-sm ${_roboAtual.tipo==='Interface'?'badge-iface':'badge-bg'}">${_roboAtual.tipo||'Background'}</span>
+      <span class="badge-sm ${_roboAtual.ambiente==='nuvem'?'badge-nuvem':'badge-local'}">${_roboAtual.ambiente==='nuvem'?'☁️ Nuvem':'🖥️ Local'}</span>
+      <span class="badge-sm ${_roboAtual.ativo!==false?'badge-ativo':'badge-inativo'}">${_roboAtual.ativo!==false?'Ativo':'Inativo'}</span>
+    `;
+    document.getElementById('robotDrawer').classList.add('open');
+    document.getElementById('drawerOverlay').style.display = 'block';
+    document.querySelectorAll('.rbt-row').forEach(r=>r.classList.remove('selected'));
+    // Mark selected
+    event?.currentTarget?.classList?.add('selected');
+    showDrawerTab('dtExecucoes', document.querySelector('.drawer-tab'));
+    carregarExecsDrawer();
+    renderApiDocs();
+    carregarVersoesDrawer();
+    renderFilaDrawer();
+  }
+
+  function fecharDrawer() {
+    document.getElementById('robotDrawer').classList.remove('open');
+    document.getElementById('drawerOverlay').style.display = 'none';
+    document.querySelectorAll('.rbt-row').forEach(r=>r.classList.remove('selected'));
+  }
+
+  function showDrawerTab(id, btn) {
+    document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.drawer-tab').forEach(t=>t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (id==='dtLogs') carregarLogsRobo();
+    if (id==='dtAuditoria') renderAuditoria();
+    if (id==='dtArtifacts') renderArtifacts();
+  }
+
+  async function carregarExecsDrawer() {
+    if (!_roboAtual) return;
+    const r = await fetch(`/api/robos/execucoes?roboId=${_roboAtual._id}`, { headers:HEADERS });
+    if (!r.ok) return;
+    const exs = await r.json();
+    const el = document.getElementById('drawerExecucoes');
+    if (!exs.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:24px">Nenhuma execução ainda</div>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px">
+      <tr style="background:#f8fafc"><th style="padding:7px 10px;text-align:left;font-size:10px;color:#718096;font-weight:700;text-transform:uppercase;border-bottom:1px solid #e2e8f0">Data</th><th style="padding:7px 10px;text-align:left;font-size:10px;color:#718096;font-weight:700;text-transform:uppercase;border-bottom:1px solid #e2e8f0">Gatilho</th><th style="padding:7px 10px;text-align:left;font-size:10px;color:#718096;font-weight:700;text-transform:uppercase;border-bottom:1px solid #e2e8f0">Duração</th><th style="padding:7px 10px;text-align:left;font-size:10px;color:#718096;font-weight:700;text-transform:uppercase;border-bottom:1px solid #e2e8f0">Status</th></tr>
+      ${exs.slice(0,20).map(e=>`<tr style="border-bottom:1px solid #f0f2f5"><td style="padding:7px 10px;color:#64748b">${fmtDate(e.criadoEm)}</td><td style="padding:7px 10px;color:#4a5568">${_esc(e.gatilho||'manual')}</td><td style="padding:7px 10px;font-family:monospace;font-size:11px">${e.duracao?formatDur(e.duracao):'—'}</td><td style="padding:7px 10px">${statusBadge(e.status)}</td></tr>`).join('')}
+    </table>`;
+  }
+
+  async function executarRobo() {
+    if (!_roboAtual) return;
+    await executarRoboById(_roboAtual._id);
+    carregarExecsDrawer();
+  }
+
+  async function carregarLogsRobo() {
+    if (!_roboAtual) return;
+    const r = await fetch(`/api/robos/execucoes?roboId=${_roboAtual._id}`, { headers:HEADERS });
+    if (!r.ok) return;
+    const exs = await r.json();
+    const ultima = exs[0];
+    const el = document.getElementById('drawerLogs');
+    if (!ultima || !ultima.logs?.length) { el.innerHTML = '<span class="log-info">Nenhum log disponível para a última execução</span>'; return; }
+    el.innerHTML = ultima.logs.map(l=>`<div class="log-${l.nivel||'info'}">[${fmtDate(l.timestamp)}] <span style="text-transform:uppercase;font-size:9px;font-weight:700">${l.nivel||'info'}</span> ${_esc(l.mensagem)}</div>`).join('');
+    el.scrollTop = el.scrollHeight;
+  }
+
+  function renderApiDocs() {
+    if (!_roboAtual) return;
+    const baseUrl = window.location.origin;
+    const headers = JSON.stringify({'Authorization':'Bearer <token>','Content-Type':'application/json'}, null, 2);
+    document.getElementById('drawerApi').innerHTML = `
+      <div style="background:#0f172a;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:#94a3b8;margin-bottom:10px">
+        <div style="color:#4ade80;font-weight:700;margin-bottom:4px">POST /api/robos/${_roboAtual._id}/executar</div>
+        <div style="color:#fbbf24">// Disparar o robô manualmente</div>
+        <div style="margin-top:6px">{"gatilho": "manual"}</div>
+      </div>
+      <div style="background:#0f172a;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:#94a3b8;margin-bottom:10px">
+        <div style="color:#f87171;font-weight:700;margin-bottom:4px">POST /api/robos/execucoes/:id/interromper</div>
+        <div style="color:#fbbf24">// Interromper uma execução em andamento</div>
+        <div style="margin-top:6px">{"motivo": "motivo da interrupção"}</div>
+      </div>
+      <div style="background:#0f172a;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:#94a3b8;margin-bottom:10px">
+        <div style="color:#60a5fa;font-weight:700;margin-bottom:4px">POST /api/robos/execucoes/:id/logs</div>
+        <div style="color:#fbbf24">// Postar log de execução (chamado pelo Agente)</div>
+        <div style="margin-top:6px">{"nivel": "info|aviso|erro|sucesso", "mensagem": "texto"}</div>
+      </div>
+      <div style="background:#0f172a;border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:#94a3b8">
+        <div style="color:#a78bfa;font-weight:700;margin-bottom:4px">GET /api/robos/execucoes/:id</div>
+        <div style="color:#fbbf24">// Consultar status de uma execução (para os robôs fazerem GET e interromperem)</div>
+        <div style="color:#fbbf24">// Campo status='interrompido' sinaliza ao robô que deve parar</div>
+      </div>`;
+  }
+
+  function renderFilaDrawer() {
+    if (!_roboAtual) return;
+    const fila = (execucoes||[]).filter(e=>e.roboId===_roboAtual._id && e.status==='em_execucao');
+    const el = document.getElementById('drawerFila');
+    if (!fila.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem execuções em andamento</div>'; return; }
+    el.innerHTML = fila.map(e=>`<div class="fila-item">
+      <span style="cursor:move;color:#a0aec0">⠿</span>
+      <div style="flex:1"><div style="font-weight:600;color:#1e2a4a">${_esc(e.roboNome)}</div><div style="font-size:10px;color:#718096">Iniciado: ${fmtDate(e.iniciadoEm||e.criadoEm)} · ${_esc(e.maquina||'—')}</div></div>
+      ${statusBadge(e.status)}
+      <button onclick="interromperExec('${e._id}')" class="btn-xs" style="background:#fef2f2;color:#dc2626;border-color:#fecaca">Parar</button>
+    </div>`).join('');
+  }
+
+  function renderArtifacts() {
+    if (!_roboAtual) return;
+    const el = document.getElementById('drawerArtifacts');
+    // Get from latest execução
+    const ultimaExec = (execucoes||[]).find(e=>e.roboId===_roboAtual._id && (e.artifacts||[]).length);
+    if (!ultimaExec?.artifacts?.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:24px">Sem artifacts disponíveis</div>'; return; }
+    el.innerHTML = ultimaExec.artifacts.map(a=>`<div class="artifact-item">
+      <span style="font-size:20px">📄</span>
+      <div style="flex:1"><div style="font-weight:600;color:#1e2a4a">${_esc(a.nome)}</div><div style="font-size:10px;color:#718096">${a.tamanho?Math.round(a.tamanho/1024)+'KB':''}</div></div>
+      <a href="${_esc(a.url)}" download style="padding:5px 12px;background:#f5f0ff;color:#4f46e5;border:1px solid #c4b5fd;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none">⬇ Download</a>
+    </div>`).join('');
+  }
+
+  function renderAuditoria() {
+    if (!_roboAtual) return;
+    const exs = (execucoes||[]).filter(e=>e.roboId===_roboAtual._id);
+    const el = document.getElementById('drawerAuditoria');
+    if (!exs.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:24px">Sem registros</div>'; return; }
+    el.innerHTML = `<table class="audit-table">
+      <thead><tr><th>Data/Hora</th><th>Evento</th><th>Gatilho</th><th>Máquina</th><th>Status</th></tr></thead>
+      <tbody>${exs.slice(0,50).map(e=>`<tr>
+        <td>${fmtDate(e.criadoEm)}</td>
+        <td>Execução disparada</td>
+        <td>${_esc(e.gatilho||'manual')}</td>
+        <td>${_esc(e.maquina||'—')}</td>
+        <td>${statusBadge(e.status)}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  function exportarAuditoria() {
+    if (!_roboAtual) return;
+    const exs = (execucoes||[]).filter(e=>e.roboId===_roboAtual._id);
+    const csv = ['Data,Evento,Gatilho,Máquina,Status', ...exs.map(e=>[fmtDate(e.criadoEm),'Execução',e.gatilho||'manual',e.maquina||'',e.status].join(','))].join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `auditoria_${_roboAtual.nome}_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  }
+
+  function carregarVersoesDrawer() {
+    if (!_roboAtual) return;
+    const versoes = _roboAtual.versoes || [];
+    const el = document.getElementById('drawerVersoes');
+    if (!versoes.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:24px">Sem versões cadastradas. Adicione versões na edição do robô.</div>'; return; }
+    el.innerHTML = versoes.map((v,i)=>`<div class="ver-row ${v.ativo?'ver-active':''}">
+      <div style="flex:1">
+        <div style="font-weight:700;color:#1e2a4a">${_esc(v.versao||'v'+(i+1))}</div>
+        <div style="font-size:11px;color:#718096;font-family:monospace">${_esc(v.comando||'')}</div>
+      </div>
+      ${v.ativo?'<span style="background:#dcfce7;color:#166534;border-radius:10px;padding:2px 8px;font-size:10px;font-weight:700">✓ Ativa</span>':'<button onclick="ativarVersao('+i+')" class="btn-xs" style="background:#f5f0ff;color:#4f46e5;border-color:#c4b5fd">Ativar</button>'}
+    </div>`).join('');
+  }
+
+  async function ativarVersao(idx) {
+    if (!_roboAtual) return;
+    const versoes = (_roboAtual.versoes||[]).map((v,i)=>({...v, ativo: i===idx}));
+    const r = await fetch(`/api/robos/${_roboAtual._id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({versoes}) });
+    if (r.ok) { _roboAtual = await r.json(); carregarVersoesDrawer(); carregarRobos(); }
+  }
+
+  // =================== MODAL CRIAR/EDITAR ===================
+  let _editandoId = null;
+
+  function abrirModalRobo(id) {
+    _editandoId = id || null;
+    schedules = [];
+    payloadRows = [];
+    const r = id ? robos.find(x=>x._id===id) : null;
+    document.getElementById('modalTitle').textContent = r ? 'Editar Robô' : 'Novo Robô';
+    document.getElementById('modalEditActions').style.display = r ? 'block' : 'none';
+    if (r) {
+      document.getElementById('btnToggleAtivo').textContent = r.ativo!==false ? 'Desativar Robô' : 'Reativar Robô';
+    }
+    // Preencher campos
+    document.getElementById('fNome').value = r?.nome || '';
+    document.getElementById('fVersao').value = r?.versao || 'v1.0';
+    document.getElementById('fTipo').value = r?.tipo || 'Background';
+    document.getElementById('fAmbiente').value = r?.ambiente || 'local';
+    document.getElementById('fDescricao').value = r?.descricao || '';
+    document.getElementById('fVinculoTipo').value = r?.vinculo?.tipo || 'zip';
+    document.getElementById('fGitUrl').value = r?.vinculo?.gitUrl || '';
+    document.getElementById('fGitBranch').value = r?.vinculo?.gitBranch || 'main';
+    document.getElementById('fWebhookUrl').value = r?.vinculo?.webhookUrl || '';
+    document.getElementById('fComando').value = r?.comandoExecucao || '';
+    document.getElementById('fRequirements').value = r?.requirementsTxt || '';
+    document.getElementById('fVenvCache').value = r?.venvCache || 'cache';
+    document.getElementById('fTag').value = r?.tag || '';
+    document.getElementById('fTempoManual').value = r?.tempoManual || '';
+    document.getElementById('fSla').value = r?.sla || '';
+    document.getElementById('fTimeout').value = r?.timeout || 300;
+    document.getElementById('fPrioridade').value = r?.prioridade || 'Media';
+    document.getElementById('fAreas').value = (r?.areasBeneficiadas||[]).join(', ');
+    document.getElementById('fMaquinas').value = (r?.maquinas||[]).join(', ');
+    // Payload
+    payloadRows = (r?.webhookPayload||[]).map(p=>({...p}));
+    renderPayloadRows();
+    // Schedules
+    schedules = (r?.schedules||[]).map(s=>({...s}));
+    renderSchedulesList();
+    // Update conditional fields
+    atualizarCamposAmbiente();
+    atualizarVinculo();
+    document.getElementById('roboModal').style.display = 'flex';
+  }
+
+  function fecharModal() {
+    document.getElementById('roboModal').style.display = 'none';
+    _editandoId = null;
+  }
+
+  function atualizarCamposAmbiente() {
+    const amb = document.getElementById('fAmbiente').value;
+    document.getElementById('camposLocal').style.display = amb==='local' ? '' : 'none';
+    document.getElementById('camposNuvem').style.display = amb==='nuvem' ? '' : 'none';
+    document.getElementById('campoComando').style.display = amb==='local' ? '' : 'none';
+    document.getElementById('campoPayload').style.display = amb==='nuvem' ? '' : 'none';
+    document.getElementById('secaoInfra').style.display = amb==='local' ? '' : 'none';
+  }
+
+  function atualizarVinculo() {
+    const tipo = document.getElementById('fVinculoTipo').value;
+    document.getElementById('campoZip').style.display = tipo==='zip' ? '' : 'none';
+    document.getElementById('camposGit').style.display = tipo==='git' ? '' : 'none';
+  }
+
+  function atualizarCamposSched() {
+    const tipo = document.getElementById('schedTipo').value;
+    document.getElementById('schedCampoData').style.display = tipo==='unico' ? '' : 'none';
+    document.getElementById('schedCampoCron').style.display = tipo==='recorrente' ? '' : 'none';
+    document.getElementById('schedCampoOpts').style.display = tipo==='recorrente' ? '' : 'none';
+  }
+
+  function addSchedule() {
+    const tipo = document.getElementById('schedTipo').value;
+    const obj = { tipo, ativo: true };
+    if (tipo==='unico') obj.dataHora = document.getElementById('schedDataHora').value;
+    if (tipo==='recorrente') {
+      obj.cron = document.getElementById('schedCron').value;
+      obj.considerarFeriados = document.getElementById('schedFeriados').checked;
+      obj.considerarFds = document.getElementById('schedFds').checked;
+    }
+    schedules.push(obj);
+    renderSchedulesList();
+  }
+
+  function removeSchedule(i) { schedules.splice(i,1); renderSchedulesList(); }
+
+  function renderSchedulesList() {
+    const el = document.getElementById('schedulesList');
+    if (!schedules.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:12px;margin-bottom:8px">Nenhum schedule configurado — disparo somente manual</div>'; return; }
+    el.innerHTML = schedules.map((s,i)=>`<div class="sched-item">
+      <span class="sched-item-label">${formatSched(s)}</span>
+      <button type="button" class="sched-item-del" onclick="removeSchedule(${i})">✕</button>
+    </div>`).join('');
+  }
+
+  function formatSched(s) {
+    if (s.tipo==='manual') return '🖱️ Manual';
+    if (s.tipo==='unico') return `📅 Único — ${s.dataHora||'?'}`;
+    if (s.tipo==='recorrente') return `🔁 Recorrente — ${s.cron||'?'}${s.considerarFds?' · incl. FDS':''}${s.considerarFeriados?' · incl. Feriados':''}`;
+    return s.tipo;
+  }
+
+  function addPayloadRow() { payloadRows.push({chave:'',valor:''}); renderPayloadRows(); }
+  function removePayloadRow(i) { payloadRows.splice(i,1); renderPayloadRows(); }
+  function updatePayloadRow(i, campo, val) { payloadRows[i][campo] = val; }
+
+  function renderPayloadRows() {
+    const tb = document.getElementById('payloadRows');
+    tb.innerHTML = payloadRows.map((p,i)=>`<tr>
+      <td><input value="${_esc(p.chave)}" placeholder="Chave" oninput="updatePayloadRow(${i},'chave',this.value)"></td>
+      <td><input value="${_esc(p.valor)}" placeholder="Valor" oninput="updatePayloadRow(${i},'valor',this.value)"></td>
+      <td style="text-align:center"><button type="button" onclick="removePayloadRow(${i})" style="background:none;border:none;color:#e53e3e;cursor:pointer;font-size:14px">✕</button></td>
+    </tr>`).join('');
+  }
+
+  async function salvarRobo() {
+    const nome = document.getElementById('fNome').value.trim();
+    if (!nome) { alert('Nome é obrigatório'); return; }
+    const amb = document.getElementById('fAmbiente').value;
+    const vinculoTipo = document.getElementById('fVinculoTipo').value;
+    const vinculo = {};
+    if (amb==='local') {
+      vinculo.tipo = vinculoTipo;
+      if (vinculoTipo==='git') { vinculo.gitUrl = document.getElementById('fGitUrl').value; vinculo.gitBranch = document.getElementById('fGitBranch').value; }
+    } else {
+      vinculo.tipo = 'webhook'; vinculo.webhookUrl = document.getElementById('fWebhookUrl').value;
+    }
+    const areas = document.getElementById('fAreas').value.split(',').map(a=>a.trim()).filter(Boolean);
+    const maquinas = document.getElementById('fMaquinas').value.split(',').map(m=>m.trim()).filter(Boolean);
+    const body = {
+      nome, versao: document.getElementById('fVersao').value.trim(),
+      tipo: document.getElementById('fTipo').value, ambiente: amb,
+      descricao: document.getElementById('fDescricao').value,
+      vinculo, comandoExecucao: document.getElementById('fComando').value,
+      webhookPayload: payloadRows,
+      requirementsTxt: document.getElementById('fRequirements').value,
+      venvCache: document.getElementById('fVenvCache').value,
+      tag: document.getElementById('fTag').value.trim(),
+      tempoManual: parseFloat(document.getElementById('fTempoManual').value)||0,
+      sla: parseFloat(document.getElementById('fSla').value)||0,
+      timeout: parseInt(document.getElementById('fTimeout').value)||300,
+      prioridade: document.getElementById('fPrioridade').value,
+      areasBeneficiadas: areas, maquinas, schedules, ativo: true
+    };
+    const url = _editandoId ? `/api/robos/${_editandoId}` : '/api/robos';
+    const method = _editandoId ? 'PUT' : 'POST';
+    const r = await fetch(url, { method, headers:HEADERS, body:JSON.stringify(body) });
+    if (r.ok) { fecharModal(); carregarRobos(); } else { const d=await r.json(); alert('Erro: '+(d.erro||'desconhecido')); }
+  }
+
+  async function toggleAtivoRobo() {
+    if (!_editandoId) return;
+    const robo = robos.find(r=>r._id===_editandoId);
+    const novoAtivo = !(robo?.ativo !== false);
+    const r = await fetch(`/api/robos/${_editandoId}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({ativo:novoAtivo}) });
+    if (r.ok) { fecharModal(); carregarRobos(); }
+  }
+
+  // =================== UTILITÁRIOS ===================
+  function _esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function statusBadge(st) {
+    const map = {
+      em_execucao: ['Em execução','st-em_execucao','⚙️'],
+      concluido: ['Concluído','st-concluido','✅'],
+      erro: ['Erro','st-erro','❌'],
+      interrompido: ['Interrompido','st-interrompido','⚠️'],
+      nao_disparado: ['Não disparado','st-nao_disparado','⏸️'],
+    };
+    const [label, cls, icon] = map[st] || [st||'—','st-nao_disparado',''];
+    return `<span class="status-badge ${cls}">${icon} ${label}</span>`;
+  }
+
+  function fmtDate(d) {
+    if (!d) return '—';
+    const dt = new Date(d);
+    return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  function formatDur(sec) {
+    if (!sec) return '0s';
+    if (sec < 60) return sec + 's';
+    if (sec < 3600) return Math.floor(sec/60)+'m '+( sec%60)+'s';
+    return Math.floor(sec/3600)+'h '+Math.floor((sec%3600)/60)+'m';
+  }
+
+  // =================== INIT ===================
+  document.addEventListener('DOMContentLoaded', () => {
+    carregarMetricas();
+  });
+</script>
+</body>
+</html>

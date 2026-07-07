@@ -7449,19 +7449,23 @@
       if (!res.ok) { alert('Erro ao gerar configuração'); return; }
       const config = await res.json();
 
-      // Download config.json
+      function dl(url, filename, delay) {
+        setTimeout(() => {
+          const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+        }, delay);
+      }
+
+      // config.json gerado dinamicamente
       const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'config.json'; a.click();
-      URL.revokeObjectURL(url);
+      const configUrl = URL.createObjectURL(blob);
+      dl(configUrl, 'config.json', 0);
+      setTimeout(() => URL.revokeObjectURL(configUrl), 5000);
 
-      // Download agent.py após pequeno delay
-      setTimeout(() => {
-        const agentUrl = '/agent.py';
-        const a2 = document.createElement('a'); a2.href = agentUrl; a2.download = 'agent.py'; a2.click();
-      }, 500);
+      // agent.py e iniciar.bat estáticos
+      dl('/agent.py',    'agent.py',    600);
+      dl('/iniciar.bat', 'iniciar.bat', 1200);
 
-      alert('✅ Baixando config.json e agent.py!\n\nInstale na máquina:\n1. pip install requests psutil\n2. python agent.py');
+      alert('✅ 3 arquivos baixando: config.json, agent.py e iniciar.bat\n\nPara instalar na máquina:\n→ Coloque os 3 na mesma pasta\n→ Dê duplo clique em iniciar.bat\n→ Pronto!');
     } catch(e) { alert('Erro ao gerar pacote: '+e.message); }
   }
 

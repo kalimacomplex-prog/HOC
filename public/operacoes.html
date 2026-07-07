@@ -806,10 +806,11 @@
         <div class="robos-subtabs">
           <button class="robo-subtab active" onclick="mudarRoboTab('dashboard',this)">📊 Resumo</button>
           <button class="robo-subtab" onclick="mudarRoboTab('producao',this)">⚙️ Produção</button>
+          <button class="robo-subtab" onclick="mudarRoboTab('robos-lista',this)">🤖 Robôs</button>
           <button class="robo-subtab" onclick="mudarRoboTab('credenciais',this)">🔐 Credenciais</button>
           <button class="robo-subtab" onclick="mudarRoboTab('calendario',this)">📅 Calendário</button>
           <button class="robo-subtab" onclick="mudarRoboTab('ambiente',this)">🖥️ Ambiente</button>
-          <button class="robo-subtab" onclick="mudarRoboTab('agentes',this)">🤖 Agentes</button>
+          <button class="robo-subtab" onclick="mudarRoboTab('agentes',this)">📦 Agentes</button>
         </div>
 
         <!-- ===== RESUMO ===== -->
@@ -918,78 +919,67 @@
           </div>
         </div>
 
-        <!-- ===== PRODUÇÃO ===== -->
+        <!-- ===== PRODUÇÃO (histórico de execuções) ===== -->
         <div class="robo-secao" id="robo-producao">
-          <!-- Sub-tabs internos: Execuções | Robôs -->
-          <div style="display:flex;gap:4px;margin-bottom:16px;background:#f1f5f9;border-radius:8px;padding:4px;width:fit-content">
-            <button id="prodTab-exec" onclick="mudarProdTab('exec')" style="padding:6px 16px;border-radius:6px;border:none;font-size:12px;font-weight:700;cursor:pointer;background:#2d1b69;color:white;transition:all .15s">Execuções</button>
-            <button id="prodTab-lista" onclick="mudarProdTab('lista')" style="padding:6px 16px;border-radius:6px;border:none;font-size:12px;font-weight:700;cursor:pointer;background:transparent;color:#718096;transition:all .15s">Robôs</button>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+            <div style="position:relative;flex:1;min-width:180px;max-width:240px">
+              <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e2a4a" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" id="execFiltroNome" placeholder="Buscar robô..." oninput="filtrarExecucoesRobos()" style="width:100%;padding:8px 10px 8px 32px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;font-family:inherit;color:#1e2a4a">
+            </div>
+            <select id="execFiltroStatus" onchange="filtrarExecucoesRobos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit">
+              <option value="">Todos os status</option>
+              <option value="em_execucao">Em execução</option>
+              <option value="concluido">Concluído</option>
+              <option value="erro">Erro</option>
+              <option value="interrompido">Interrompido</option>
+              <option value="nao_disparado">Não disparado</option>
+            </select>
+            <select id="execFiltroGatilho" onchange="filtrarExecucoesRobos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit">
+              <option value="">Todos os gatilhos</option>
+              <option value="manual">Manual</option>
+              <option value="schedule">Schedule</option>
+              <option value="webhook">Webhook</option>
+            </select>
+            <button onclick="carregarExecsRobos()" style="padding:8px 14px;background:white;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;color:#4a5568;cursor:pointer">↻ Atualizar</button>
+            <span style="font-size:10px;color:#a0aec0;margin-left:4px">Auto: <span id="execCountdownOps">30</span>s</span>
           </div>
-
-          <!-- Sub: Execuções -->
-          <div id="prodSecao-exec">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-              <div style="position:relative;flex:1;min-width:180px;max-width:240px">
-                <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e2a4a" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                <input type="text" id="execFiltroNome" placeholder="Buscar robô..." oninput="filtrarExecucoesRobos()" style="width:100%;padding:8px 10px 8px 32px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;font-family:inherit;color:#1e2a4a">
-              </div>
-              <select id="execFiltroStatus" onchange="filtrarExecucoesRobos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit">
-                <option value="">Todos os status</option>
-                <option value="em_execucao">Em execução</option>
-                <option value="concluido">Concluído</option>
-                <option value="erro">Erro</option>
-                <option value="interrompido">Interrompido</option>
-                <option value="nao_disparado">Não disparado</option>
-              </select>
-              <select id="execFiltroGatilho" onchange="filtrarExecucoesRobos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit">
-                <option value="">Todos os gatilhos</option>
-                <option value="manual">Manual</option>
-                <option value="schedule">Schedule</option>
-                <option value="webhook">Webhook</option>
-              </select>
-              <button onclick="carregarExecsRobos()" style="padding:8px 14px;background:white;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;color:#4a5568;cursor:pointer">↻ Atualizar</button>
-              <span style="font-size:10px;color:#a0aec0;margin-left:4px">Auto: <span id="execCountdownOps">30</span>s</span>
+          <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden">
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
+                <thead><tr style="background:#f8fafc">
+                  <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0;white-space:nowrap">Robô</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Status</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Máquina</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Gatilho</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Início</th>
+                  <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Duração</th>
+                  <th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Ações</th>
+                </tr></thead>
+                <tbody id="execRobosBody"><tr><td colspan="7" style="text-align:center;padding:32px;color:#a0aec0">Carregando execuções...</td></tr></tbody>
+              </table>
             </div>
-            <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden">
-              <div style="overflow-x:auto">
-                <table style="width:100%;border-collapse:collapse;font-size:12px">
-                  <thead><tr style="background:#f8fafc">
-                    <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0;white-space:nowrap">Robô</th>
-                    <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Status</th>
-                    <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Máquina</th>
-                    <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Gatilho</th>
-                    <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Início</th>
-                    <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Duração</th>
-                    <th style="padding:10px 14px;text-align:right;font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e2e8f0">Ações</th>
-                  </tr></thead>
-                  <tbody id="execRobosBody"><tr><td colspan="7" style="text-align:center;padding:32px;color:#a0aec0">Carregando execuções...</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sub: Lista de Robôs -->
-          <div id="prodSecao-lista" style="display:none">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
-              <div style="position:relative;flex:1;min-width:180px;max-width:240px">
-                <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e2a4a" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                <input type="text" id="searchRobo" placeholder="Buscar robôs..." oninput="filtrarRobos()" style="width:100%;padding:8px 10px 8px 32px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;font-family:inherit;color:#1e2a4a">
-              </div>
-              <select id="filtroStatusRobo" onchange="filtrarRobos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit">
-                <option value="">Todos os Status</option>
-                <option>Executando</option><option>Pausado</option><option>Erro</option><option>Concluído</option>
-              </select>
-              <select id="filtroTipoRobo" onchange="filtrarRobos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit">
-                <option value="">Todos os Tipos</option>
-                <option value="Background">Background</option>
-                <option value="Interface">Interface</option>
-              </select>
-              <div style="flex:1"></div>
-              <button class="btn-primary" onclick="abrirModalRobo()" style="font-size:12px;padding:8px 16px">+ Criar Robô</button>
-            </div>
-            <div id="robosLista"></div>
           </div>
         </div>
+
+        <!-- ===== ROBÔS (catálogo) ===== -->
+        <div class="robo-secao" id="robo-robos-lista">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+            <div style="position:relative;flex:1;min-width:180px;max-width:240px">
+              <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1e2a4a" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input type="text" id="searchRobo" placeholder="Buscar robôs..." oninput="filtrarRobos()" style="width:100%;padding:8px 10px 8px 32px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;font-family:inherit;color:#1e2a4a">
+            </div>
+            <select id="filtroStatusRobo" onchange="filtrarRobos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit">
+              <option value="">Todos os Status</option>
+              <option>Executando</option><option>Pausado</option><option>Erro</option><option>Concluído</option>
+            </select>
+            <select id="filtroTipoRobo" onchange="filtrarRobos()" style="padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit">
+              <option value="">Todos os Tipos</option>
+              <option value="Background">Background</option>
+              <option value="Interface">Interface</option>
+            </select>
+            <div style="flex:1"></div>
+            <button class="btn-primary" onclick="abrirModalRobo()" style="font-size:12px;padding:8px 16px">+ Criar Robô</button>
+          </div>
           <div id="robosLista"></div>
         </div>
 
@@ -1032,23 +1022,104 @@
           </div>
         </div>
 
-        <!-- Ambiente -->
+        <!-- ===== AMBIENTE (Máquinas) ===== -->
         <div class="robo-secao" id="robo-ambiente">
-          <div class="mockup-aviso">⚠️ Mockup — Status de máquinas em tempo real requer agente instalado enviando heartbeat. Cadastre máquinas para gerenciar a infraestrutura.</div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:14px">
-            <div style="font-size:13px;font-weight:700;color:#1e2a4a">🖥️ Máquinas Cadastradas</div>
-            <button class="btn-primary" onclick="abrirModalMaquina()" style="font-size:12px;padding:8px 14px">+ Adicionar Máquina</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#1e2a4a">🖥️ Máquinas de Execução</div>
+              <div style="font-size:11px;color:#718096;margin-top:2px">Cada máquina precisa do Agent instalado para aparecer Online</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button onclick="carregarMaquinas()" style="padding:7px 14px;background:white;border:1.5px solid #e2e8f0;border-radius:8px;font-size:11px;font-weight:600;color:#4a5568;cursor:pointer">↻ Atualizar</button>
+              <button class="btn-primary" onclick="abrirModalMaquina()" style="font-size:12px;padding:8px 16px">+ Nova Máquina</button>
+            </div>
           </div>
-          <div id="maquinasLista"></div>
+
+          <!-- Status summary bar -->
+          <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+            <div style="background:white;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:8px;min-width:100px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#38a169"></div>
+              <div><div id="mqOnlineCount" style="font-size:18px;font-weight:800;color:#276749">0</div><div style="font-size:10px;color:#718096">Online</div></div>
+            </div>
+            <div style="background:white;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:8px;min-width:100px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#e53e3e"></div>
+              <div><div id="mqOfflineCount" style="font-size:18px;font-weight:800;color:#c53030">0</div><div style="font-size:10px;color:#718096">Offline</div></div>
+            </div>
+            <div style="background:white;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:8px;min-width:100px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#d69e2e"></div>
+              <div><div id="mqBusyCount" style="font-size:18px;font-weight:800;color:#b7791f">0</div><div style="font-size:10px;color:#718096">Ocupadas</div></div>
+            </div>
+            <div style="background:white;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.06);display:flex;align-items:center;gap:8px;min-width:100px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#718096"></div>
+              <div><div id="mqMaintenanceCount" style="font-size:18px;font-weight:800;color:#4a5568">0</div><div style="font-size:10px;color:#718096">Manutenção</div></div>
+            </div>
+          </div>
+
+          <div id="maquinasLista"><div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Carregando máquinas...</div></div>
         </div>
 
-        <!-- Agentes -->
+        <!-- ===== AGENTES (software) ===== -->
         <div class="robo-secao" id="robo-agentes">
-          <div class="mockup-aviso">⚠️ Mockup — Heartbeat e status em tempo real requerem o software Agente instalado nas máquinas. Esta seção permite gerenciar as configurações dos agentes.</div>
-          <div style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#276749">
-            📥 Para instalar o Agente em uma máquina, baixe o instalador e configure o arquivo <code>conf.bct</code> com a URL do servidor e sua API Key.
+          <!-- Header -->
+          <div style="margin-bottom:20px">
+            <div style="font-size:14px;font-weight:700;color:#1e2a4a;margin-bottom:4px">📦 Agent HOC — Software Executor</div>
+            <div style="font-size:11px;color:#718096">O Agent é um script Python que você instala em cada máquina. Ele recebe ordens do SaaS, executa robôs e envia heartbeats a cada 20s.</div>
           </div>
-          <div id="agentesLista"></div>
+
+          <!-- How it works -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+            <div style="background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #2d1b69">
+              <div style="font-size:20px;margin-bottom:6px">1️⃣</div>
+              <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:4px">Criar Máquina</div>
+              <div style="font-size:10px;color:#718096">Cadastre a máquina em <strong>Ambiente</strong> → o SaaS gera uma chave secreta única</div>
+            </div>
+            <div style="background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #3b5bdb">
+              <div style="font-size:20px;margin-bottom:6px">2️⃣</div>
+              <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:4px">Baixar Agent</div>
+              <div style="font-size:10px;color:#718096">Clique em <strong>⬇ Baixar Agent</strong> na máquina desejada — gera <code>agent.py</code> + <code>config.json</code></div>
+            </div>
+            <div style="background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #38a169">
+              <div style="font-size:20px;margin-bottom:6px">3️⃣</div>
+              <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:4px">Instalar e Rodar</div>
+              <div style="font-size:10px;color:#718096"><code>pip install requests psutil</code> e depois <code>python agent.py</code> na máquina</div>
+            </div>
+            <div style="background:white;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #38a169">
+              <div style="font-size:20px;margin-bottom:6px">4️⃣</div>
+              <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:4px">Máquina Online</div>
+              <div style="font-size:10px;color:#718096">Em até 20s a máquina aparece <span style="color:#276749;font-weight:700">● Online</span> em Ambiente e já pode executar robôs</div>
+            </div>
+          </div>
+
+          <!-- Download section -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <div style="width:3px;height:16px;background:#2d1b69;border-radius:2px"></div>
+            <span style="font-size:11px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:.5px">Download do Agent por Máquina</span>
+          </div>
+          <div id="agentDownloadLista"><div style="text-align:center;padding:20px;color:#a0aec0;font-size:12px">Cadastre uma máquina em <strong>Ambiente</strong> para gerar o pacote do Agent.</div></div>
+
+          <!-- API reference -->
+          <div style="margin-top:24px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+              <div style="width:3px;height:16px;background:#3b5bdb;border-radius:2px"></div>
+              <span style="font-size:11px;font-weight:700;color:#3b5bdb;text-transform:uppercase;letter-spacing:.5px">API para os Robôs usarem</span>
+            </div>
+            <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden">
+              <table style="width:100%;border-collapse:collapse;font-size:11px">
+                <thead><tr style="background:#f8fafc">
+                  <th style="padding:8px 14px;text-align:left;color:#718096;font-size:10px;font-weight:700;border-bottom:1px solid #e2e8f0">MÉTODO</th>
+                  <th style="padding:8px 14px;text-align:left;color:#718096;font-size:10px;font-weight:700;border-bottom:1px solid #e2e8f0">ENDPOINT</th>
+                  <th style="padding:8px 14px;text-align:left;color:#718096;font-size:10px;font-weight:700;border-bottom:1px solid #e2e8f0">DESCRIÇÃO</th>
+                </tr></thead>
+                <tbody id="apiRefBody">
+                  <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 14px"><span style="background:#e6f4ea;color:#276749;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10px">POST</span></td><td style="padding:8px 14px;font-family:monospace;color:#2d1b69">/api/maquinas/heartbeat</td><td style="padding:8px 14px;color:#4a5568">Agent envia status (CPU/RAM) e recebe comandos pendentes</td></tr>
+                  <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 14px"><span style="background:#e6f4ea;color:#276749;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10px">POST</span></td><td style="padding:8px 14px;font-family:monospace;color:#2d1b69">/api/robos/execucoes/:id/logs</td><td style="padding:8px 14px;color:#4a5568">Robô envia log com status (info / success / error)</td></tr>
+                  <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 14px"><span style="background:#e9d8fd;color:#4f46e5;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10px">GET</span></td><td style="padding:8px 14px;font-family:monospace;color:#2d1b69">/api/robos/execucoes/:id/status</td><td style="padding:8px 14px;color:#4a5568">Agent verifica se execução foi interrompida</td></tr>
+                  <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 14px"><span style="background:#e9d8fd;color:#4f46e5;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10px">GET</span></td><td style="padding:8px 14px;font-family:monospace;color:#2d1b69">/api/credenciais/:nome/valor</td><td style="padding:8px 14px;color:#4a5568">Robô busca credencial pelo nome (retorna JSON)</td></tr>
+                  <tr><td style="padding:8px 14px"><span style="background:#e6f4ea;color:#276749;padding:2px 7px;border-radius:4px;font-weight:700;font-size:10px">POST</span></td><td style="padding:8px 14px;font-family:monospace;color:#2d1b69">/api/robos/execucoes/:id/artifacts</td><td style="padding:8px 14px;color:#4a5568">Robô faz upload de arquivo gerado (PDF, Excel...)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1411,17 +1482,17 @@
 
 <!-- Modal Máquina -->
 <div class="modal-overlay" id="modalMaquina">
-  <div class="modal modal-ops">
-    <div class="modal-header"><span class="modal-titulo" id="modalMaqTitulo">Adicionar Máquina</span><button class="btn-fechar" onclick="fecharModal('modalMaquina')">×</button></div>
+  <div class="modal modal-ops" style="max-width:520px">
+    <div class="modal-header"><span class="modal-titulo" id="modalMaqTitulo">Nova Máquina</span><button class="btn-fechar" onclick="fecharModal('modalMaquina')">×</button></div>
     <div class="form-row">
-      <div class="form-group"><label>Nome / Machine ID *</label><input type="text" class="form-control" id="maqNome" placeholder="Ex: VM-PROD-01"></div>
-      <div class="form-group"><label>Tipo</label><select class="form-control" id="maqTipo"><option>Virtual Machine</option><option>Physical Machine</option></select></div>
-      <div class="form-group"><label>Sistema Operacional</label><input type="text" class="form-control" id="maqSO" placeholder="Ex: Windows Server 2022"></div>
-      <div class="form-group"><label>IP</label><input type="text" class="form-control" id="maqIP" placeholder="Ex: 192.168.1.101"></div>
-      <div class="form-group"><label>CPU Total</label><input type="text" class="form-control" id="maqCPU" placeholder="Ex: 8 cores"></div>
-      <div class="form-group"><label>RAM Total</label><input type="text" class="form-control" id="maqRAM" placeholder="Ex: 16 GB"></div>
-      <div class="form-group"><label>Slots Disponíveis</label><input type="number" class="form-control" id="maqSlots" value="10" min="1"></div>
-      <div class="form-group"><label>Status</label><select class="form-control" id="maqStatus"><option>Online</option><option>Offline</option><option>Manutenção</option><option>Ocupado</option></select></div>
+      <div class="form-group"><label>Nome da Máquina *</label><input type="text" class="form-control" id="maqNome" placeholder="Ex: Servidor RPA Produção"></div>
+      <div class="form-group"><label>ID Único (Machine ID) *</label><input type="text" class="form-control" id="maqMachineId" placeholder="Ex: VM_PROD_01" style="font-family:monospace"></div>
+      <div class="form-group"><label>Grupo de Máquinas</label><input type="text" class="form-control" id="maqGrupo" placeholder="Ex: Grupo SAP, Grupo Contábil"></div>
+      <div class="form-group"><label>Capacidade Máxima (robôs simultâneos)</label><input type="number" class="form-control" id="maqCapacidade" value="4" min="1" max="20"></div>
+      <div class="form-group form-full"><label>Descrição</label><input type="text" class="form-control" id="maqDescricao" placeholder="Ex: VM Windows 2022 para automações SAP"></div>
+    </div>
+    <div id="maqChaveInfo" style="display:none;background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:12px 14px;margin:8px 0;font-size:12px;color:#276749">
+      ✅ <strong>Máquina criada!</strong> Vá em <strong>Agentes → Baixar Agent</strong> para obter o pacote com a chave desta máquina. A chave <strong>não é exibida novamente</strong>.
     </div>
     <input type="hidden" id="maqEditId">
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalMaquina')">Cancelar</button><button class="btn-confirmar" onclick="salvarMaquina()">Salvar</button></div>
@@ -1678,9 +1749,30 @@
     btn.classList.add('active');
     document.getElementById('robo-' + id).classList.add('active');
     if (id === 'dashboard') renderDashboardRobos();
+    if (id === 'producao') { carregarExecsRobos(); iniciarAutoRefreshExecs(); }
+    if (id === 'robos-lista') { filtrarRobos(); }
     if (id === 'calendario') renderCalendario();
-    if (id === 'ambiente') renderAmbiente();
-    if (id === 'agentes') renderAgentes();
+    if (id === 'ambiente') { carregarMaquinas(); iniciarAutoRefreshMaquinas(); }
+    if (id === 'agentes') { renderAgentDownloadLista(); }
+  }
+
+  let _execsAutoTimer = null;
+  let _execsCountdown = 30;
+  function iniciarAutoRefreshExecs() {
+    if (_execsAutoTimer) clearInterval(_execsAutoTimer);
+    _execsCountdown = 30;
+    const el = document.getElementById('execCountdownOps');
+    _execsAutoTimer = setInterval(()=>{
+      _execsCountdown--;
+      if (el) el.textContent = _execsCountdown;
+      if (_execsCountdown <= 0) { _execsCountdown = 30; carregarExecsRobos(); }
+    }, 1000);
+  }
+
+  let _maqAutoTimer = null;
+  function iniciarAutoRefreshMaquinas() {
+    if (_maqAutoTimer) clearInterval(_maqAutoTimer);
+    _maqAutoTimer = setInterval(() => carregarMaquinas(), 15000);
   }
 
   // ===== UTILS =====
@@ -7137,47 +7229,240 @@
         </div>`).join('');
   }
 
+  // ===== AMBIENTE (MÁQUINAS) =====
+  let maquinasData = [];
+  let _maquinasRefreshTimer = null;
+
+  async function carregarMaquinas() {
+    try {
+      const res = await fetch('/api/maquinas', { headers: HEADERS });
+      if (!res.ok) return;
+      maquinasData = await res.json();
+      renderMaquinas();
+      renderAgentDownloadLista();
+    } catch(e) { console.error('Erro ao carregar máquinas:', e); }
+  }
+
+  function renderMaquinas() {
+    const lista = maquinasData;
+    const el = document.getElementById('maquinasLista');
+    if (!el) return;
+
+    // Update summary badges
+    const cnt = { online:0, offline:0, busy:0, maintenance:0 };
+    lista.forEach(m => {
+      const s = m.status || 'offline';
+      if (s === 'online') cnt.online++;
+      else if (s === 'offline') cnt.offline++;
+      else if (s === 'busy') cnt.busy++;
+      else if (s === 'maintenance') cnt.maintenance++;
+    });
+    ['online','offline','busy','maintenance'].forEach(k => {
+      const el2 = document.getElementById('mq'+k.charAt(0).toUpperCase()+k.slice(1)+'Count');
+      if (el2) el2.textContent = cnt[k];
+    });
+
+    if (lista.length === 0) {
+      el.innerHTML = `<div style="text-align:center;padding:48px;background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+        <div style="font-size:36px;margin-bottom:12px">🖥️</div>
+        <div style="font-size:14px;font-weight:600;color:#1e2a4a;margin-bottom:6px">Nenhuma máquina cadastrada</div>
+        <div style="font-size:12px;color:#718096;margin-bottom:16px">Cadastre uma máquina para começar a orquestrar robôs</div>
+        <button class="btn-primary" onclick="abrirModalMaquina()" style="font-size:12px;padding:8px 18px">+ Nova Máquina</button>
+      </div>`;
+      return;
+    }
+
+    const STATUS_CFG = {
+      online:      { dot:'#38a169', bg:'#f0fff4', border:'#9ae6b4', label:'Online',      txt:'#276749' },
+      offline:     { dot:'#e53e3e', bg:'#fff5f5', border:'#feb2b2', label:'Offline',     txt:'#c53030' },
+      busy:        { dot:'#d69e2e', bg:'#fffbeb', border:'#fbd38d', label:'Ocupada',     txt:'#b7791f' },
+      maintenance: { dot:'#718096', bg:'#f8fafc', border:'#cbd5e0', label:'Manutenção',  txt:'#4a5568' },
+    };
+
+    el.innerHTML = lista.map(m => {
+      const s = STATUS_CFG[m.status] || STATUS_CFG.offline;
+      const cap = m.capacidadeMaxima || 4;
+      const ativos = m.robosAtivos || 0;
+      const slots = Math.min(ativos, cap);
+      const pctCpu = m.cpu || 0;
+      const pctRam = m.ram || 0;
+      const hb = m.ultimoHeartbeat ? new Date(m.ultimoHeartbeat).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '—';
+      const robosRunning = (m.robosAtivosList||[]).slice(0,4);
+
+      return `<div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-left:4px solid ${s.dot};margin-bottom:12px;padding:16px 20px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <!-- Status dot + name -->
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:160px">
+            <div style="width:10px;height:10px;border-radius:50%;background:${s.dot};flex-shrink:0${m.status==='online'?';box-shadow:0 0 0 3px '+s.border:''}"></div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#1e2a4a">${m.nome}</div>
+              <div style="font-size:10px;color:#a0aec0;font-family:monospace">${m.machineId||'—'}${m.grupo?' · '+m.grupo:''}</div>
+            </div>
+          </div>
+
+          <!-- Status badge -->
+          <span style="padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;background:${s.bg};color:${s.txt};border:1px solid ${s.border}">${s.label}</span>
+
+          <!-- Capacity indicator -->
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="display:flex;gap:3px">
+              ${Array.from({length:cap}).map((_,i)=>`<div style="width:14px;height:14px;border-radius:3px;background:${i<ativos?s.dot:'#e2e8f0'}"></div>`).join('')}
+            </div>
+            <span style="font-size:10px;color:#718096">${ativos}/${cap}</span>
+          </div>
+
+          <!-- CPU/RAM -->
+          <div style="display:flex;gap:12px">
+            <div style="min-width:60px">
+              <div style="font-size:9px;color:#a0aec0;margin-bottom:2px">CPU</div>
+              <div style="background:#e2e8f0;border-radius:3px;height:6px;overflow:hidden">
+                <div style="height:100%;background:${pctCpu>80?'#e53e3e':pctCpu>50?'#d69e2e':'#38a169'};width:${pctCpu}%;transition:width .3s"></div>
+              </div>
+              <div style="font-size:9px;color:#718096;margin-top:1px">${pctCpu}%</div>
+            </div>
+            <div style="min-width:60px">
+              <div style="font-size:9px;color:#a0aec0;margin-bottom:2px">RAM</div>
+              <div style="background:#e2e8f0;border-radius:3px;height:6px;overflow:hidden">
+                <div style="height:100%;background:${pctRam>80?'#e53e3e':pctRam>50?'#d69e2e':'#3b5bdb'};width:${pctRam}%;transition:width .3s"></div>
+              </div>
+              <div style="font-size:9px;color:#718096;margin-top:1px">${pctRam}%</div>
+            </div>
+          </div>
+
+          <!-- Heartbeat -->
+          <div style="font-size:10px;color:#a0aec0">⏱ ${hb}</div>
+
+          <!-- Actions -->
+          <div style="display:flex;gap:6px;margin-left:auto">
+            <button onclick="toggleManutencao('${m._id}')" title="${m.maintenanceMode?'Sair da manutenção':'Modo manutenção'}"
+              style="padding:5px 10px;background:${m.maintenanceMode?'#fffbeb':'#f8fafc'};color:${m.maintenanceMode?'#b7791f':'#718096'};border:1.5px solid ${m.maintenanceMode?'#fbd38d':'#e2e8f0'};border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">
+              🔧 ${m.maintenanceMode?'Sair Manutenção':'Manutenção'}
+            </button>
+            <button onclick="editarMaquina('${m._id}')" style="padding:5px 10px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">✏️</button>
+            <button onclick="deletarMaquina('${m._id}')" style="padding:5px 10px;background:#fff5f5;color:#c53030;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">🗑️</button>
+          </div>
+        </div>
+
+        ${robosRunning.length>0?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9;display:flex;gap:6px;flex-wrap:wrap">
+          <span style="font-size:10px;color:#a0aec0;align-self:center">Rodando:</span>
+          ${robosRunning.map(r=>`<span style="padding:2px 8px;background:#f0fff4;color:#276749;border-radius:10px;font-size:10px;font-weight:600">● ${r}</span>`).join('')}
+        </div>`:''}</div>`;
+    }).join('');
+  }
+
   function abrirModalMaquina(id) {
     document.getElementById('maqEditId').value = id||'';
-    if (id) { const m=maquinas.find(m=>m._id===id); if(m){document.getElementById('maqNome').value=m.nome;document.getElementById('maqTipo').value=m.tipo;document.getElementById('maqSO').value=m.so||'';document.getElementById('maqIP').value=m.ip||'';document.getElementById('maqCPU').value=m.cpu||'';document.getElementById('maqRAM').value=m.ram||'';document.getElementById('maqSlots').value=m.slots||10;document.getElementById('maqStatus').value=m.status;} }
-    else { ['maqNome','maqSO','maqIP','maqCPU','maqRAM'].forEach(id=>document.getElementById(id).value=''); document.getElementById('maqTipo').value='Virtual Machine'; document.getElementById('maqSlots').value=10; document.getElementById('maqStatus').value='Online'; }
+    document.getElementById('maqChaveInfo').style.display = 'none';
+    document.getElementById('modalMaqTitulo').textContent = id ? 'Editar Máquina' : 'Nova Máquina';
+    if (id) {
+      const m = maquinasData.find(m=>m._id===id);
+      if (m) {
+        document.getElementById('maqNome').value = m.nome||'';
+        document.getElementById('maqMachineId').value = m.machineId||'';
+        document.getElementById('maqGrupo').value = m.grupo||'';
+        document.getElementById('maqCapacidade').value = m.capacidadeMaxima||4;
+        document.getElementById('maqDescricao').value = m.descricao||'';
+      }
+    } else {
+      ['maqNome','maqMachineId','maqGrupo','maqDescricao'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('maqCapacidade').value = 4;
+    }
     document.getElementById('modalMaquina').classList.add('aberto');
   }
   function editarMaquina(id) { abrirModalMaquina(id); }
 
   async function salvarMaquina() {
     const nome = document.getElementById('maqNome').value.trim();
+    const machineId = document.getElementById('maqMachineId').value.trim();
     if (!nome) { alert('Nome obrigatório.'); return; }
-    const dados = { nome, tipo:document.getElementById('maqTipo').value, so:document.getElementById('maqSO').value, ip:document.getElementById('maqIP').value, cpu:document.getElementById('maqCPU').value, ram:document.getElementById('maqRAM').value, slots:parseInt(document.getElementById('maqSlots').value)||10, status:document.getElementById('maqStatus').value };
+    if (!machineId) { alert('Machine ID obrigatório (ex: VM_PROD_01).'); return; }
+    const dados = {
+      nome, machineId,
+      grupo: document.getElementById('maqGrupo').value.trim(),
+      capacidadeMaxima: parseInt(document.getElementById('maqCapacidade').value)||4,
+      descricao: document.getElementById('maqDescricao').value.trim()
+    };
     const id = document.getElementById('maqEditId').value;
-    // Salva localmente (não tem model no banco para máquinas ainda — usa localStorage como cache)
-    if (id) { const idx=maquinas.findIndex(m=>m._id===id); if(idx!==-1) maquinas[idx]={...maquinas[idx],...dados}; }
-    else maquinas.push({_id:Date.now().toString(),...dados});
-    localStorage.setItem('maquinas_'+usuario.empresaNome, JSON.stringify(maquinas));
-    fecharModal('modalMaquina');
-    renderAmbiente();
+    try {
+      const res = await fetch(id ? `/api/maquinas/${id}` : '/api/maquinas', {
+        method: id ? 'PUT' : 'POST', headers: HEADERS, body: JSON.stringify(dados)
+      });
+      if (!res.ok) { const e=await res.json(); alert(e.erro||'Erro ao salvar'); return; }
+      if (!id) {
+        document.getElementById('maqChaveInfo').style.display = 'block';
+        document.getElementById('modalMaqTitulo').textContent = 'Máquina Criada!';
+        document.querySelector('#modalMaquina .btn-confirmar').style.display='none';
+        document.querySelector('#modalMaquina .btn-cancelar').textContent='Fechar';
+      } else {
+        fecharModal('modalMaquina');
+        document.querySelector('#modalMaquina .btn-confirmar').style.display='';
+        document.querySelector('#modalMaquina .btn-cancelar').textContent='Cancelar';
+      }
+      await carregarMaquinas();
+    } catch(e) { alert('Erro de conexão'); }
   }
 
   async function deletarMaquina(id) {
-    if (!confirm('Deletar máquina?')) return;
-    maquinas = maquinas.filter(m=>m._id!==id);
-    localStorage.setItem('maquinas_'+usuario.empresaNome, JSON.stringify(maquinas));
-    renderAmbiente();
+    if (!confirm('Deletar esta máquina? O Agent instalado nela perderá a conexão.')) return;
+    try {
+      await fetch(`/api/maquinas/${id}`, { method:'DELETE', headers:HEADERS });
+      await carregarMaquinas();
+    } catch(e) { alert('Erro ao deletar'); }
   }
 
-  // ===== AGENTES =====
-  function renderAgentes() {
-    const agentes = JSON.parse(localStorage.getItem('agentes_'+usuario.empresaNome)||'[]');
-    const stCls = {Conectado:'ast-conectado',Desconectado:'ast-desconectado',Atualizando:'ast-atualizando'};
-    document.getElementById('agentesLista').innerHTML = agentes.length===0
-      ? `<div class="empty-ops"><div style="font-size:28px">🤖</div><div>Nenhum agente instalado.</div><div style="font-size:12px;margin-top:6px">Baixe o instalador e configure o arquivo conf.bct nas máquinas de execução.</div></div>`
-      : agentes.map(a=>`<div class="agente-card">
-          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1e2a4a">${a.nome||'Agente'}</div><div style="font-size:11px;color:#718096">${a.versao||'—'} • ${a.tipo||'Unattended'}</div></div>
-          <div style="font-size:12px;color:#4a5568">🖥️ ${a.maquina||'—'}</div>
-          <span class="agente-status ${stCls[a.status]||'ast-desconectado'}">${a.status}</span>
-          <span class="slots-badge">${a.slotsLivres||0}/${a.slots||1} slots</span>
-          <span class="heartbeat">Heartbeat: <span>${a.heartbeat||'—'}</span></span>
-        </div>`).join('');
+  async function toggleManutencao(id) {
+    try {
+      await fetch(`/api/maquinas/${id}/manutencao`, { method:'POST', headers:HEADERS });
+      await carregarMaquinas();
+    } catch(e) { alert('Erro'); }
+  }
+
+  // ===== AGENTES (download) =====
+  function renderAgentDownloadLista() {
+    const el = document.getElementById('agentDownloadLista');
+    if (!el) return;
+    if (maquinasData.length === 0) {
+      el.innerHTML = `<div style="text-align:center;padding:20px;color:#a0aec0;font-size:12px">Cadastre uma máquina em <strong>Ambiente</strong> para gerar o pacote do Agent.</div>`;
+      return;
+    }
+    const STATUS_DOT = { online:'#38a169', offline:'#e53e3e', busy:'#d69e2e', maintenance:'#718096' };
+    el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">` +
+      maquinasData.map(m => {
+        const dot = STATUS_DOT[m.status]||'#e53e3e';
+        return `<div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:16px 18px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:${dot}"></div>
+            <div style="font-size:12px;font-weight:700;color:#1e2a4a;flex:1">${m.nome}</div>
+          </div>
+          <div style="font-size:10px;color:#a0aec0;font-family:monospace;margin-bottom:12px">${m.machineId}</div>
+          <button onclick="downloadAgentPackage('${m._id}')"
+            style="width:100%;padding:8px;background:#2d1b69;color:white;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">
+            ⬇ Baixar Agent para esta máquina
+          </button>
+        </div>`;
+      }).join('') + `</div>`;
+  }
+
+  async function downloadAgentPackage(maquinaId) {
+    try {
+      const res = await fetch(`/api/maquinas/${maquinaId}/agent-config`, { headers: HEADERS });
+      if (!res.ok) { alert('Erro ao gerar configuração'); return; }
+      const config = await res.json();
+
+      // Download config.json
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'config.json'; a.click();
+      URL.revokeObjectURL(url);
+
+      // Download agent.py após pequeno delay
+      setTimeout(() => {
+        const agentUrl = '/agent.py';
+        const a2 = document.createElement('a'); a2.href = agentUrl; a2.download = 'agent.py'; a2.click();
+      }, 500);
+
+      alert('✅ Baixando config.json e agent.py!\n\nInstale na máquina:\n1. pip install requests psutil\n2. python agent.py');
+    } catch(e) { alert('Erro ao gerar pacote: '+e.message); }
   }
 
   // ===== UTILS GERAIS =====
@@ -7186,7 +7471,6 @@
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href = '/'; }
 
   // ===== INIT =====
-  maquinas = JSON.parse(localStorage.getItem('maquinas_'+usuario.empresaNome)||'[]');
   carregarFluxo();
 
   function fecharBanner() {

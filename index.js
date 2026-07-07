@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const path = require('path');
 const crypto = require('crypto');
 const fetch = require('node-fetch');
+const nodemailer = require('nodemailer');
 const multer = require('multer');
 const fs = require('fs');
 
@@ -78,19 +79,127 @@ async function asaasRequest(method, endpoint, body = null) {
 const VALOR_PLANO_CENTAVOS = { basico: 4900, intermediario: 14900, avancado: 34900, enterprise: 0 };
 const NOME_PLANO = { basico: 'Básico', intermediario: 'Intermediário', avancado: 'Avançado', enterprise: 'Enterprise' };
 
-// ==================== BREVO ====================
+// ==================== EMAIL (SMTP via nodemailer) ====================
 
-async function enviarEmail(para, assunto, html) {
-  try {
-    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-      method: 'POST',
-      headers: { 'accept': 'application/json', 'api-key': process.env.BREVO_API_KEY, 'content-type': 'application/json' },
-      body: JSON.stringify({ sender: { name: 'HOC System', email: 'kalimacomplex@gmail.com' }, to: [{ email: para }], subject: assunto, htmlContent: html })
-    });
-    const data = await response.json();
-    console.log('Email enviado:', data);
-    return data;
-  } catch (err) { console.error('Erro ao enviar email:', err); }
+async function _getSmtpTransporter(empresa) {
+  const cfg = await SmtpConfig.findOne({ empresa }).lean();
+  if (!cfg || !cfg.servidor) throw new Error('SMTP não configurado. Configure em Configurações → SMTP.');
+  return nodemailer.createTransport({
+    host: cfg.servidor, port: parseInt(cfg.porta)||587,
+    secure: parseInt(cfg.porta)===465,
+    auth: { user: cfg.usuario, pass: cfg.senha },
+    tls: { rejectUnauthorized: false }
+  });
+}
+
+async function enviarEmailTarefa(tarefaId, empresa) {
+  const tarefa = await Tarefa.findById(tarefaId).lean();
+  if (!tarefa) throw new Error('Tarefa não encontrada.');
+  // Inherit emailTemplateId from model if not set directly on item
+  if (!tarefa.emailTemplateId && tarefa.modeloId) {
+    const modelo = await Tarefa.findById(tarefa.modeloId).lean();
+    if (modelo?.emailTemplateId) tarefa.emailTemplateId = modelo.emailTemplateId;
+  }
+  if (!tarefa.emailTemplateId) throw new Error('Tarefa sem template de email configurado.');
+  const template = await EmailTemplate.findById(tarefa.emailTemplateId).lean();
+  if (!template) throw new Error('Template não encontrado.');
+  const smtpCfg = await SmtpConfig.findOne({ empresa }).lean();
+  if (!smtpCfg || !smtpCfg.servidor) throw new Error('SMTP não configurado.');
+  const contatosIds = tarefa.contatosIds || (tarefa.contatoId ? [tarefa.contatoId] : []);
+  const gruposIds = tarefa.gruposIds || [];
+  let contatos = await Contato.find({ empresa, _id: { $in: contatosIds } }).lean();
+  if (gruposIds.length) {
+    const grupoContatos = await Contato.find({ empresa, grupo: { $in: gruposIds } }).lean();
+    const existingIds = new Set(contatos.map(c => c._id.toString()));
+    grupoContatos.forEach(c => { if (!existingIds.has(c._id.toString())) contatos.push(c); });
+  }
+  if (!contatos.length) throw new Error('Nenhum contato associado.');
+  const anexos = tarefa.anexos || [];
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  // Generate tracking tokens per doc
+  const tokens = [];
+  for (let i = 0; i < anexos.length; i++) {
+    const token = crypto.randomBytes(20).toString('hex');
+    await LinkTracking.create({ token, tarefaId, empresa, docNome: anexos[i].nome, docIdx: i });
+    tokens.push(token);
+  }
+  // Compute vencData from config if not stored directly on item
+  let vencData = tarefa.vencData || '';
+  if (!vencData && tarefa.vencTipo && tarefa.prazo) {
+    if (tarefa.vencTipo === 'igual_prazo') {
+      vencData = tarefa.prazo;
+    } else if (tarefa.vencTipo === 'offset_prazo') {
+      const _vd = new Date(tarefa.prazo + 'T12:00:00');
+      const _v = parseInt(tarefa.vencOffV)||0;
+      const _u = tarefa.vencOffU||'dias';
+      if (_u==='dias') _vd.setDate(_vd.getDate()+_v);
+      else if (_u==='semanas') _vd.setDate(_vd.getDate()+_v*7);
+      else if (_u==='meses') _vd.setMonth(_vd.getMonth()+_v);
+      else if (_u==='anos') _vd.setFullYear(_vd.getFullYear()+_v);
+      vencData = _vd.toISOString().split('T')[0];
+    }
+  }
+  const transporter = nodemailer.createTransport({
+    host: smtpCfg.servidor, port: parseInt(smtpCfg.porta)||587,
+    secure: parseInt(smtpCfg.porta)===465,
+    auth: { user: smtpCfg.usuario, pass: smtpCfg.senha },
+    tls: { rejectUnauthorized: false }
+  });
+  const dataConclusao = tarefa.dataConclusao ? new Date(tarefa.dataConclusao).toLocaleDateString('pt-BR') : '';
+  const docLinks = anexos.map((d,i) => {
+    const texto = d.nome || d.nomeOriginal || 'Documento';
+    return `<a href="${baseUrl}/link/${tokens[i]}" style="color:#2d1b69">${texto}</a>`;
+  }).join('<br>');
+  const variavelDoc = anexos.map(d => d.obs||'').filter(Boolean).join('; ');
+  const variavelAvulsa = tarefa.observacao || tarefa.variavelAvulsa || '';
+  const buildCorpo = (contato) => {
+    const primeiroNome = (contato.nome||'').split(' ')[0];
+    return (template.corpo||'')
+      .replace(/\{nomeCompleto\}/g, contato.nome||'')
+      .replace(/\{primeiroNome\}/g, primeiroNome)
+      .replace(/\{cpfCnpj\}/g, contato.cpfCnpj||'')
+      .replace(/\{prazo\}/g, tarefa.prazo||'')
+      .replace(/\{competencia\}/g, tarefa.competenciaFixa||tarefa.competencia||'')
+      .replace(/\{dataEfetivacao\}/g, dataConclusao)
+      .replace(/\{vencimento\}/g, vencData)
+      .replace(/\{documentos\}/g, docLinks)
+      .replace(/\{variavelDoc\}/g, variavelDoc)
+      .replace(/\{variavelAvulsa\}/g, variavelAvulsa)
+      .replace(/\{cliente\}/g, contato.nome||'')
+      .replace(/\{empresa\}/g, contato.empresa_contato||'')
+      .replace(/\{data\}/g, new Date().toLocaleDateString('pt-BR'));
+  };
+  if (gruposIds.length) {
+    // Group task: ONE email with all group contacts, first in TO rest in CC
+    const comEmail = contatos.filter(c => c.email);
+    if (!comEmail.length) throw new Error('Nenhum contato do grupo possui e-mail.');
+    const [primeiro, ...resto] = comEmail;
+    const corpo = buildCorpo(primeiro);
+    const mailOpts = {
+      from: smtpCfg.remetente || smtpCfg.usuario,
+      to: primeiro.email,
+      subject: template.assunto||'',
+      html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">${corpo}</div>`,
+    };
+    if (resto.length) mailOpts.cc = resto.map(c => c.email).join(', ');
+    if (tarefa.bccEmails) mailOpts.bcc = tarefa.bccEmails;
+    await transporter.sendMail(mailOpts);
+  } else {
+    // Individual contacts: one email per contact
+    for (const contato of contatos) {
+      if (!contato.email) continue;
+      const corpo = buildCorpo(contato);
+      const mailOpts = {
+        from: smtpCfg.remetente || smtpCfg.usuario,
+        to: contato.email,
+        subject: template.assunto||'',
+        html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">${corpo}</div>`,
+      };
+      if (tarefa.bccEmails) mailOpts.bcc = tarefa.bccEmails;
+      await transporter.sendMail(mailOpts);
+    }
+  }
+  await Tarefa.findByIdAndUpdate(tarefaId, { emailEnviado:true, emailEnviadoEm:new Date() }, { strict:false });
 }
 
 // ==================== MONGODB ====================
@@ -267,9 +376,11 @@ const contatoSchema = new mongoose.Schema({
   nome: { type: String, required: true }, descricao: { type: String, default: '' },
   email: { type: String, default: '' }, telefone: { type: String, default: '' },
   empresa_contato: { type: String, default: '' }, grupo: { type: String, default: 'Clientes' },
+  cpfCnpj: { type: String, default: '' }, responsavel: { type: String, default: '' },
+  infoAdicionais: { type: String, default: '' },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoEm: { type: Date, default: Date.now }
-});
+}, { strict: false });
 const Contato = mongoose.model('Contato', contatoSchema);
 
 const emailTemplateSchema = new mongoose.Schema({
@@ -281,55 +392,172 @@ const emailTemplateSchema = new mongoose.Schema({
 });
 const EmailTemplate = mongoose.model('EmailTemplate', emailTemplateSchema);
 
+const smtpConfigSchema = new mongoose.Schema({
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true, unique: true },
+  servidor: { type: String, default: '' }, porta: { type: Number, default: 587 },
+  usuario: { type: String, default: '' }, senha: { type: String, default: '' },
+  remetente: { type: String, default: '' },
+});
+const SmtpConfig = mongoose.model('SmtpConfig', smtpConfigSchema);
+
+const linkTrackingSchema = new mongoose.Schema({
+  token: { type: String, required: true, unique: true },
+  tarefaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tarefa' },
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa' },
+  docNome: { type: String, default: '' }, docIdx: { type: Number, default: 0 },
+  criadoEm: { type: Date, default: Date.now },
+  acessadoEm: { type: Date, default: null }, acessos: { type: Number, default: 0 },
+});
+const LinkTracking = mongoose.model('LinkTracking', linkTrackingSchema);
+
 const tarefaSchema = new mongoose.Schema({
   titulo: { type: String, required: true }, descricao: { type: String, default: '' },
   responsaveis: { type: Array, default: [] }, areas: { type: Array, default: [] },
   prazo: { type: String, default: '' }, competencia: { type: String, default: '' },
-  tags: { type: Array, default: [] }, status: { type: String, default: 'Pendente', enum: ['Pendente', 'Em Progresso', 'Concluída', 'Dispensada'] },
+  tags: { type: Array, default: [] }, status: { type: String, default: 'Pendente', enum: ['Pendente', 'Em Progresso', 'Concluída', 'Dispensada', 'Concluída Atrasada'] },
   prioridade: { type: String, default: 'Media', enum: ['Baixa', 'Media', 'Alta', 'Urgente'] },
   progresso: { type: Number, default: 0 }, grupo: { type: String, default: '' },
   recorrente: { type: Boolean, default: false }, frequencia: { type: String, default: '' },
   contatoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contato' },
   emailTemplateId: { type: mongoose.Schema.Types.ObjectId, ref: 'EmailTemplate' },
   lembretes: { type: Array, default: [] },
-  anexos: [{ nome: String, tipo: String, tamanho: Number, base64: String, prazoVencimento: String }],
+  anexos: [{ nome: String, nomeOriginal: String, tipo: String, tamanho: Number, base64: String, prazoVencimento: String, fileUrl: String, obs: String }],
   tarefaVinculadaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tarefa' },
   emailEnviado: { type: Boolean, default: false }, emailAberto: { type: Boolean, default: false },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
-});
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now },
+  // HOC extended fields
+  isModelo: { type: Boolean, default: false },
+  modeloId: { type: mongoose.Schema.Types.ObjectId, ref: 'Tarefa' },
+  tipo: { type: String, default: 'unica' },
+  prazoTipo: { type: String, default: 'fixa' },
+  qtdGeradas: { type: Number, default: 12 },
+  compGranularidade: { type: String, default: 'mes' },
+  competenciaFixa: { type: String, default: '' },
+  contatosIds: { type: Array, default: [] },
+  gruposIds: { type: Array, default: [] },
+  bccEmails: { type: String, default: '' },
+  apelido: { type: String, default: '' },
+  detalhamento: { type: String, default: '' },
+  agrupamento: { type: String, default: '' },
+  observacao: { type: String, default: '' },
+  comentarios: { type: Array, default: [] },
+  vencTipo: { type: String, default: 'nenhum' },
+  vencData: { type: String, default: '' },
+  vencGranularidade: { type: String, default: 'mes' },
+  vencimentosPorCliente: { type: Array, default: [] },
+  prazosFixos: { type: Array, default: [] },
+  compTipo: { type: String, default: 'igual_prazo' },
+  compOffV: { type: Number, default: 0 },
+  compOffU: { type: String, default: 'meses' },
+  variavelAvulsa: { type: String, default: '' },
+  dataConclusao: { type: Date, default: null },
+  emailEnviadoEm: { type: Date, default: null },
+}, { strict: false });
 const Tarefa = mongoose.model('Tarefa', tarefaSchema);
 
 const processoSchema = new mongoose.Schema({
   nome: { type: String, required: true }, descricao: { type: String, default: '' },
-  categoria: { type: String, default: '' }, responsavel: { type: String, default: '' },
-  versao: { type: String, default: 'v1.0' }, status: { type: String, default: 'Ativo', enum: ['Ativo', 'Em Revisão', 'Inativo'] },
-  execucoes: { type: Number, default: 0 }, taxaSucesso: { type: Number, default: 100 },
-  passos: { type: Array, default: [] }, versoes: { type: Array, default: [] },
+  categoria: { type: String, default: '' }, responsaveis: { type: Array, default: [] },
+  tags: { type: Array, default: [] },
+  versao: { type: String, default: 'v1.0' }, ativo: { type: Boolean, default: true },
+  // Builder canvas: array of {id, tipo, titulo, dados, x, y} + conexoes [{de,para,tipo}]
+  elementos: { type: Array, default: [] }, conexoes: { type: Array, default: [] },
+  // Documentation tabs
+  sipoc: { type: Object, default: {} }, cincoW2H: { type: Object, default: {} },
+  swimlane: { type: String, default: '' }, playbook: { type: String, default: '' },
+  docAnexos: { type: Array, default: [] },
+  // Audit checklists
+  checklists: { type: Array, default: [] },
+  // Version history
+  versoes: { type: Array, default: [] },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
-});
+}, { strict: false });
 const Processo = mongoose.model('Processo', processoSchema);
+
+const proExecSchema = new mongoose.Schema({
+  processoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Processo' },
+  titulo: { type: String, required: true }, descricao: { type: String, default: '' },
+  responsaveis: { type: Array, default: [] }, tags: { type: Array, default: [] },
+  prazo: { type: String, default: '' },
+  status: { type: String, default: 'Em Execução', enum: ['Em Execução','Pausado','Suspenso','Desistente','Concluído com Sucesso','Concluído com Falha'] },
+  etapas: { type: Array, default: [] }, // [{elementoId, status, obs, completadoEm, loopPagina}]
+  variavelGlobal: { type: Object, default: {} },
+  versaoModelo: { type: String, default: '' },
+  logs: { type: Array, default: [] },
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
+}, { strict: false });
+const ProExec = mongoose.model('ProExec', proExecSchema);
 
 const robotSchema = new mongoose.Schema({
   nome: { type: String, required: true }, descricao: { type: String, default: '' },
-  tipo: { type: String, default: 'Background', enum: ['Background', 'Desktop'] },
-  categoria: { type: String, default: '' }, departamento: { type: String, default: '' },
-  versao: { type: String, default: 'v1.0' }, comandoExecucao: { type: String, default: '' },
-  status: { type: String, default: 'Pausado', enum: ['Executando', 'Pausado', 'Erro', 'Concluído'] },
+  versao: { type: String, default: 'v1.0' },
+  tipo: { type: String, default: 'Background', enum: ['Background', 'Interface'] },
+  ambiente: { type: String, default: 'local', enum: ['local', 'nuvem'] },
+  // Vínculo do robô
+  vinculo: { type: Object, default: {} }, // { tipo:'zip'|'git'|'webhook', zipNome, gitUrl, gitBranch, webhookUrl }
+  comandoExecucao: { type: String, default: '' }, // local: command; nuvem: ignored
+  webhookPayload: { type: Array, default: [] }, // [{chave, valor}] for cloud
+  requirementsTxt: { type: String, default: '' },
+  venvCache: { type: String, default: 'cache', enum: ['sempre', 'cache'] },
+  // Classificação
+  tag: { type: String, default: '' }, categoria: { type: String, default: '' },
+  tempoManual: { type: Number, default: 0 }, // minutes human time
+  areasBeneficiadas: { type: Array, default: [] },
+  sla: { type: Number, default: 0 }, // minutes
+  timeout: { type: Number, default: 300 }, // seconds
   prioridade: { type: String, default: 'Media', enum: ['Baixa', 'Media', 'Alta'] },
-  maquina: { type: String, default: '' }, timeout: { type: Number, default: 30 },
-  fila: { type: Array, default: [] }, logs: { type: Array, default: [] },
-  schedules: { type: Array, default: [] }, versoes: { type: Array, default: [] },
-  tempoMedioExecucao: { type: Number, default: 0 }, totalExecucoes: { type: Number, default: 0 },
-  totalErros: { type: Number, default: 0 }, tempoHumanoMinutos: { type: Number, default: 0 },
+  // Infraestrutura
+  maquinas: { type: Array, default: [] }, // machine/group names
+  // Schedules
+  schedules: { type: Array, default: [] }, // [{tipo:'manual'|'unico'|'recorrente', dataHora, cron, considerarFeriados, considerarFds, ativo}]
+  // Versões/Deploy
+  versoes: { type: Array, default: [] }, // [{versao, comando, ativo, criadoEm}]
+  // Runtime
+  ativo: { type: Boolean, default: true },
+  // Métricas (computed/cached)
+  totalExecucoes: { type: Number, default: 0 }, totalErros: { type: Number, default: 0 },
+  tempoMedioExecucao: { type: Number, default: 0 }, // seconds
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
-});
+}, { strict: false });
 const Robot = mongoose.model('Robot', robotSchema);
+
+const execucaoRoboSchema = new mongoose.Schema({
+  roboId: { type: mongoose.Schema.Types.ObjectId, ref: 'Robot', required: true },
+  roboNome: { type: String, default: '' },
+  status: { type: String, default: 'em_execucao', enum: ['em_execucao','interrompido','erro','concluido','nao_disparado'] },
+  motivoInterrupcao: { type: String, default: '' },
+  maquina: { type: String, default: '' },
+  gatilho: { type: String, default: 'manual', enum: ['manual','schedule','webhook','workflow'] },
+  prioridade: { type: String, default: 'Media' },
+  iniciadoEm: { type: Date, default: null }, finalizadoEm: { type: Date, default: null },
+  duracao: { type: Number, default: 0 }, // seconds
+  logs: { type: Array, default: [] }, // [{timestamp, nivel:'info'|'aviso'|'erro', mensagem}]
+  artifacts: { type: Array, default: [] }, // [{nome, tamanho, url}]
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
+  criadoEm: { type: Date, default: Date.now }
+}, { strict: false });
+const ExecucaoRobo = mongoose.model('ExecucaoRobo', execucaoRoboSchema);
+
+const agenteRoboSchema = new mongoose.Schema({
+  nome: { type: String, required: true }, descricao: { type: String, default: '' },
+  token: { type: String, default: '' }, // agent auth token
+  maquina: { type: String, default: '' }, grupo: { type: String, default: '' },
+  status: { type: String, default: 'desconectado', enum: ['conectado','desconectado'] },
+  ultimoHeartbeat: { type: Date, default: null },
+  robosAtivos: { type: Number, default: 0 }, capacidadeMaxima: { type: Number, default: 3 },
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
+}, { strict: false });
+const AgenteRobo = mongoose.model('AgenteRobo', agenteRoboSchema);
 
 const credencialSchema = new mongoose.Schema({
   nome: { type: String, required: true }, tipo: { type: String, default: 'API Key' },
@@ -345,7 +573,8 @@ const notificacaoSchema = new mongoose.Schema({
   titulo: { type: String, required: true }, mensagem: { type: String, default: '' },
   tipo: { type: String, default: 'info', enum: ['info', 'sucesso', 'aviso', 'erro', 'licenca_vencendo', 'licenca_vencida'] },
   icone: { type: String, default: '🔔' }, link: { type: String, default: '' },
-  lida: { type: Boolean, default: false }, criadoEm: { type: Date, default: Date.now }
+  lida: { type: Boolean, default: false }, criadoEm: { type: Date, default: Date.now },
+  destinatario: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', default: null }
 });
 const Notificacao = mongoose.model('Notificacao', notificacaoSchema);
 
@@ -486,6 +715,7 @@ app.get('/projeto-agil', (req, res) => res.sendFile(path.join(__dirname, 'public
 app.get('/repositorio-templates', (req, res) => res.sendFile(path.join(__dirname, 'public', 'repositorio-templates.html')));
 app.get('/gestao-licencas', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-licencas.html')));
 app.get('/operacoes', (req, res) => res.sendFile(path.join(__dirname, 'public', 'operacoes.html')));
+app.get('/robos', (req, res) => res.sendFile(path.join(__dirname, 'public', 'robos.html')));
 app.get('/aceitar-convite', (req, res) => res.sendFile(path.join(__dirname, 'public', 'aceitar-convite.html')));
 app.get('/plano-usuarios', (req, res) => res.sendFile(path.join(__dirname, 'public', 'plano-usuarios.html')));
 
@@ -1048,16 +1278,28 @@ app.post('/api/admin/trocar-plano', adminSecretMiddleware, async (req, res) => {
 
 // ==================== NOTIFICAÇÕES ====================
 
+app.post('/api/notificacoes', authMiddleware, async (req, res) => {
+  try {
+    const { titulo, mensagem, tipo, icone, link, destinatario } = req.body;
+    const notif = await Notificacao.create({ empresa: req.usuario.empresa, titulo, mensagem: mensagem||'', tipo: tipo||'info', icone: icone||'🔔', link: link||'', destinatario: destinatario||null });
+    res.status(201).json(notif);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
 app.get('/api/notificacoes', authMiddleware, async (req, res) => {
-  try { const notificacoes = await Notificacao.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }).limit(50); res.json(notificacoes); }
-  catch (err) { res.status(500).json({ erro: err.message }); }
+  try {
+    const userId = req.usuario.id;
+    const notificacoes = await Notificacao.find({ empresa: req.usuario.empresa, $or: [{ destinatario: null }, { destinatario: { $exists: false } }, { destinatario: userId }] }).sort({ criadoEm: -1 }).limit(50);
+    res.json(notificacoes);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 app.get('/api/notificacoes/resumo', authMiddleware, async (req, res) => {
   try {
-    const naoLidas = await Notificacao.countDocuments({ empresa: req.usuario.empresa, lida: false });
-    const temVencida = await Notificacao.countDocuments({ empresa: req.usuario.empresa, tipo: 'licenca_vencida', lida: false });
-    const temVencendo = await Notificacao.countDocuments({ empresa: req.usuario.empresa, tipo: 'licenca_vencendo', lida: false });
+    const userId = req.usuario.id;
+    const baseFilter = { empresa: req.usuario.empresa, $or: [{ destinatario: null }, { destinatario: { $exists: false } }, { destinatario: userId }] };
+    const naoLidas = await Notificacao.countDocuments({ ...baseFilter, lida: false });
+    const temVencida = await Notificacao.countDocuments({ ...baseFilter, tipo: 'licenca_vencida', lida: false });
+    const temVencendo = await Notificacao.countDocuments({ ...baseFilter, tipo: 'licenca_vencendo', lida: false });
     const assinatura = await Assinatura.findOne({ empresa: req.usuario.empresa });
     const statusAssinatura = assinatura ? {
       status: assinatura.status,
@@ -1536,7 +1778,10 @@ app.delete('/api/email-templates/:id', authMiddleware, verificarAssinatura, asyn
 // ==================== TAREFAS ====================
 
 app.get('/api/tarefas', authMiddleware, verificarAssinatura, async (req, res) => {
-  try { const tarefas = await Tarefa.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(tarefas); }
+  // lean() returns plain JS objects (not Mongoose documents), so ALL fields stored in MongoDB
+  // are returned — including extended fields like isModelo, gruposIds, modeloId, etc.
+  // This works even if the running server hasn't been restarted with the updated schema.
+  try { const tarefas = await Tarefa.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }).lean(); res.json(tarefas); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 app.get('/api/tarefas/:id', authMiddleware, verificarAssinatura, async (req, res) => {
@@ -1544,13 +1789,29 @@ app.get('/api/tarefas/:id', authMiddleware, verificarAssinatura, async (req, res
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 app.post('/api/tarefas', authMiddleware, verificarAssinatura, permOperacoes('criar'), async (req, res) => {
-  try { const tarefa = await Tarefa.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id }); await criarNotificacao(req.usuario.empresa, `Nova tarefa: ${tarefa.titulo}`, `A tarefa foi criada.`, 'info', '📋', '/operacoes'); res.status(201).json(tarefa); }
-  catch (err) { res.status(400).json({ erro: err.message }); }
+  try {
+    // Use collection.insertOne to bypass Mongoose schema strict mode on the running instance,
+    // ensuring extended fields (isModelo, modeloId, gruposIds, etc.) are always persisted.
+    const doc = {
+      ...req.body,
+      empresa: mongoose.Types.ObjectId.isValid(req.usuario.empresa) ? new mongoose.Types.ObjectId(req.usuario.empresa) : req.usuario.empresa,
+      criadoPor: mongoose.Types.ObjectId.isValid(req.usuario.id) ? new mongoose.Types.ObjectId(req.usuario.id) : req.usuario.id,
+      criadoEm: new Date(), atualizadoEm: new Date(),
+    };
+    if (doc.contatoId && mongoose.Types.ObjectId.isValid(doc.contatoId)) doc.contatoId = new mongoose.Types.ObjectId(doc.contatoId);
+    if (doc.modeloId && mongoose.Types.ObjectId.isValid(doc.modeloId)) doc.modeloId = new mongoose.Types.ObjectId(doc.modeloId);
+    if (doc.tarefaVinculadaId && mongoose.Types.ObjectId.isValid(doc.tarefaVinculadaId)) doc.tarefaVinculadaId = new mongoose.Types.ObjectId(doc.tarefaVinculadaId);
+    if (doc.emailTemplateId && mongoose.Types.ObjectId.isValid(doc.emailTemplateId)) doc.emailTemplateId = new mongoose.Types.ObjectId(doc.emailTemplateId);
+    const result = await Tarefa.collection.insertOne(doc);
+    const tarefa = await Tarefa.findById(result.insertedId).lean();
+    await criarNotificacao(req.usuario.empresa, `Nova tarefa: ${tarefa.titulo}`, `A tarefa foi criada.`, 'info', '📋', '/operacoes');
+    res.status(201).json(tarefa);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.put('/api/tarefas/:id', authMiddleware, verificarAssinatura, permOperacoes('editar'), async (req, res) => {
   try {
     const anterior = await Tarefa.findById(req.params.id);
-    const tarefa = await Tarefa.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
+    const tarefa = await Tarefa.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true, strict: false });
     if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
     if (anterior && anterior.status !== 'Concluída' && tarefa.status === 'Concluída') await criarNotificacao(req.usuario.empresa, `Tarefa concluída: ${tarefa.titulo}`, `A tarefa foi concluída.`, 'sucesso', '✅', '/operacoes');
     res.json(tarefa);
@@ -1562,17 +1823,81 @@ app.delete('/api/tarefas/:id', authMiddleware, verificarAssinatura, permOperacoe
 });
 app.post('/api/tarefas/:id/enviar-email', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    const tarefa = await Tarefa.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
-    if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
-    const contato = tarefa.contatoId ? await Contato.findById(tarefa.contatoId) : null;
-    const emailTemplate = tarefa.emailTemplateId ? await EmailTemplate.findById(tarefa.emailTemplateId) : null;
-    if (!contato || !emailTemplate) return res.status(400).json({ erro: 'Contato ou template não configurado' });
-    let corpo = emailTemplate.corpo;
-    corpo = corpo.replace(/{cliente}/g, contato.nome).replace(/{empresa}/g, contato.empresa_contato||'').replace(/{data}/g, new Date().toLocaleDateString('pt-BR'));
-    await enviarEmail(contato.email, emailTemplate.assunto, `<div style="font-family:sans-serif;padding:24px">${corpo}</div>`);
-    await Tarefa.findByIdAndUpdate(tarefa._id, { emailEnviado: true });
+    await enviarEmailTarefa(req.params.id, req.usuario.empresa);
     res.json({ mensagem: 'Email enviado!' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ── Tracking link (unauthenticated) ──────────────────────────────────────────
+app.get('/link/:token', async (req, res) => {
+  try {
+    const tracking = await LinkTracking.findOne({ token: req.params.token });
+    if (!tracking) return res.status(404).send('<h2 style="font-family:sans-serif;text-align:center;padding:40px">Link inválido ou expirado.</h2>');
+    const isFirst = !tracking.acessadoEm;
+    await LinkTracking.findByIdAndUpdate(tracking._id, {
+      acessadoEm: tracking.acessadoEm || new Date(),
+      $inc: { acessos: 1 }
+    });
+    if (isFirst) {
+      const allLinks = await LinkTracking.find({ tarefaId: tracking.tarefaId });
+      if (allLinks.every(l => l._id.equals(tracking._id) || l.acessadoEm)) {
+        await Tarefa.findByIdAndUpdate(tracking.tarefaId, { emailAberto: true }, { strict: false });
+      }
+    }
+    // If doc has a file URL, redirect to the actual file
+    const tarefa = await Tarefa.findById(tracking.tarefaId).lean();
+    const doc = tarefa?.anexos?.[tracking.docIdx];
+    if (doc?.fileUrl) {
+      const filePath = path.join(__dirname, 'public', doc.fileUrl);
+      if (fs.existsSync(filePath)) return res.sendFile(filePath);
+      return res.redirect(doc.fileUrl);
+    }
+    res.send(`<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>${tracking.docNome}</title><style>*{box-sizing:border-box}body{font-family:sans-serif;background:#f5f0ff;min-height:100vh;display:flex;align-items:center;justify-content:center;margin:0}.card{background:white;padding:40px;border-radius:16px;text-align:center;box-shadow:0 4px 24px rgba(45,27,105,.15);max-width:420px;width:90%}.ico{font-size:52px;margin-bottom:12px}.title{font-size:20px;font-weight:700;color:#2d1b69;margin-bottom:8px}.sub{font-size:14px;color:#718096}</style></head><body><div class='card'><div class='ico'>📄</div><div class='title'>${tracking.docNome}</div><div class='sub'>Documento acessado com sucesso.</div></div></body></html>`);
+  } catch (err) { res.status(500).send('Erro interno.'); }
+});
+
+app.get('/api/tarefas/:id/trackings', authMiddleware, async (req, res) => {
+  try {
+    const trackings = await LinkTracking.find({ tarefaId: req.params.id }).lean();
+    res.json(trackings);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ── SMTP Config ───────────────────────────────────────────────────────────────
+app.get('/api/smtp-config', authMiddleware, async (req, res) => {
+  try {
+    const cfg = await SmtpConfig.findOne({ empresa: req.usuario.empresa }).lean();
+    if (!cfg) return res.json({});
+    const { senha, ...safe } = cfg;
+    res.json({ ...safe, temSenha: !!senha });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.put('/api/smtp-config', authMiddleware, async (req, res) => {
+  try {
+    const { servidor, porta, usuario, senha, remetente } = req.body;
+    const upd = { servidor, porta: parseInt(porta)||587, usuario, remetente: remetente||usuario };
+    if (senha) upd.senha = senha;
+    await SmtpConfig.findOneAndUpdate(
+      { empresa: req.usuario.empresa },
+      { ...upd, empresa: req.usuario.empresa },
+      { upsert: true, new: true }
+    );
+    res.json({ mensagem: 'Configurações salvas.' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.post('/api/smtp-config/testar', authMiddleware, async (req, res) => {
+  try {
+    const cfg = await SmtpConfig.findOne({ empresa: req.usuario.empresa }).lean();
+    if (!cfg || !cfg.servidor) return res.json({ ok: false, erro: 'SMTP não configurado.' });
+    const t = nodemailer.createTransport({
+      host: cfg.servidor, port: parseInt(cfg.porta)||587,
+      secure: parseInt(cfg.porta)===465,
+      auth: { user: cfg.usuario, pass: cfg.senha },
+      tls: { rejectUnauthorized: false }
+    });
+    await t.verify();
+    res.json({ ok: true });
+  } catch (err) { res.json({ ok: false, erro: err.message }); }
 });
 
 // ==================== PROCESSOS ====================
@@ -1586,12 +1911,104 @@ app.post('/api/processos', authMiddleware, verificarAssinatura, permOperacoes('c
   catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.put('/api/processos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
-  try { const processo = await Processo.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true }); if (!processo) return res.status(404).json({ erro: 'Processo não encontrado' }); res.json(processo); }
-  catch (err) { res.status(400).json({ erro: err.message }); }
+  try {
+    const prev = await Processo.findById(req.params.id).lean();
+    const body = { ...req.body, atualizadoEm: new Date() };
+    // versioning: if caller passes versionar:true, snapshot current before saving
+    if (req.body.versionar && prev) {
+      body.versoes = [...(prev.versoes||[]), { versao: prev.versao, elementos: prev.elementos, conexoes: prev.conexoes, data: new Date(), autor: req.usuario.nome||req.usuario.email||'—' }];
+    }
+    const processo = await Processo.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, body, { new: true, strict: false });
+    if (!processo) return res.status(404).json({ erro: 'Processo não encontrado' });
+    res.json(processo);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.delete('/api/processos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
   try { await Processo.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ mensagem: 'Processo deletado!' }); }
   catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Execuções de processo
+app.get('/api/pro-execucoes', authMiddleware, verificarAssinatura, async (req, res) => {
+  try { const execs = await ProExec.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }).lean(); res.json(execs); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.post('/api/pro-execucoes', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const proc = await Processo.findById(req.body.processoId).lean();
+    const flatElems = [];
+    for (const e of (proc?.elementos||[])) {
+      flatElems.push(e);
+      if (e.tipo === 'condicional') {
+        for (const b of (e.dados?.branchVerd||[])) flatElems.push(b);
+        for (const b of (e.dados?.branchFalso||[])) flatElems.push(b);
+      }
+      if (e.tipo === 'loop') {
+        for (const b of (e.dados?.loopBody||[])) flatElems.push(b);
+      }
+    }
+    const etapas = flatElems
+      .filter(e => !['break_loop','try_catch'].includes(e.tipo))
+      .map(e => ({ elementoId: e.id, status: 'Pendente', obs: '', completadoEm: null }));
+    const exec = await ProExec.create({ ...req.body, etapas, versaoModelo: proc?.versao||'', empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    res.status(201).json(exec);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+app.put('/api/pro-execucoes/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const exec = await ProExec.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true, strict: false });
+    if (!exec) return res.status(404).json({ erro: 'Execução não encontrada' });
+    // auto-complete: if all non-structural etapas done, mark process status
+    if (!req.body.status) {
+      const etapas = exec.etapas || [];
+      const allDone = etapas.length && etapas.every(e => ['Concluído','Dispensado'].includes(e.status));
+      if (allDone) await ProExec.findByIdAndUpdate(exec._id, { status: 'Concluído com Sucesso' }, { strict: false });
+    }
+    res.json(exec);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+app.delete('/api/pro-execucoes/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+  try { await ProExec.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ ok: true }); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.post('/api/pro-execucoes/:id/enviar-email', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const { emailTemplateId, emailContatoId, emailGrupoId } = req.body;
+    if (!emailTemplateId) return res.status(400).json({ erro: 'Template de e-mail não configurado.' });
+    const template = await EmailTemplate.findById(emailTemplateId).lean();
+    if (!template) return res.status(400).json({ erro: 'Template não encontrado.' });
+    const smtpCfg = await SmtpConfig.findOne({ empresa: req.usuario.empresa }).lean();
+    if (!smtpCfg || !smtpCfg.servidor) return res.status(400).json({ erro: 'SMTP não configurado.' });
+    let contatos = [];
+    if (emailGrupoId) {
+      contatos = await Contato.find({ empresa: req.usuario.empresa, grupo: emailGrupoId }).lean();
+    } else if (emailContatoId) {
+      const c = await Contato.findById(emailContatoId).lean();
+      if (c) contatos = [c];
+    }
+    if (!contatos.length) return res.status(400).json({ erro: 'Nenhum contato configurado.' });
+    const transporter = nodemailer.createTransport({
+      host: smtpCfg.servidor, port: parseInt(smtpCfg.porta)||587,
+      secure: parseInt(smtpCfg.porta)===465,
+      auth: { user: smtpCfg.usuario, pass: smtpCfg.senha },
+      tls: { rejectUnauthorized: false }
+    });
+    for (const contato of contatos) {
+      if (!contato.email) continue;
+      const primeiroNome = (contato.nome||'').split(' ')[0];
+      const corpo = (template.corpo||'')
+        .replace(/\{nomeCompleto\}/g, contato.nome||'')
+        .replace(/\{primeiroNome\}/g, primeiroNome)
+        .replace(/\{data\}/g, new Date().toLocaleDateString('pt-BR'));
+      await transporter.sendMail({
+        from: smtpCfg.remetente || smtpCfg.usuario,
+        to: contato.email,
+        subject: template.assunto||'',
+        html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">${corpo}</div>`,
+      });
+    }
+    res.json({ mensagem: 'E-mail enviado!' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 // ==================== ROBÔS ====================
@@ -1600,22 +2017,206 @@ app.get('/api/robos', authMiddleware, verificarAssinatura, async (req, res) => {
   try { const robos = await Robot.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(robos); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
-app.post('/api/robos', authMiddleware, verificarAssinatura, permOperacoes('criar'), async (req, res) => {
-  try { const robo = await Robot.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id }); await criarNotificacao(req.usuario.empresa, `Novo robô: ${robo.nome}`, `O robô foi cadastrado.`, 'info', '🤖', '/operacoes'); res.status(201).json(robo); }
-  catch (err) { res.status(400).json({ erro: err.message }); }
+app.post('/api/robos', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const robo = await Robot.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    await criarNotificacao(req.usuario.empresa, `Novo robô: ${robo.nome}`, `O robô foi cadastrado.`, 'info', '🤖', '/robos');
+    res.status(201).json(robo);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.put('/api/robos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    const anterior = await Robot.findById(req.params.id);
-    const robo = await Robot.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true });
+    const robo = await Robot.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true, strict: false });
     if (!robo) return res.status(404).json({ erro: 'Robô não encontrado' });
-    if (anterior && anterior.status !== 'Erro' && robo.status === 'Erro') await criarNotificacao(req.usuario.empresa, `Robô com erro: ${robo.nome}`, `O robô encontrou um erro.`, 'erro', '🔴', '/operacoes');
     res.json(robo);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.delete('/api/robos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
-  try { await Robot.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ mensagem: 'Robô deletado!' }); }
+  try {
+    await Robot.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
+    await ExecucaoRobo.deleteMany({ roboId: req.params.id, empresa: req.usuario.empresa });
+    res.json({ mensagem: 'Robô deletado!' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Executar robô manualmente
+app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const robo = await Robot.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!robo) return res.status(404).json({ erro: 'Robô não encontrado' });
+    if (!robo.ativo) return res.status(400).json({ erro: 'Robô desativado' });
+    // Check for available agent
+    const agente = await AgenteRobo.findOne({ empresa: req.usuario.empresa, status: 'conectado' }).sort({ robosAtivos: 1 });
+    const exec = await ExecucaoRobo.create({
+      roboId: robo._id, roboNome: robo.nome,
+      status: agente ? 'em_execucao' : 'nao_disparado',
+      motivoInterrupcao: agente ? '' : 'Sem agentes disponíveis no momento',
+      maquina: agente ? agente.maquina || agente.nome : '',
+      gatilho: req.body.gatilho || 'manual',
+      prioridade: robo.prioridade || 'Media',
+      iniciadoEm: agente ? new Date() : null,
+      empresa: req.usuario.empresa, criadoPor: req.usuario.id
+    });
+    if (agente) await AgenteRobo.findByIdAndUpdate(agente._id, { $inc: { robosAtivos: 1 } });
+    res.status(201).json(exec);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Interromper execução
+app.post('/api/robos/execucoes/:id/interromper', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const exec = await ExecucaoRobo.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa, status: 'em_execucao' },
+      { status: 'interrompido', motivoInterrupcao: req.body.motivo || 'Interrupção manual', finalizadoEm: new Date() },
+      { new: true }
+    );
+    if (!exec) return res.status(404).json({ erro: 'Execução não encontrada ou já finalizada' });
+    res.json(exec);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// CRUD execuções
+app.get('/api/robos/execucoes', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const filter = { empresa: req.usuario.empresa };
+    if (req.query.status) filter.status = req.query.status;
+    if (req.query.roboId) filter.roboId = req.query.roboId;
+    const execs = await ExecucaoRobo.find(filter).sort({ criadoEm: -1 }).limit(200);
+    res.json(execs);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.get('/api/robos/execucoes/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const exec = await ExecucaoRobo.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!exec) return res.status(404).json({ erro: 'Execução não encontrada' });
+    res.json(exec);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.put('/api/robos/execucoes/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const exec = await ExecucaoRobo.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { ...req.body },
+      { new: true, strict: false }
+    );
+    if (!exec) return res.status(404).json({ erro: 'Execução não encontrada' });
+    res.json(exec);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Logs da execução (agent posts here)
+app.post('/api/robos/execucoes/:id/logs', authMiddleware, async (req, res) => {
+  try {
+    const { nivel, mensagem } = req.body;
+    const exec = await ExecucaoRobo.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { $push: { logs: { timestamp: new Date(), nivel: nivel || 'info', mensagem } } },
+      { new: true }
+    );
+    // Auto-set status from terminal log nivel
+    if (exec && nivel === 'erro') {
+      await ExecucaoRobo.findByIdAndUpdate(exec._id, { status: 'erro', finalizadoEm: new Date() });
+    } else if (exec && nivel === 'sucesso') {
+      const dur = exec.iniciadoEm ? Math.round((Date.now() - new Date(exec.iniciadoEm).getTime()) / 1000) : 0;
+      await ExecucaoRobo.findByIdAndUpdate(exec._id, { status: 'concluido', finalizadoEm: new Date(), duracao: dur });
+      await Robot.findByIdAndUpdate(exec.roboId, { $inc: { totalExecucoes: 1 } });
+    }
+    res.json({ ok: true });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Métricas resumo
+app.get('/api/robos/metricas', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const empresa = req.usuario.empresa;
+    const [robos, execs, agentes] = await Promise.all([
+      Robot.find({ empresa }).lean(),
+      ExecucaoRobo.find({ empresa }).lean(),
+      AgenteRobo.find({ empresa }).lean()
+    ]);
+    const total = execs.length;
+    const concluidos = execs.filter(e => e.status === 'concluido').length;
+    const erros = execs.filter(e => e.status === 'erro').length;
+    const emExecucao = execs.filter(e => e.status === 'em_execucao').length;
+    const taxaSucesso = total > 0 ? Math.round(concluidos / total * 100) : 0;
+    const backlog = execs.filter(e => e.status === 'nao_disparado').length;
+    // Top 5 erros por robo
+    const errosPorRobo = {};
+    for (const e of execs.filter(x => x.status === 'erro')) {
+      errosPorRobo[e.roboNome] = (errosPorRobo[e.roboNome] || 0) + 1;
+    }
+    const top5Erros = Object.entries(errosPorRobo).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([nome,erros])=>({nome,erros}));
+    // Tempo médio por robo
+    const tempoPorRobo = {};
+    for (const e of execs.filter(x => x.status === 'concluido' && x.duracao)) {
+      if (!tempoPorRobo[e.roboNome]) tempoPorRobo[e.roboNome] = [];
+      tempoPorRobo[e.roboNome].push(e.duracao);
+    }
+    const tempoMedio = Object.entries(tempoPorRobo).map(([nome, durs]) => ({
+      nome, media: Math.round(durs.reduce((a,b)=>a+b,0)/durs.length)
+    }));
+    // SLA atingimento per robot
+    const slaMap = {};
+    for (const r of robos) if (r.sla) slaMap[r._id.toString()] = r.sla * 60;
+    const slaPorRobo = {};
+    for (const e of execs.filter(x => x.status === 'concluido')) {
+      const rid = e.roboId?.toString();
+      const sla = slaMap[rid];
+      if (!sla) continue;
+      if (!slaPorRobo[e.roboNome]) slaPorRobo[e.roboNome] = {total:0, ok:0};
+      slaPorRobo[e.roboNome].total++;
+      if ((e.duracao||0) <= sla) slaPorRobo[e.roboNome].ok++;
+    }
+    const slaAtingimento = Object.entries(slaPorRobo).map(([nome,v])=>({ nome, pct: Math.round(v.ok/v.total*100) }));
+    // Volumetria por area
+    const areaCounts = {};
+    for (const r of robos) for (const a of (r.areasBeneficiadas||[])) areaCounts[a] = (areaCounts[a]||0) + 1;
+    const volumetria = Object.entries(areaCounts).sort((a,b)=>b[1]-a[1]).map(([area,count])=>({area,count}));
+    // FTE saved: avg human time vs avg exec time
+    const ftePorRobo = robos.map(r => {
+      const exeRobo = execs.filter(e => e.roboId?.toString()===r._id.toString() && e.status==='concluido' && e.duracao);
+      const avgExec = exeRobo.length ? exeRobo.reduce((a,e)=>a+e.duracao,0)/exeRobo.length : 0;
+      const humanSec = (r.tempoManual||0)*60;
+      const pct = humanSec > 0 && avgExec > 0 ? Math.round((humanSec - avgExec)/humanSec*100) : null;
+      return { nome: r.nome, pct };
+    }).filter(x=>x.pct!==null);
+    res.json({ taxaSucesso, total, concluidos, erros, emExecucao, backlog, top5Erros, tempoMedio, slaAtingimento, volumetria, ftePorRobo, agentes: agentes.map(a=>({nome:a.nome,status:a.status,robosAtivos:a.robosAtivos,capacidadeMaxima:a.capacidadeMaxima})) });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// CRUD agentes
+app.get('/api/robos/agentes', authMiddleware, verificarAssinatura, async (req, res) => {
+  try { const agentes = await AgenteRobo.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(agentes); }
   catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.post('/api/robos/agentes', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const token = require('crypto').randomBytes(32).toString('hex');
+    const agente = await AgenteRobo.create({ ...req.body, token, empresa: req.usuario.empresa });
+    res.status(201).json(agente);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+app.put('/api/robos/agentes/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const agente = await AgenteRobo.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true, strict: false });
+    if (!agente) return res.status(404).json({ erro: 'Agente não encontrado' });
+    res.json(agente);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+app.delete('/api/robos/agentes/:id', authMiddleware, verificarAssinatura, async (req, res) => {
+  try { await AgenteRobo.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ ok: true }); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
+});
+// Heartbeat — called by worker agent (auth by token header)
+app.post('/api/robos/agentes/:id/heartbeat', async (req, res) => {
+  try {
+    const agente = await AgenteRobo.findById(req.params.id);
+    if (!agente) return res.status(404).json({ erro: 'Agente não encontrado' });
+    const token = req.headers['x-agent-token'];
+    if (token && agente.token && token !== agente.token) return res.status(401).json({ erro: 'Token inválido' });
+    await AgenteRobo.findByIdAndUpdate(agente._id, { status: 'conectado', ultimoHeartbeat: new Date(), robosAtivos: req.body.robosAtivos || 0 });
+    res.json({ ok: true });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
 // ==================== CREDENCIAIS ====================

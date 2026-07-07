@@ -215,6 +215,7 @@
     <a class="menu-item active" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
     <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
     <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
+    <a class="menu-item" href="/robos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M9 11V7a3 3 0 016 0v4"/><circle cx="9" cy="16" r="1" fill="currentColor"/><circle cx="15" cy="16" r="1" fill="currentColor"/></svg>Robôs</a>
     <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
     <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
     <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
@@ -315,7 +316,7 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','insertOrderedList')" title="Numerada">1. Lista</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-missao')" title="Link">🔗</button>
             </div>
-            <div class="mvv-texto rich-editor" id="val-missao" contenteditable="false" placeholder="Nossa missão é...">Clique em Editar para adicionar.</div>
+            <div class="mvv-texto rich-editor" id="val-missao" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossa missão é...">Clique em Editar para adicionar.</div>
           </div>
           <div class="mvv-card" style="border-top-color:#38a169">
             <div class="mvv-titulo" style="color:#38a169">👁️ Visão</div>
@@ -326,7 +327,7 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','insertOrderedList')" title="Numerada">1. Lista</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-visao')" title="Link">🔗</button>
             </div>
-            <div class="mvv-texto rich-editor" id="val-visao" contenteditable="false" placeholder="Nossa visão é...">Clique em Editar para adicionar.</div>
+            <div class="mvv-texto rich-editor" id="val-visao" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossa visão é...">Clique em Editar para adicionar.</div>
           </div>
           <div class="mvv-card" style="border-top-color:#6b46c1">
             <div class="mvv-titulo" style="color:#6b46c1">💎 Valores</div>
@@ -337,7 +338,7 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','insertOrderedList')" title="Numerada">1. Lista</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-valores')" title="Link">🔗</button>
             </div>
-            <div class="mvv-texto rich-editor" id="val-valores" contenteditable="false" placeholder="Nossos valores são...">Clique em Editar para adicionar.</div>
+            <div class="mvv-texto rich-editor" id="val-valores" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossos valores são...">Clique em Editar para adicionar.</div>
           </div>
         </div>
       </div>
@@ -368,7 +369,7 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','insertOrderedList')">1. Lista</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-e')">🔗</button>
             </div>
-            <div class="esg-texto rich-editor" id="val-esg-e" contenteditable="false" placeholder="Iniciativas ambientais...">Clique em Editar para adicionar.</div>
+            <div class="esg-texto rich-editor" id="val-esg-e" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Iniciativas ambientais...">Clique em Editar para adicionar.</div>
           </div>
           <div class="esg-card">
             <div class="esg-badge esg-s">S — Social</div>
@@ -379,7 +380,7 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','insertOrderedList')">1. Lista</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-s')">🔗</button>
             </div>
-            <div class="esg-texto rich-editor" id="val-esg-s" contenteditable="false" placeholder="Iniciativas sociais...">Clique em Editar para adicionar.</div>
+            <div class="esg-texto rich-editor" id="val-esg-s" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Iniciativas sociais...">Clique em Editar para adicionar.</div>
           </div>
           <div class="esg-card">
             <div class="esg-badge esg-g">G — Governança</div>
@@ -390,7 +391,7 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','insertOrderedList')">1. Lista</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-g')">🔗</button>
             </div>
-            <div class="esg-texto rich-editor" id="val-esg-g" contenteditable="false" placeholder="Práticas de governança...">Clique em Editar para adicionar.</div>
+            <div class="esg-texto rich-editor" id="val-esg-g" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Práticas de governança...">Clique em Editar para adicionar.</div>
           </div>
         </div>
       </div>
@@ -573,7 +574,7 @@
         <button class="toolbar-btn" onmousedown="event.preventDefault();fmtTimeline('insertOrderedList')" title="Lista numerada">1. Lista</button>
         <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLinkTimeline()" title="Link">🔗 Link</button>
       </div>
-      <div class="timeline-rich-editor" id="timelineDescEditor" contenteditable="true" placeholder="Descreva o marco histórico..."></div>
+      <div class="timeline-rich-editor" id="timelineDescEditor" contenteditable="true" onkeydown="_ovRichKeydown(event)" placeholder="Descreva o marco histórico..."></div>
     </div>
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalTimeline')">Cancelar</button><button class="btn-confirmar" onclick="adicionarTimeline()">Adicionar</button></div>
   </div>
@@ -825,6 +826,9 @@
   }
 
   function fmtRich(id, cmd) { document.getElementById(id).focus(); document.execCommand(cmd, false, null); }
+  function _ovRichKeydown(e) {
+    if (e.key === 'Tab') { e.preventDefault(); document.execCommand(e.shiftKey ? 'outdent' : 'indent'); }
+  }
   function inserirLink(id) {
     const url = prompt('URL do link:');
     if (!url) return;

@@ -1,57 +1,58 @@
 @echo off
-chcp 65001 >nul
 title HOC Agent
 
 echo.
-echo  ╔══════════════════════════════════════╗
-echo  ║         HOC Agent - Instalador       ║
-echo  ╚══════════════════════════════════════╝
+echo  ====================================
+echo   HOC Agent - Instalador
+echo  ====================================
 echo.
 
 :: Verifica se config.json existe
 if not exist "%~dp0config.json" (
-    echo  [ERRO] config.json nao encontrado!
-    echo  Coloque este arquivo na mesma pasta que o agent.py
-    echo  e o config.json baixados do HOC.
+    echo  ERRO: config.json nao encontrado!
+    echo  Coloque este arquivo na mesma pasta que agent.py e config.json.
+    echo.
     pause
     exit /b 1
 )
 
-:: Verifica se Python esta instalado
+:: Verifica Python
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo  [!] Python nao encontrado. Instalando automaticamente...
+    echo  Python nao encontrado. Tentando instalar via winget...
     echo.
-
-    :: Tenta instalar via winget (Windows 10/11)
-    winget install -e --id Python.Python.3.11 --silent --accept-package-agreements --accept-source-agreements >nul 2>&1
-
-    :: Aguarda instalacao
-    timeout /t 5 /nobreak >nul
-
-    :: Atualiza PATH para a sessao atual
-    for /f "delims=" %%i in ('where python 2^>nul') do set PYTHON_PATH=%%i
-    if not defined PYTHON_PATH (
-        echo  Python nao encontrado mesmo apos instalacao.
+    winget install -e --id Python.Python.3.11 --silent --accept-package-agreements --accept-source-agreements
+    timeout /t 10 /nobreak >nul
+    python --version >nul 2>&1
+    if errorlevel 1 (
+        echo.
+        echo  ERRO: Python nao instalado automaticamente.
         echo  Instale manualmente em: https://python.org/downloads
         echo  Marque "Add Python to PATH" na instalacao.
+        echo.
         pause
         exit /b 1
     )
-    echo  [OK] Python instalado com sucesso!
+    echo  Python instalado com sucesso!
     echo.
 )
 
-:: Instala dependencias silenciosamente
-echo  [1/2] Instalando dependencias (requests, psutil)...
-python -m pip install requests psutil --quiet --disable-pip-version-check >nul 2>&1
-echo  [OK] Dependencias prontas.
+:: Instala dependencias
+echo  Instalando dependencias...
+python -m pip install requests psutil
+if errorlevel 1 (
+    echo.
+    echo  ERRO ao instalar dependencias. Verifique sua conexao com a internet.
+    echo.
+    pause
+    exit /b 1
+)
+
+echo.
+echo  Iniciando HOC Agent...
+echo  ------------------------------------
 echo.
 
-:: Inicia o Agent
-echo  [2/2] Iniciando HOC Agent...
-echo  ─────────────────────────────────────────
-echo.
 cd /d "%~dp0"
 python agent.py
 

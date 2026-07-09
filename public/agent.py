@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-HOC Agent v1.0 - Robot Orchestrator Client
+HOC Agent v1.1 - Robot Orchestrator Client
 Docs: veja /operacoes -> Agentes para instruções de instalação
 
 Requisitos: pip install requests psutil
@@ -9,10 +9,12 @@ Uso: python agent.py
 
 import json
 import os
+import queue
 import sys
 import subprocess
 import threading
 import time
+import zipfile
 import requests
 
 # ── Carrega config ──────────────────────────────────────────────────────────
@@ -84,16 +86,95 @@ def check_interrupt(exec_id):
         return False
 
 
+def kill_proc(proc):
+    """Mata o processo e todos os filhos usando psutil; fecha stdout para desbloquear readline."""
+    try:
+        import psutil
+        parent = psutil.Process(proc.pid)
+        for child in parent.children(recursive=True):
+            try: child.kill()
+            except Exception: pass
+        try: parent.kill()
+        except Exception: pass
+    except Exception:
+        try: proc.kill()
+        except Exception: pass
+    # Fecha o pipe para desbloquear qualquer readline em espera
+    try: proc.stdout.close()
+    except Exception: pass
+
+
+def notify(title, message):
+    """Exibe notificação balloon no Windows via PowerShell (silencioso se falhar)."""
+    if sys.platform != 'win32':
+        return
+    script = (
+        "Add-Type -AssemblyName System.Windows.Forms;"
+        "$n=New-Object System.Windows.Forms.NotifyIcon;"
+        "$n.Icon=[System.Drawing.SystemIcons]::Information;"
+        f"$n.BalloonTipTitle='{title}';"
+        f"$n.BalloonTipText='{message}';"
+        "$n.Visible=$true;"
+        "$n.ShowBalloonTip(4000);"
+        "Start-Sleep -Milliseconds 4500;"
+        "$n.Dispose()"
+    )
+    try:
+        subprocess.Popen(
+            ['powershell', '-NonInteractive', '-WindowStyle', 'Hidden', '-Command', script],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+    except Exception:
+        pass
+
+
+# ── Download de ZIP do SaaS ──────────────────────────────────────────────────
+
+def download_robot_zip(robo_id, workdir):
+    """
+    Baixa o ZIP do robô do SaaS e extrai em workdir.
+    Retorna True se baixou com sucesso, False se não havia ZIP.
+    """
+    url = f"{SERVER}/api/robos/{robo_id}/package"
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=60, stream=True)
+        if r.status_code == 404:
+            return False
+        r.raise_for_status()
+        zip_path = os.path.join(workdir, '_robot.zip')
+        with open(zip_path, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+        with zipfile.ZipFile(zip_path, 'r') as zf:
+            zf.extractall(workdir)
+        os.remove(zip_path)
+        log('INFO', f"ZIP extraído em {workdir}")
+        return True
+    except Exception as e:
+        log('WARN', f"Falha ao baixar ZIP: {e}")
+        return False
+
+
 # ── Execução de robôs ────────────────────────────────────────────────────────
 
-def run_robot(exec_id, command, timeout_min=30, git_url=None, git_branch='main'):
+def run_robot(exec_id, command, timeout_min=30, git_url=None, git_branch='main',
+              robo_id=None, robo_nome='Robô', pacotes_pip='', pre_comando=''):
     """Executa um robô como subprocess e faz streaming de logs ao SaaS."""
     exec_id = str(exec_id)
-    workdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'runtime', exec_id)
+    base    = os.path.dirname(os.path.abspath(__file__))
+    workdir = os.path.join(base, 'runtime', exec_id)
     os.makedirs(workdir, exist_ok=True)
 
+    notify(f"HOC — {robo_nome}", "Execução iniciada...")
+
     try:
-        # ── Clonar/atualizar via Git ─────────────────────────────────────
+        # ── 1. Tentar baixar ZIP do SaaS ─────────────────────────────────
+        if robo_id and not git_url:
+            got_zip = download_robot_zip(robo_id, workdir)
+            if got_zip:
+                post_log(exec_id, "Pacote ZIP baixado e extraído.")
+
+        # ── 2. Clonar/atualizar via Git ──────────────────────────────────
         if git_url:
             repo_dir = os.path.join(workdir, 'repo')
             if os.path.isdir(os.path.join(repo_dir, '.git')):
@@ -103,10 +184,13 @@ def run_robot(exec_id, command, timeout_min=30, git_url=None, git_branch='main')
             else:
                 log('INFO', f"[{exec_id}] git clone {git_url} branch={git_branch}")
                 post_log(exec_id, f"Clonando repositório: {git_url} ({git_branch})")
-                subprocess.run(['git', 'clone', '--depth=1', '-b', git_branch, git_url, repo_dir], capture_output=True)
+                subprocess.run(
+                    ['git', 'clone', '--depth=1', '-b', git_branch, git_url, repo_dir],
+                    capture_output=True
+                )
             workdir = repo_dir
 
-        # ── Instalar dependências ────────────────────────────────────────
+        # ── 3. Instalar requirements.txt ─────────────────────────────────
         req_file = os.path.join(workdir, 'requirements.txt')
         if os.path.exists(req_file):
             log('INFO', f"[{exec_id}] instalando requirements.txt")
@@ -116,63 +200,129 @@ def run_robot(exec_id, command, timeout_min=30, git_url=None, git_branch='main')
                 cwd=workdir, capture_output=True
             )
 
-        # ── Executar ─────────────────────────────────────────────────────
+        # ── 4. Instalar pacotes pip adicionais ───────────────────────────
+        if pacotes_pip:
+            pkgs = [p.strip() for p in pacotes_pip.splitlines() if p.strip()]
+            if pkgs:
+                log('INFO', f"[{exec_id}] instalando pacotes: {pkgs}")
+                post_log(exec_id, f"Instalando pacotes: {', '.join(pkgs)}")
+                subprocess.run(
+                    [sys.executable, '-m', 'pip', 'install', '-q'] + pkgs,
+                    cwd=workdir, capture_output=True
+                )
+
+        # ── 5. Pré-comando ───────────────────────────────────────────────
+        if pre_comando:
+            log('INFO', f"[{exec_id}] pré-comando: {pre_comando}")
+            post_log(exec_id, f"Pré-comando: {pre_comando}")
+            subprocess.run(pre_comando, shell=True, cwd=workdir, capture_output=True)
+
+        # ── 6. Executar ──────────────────────────────────────────────────
         log('INFO', f"[{exec_id}] executando: {command}")
         post_log(exec_id, f"Iniciando: {command}")
 
+        extra = {'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP} if sys.platform == 'win32' else {'start_new_session': True}
         proc = subprocess.Popen(
             command, shell=True,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, encoding='utf-8', errors='replace',
-            cwd=workdir
+            cwd=workdir, **extra
         )
         with _lock:
             running_procs[exec_id] = proc
 
-        deadline = time.time() + timeout_min * 60
+        # Thread separada que mata o processo ao detectar interrupt ou timeout
+        _stop_checker = threading.Event()
+        _killed_by    = [None]
+        deadline      = time.time() + timeout_min * 60
 
-        for line in iter(proc.stdout.readline, ''):
-            line = line.rstrip()
-            if line:
-                log('BOT', f"[{exec_id}] {line}")
-                post_log(exec_id, line, 'info')
-            if check_interrupt(exec_id):
-                proc.kill()
-                log('INFO', f"[{exec_id}] interrompido pelo SaaS")
-                post_log(exec_id, 'Execução interrompida pelo orquestrador.', 'error')
-                return
-            if time.time() > deadline:
-                proc.kill()
-                log('WARN', f"[{exec_id}] timeout após {timeout_min}min")
-                post_log(exec_id, f'Timeout após {timeout_min} minutos.', 'error')
-                return
+        def _checker():
+            while not _stop_checker.is_set():
+                if check_interrupt(exec_id):
+                    _killed_by[0] = 'interrupt'
+                    kill_proc(proc)
+                    return
+                if time.time() > deadline:
+                    _killed_by[0] = 'timeout'
+                    kill_proc(proc)
+                    return
+                _stop_checker.wait(5)
+
+        checker_thread = threading.Thread(target=_checker, daemon=True)
+        checker_thread.start()
+
+        # Lê stdout em thread separada para não bloquear quando o processo é morto
+        stdout_q = queue.Queue()
+
+        def _reader():
+            try:
+                for line in iter(proc.stdout.readline, ''):
+                    stdout_q.put(line)
+            except Exception:
+                pass
+            stdout_q.put(None)  # sentinel: fim do stream
+
+        reader_thread = threading.Thread(target=_reader, daemon=True)
+        reader_thread.start()
+
+        while True:
+            try:
+                line = stdout_q.get(timeout=0.5)
+                if line is None:
+                    break
+                line = line.rstrip()
+                if line:
+                    log('BOT', f"[{exec_id}] {line}")
+                    post_log(exec_id, line, 'info')
+            except queue.Empty:
+                if proc.poll() is not None:
+                    break  # processo terminou
 
         proc.wait()
-        if proc.returncode == 0:
+        _stop_checker.set()
+        checker_thread.join(timeout=2)
+        reader_thread.join(timeout=2)
+
+        if _killed_by[0] == 'interrupt':
+            log('INFO', f"[{exec_id}] interrompido pelo SaaS")
+            post_log(exec_id, 'Execução interrompida pelo orquestrador.', 'error')
+            notify(f"HOC — {robo_nome}", "Execução interrompida.")
+        elif _killed_by[0] == 'timeout':
+            log('WARN', f"[{exec_id}] timeout após {timeout_min}min")
+            post_log(exec_id, f'Timeout após {timeout_min} minutos.', 'error')
+            notify(f"HOC — {robo_nome}", f"Timeout após {timeout_min} min.")
+        elif proc.returncode == 0:
             log('INFO', f"[{exec_id}] concluído ✓")
             post_log(exec_id, 'Execução concluída com sucesso.', 'success')
+            notify(f"HOC — {robo_nome}", "Concluído com sucesso ✓")
         else:
             log('WARN', f"[{exec_id}] erro (código {proc.returncode})")
             post_log(exec_id, f'Erro na execução (exit code {proc.returncode}).', 'error')
+            notify(f"HOC — {robo_nome}", f"Erro (exit {proc.returncode})")
 
     except Exception as e:
         log('ERR', f"[{exec_id}] exceção: {e}")
         post_log(exec_id, f'Erro inesperado: {e}', 'error')
+        notify(f"HOC — {robo_nome}", "Erro inesperado na execução.")
     finally:
         with _lock:
             running_procs.pop(exec_id, None)
 
 
-def run_webhook(exec_id, webhook_url, payload):
+def run_webhook(exec_id, webhook_url, payload, robo_nome='Robô'):
     """Dispara robô de nuvem via POST no webhook configurado."""
     exec_id = str(exec_id)
+    notify(f"HOC — {robo_nome}", "Disparando webhook...")
     try:
         post_log(exec_id, f"Disparando webhook: {webhook_url}")
         r = requests.post(webhook_url, json=payload, timeout=30)
-        post_log(exec_id, f"Webhook respondeu: {r.status_code}", 'success' if r.ok else 'error')
+        status = 'success' if r.ok else 'error'
+        post_log(exec_id, f"Webhook respondeu: {r.status_code}", status)
+        notify(f"HOC — {robo_nome}", f"Webhook: {r.status_code} {'OK' if r.ok else 'ERRO'}")
     except Exception as e:
         log('ERR', f"[{exec_id}] webhook falhou: {e}")
         post_log(exec_id, f'Webhook falhou: {e}', 'error')
+        notify(f"HOC — {robo_nome}", "Webhook falhou.")
     finally:
         with _lock:
             running_procs.pop(exec_id, None)
@@ -212,14 +362,16 @@ def heartbeat_loop():
                     if exec_id in running_procs:
                         continue  # já rodando
 
-                tipo    = cmd.get('tipo', 'local')
-                command = cmd.get('command', '')
-                timeout = cmd.get('timeout', 30)
+                tipo       = cmd.get('tipo', 'local')
+                command    = cmd.get('command', '')
+                timeout    = cmd.get('timeout', 30)
+                robo_nome  = cmd.get('roboNome', 'Robô')
+                robo_id    = cmd.get('roboId', None)
 
                 if tipo in ('nuvem', 'cloud') and cmd.get('webhookUrl'):
                     t = threading.Thread(
                         target=run_webhook,
-                        args=(exec_id, cmd['webhookUrl'], cmd.get('webhookPayload', {})),
+                        args=(exec_id, cmd['webhookUrl'], cmd.get('webhookPayload', {}), robo_nome),
                         daemon=True
                     )
                 else:
@@ -229,7 +381,14 @@ def heartbeat_loop():
                     t = threading.Thread(
                         target=run_robot,
                         args=(exec_id, command, timeout),
-                        kwargs={'git_url': cmd.get('gitUrl'), 'git_branch': cmd.get('gitBranch', 'main')},
+                        kwargs={
+                            'git_url':    cmd.get('gitUrl'),
+                            'git_branch': cmd.get('gitBranch', 'main'),
+                            'robo_id':    robo_id,
+                            'robo_nome':  robo_nome,
+                            'pacotes_pip':cmd.get('pacotesPip', ''),
+                            'pre_comando':cmd.get('preComando', ''),
+                        },
                         daemon=True
                     )
                 t.start()
@@ -247,7 +406,7 @@ def heartbeat_loop():
 
 if __name__ == '__main__':
     log('INFO', '=' * 50)
-    log('INFO', 'HOC Agent v1.0 iniciando...')
+    log('INFO', 'HOC Agent v1.1 iniciando...')
     log('INFO', f"Servidor : {SERVER}")
     log('INFO', f"Machine  : {MACHINE_ID}")
     log('INFO', 'Pressione Ctrl+C para parar')

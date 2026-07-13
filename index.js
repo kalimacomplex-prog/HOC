@@ -696,7 +696,8 @@ async function filaAuth(req, res, next) {
     try {
       const robo = await Robot.findOne({ apiKey }).lean();
       if (!robo) return res.status(401).json({ erro: 'x-robot-key inválida' });
-      if (req.params.id && req.params.id !== robo._id.toString())
+      // aceita tanto o _id do MongoDB quanto a própria apiKey como :id na URL
+      if (req.params.id && req.params.id !== robo._id.toString() && req.params.id !== robo.apiKey)
         return res.status(403).json({ erro: 'Chave não autorizada para este robô' });
       req.roboFromKey = robo;
       req.filaEmpresa = robo.empresa;

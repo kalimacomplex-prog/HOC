@@ -525,9 +525,34 @@ const robotSchema = new mongoose.Schema({
   tempoMedioExecucao: { type: Number, default: 0 }, // seconds
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now },
+  apiKey: { type: String, default: () => crypto.randomUUID() }
 }, { strict: false });
 const Robot = mongoose.model('Robot', robotSchema);
+
+const filaItemSchema = new mongoose.Schema({
+  roboId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Robot', required: true },
+  empresaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  itemId:    { type: String, default: () => crypto.randomUUID() },
+  nome:      { type: String, default: '' },
+  status:    { type: String, default: 'aguardando', enum: ['aguardando','em_execucao','concluido','erro'] },
+  conteudo:  { type: mongoose.Schema.Types.Mixed, default: {} },
+  posicao:   { type: Number, default: 0 },
+  criadoEm:  { type: Date, default: Date.now },
+  atualizadoEm: { type: Date, default: Date.now }
+});
+const FilaItem = mongoose.model('FilaItem', filaItemSchema);
+
+const auditoriaRoboSchema = new mongoose.Schema({
+  roboId:       { type: mongoose.Schema.Types.ObjectId, ref: 'Robot', required: true },
+  empresaId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  usuarioNome:  { type: String, default: '' },
+  usuarioEmail: { type: String, default: '' },
+  acao:         { type: String, default: '' },
+  detalhes:     { type: String, default: '' },
+  timestamp:    { type: Date, default: Date.now }
+});
+const AuditoriaRobo = mongoose.model('AuditoriaRobo', auditoriaRoboSchema);
 
 const execucaoRoboSchema = new mongoose.Schema({
   roboId: { type: mongoose.Schema.Types.ObjectId, ref: 'Robot', required: true },
@@ -653,6 +678,32 @@ function authMiddleware(req, res, next) {
   if (!token) return res.status(401).json({ erro: 'Token não fornecido' });
   try { const decoded = jwt.verify(token, process.env.JWT_SECRET || 'segredo123'); req.usuario = decoded; next(); }
   catch { res.status(401).json({ erro: 'Token inválido' }); }
+}
+
+async function filaAuth(req, res, next) {
+  // Aceita JWT (SaaS) ou x-robot-key (ferramenta externa)
+  const auth = req.headers['authorization'];
+  if (auth?.startsWith('Bearer ')) {
+    try {
+      const decoded = jwt.verify(auth.split(' ')[1], process.env.JWT_SECRET || 'segredo123');
+      req.usuario = decoded;
+      req.filaEmpresa = decoded.empresa;
+      return next();
+    } catch {}
+  }
+  const apiKey = req.headers['x-robot-key'];
+  if (apiKey) {
+    try {
+      const robo = await Robot.findOne({ apiKey }).lean();
+      if (!robo) return res.status(401).json({ erro: 'x-robot-key inválida' });
+      if (req.params.id && req.params.id !== robo._id.toString())
+        return res.status(403).json({ erro: 'Chave não autorizada para este robô' });
+      req.roboFromKey = robo;
+      req.filaEmpresa = robo.empresa;
+      return next();
+    } catch (e) { return res.status(500).json({ erro: e.message }); }
+  }
+  return res.status(401).json({ erro: 'Autenticação necessária: Authorization Bearer ou x-robot-key' });
 }
 
 async function verificarAssinatura(req, res, next) {
@@ -2041,15 +2092,21 @@ app.get('/api/robos', authMiddleware, verificarAssinatura, async (req, res) => {
 });
 app.post('/api/robos', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    const robo = await Robot.create({ ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id });
+    const body = { ...req.body, empresa: req.usuario.empresa, criadoPor: req.usuario.id };
+    if (body.schedule?.ativo) body.schedule.proximaExec = calcularProximaExec(body.schedule);
+    const robo = await Robot.create(body);
+    await AuditoriaRobo.create({ roboId: robo._id, empresaId: req.usuario.empresa, usuarioNome: req.usuario.nome || '', usuarioEmail: req.usuario.email || '', acao: 'criou', detalhes: `Robô "${robo.nome}" criado.` });
     await criarNotificacao(req.usuario.empresa, `Novo robô: ${robo.nome}`, `O robô foi cadastrado.`, 'info', '🤖', '/robos');
     res.status(201).json(robo);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.put('/api/robos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    const robo = await Robot.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true, strict: false });
+    const body = { ...req.body, atualizadoEm: new Date() };
+    if (body.schedule?.ativo) body.schedule.proximaExec = calcularProximaExec(body.schedule);
+    const robo = await Robot.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, body, { new: true, strict: false });
     if (!robo) return res.status(404).json({ erro: 'Robô não encontrado' });
+    if (robo) await AuditoriaRobo.create({ roboId: robo._id, empresaId: req.usuario.empresa, usuarioNome: req.usuario.nome || '', usuarioEmail: req.usuario.email || '', acao: 'editou', detalhes: `Robô "${robo.nome}" atualizado.` });
     res.json(robo);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -2061,26 +2118,130 @@ app.delete('/api/robos/:id', authMiddleware, verificarAssinatura, async (req, re
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+app.patch('/api/robos/:id/ativar', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const robo = await Robot.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ativo: req.body.ativo, atualizadoEm: new Date() }, { new: true });
+    if (!robo) return res.status(404).json({ erro: 'Robô não encontrado' });
+    const acao = req.body.ativo ? 'ativou' : 'inativou';
+    await AuditoriaRobo.create({ roboId: robo._id, empresaId: req.usuario.empresa, usuarioNome: req.usuario.nome || '', usuarioEmail: req.usuario.email || '', acao, detalhes: `Robô "${robo.nome}" ${acao}.` });
+    res.json(robo);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// ==================== FILA DE PROCESSAMENTO ====================
+
+// GET /api/robos/:id/fila — lista itens (JWT ou x-robot-key)
+app.get('/api/robos/:id/fila', filaAuth, async (req, res) => {
+  try {
+    const items = await FilaItem.find({ roboId: req.params.id, empresaId: req.filaEmpresa }).sort({ posicao: 1, criadoEm: 1 });
+    res.json(items);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// GET /api/robos/:id/fila/proximo — próximo item aguardando (ANTES de /:itemId para não conflitar)
+app.get('/api/robos/:id/fila/proximo', filaAuth, async (req, res) => {
+  try {
+    const item = await FilaItem.findOne({ roboId: req.params.id, empresaId: req.filaEmpresa, status: 'aguardando' }).sort({ posicao: 1, criadoEm: 1 });
+    if (!item) return res.json(null);
+    res.json(item);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// POST /api/robos/:id/fila — adiciona item
+app.post('/api/robos/:id/fila', filaAuth, async (req, res) => {
+  try {
+    const robo = await Robot.findById(req.params.id).lean();
+    if (!robo || robo.empresa.toString() !== req.filaEmpresa.toString()) return res.status(404).json({ erro: 'Robô não encontrado' });
+    const count = await FilaItem.countDocuments({ roboId: req.params.id, empresaId: req.filaEmpresa });
+    const item = await FilaItem.create({
+      roboId: req.params.id,
+      empresaId: req.filaEmpresa,
+      itemId: req.body.itemId || crypto.randomUUID(),
+      nome: req.body.nome || '',
+      status: req.body.status || 'aguardando',
+      conteudo: req.body.conteudo || {},
+      posicao: req.body.posicao ?? count
+    });
+    res.status(201).json(item);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// PATCH /api/robos/:id/fila/:itemId — atualiza status ou campos
+app.patch('/api/robos/:id/fila/:itemId', filaAuth, async (req, res) => {
+  try {
+    const updates = { ...req.body, atualizadoEm: new Date() };
+    const item = await FilaItem.findOneAndUpdate(
+      { _id: req.params.itemId, roboId: req.params.id, empresaId: req.filaEmpresa },
+      updates, { new: true }
+    );
+    if (!item) return res.status(404).json({ erro: 'Item não encontrado' });
+    res.json(item);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// DELETE /api/robos/:id/fila/:itemId — remove item
+app.delete('/api/robos/:id/fila/:itemId', filaAuth, async (req, res) => {
+  try {
+    await FilaItem.findOneAndDelete({ _id: req.params.itemId, roboId: req.params.id, empresaId: req.filaEmpresa });
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// PUT /api/robos/:id/fila/reorder — reordena (body: { ids: ['id1','id2',...] })
+app.put('/api/robos/:id/fila/reorder', filaAuth, async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids)) return res.status(400).json({ erro: 'ids deve ser array' });
+    await Promise.all(ids.map((id, i) => FilaItem.findByIdAndUpdate(id, { posicao: i, atualizadoEm: new Date() })));
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// GET /api/robos/:id/auditoria — histórico de auditoria
+app.get('/api/robos/:id/auditoria', authMiddleware, async (req, res) => {
+  try {
+    const logs = await AuditoriaRobo.find({ roboId: req.params.id, empresaId: req.usuario.empresa }).sort({ timestamp: -1 }).limit(100);
+    res.json(logs);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 // Executar robô manualmente
 app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
     const robo = await Robot.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
     if (!robo) return res.status(404).json({ erro: 'Robô não encontrado' });
-    if (!robo.ativo) return res.status(400).json({ erro: 'Robô desativado' });
-    // Check for available agent
-    const agente = await AgenteRobo.findOne({ empresa: req.usuario.empresa, status: 'conectado' }).sort({ robosAtivos: 1 });
+
+    // Busca máquina alvo: primeiro a vinculada ao robô, senão qualquer online com slot livre
+    let maquina = null;
+    if (robo.maquinaId) {
+      maquina = await Maquina.findOne({ _id: robo.maquinaId, empresa: req.usuario.empresa, status: { $in: ['online','busy'] }, ativo: true });
+    }
+    if (!maquina) {
+      maquina = await Maquina.findOne({
+        empresa: req.usuario.empresa, status: 'online', ativo: true,
+        $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
+      }).sort({ robosAtivos: 1 });
+    }
+
     const exec = await ExecucaoRobo.create({
-      roboId: robo._id, roboNome: robo.nome,
-      status: agente ? 'em_execucao' : 'nao_disparado',
-      motivoInterrupcao: agente ? '' : 'Sem agentes disponíveis no momento',
-      maquina: agente ? agente.maquina || agente.nome : '',
-      gatilho: req.body.gatilho || 'manual',
+      roboId:    robo._id,
+      roboNome:  robo.nome,
+      status:    maquina ? 'em_execucao' : 'nao_disparado',
+      motivoInterrupcao: maquina ? '' : 'Nenhuma máquina online disponível',
+      maquina:   maquina ? maquina.machineId : '',
+      maquinaId: maquina ? maquina._id : null,
+      gatilho:   req.body.gatilho || 'manual',
       prioridade: robo.prioridade || 'Media',
-      iniciadoEm: agente ? new Date() : null,
-      empresa: req.usuario.empresa, criadoPor: req.usuario.id
+      iniciadoEm: maquina ? new Date() : null,
+      empresa:   req.usuario.empresa,
+      criadoPor: req.usuario.id
     });
-    if (agente) await AgenteRobo.findByIdAndUpdate(agente._id, { $inc: { robosAtivos: 1 } });
-    res.status(201).json(exec);
+
+    if (maquina) {
+      await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
+    }
+
+    res.status(201).json({ ...exec.toObject(), status: exec.status });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
@@ -2127,25 +2288,6 @@ app.put('/api/robos/execucoes/:id', authMiddleware, verificarAssinatura, async (
 });
 
 // Logs da execução (agent posts here)
-app.post('/api/robos/execucoes/:id/logs', authMiddleware, async (req, res) => {
-  try {
-    const { nivel, mensagem } = req.body;
-    const exec = await ExecucaoRobo.findOneAndUpdate(
-      { _id: req.params.id, empresa: req.usuario.empresa },
-      { $push: { logs: { timestamp: new Date(), nivel: nivel || 'info', mensagem } } },
-      { new: true }
-    );
-    // Auto-set status from terminal log nivel
-    if (exec && nivel === 'erro') {
-      await ExecucaoRobo.findByIdAndUpdate(exec._id, { status: 'erro', finalizadoEm: new Date() });
-    } else if (exec && nivel === 'sucesso') {
-      const dur = exec.iniciadoEm ? Math.round((Date.now() - new Date(exec.iniciadoEm).getTime()) / 1000) : 0;
-      await ExecucaoRobo.findByIdAndUpdate(exec._id, { status: 'concluido', finalizadoEm: new Date(), duracao: dur });
-      await Robot.findByIdAndUpdate(exec.roboId, { $inc: { totalExecucoes: 1 } });
-    }
-    res.json({ ok: true });
-  } catch (err) { res.status(400).json({ erro: err.message }); }
-});
 
 // Métricas resumo
 app.get('/api/robos/metricas', authMiddleware, verificarAssinatura, async (req, res) => {
@@ -2328,29 +2470,41 @@ app.post('/api/maquinas/heartbeat', async (req, res) => {
       status: 'em_execucao',
       comandoEnviado: { $ne: true }
     }).limit(3);
-    // Marca como enviados
+    const roboIds = [...new Set(pendentes.map(e => e.roboId?.toString()).filter(Boolean))];
+    const robosEncontrados = roboIds.length ? await Robot.find({ _id: { $in: roboIds } }) : [];
+    const roboMap = Object.fromEntries(robosEncontrados.map(r => [r._id.toString(), r]));
+    // Marca como enviados só depois de ter os dados do robô
     if (pendentes.length) {
       await ExecucaoRobo.updateMany(
         { _id: { $in: pendentes.map(e => e._id) } },
         { comandoEnviado: true }
       );
     }
-    const roboIds = [...new Set(pendentes.map(e => e.roboId?.toString()).filter(Boolean))];
-    const robos = roboIds.length
-      ? await (async () => { const R = require('mongoose').model('Robot'); return R.find({ _id: { $in: roboIds } }); })().catch(() => [])
-      : [];
-    const roboMap = Object.fromEntries(robos.map(r => [r._id.toString(), r]));
+    const INTERP = { py:'python', js:'node', ts:'npx ts-node', rb:'ruby', sh:'bash', php:'php', r:'Rscript' };
     const commands = pendentes.map(e => {
       const robo = roboMap[e.roboId?.toString()] || {};
+      let command = robo.comandoExecucao || '';
+      if (!command && robo.arquivoPrincipal) {
+        const arq = robo.arquivoPrincipal;
+        const ext = (arq.split('.').pop()||'').toLowerCase();
+        if (INTERP[ext]) command = `${INTERP[ext]} ${arq}`;
+        else if (['exe','bat','cmd'].includes(ext)) command = arq;
+        else command = `python ${arq}`;
+      }
       return {
-        execId: e._id,
-        command: robo.comandoExecucao || '',
-        tipo: robo.ambiente || 'local',
-        webhookUrl: robo.webhookUrl || '',
-        webhookPayload: robo.webhookPayload || {},
-        gitUrl: robo.gitUrl || '',
-        gitBranch: robo.gitBranch || 'main',
-        timeout: robo.timeout || 30
+        execId:           e._id,
+        roboId:           e.roboId?.toString() || '',
+        roboNome:         robo.nome || 'Robô',
+        command,
+        arquivoPrincipal: robo.arquivoPrincipal || '',
+        tipo:             robo.ambiente || 'local',
+        webhookUrl:       robo.webhookUrl || '',
+        webhookPayload:   robo.webhookPayload || {},
+        gitUrl:           robo.gitUrl || '',
+        gitBranch:        robo.gitBranch || 'main',
+        pacotesPip:       robo.pacotesPip || '',
+        preComando:       robo.preComando || '',
+        timeout:          robo.timeout || 30
       };
     });
     res.json({ ok: true, status, commands });
@@ -2364,11 +2518,19 @@ app.post('/api/robos/execucoes/:id/logs', async (req, res) => {
     if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
     const maquina = await Maquina.findOne({ machineKey, ativo: true });
     if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
+    const exec = await ExecucaoRobo.findById(req.params.id);
     const updates = { $push: { logs: { message: message || '', status: status || 'info', time: new Date() } } };
-    if (status === 'success') Object.assign(updates, { $set: { status: 'concluido', finalizadoEm: new Date() } });
-    if (status === 'error')   Object.assign(updates, { $set: { status: 'erro', finalizadoEm: new Date() } });
+    if (status === 'success') {
+      const dur = exec?.iniciadoEm ? Math.round((Date.now() - new Date(exec.iniciadoEm).getTime()) / 1000) : 0;
+      Object.assign(updates, { $set: { status: 'concluido', finalizadoEm: new Date(), duracao: dur } });
+    }
+    // Só muda status para 'erro' se não estiver já 'interrompido' (evita sobrescrever)
+    if (status === 'error' && exec?.status !== 'interrompido') {
+      Object.assign(updates, { $set: { status: 'erro', finalizadoEm: new Date() } });
+    }
     await ExecucaoRobo.findByIdAndUpdate(req.params.id, updates);
-    if (status === 'success' || status === 'error') {
+    if (status === 'success') await Robot.findByIdAndUpdate(exec?.roboId, { $inc: { totalExecucoes: 1 } });
+    if (status === 'success' || (status === 'error' && exec?.status !== 'interrompido')) {
       await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: -1 } });
     }
     res.json({ ok: true });
@@ -2411,6 +2573,117 @@ setInterval(async () => {
     );
   } catch (e) { /* silent */ }
 }, 30000);
+
+function calcularProximaExec(schedule) {
+  const { frequencia, horario, diasSemana, diaMes, intervaloValor, intervaloUnidade, inicio, dataUnica } = schedule || {};
+  const now = new Date();
+
+  if (frequencia === 'unico') return null;
+
+  if (frequencia === 'intervalo') {
+    const val = parseInt(intervaloValor) || 1;
+    const ms  = intervaloUnidade === 'minutos' ? val * 60000 : intervaloUnidade === 'horas' ? val * 3600000 : val * 86400000;
+    let prox  = inicio ? new Date(inicio) : new Date();
+    while (prox <= now) prox = new Date(prox.getTime() + ms);
+    return prox;
+  }
+
+  const [hh, mm] = (horario || '08:00').split(':').map(Number);
+  let next;
+
+  if (frequencia === 'semanal') {
+    const dias = (diasSemana || []).length ? diasSemana : [1];
+    for (let i = 0; i <= 7; i++) {
+      const c = new Date(now); c.setDate(now.getDate() + i); c.setHours(hh, mm, 0, 0);
+      if (dias.includes(c.getDay()) && c > now) { next = c; break; }
+    }
+    if (!next) { next = new Date(now); next.setDate(next.getDate() + 7); next.setHours(hh, mm, 0, 0); }
+  } else if (frequencia === 'mensal') {
+    next = new Date(now.getFullYear(), now.getMonth(), diaMes || 1, hh, mm, 0);
+    if (next <= now) next = new Date(now.getFullYear(), now.getMonth() + 1, diaMes || 1, hh, mm, 0);
+  } else {
+    next = new Date(now); next.setHours(hh, mm, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+  }
+  return next;
+}
+
+// Job: scheduler de robôs agendados (roda a cada 60s)
+setInterval(async () => {
+  try {
+    const now = new Date();
+    const agendados = await Robot.find({ 'schedule.ativo': true, 'schedule.proximaExec': { $lte: now }, ativo: true });
+    for (const robo of agendados) {
+      let maquina = null;
+      if (robo.maquinaId) {
+        maquina = await Maquina.findOne({ _id: robo.maquinaId, status: { $in: ['online','busy'] }, ativo: true });
+      }
+      if (!maquina) {
+        maquina = await Maquina.findOne({
+          empresa: robo.empresa, status: 'online', ativo: true,
+          $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
+        }).sort({ robosAtivos: 1 });
+      }
+      await ExecucaoRobo.create({
+        roboId: robo._id, roboNome: robo.nome,
+        status: maquina ? 'em_execucao' : 'nao_disparado',
+        motivoInterrupcao: maquina ? '' : 'Nenhuma máquina disponível',
+        maquina: maquina ? maquina.machineId : '',
+        maquinaId: maquina ? maquina._id : null,
+        gatilho: 'schedule', prioridade: robo.prioridade || 'Media',
+        iniciadoEm: maquina ? new Date() : null, empresa: robo.empresa
+      });
+      if (maquina) await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
+      const proxima = calcularProximaExec(robo.schedule);
+      if (proxima) await Robot.findByIdAndUpdate(robo._id, { 'schedule.proximaExec': proxima });
+      else await Robot.findByIdAndUpdate(robo._id, { 'schedule.ativo': false }); // unico: desativa após disparar
+    }
+  } catch (e) { /* silent */ }
+}, 60000);
+
+// ==================== ROBÔ ZIP PACKAGE ====================
+
+const robotPackagesDir = path.join(__dirname, 'public', 'robot-packages');
+if (!fs.existsSync(robotPackagesDir)) fs.mkdirSync(robotPackagesDir, { recursive: true });
+
+const uploadRobotZip = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, robotPackagesDir),
+    filename: (req, file, cb) => cb(null, `${req.params.id}.zip`)
+  }),
+  limits: { fileSize: 100 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.originalname.endsWith('.zip') || file.mimetype === 'application/zip') cb(null, true);
+    else cb(new Error('Apenas arquivos .zip são aceitos'));
+  }
+});
+
+// Upload do ZIP do robô (autenticado pelo usuário SaaS)
+app.post('/api/robos/:id/package', authMiddleware, verificarAssinatura, uploadRobotZip.single('zip'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado' });
+    await Robot.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { zipNome: req.file.originalname, vinculoTipo: 'zip', atualizadoEm: new Date() }
+    );
+    res.json({ ok: true, zipNome: req.file.originalname });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Download do ZIP pelo Agent (autenticado por machineKey no header)
+app.get('/api/robos/:id/package', async (req, res) => {
+  try {
+    const machineKey = req.headers['x-machine-key'];
+    if (!machineKey) return res.status(401).json({ erro: 'x-machine-key obrigatório' });
+    const maquina = await Maquina.findOne({ machineKey, ativo: true });
+    if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
+
+    const zipPath = path.join(robotPackagesDir, `${req.params.id}.zip`);
+    if (!fs.existsSync(zipPath)) return res.status(404).json({ erro: 'Pacote não encontrado' });
+
+    res.download(zipPath, `robot-${req.params.id}.zip`);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
 
 // ==================== CREDENCIAIS ====================
 

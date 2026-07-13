@@ -307,6 +307,28 @@
     .robo-prog-fill { height: 6px; border-radius: 3px; background: #2d1b69; }
     .fila-badge { font-size: 11px; font-weight: 700; padding: 3px 8px; background: #f5f0ff; color: #2d1b69; border-radius: 4px; }
 
+    /* Painel de detalhes do robô */
+    .robo-detalhe-painel { width: 58%; min-width: 320px; background: white; border-radius: 12px; box-shadow: 0 2px 14px rgba(0,0,0,0.11); border: 1.5px solid #e2e8f0; position: sticky; top: 16px; max-height: calc(100vh - 130px); display: flex; flex-direction: column; }
+    .rdp-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1.5px solid #f0f2f5; font-size: 14px; font-weight: 700; color: #1e2a4a; flex-shrink: 0; }
+    .rdp-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+    .rdp-secao-titulo { font-size: 11px; font-weight: 800; color: #2d1b69; padding: 6px 0; border-bottom: 2px solid #2d1b69; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.6px; }
+    .rdp-subsecao { font-size: 10px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin: 12px 0 5px; }
+    .fila-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .fila-tbl th { text-align: left; padding: 5px 7px; font-size: 10px; font-weight: 700; color: #a0aec0; text-transform: uppercase; border-bottom: 1.5px solid #e2e8f0; }
+    .fila-tbl td { padding: 6px 7px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+    .fila-tbl tr:hover td { background: #fafbff; }
+    .fst-badge { padding: 2px 7px; border-radius: 12px; font-size: 10px; font-weight: 700; border: none; cursor: pointer; }
+    .fst-aguardando { background: #fffaf0; color: #c05621; }
+    .fst-em_execucao { background: #f0fff4; color: #276749; }
+    .fst-concluido { background: #ebf0ff; color: #3b5bdb; }
+    .fst-erro { background: #fff5f5; color: #c53030; }
+    .audit-item { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+    .audit-dot { width: 8px; height: 8px; border-radius: 50%; background: #2d1b69; margin-top: 5px; flex-shrink: 0; }
+    .audit-time { font-size: 10px; color: #a0aec0; }
+    .audit-user { font-size: 11px; font-weight: 700; color: #2d1b69; }
+    .audit-acao { font-size: 11px; color: #4a5568; }
+    .robo-row.ativo-detalhe { border-left: 3px solid #2d1b69; background: #f8f5ff; }
+
     /* Credenciais */
     .cred-alerta { background: #fffaf0; border: 1px solid #fbd38d; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
     .cred-alerta-txt { font-size: 12px; color: #744210; flex: 1; }
@@ -316,19 +338,36 @@
     .cst-expirando { background: #fffaf0; color: #c05621; }
     .cst-expirada { background: #fff5f5; color: #c53030; }
 
-    /* Calendário */
-    .cal-layout { display: grid; grid-template-columns: 1fr 260px; gap: 16px; }
-    .cal-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 20px; }
-    .cal-titulo { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 14px; }
-    .cal-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 7px; margin-bottom: 6px; background: #f8fafc; border-left: 3px solid #2d1b69; }
-    .cal-hora { font-size: 12px; font-weight: 700; color: #2d1b69; width: 44px; }
-    .cal-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; }
-    .cal-dur { font-size: 11px; color: #718096; }
-    .cal-maq { font-size: 10px; color: #a0aec0; }
-    .prox-item { display: flex; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 7px; margin-bottom: 6px; }
-    .prox-hora { font-size: 13px; font-weight: 700; color: #2d1b69; }
-    .prox-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; }
-    .prox-maq { font-size: 11px; color: #a0aec0; }
+    /* Calendário semanal */
+    .cal-nav { display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .cal-nav-btn { background:white; border:1.5px solid #e2e8f0; border-radius:8px; padding:6px 16px; font-size:13px; font-weight:600; color:#4a5568; cursor:pointer; transition:background .15s; line-height:1.4; }
+    .cal-nav-btn:hover { background:#f8fafc; }
+    .cal-hoje-btn { color:#2d1b69; border-color:#c4b5fd; }
+    .cal-periodo-txt { font-size:14px; font-weight:700; color:#1e2a4a; }
+    .cal-date-input { padding:6px 10px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:12px; color:#4a5568; outline:none; }
+    .cal-wrapper { background:white; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.08); overflow:hidden; }
+    .cal-day-headers { display:grid; grid-template-columns:52px repeat(7,1fr); border-bottom:2px solid #e2e8f0; background:#f8fafc; }
+    .cal-gutter-top { border-right:1px solid #e2e8f0; min-height:54px; }
+    .cal-day-head { padding:10px 6px; text-align:center; border-right:1px solid #e2e8f0; }
+    .cal-day-head:last-child { border-right:none; }
+    .cal-day-head-today { background:#f5f0ff; }
+    .cal-day-name { font-size:11px; font-weight:600; color:#718096; text-transform:uppercase; letter-spacing:.5px; }
+    .cal-day-num { font-size:18px; font-weight:700; color:#2d3748; margin-top:2px; }
+    .cal-day-num-today { background:#2d1b69; color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; margin:2px auto 0; }
+    .cal-body-scroll { overflow-y:auto; max-height:580px; }
+    .cal-body-grid { display:grid; grid-template-columns:52px repeat(7,1fr); }
+    .cal-time-gutter { border-right:1px solid #e2e8f0; }
+    .cal-hour-label { height:64px; padding:2px 6px 0; font-size:10px; color:#a0aec0; text-align:right; border-bottom:1px solid #f0f0f0; box-sizing:border-box; transform:translateY(-6px); }
+    .cal-day-col { position:relative; border-right:1px solid #e2e8f0; box-sizing:border-box; }
+    .cal-day-col:last-child { border-right:none; }
+    .cal-day-col-today { background:rgba(237,233,254,.15); }
+    .cal-hour-line { position:absolute; left:0; right:0; border-top:1px solid #f0f0f0; pointer-events:none; }
+    .cal-now-line { position:absolute; left:0; right:0; height:2px; background:#e53e3e; z-index:2; pointer-events:none; }
+    .cal-now-line::before { content:''; position:absolute; left:-4px; top:-4px; width:10px; height:10px; border-radius:50%; background:#e53e3e; }
+    .cal-event { position:absolute; left:2px; right:2px; border-radius:4px; padding:3px 5px; overflow:hidden; cursor:pointer; z-index:1; box-sizing:border-box; }
+    .cal-event:hover { filter:brightness(.93); }
+    .cal-event-nome { font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cal-event-hora { font-size:10px; opacity:.8; margin-top:1px; }
 
     /* Ambiente */
     .amb-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
@@ -358,6 +397,7 @@
     /* Modais */
     .modal-ops { max-width: 560px; max-height: 85vh; overflow-y: auto; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-secao-titulo { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin:12px 0 8px;padding-left:8px;border-left:3px solid; }
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
     .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; color: #1e2a4a; background: white; }
@@ -980,7 +1020,208 @@
             <div style="flex:1"></div>
             <button class="btn-primary" onclick="abrirModalRobo()" style="font-size:12px;padding:8px 16px">+ Criar Robô</button>
           </div>
-          <div id="robosLista"></div>
+          <div id="robosSplitWrap" style="display:flex;gap:16px;align-items:flex-start">
+            <div id="robosLista" style="flex:1;min-width:0"></div>
+
+            <!-- Painel de Detalhes -->
+            <div id="roboDetalhePainel" class="robo-detalhe-painel" style="display:none">
+              <div class="rdp-header">
+                <span id="rdpTitulo">Detalhes</span>
+                <button class="btn-fechar" onclick="fecharDetalheRobo()">×</button>
+              </div>
+              <div class="rdp-body">
+
+                <!-- ── SEÇÃO 1: CONFIGURAÇÕES ── -->
+                <div class="rdp-secao-titulo">Configurações</div>
+
+                <div class="rdp-subsecao">Identificação</div>
+                <div class="form-row" style="margin-bottom:8px">
+                  <div class="form-group" style="flex:2"><label>Nome *</label><input type="text" class="form-control" id="dpNome" placeholder="Ex: Validador Fiscal"></div>
+                  <div class="form-group"><label>Versão</label><input type="text" class="form-control" id="dpVersao" placeholder="v1.0"></div>
+                  <div class="form-group"><label>Tipo</label><select class="form-control" id="dpTipo"><option value="Background">Background (sem tela)</option><option value="Interface">Interface (com tela)</option></select></div>
+                  <div class="form-group"><label>Prioridade</label><select class="form-control" id="dpPrioridade"><option value="Baixa">Baixa</option><option value="Media">Média</option><option value="Alta">Alta</option></select></div>
+                  <div class="form-group"><label>Departamento</label><input type="text" class="form-control" id="dpDepartamento"></div>
+                  <div class="form-group"><label>Tag</label><input type="text" class="form-control" id="dpTag"></div>
+                </div>
+
+                <div class="rdp-subsecao">Onde Rodar</div>
+                <div class="form-row" style="margin-bottom:8px">
+                  <div class="form-group"><label>Ambiente</label>
+                    <select class="form-control" id="dpAmbiente" onchange="dpAtualizarAmbiente()">
+                      <option value="local">Local (máquina com Agent)</option>
+                      <option value="nuvem">Nuvem (webhook)</option>
+                    </select>
+                  </div>
+                  <div class="form-group" id="dpGrupoMaquinaWrap"><label>Máquina</label>
+                    <select class="form-control" id="dpMaquina"><option value="">Qualquer disponível</option></select>
+                  </div>
+                  <div class="form-group"><label>Timeout (min)</label><input type="number" class="form-control" id="dpTimeout" value="30" min="1"></div>
+                  <div class="form-group"><label>Duração estimada (min)</label><input type="number" class="form-control" id="dpDuracaoEstimada" value="15" min="1"></div>
+                </div>
+
+                <div id="dpSecaoLocal">
+                  <div class="rdp-subsecao">Fonte do Código</div>
+                  <div class="form-row" style="margin-bottom:6px">
+                    <div class="form-group form-full">
+                      <div style="display:flex;gap:8px">
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;flex:1">
+                          <input type="radio" name="dpVinculo" value="git" onchange="dpAtualizarVinculo()" checked style="accent-color:#2d1b69"> 🔗 Git
+                        </label>
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;flex:1">
+                          <input type="radio" name="dpVinculo" value="zip" onchange="dpAtualizarVinculo()" style="accent-color:#2d1b69"> 📦 ZIP
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="dpCamposGit" class="form-row" style="margin-bottom:6px">
+                    <div class="form-group" style="flex:2"><label>URL do Repositório</label><input type="text" class="form-control" id="dpGitUrl" placeholder="https://github.com/usuario/repo"></div>
+                    <div class="form-group"><label>Branch</label><input type="text" class="form-control" id="dpGitBranch" value="main"></div>
+                  </div>
+                  <div id="dpCamposZip" class="form-row" style="display:none;margin-bottom:6px">
+                    <div class="form-group form-full"><label>Arquivo ZIP</label>
+                      <input type="file" class="form-control" id="dpZipFile" accept=".zip">
+                      <div id="dpZipAtual" style="font-size:11px;color:#718096;margin-top:3px"></div>
+                    </div>
+                  </div>
+                  <div class="form-row" style="margin-bottom:4px">
+                    <div class="form-group" style="flex:1"><label>Arquivo principal</label><input type="text" class="form-control" id="dpArquivoPrincipal" placeholder="main.py" oninput="dpAtualizarComandoAuto()"></div>
+                    <div class="form-group" style="flex:1"><label>Comando</label><input type="text" class="form-control" id="dpComando" placeholder="Auto" style="font-family:monospace;font-size:11px"></div>
+                  </div>
+
+                  <div class="rdp-subsecao">Dependências</div>
+                  <div class="form-row" style="margin-bottom:8px">
+                    <div class="form-group form-full"><label>Pacotes pip (um por linha)</label>
+                      <textarea class="form-control" id="dpPacotesPip" rows="2" placeholder="requests&#10;pandas==2.0" style="font-family:monospace;font-size:11px"></textarea>
+                    </div>
+                    <div class="form-group form-full"><label>Comando pré-execução</label>
+                      <input type="text" class="form-control" id="dpPreComando" placeholder="npm install | bundle install" style="font-family:monospace;font-size:11px">
+                    </div>
+                  </div>
+                </div>
+
+                <div id="dpSecaoNuvem" style="display:none">
+                  <div class="rdp-subsecao">Webhook (Nuvem)</div>
+                  <div class="form-row" style="margin-bottom:8px">
+                    <div class="form-group form-full"><label>URL do Webhook</label><input type="text" class="form-control" id="dpWebhookUrl" placeholder="https://..."></div>
+                  </div>
+                </div>
+
+                <div class="rdp-subsecao">Agendamento</div>
+                <div class="form-row" style="margin-bottom:8px">
+                  <div class="form-group form-full">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px">
+                      <input type="checkbox" id="dpScheduleAtivo" onchange="dpAtualizarSchedule()" style="width:14px;height:14px;accent-color:#e53e3e">
+                      Habilitar execução automática
+                    </label>
+                  </div>
+                  <div id="dpScheduleConfig" style="display:none;width:100%">
+                    <div class="form-row" style="margin:4px 0">
+                      <div class="form-group"><label>Tipo</label>
+                        <select class="form-control" id="dpScheduleFreq" onchange="dpAtualizarSchedule()">
+                          <option value="diario">Todo dia</option>
+                          <option value="semanal">Toda semana</option>
+                          <option value="mensal">Todo mês</option>
+                          <option value="intervalo">A cada X tempo</option>
+                          <option value="unico">Data específica</option>
+                        </select>
+                      </div>
+                      <div class="form-group" id="dpScheduleHoraWrap"><label>Horário</label>
+                        <input type="time" class="form-control" id="dpScheduleHora" value="08:00">
+                      </div>
+                      <div class="form-group" id="dpScheduleDiaMesWrap" style="display:none"><label>Dia do mês</label>
+                        <input type="number" class="form-control" id="dpScheduleDiaMes" value="1" min="1" max="28">
+                      </div>
+                      <div class="form-group" id="dpScheduleIntervaloWrap" style="display:none"><label>Repetir a cada</label>
+                        <div style="display:flex;gap:5px">
+                          <input type="number" class="form-control" id="dpScheduleIntervaloValor" value="1" min="1" style="width:65px">
+                          <select class="form-control" id="dpScheduleIntervaloUnidade">
+                            <option value="minutos">min</option><option value="horas" selected>horas</option><option value="dias">dias</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group" id="dpScheduleInicioWrap" style="display:none"><label>A partir de</label>
+                        <input type="datetime-local" class="form-control" id="dpScheduleInicio">
+                      </div>
+                      <div class="form-group" id="dpScheduleDataUnicaWrap" style="display:none"><label>Data e hora</label>
+                        <input type="datetime-local" class="form-control" id="dpScheduleDataUnica">
+                      </div>
+                    </div>
+                    <div id="dpScheduleDiasWrap" style="display:none;margin-bottom:6px">
+                      <label style="font-size:10px;color:#718096;display:block;margin-bottom:4px">Dias da semana</label>
+                      <div style="display:flex;gap:8px">
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:10px"><input type="checkbox" value="1" class="dpDiaSemana" style="accent-color:#e53e3e">Seg</label>
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:10px"><input type="checkbox" value="2" class="dpDiaSemana" style="accent-color:#e53e3e">Ter</label>
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:10px"><input type="checkbox" value="3" class="dpDiaSemana" style="accent-color:#e53e3e">Qua</label>
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:10px"><input type="checkbox" value="4" class="dpDiaSemana" style="accent-color:#e53e3e">Qui</label>
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:10px"><input type="checkbox" value="5" class="dpDiaSemana" style="accent-color:#e53e3e">Sex</label>
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:10px"><input type="checkbox" value="6" class="dpDiaSemana" style="accent-color:#e53e3e">Sáb</label>
+                        <label style="display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-size:10px"><input type="checkbox" value="0" class="dpDiaSemana" style="accent-color:#e53e3e">Dom</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rdp-subsecao">Métricas</div>
+                <div class="form-row" style="margin-bottom:8px">
+                  <div class="form-group"><label>Tempo Humano (min)</label><input type="number" class="form-control" id="dpTempoHumano" value="0" min="0"></div>
+                  <div class="form-group"><label>SLA Ideal (min)</label><input type="number" class="form-control" id="dpSla" value="0" min="0"></div>
+                  <div class="form-group form-full"><label>Descrição</label><textarea class="form-control" id="dpDescricao" rows="2" placeholder="O que este robô faz?"></textarea></div>
+                </div>
+
+                <div style="display:flex;justify-content:flex-end;padding-bottom:18px;border-bottom:1.5px solid #f0f2f5;margin-bottom:4px">
+                  <button onclick="dpSalvarConfigs()" style="padding:7px 20px;background:#2d1b69;color:white;border:none;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600">Salvar Configurações</button>
+                </div>
+
+                <!-- ── SEÇÃO 2: FILA ── -->
+                <div class="rdp-secao-titulo" style="margin-top:16px">Fila de Processamento</div>
+
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:11px 14px;margin-bottom:14px">
+                  <div style="font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Chave da API (x-robot-key)</div>
+                  <div style="display:flex;gap:8px;align-items:center">
+                    <code id="dpApiKey" style="flex:1;font-size:11px;background:white;padding:5px 9px;border:1px solid #e2e8f0;border-radius:6px;color:#1e2a4a;word-break:break-all;font-family:monospace"></code>
+                    <button onclick="dpCopiarApiKey()" style="padding:5px 11px;background:#2d1b69;color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;white-space:nowrap">Copiar</button>
+                  </div>
+                  <div style="font-size:10px;color:#a0aec0;margin-top:5px">Header: <code style="background:#e8e8e8;padding:1px 5px;border-radius:3px">x-robot-key: &lt;chave&gt;</code></div>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                  <span id="dpFilaCount" style="font-size:12px;color:#4a5568;font-weight:600">0 itens</span>
+                  <div style="flex:1"></div>
+                  <button onclick="dpMostrarFormFila()" style="padding:5px 13px;background:#f5f0ff;color:#2d1b69;border:1px solid #c4b5fd;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">+ Adicionar</button>
+                </div>
+
+                <div id="dpFormFila" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:11px 14px;margin-bottom:12px">
+                  <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:8px">Novo Item</div>
+                  <div class="form-row">
+                    <div class="form-group" style="flex:2"><label>Nome</label><input type="text" class="form-control" id="dpFilaNome" placeholder="Ex: Processar NF #123"></div>
+                    <div class="form-group"><label>Status</label>
+                      <select class="form-control" id="dpFilaStatus">
+                        <option value="aguardando">aguardando</option>
+                        <option value="em_execucao">em_execucao</option>
+                        <option value="concluido">concluido</option>
+                        <option value="erro">erro</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-group form-full" style="margin-top:4px">
+                    <label>Conteúdo (JSON)</label>
+                    <textarea class="form-control" id="dpFilaConteudo" rows="2" placeholder='{"chave":"valor"}' style="font-family:monospace;font-size:11px"></textarea>
+                  </div>
+                  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px">
+                    <button onclick="dpFormFilaCancelar()" style="padding:5px 11px;background:#f0f2f5;color:#4a5568;border:none;border-radius:6px;font-size:12px;cursor:pointer">Cancelar</button>
+                    <button onclick="dpAdicionarItemFila()" style="padding:5px 11px;background:#2d1b69;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">Adicionar</button>
+                  </div>
+                </div>
+
+                <div id="dpFilaLista"></div>
+
+                <!-- ── SEÇÃO 3: AUDITORIA ── -->
+                <div class="rdp-secao-titulo" style="margin-top:20px">Auditoria</div>
+                <div id="dpAuditoriaLista" style="padding-bottom:24px"></div>
+
+              </div><!-- /rdp-body -->
+            </div><!-- /roboDetalhePainel -->
+          </div><!-- /robosSplitWrap -->
         </div>
 
         <!-- Credenciais -->
@@ -1007,17 +1248,20 @@
 
         <!-- Calendário -->
         <div class="robo-secao" id="robo-calendario">
-          <div class="mockup-aviso">⚠️ Mockup — Agendamentos são salvos no banco mas a execução automática requer infraestrutura de agentes.</div>
-          <div class="cal-layout">
-            <div class="cal-card">
-              <div class="cal-titulo">📅 Agendamentos dos Robôs</div>
-              <div id="calLista"></div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="calNavSemana(-1)">‹</button>
+            <button class="cal-nav-btn cal-hoje-btn" onclick="calHoje()">Hoje</button>
+            <button class="cal-nav-btn" onclick="calNavSemana(1)">›</button>
+            <span id="calPeriodo" class="cal-periodo-txt"></span>
+            <div style="flex:1"></div>
+            <input type="date" id="calDataFiltro" class="cal-date-input" onchange="calIrParaData(this.value)" title="Ir para data">
+          </div>
+          <div class="cal-wrapper">
+            <div class="cal-day-headers" id="calDayHeaders">
+              <div class="cal-gutter-top"></div>
             </div>
-            <div>
-              <div class="cal-card">
-                <div class="cal-titulo">⏰ Próximas Execuções</div>
-                <div id="proxExecucoes"></div>
-              </div>
+            <div class="cal-body-scroll">
+              <div class="cal-body-grid" id="calBodyGrid"></div>
             </div>
           </div>
         </div>
@@ -1053,6 +1297,22 @@
               <div style="width:8px;height:8px;border-radius:50%;background:#718096"></div>
               <div><div id="mqMaintenanceCount" style="font-size:18px;font-weight:800;color:#4a5568">0</div><div style="font-size:10px;color:#718096">Manutenção</div></div>
             </div>
+          </div>
+
+          <!-- Filtros -->
+          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+            <input type="text" id="mqFiltroNome" placeholder="🔍 Buscar por nome ou ID..." oninput="renderMaquinas()"
+              style="flex:1;min-width:160px;padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none">
+            <input type="text" id="mqFiltroGrupo" placeholder="Grupo..." oninput="renderMaquinas()"
+              style="width:130px;padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none">
+            <select id="mqFiltroStatus" onchange="renderMaquinas()"
+              style="padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;background:white;color:#4a5568">
+              <option value="">Todos os status</option>
+              <option value="online">Online</option>
+              <option value="offline">Offline</option>
+              <option value="busy">Ocupada</option>
+              <option value="maintenance">Manutenção</option>
+            </select>
           </div>
 
           <div id="maquinasLista"><div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Carregando máquinas...</div></div>
@@ -1096,6 +1356,60 @@
             <span style="font-size:11px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:.5px">Download do Agent por Máquina</span>
           </div>
           <div id="agentDownloadLista"><div style="text-align:center;padding:20px;color:#a0aec0;font-size:12px">Cadastre uma máquina em <strong>Ambiente</strong> para gerar o pacote do Agent.</div></div>
+
+          <!-- Troubleshooting -->
+          <div style="margin-top:24px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+              <div style="width:3px;height:16px;background:#e53e3e;border-radius:2px"></div>
+              <span style="font-size:11px;font-weight:700;color:#c53030;text-transform:uppercase;letter-spacing:.5px">O que fazer se a máquina ficar Offline?</span>
+            </div>
+            <div style="background:#fff5f5;border:1px solid #fed7d7;border-radius:10px;padding:16px 18px">
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+                <div style="background:white;border-radius:8px;padding:12px;border-left:3px solid #fc8181">
+                  <div style="font-size:11px;font-weight:700;color:#c53030;margin-bottom:6px">1. Verificar se o Agent está rodando</div>
+                  <div style="font-size:10px;color:#4a5568;line-height:1.6">Abra o terminal na máquina e verifique se <code>agent.py</code> está em execução.<br>
+                  <b>Windows:</b> procure na lista de processos por <code>python</code> no Gerenciador de Tarefas.<br>
+                  <b>Reiniciar:</b> execute <code>iniciar.bat</code> novamente.</div>
+                </div>
+                <div style="background:white;border-radius:8px;padding:12px;border-left:3px solid #f6ad55">
+                  <div style="font-size:11px;font-weight:700;color:#b7791f;margin-bottom:6px">2. Verificar conectividade</div>
+                  <div style="font-size:10px;color:#4a5568;line-height:1.6">A máquina precisa de acesso à internet para atingir o SaaS.<br>
+                  Teste no terminal:<br><code>ping hoc.app.br</code><br>
+                  Verifique se firewall ou VPN não está bloqueando a porta 443/80.</div>
+                </div>
+                <div style="background:white;border-radius:8px;padding:12px;border-left:3px solid #68d391">
+                  <div style="font-size:11px;font-weight:700;color:#276749;margin-bottom:6px">3. Validar config.json</div>
+                  <div style="font-size:10px;color:#4a5568;line-height:1.6">Abra <code>config.json</code> e confirme que:<br>
+                  • <code>server</code> aponta para a URL correta<br>
+                  • <code>machineKey</code> não está em branco<br>
+                  • <code>machineId</code> corresponde ao ID cadastrado aqui no SaaS<br>
+                  Se precisar, re-baixe o Agent nesta tela.</div>
+                </div>
+                <div style="background:white;border-radius:8px;padding:12px;border-left:3px solid #76e4f7">
+                  <div style="font-size:11px;font-weight:700;color:#0987a0;margin-bottom:6px">4. Verificar logs do Agent</div>
+                  <div style="font-size:10px;color:#4a5568;line-height:1.6">O Agent imprime todos os logs no terminal.<br>
+                  Procure mensagens como:<br>
+                  <code>[WARN] Sem conexão com...</code> → problema de rede<br>
+                  <code>[ERRO] machineKey ausente</code> → config.json incompleto<br>
+                  <code>ModuleNotFoundError</code> → rode <code>pip install requests psutil</code> novamente</div>
+                </div>
+                <div style="background:white;border-radius:8px;padding:12px;border-left:3px solid #b794f4">
+                  <div style="font-size:11px;font-weight:700;color:#553c9a;margin-bottom:6px">5. Máquina desligou ou reiniciou</div>
+                  <div style="font-size:10px;color:#4a5568;line-height:1.6">O Agent não é um serviço automático por padrão.<br>
+                  Para iniciar automaticamente no boot:<br>
+                  Baixe e execute <code>instalar_servico.bat</code> — isso cria uma tarefa no Agendador do Windows que inicia o Agent no logon.</div>
+                </div>
+                <div style="background:white;border-radius:8px;padding:12px;border-left:3px solid #fbb6ce">
+                  <div style="font-size:11px;font-weight:700;color:#97266d;margin-bottom:6px">6. Máquina em Manutenção</div>
+                  <div style="font-size:10px;color:#4a5568;line-height:1.6">Se você colocou a máquina em modo <b>Manutenção</b> no painel de Ambiente, ela não recebe novos comandos.<br>
+                  Para reativar, clique no toggle <b>Manutenção</b> novamente na lista de máquinas.</div>
+                </div>
+              </div>
+              <div style="margin-top:12px;padding:8px 12px;background:#fed7d7;border-radius:6px;font-size:10px;color:#822727">
+                ⚠️ A máquina aparece <b>Offline</b> automaticamente se o SaaS não recebe heartbeat por mais de 90 segundos. Isso é normal durante desligamentos ou quedas de rede.
+              </div>
+            </div>
+          </div>
 
           <!-- API reference -->
           <div style="margin-top:24px">
@@ -1440,24 +1754,182 @@
 
 <!-- Modal Robô -->
 <div class="modal-overlay" id="modalRobo">
-  <div class="modal modal-ops">
+  <div class="modal modal-ops" style="max-width:680px">
     <div class="modal-header"><span class="modal-titulo" id="modalRoboTitulo">Novo Robô</span><button class="btn-fechar" onclick="fecharModal('modalRobo')">×</button></div>
-    <div class="form-row">
-      <div class="form-group"><label>Nome *</label><input type="text" class="form-control" id="rNome" placeholder="Ex: Validador Fiscal"></div>
-      <div class="form-group"><label>Versão</label><input type="text" class="form-control" id="rVersao" placeholder="Ex: v1.0"></div>
-      <div class="form-group"><label>Tipo</label><select class="form-control" id="rTipo"><option>Background</option><option>Desktop</option></select></div>
-      <div class="form-group"><label>Prioridade</label><select class="form-control" id="rPrioridade"><option>Baixa</option><option>Media</option><option>Alta</option></select></div>
-      <div class="form-group"><label>Categoria / Área</label><input type="text" class="form-control" id="rCategoria" placeholder="Ex: Financeiro"></div>
-      <div class="form-group"><label>Departamento</label><input type="text" class="form-control" id="rDepartamento" placeholder="Ex: TI"></div>
-      <div class="form-group"><label>Máquina</label><input type="text" class="form-control" id="rMaquina" placeholder="Ex: VM-PROD-01"></div>
-      <div class="form-group"><label>Timeout (min)</label><input type="number" class="form-control" id="rTimeout" value="30" min="1"></div>
-      <div class="form-group form-full"><label>Comando de Execução</label><input type="text" class="form-control" id="rComando" placeholder="Ex: python bot.py"></div>
-      <div class="form-group form-full"><label>Descrição</label><textarea class="form-control" id="rDescricao" rows="2" placeholder="Descreva o robô..."></textarea></div>
-      <div class="form-group"><label>Tempo Médio Humano (min)</label><input type="number" class="form-control" id="rTempoHumano" value="0" min="0" placeholder="Tempo manual equivalente"></div>
-      <div class="form-group"><label>Status</label><select class="form-control" id="rStatus"><option>Pausado</option><option>Executando</option><option>Erro</option><option>Concluído</option></select></div>
+
+    <div style="max-height:70vh;overflow-y:auto;padding-right:4px">
+
+    <!-- Identificação -->
+    <div class="modal-secao-titulo" style="border-color:#2d1b69;color:#2d1b69">Identificação</div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group" style="flex:2"><label>Nome *</label><input type="text" class="form-control" id="rNome" placeholder="Ex: Validador Fiscal"></div>
+      <div class="form-group"><label>Versão</label><input type="text" class="form-control" id="rVersao" placeholder="v1.0"></div>
+      <div class="form-group"><label>Tipo</label><select class="form-control" id="rTipo"><option value="Background">Background (sem tela)</option><option value="Interface">Interface (com tela)</option></select></div>
+      <div class="form-group"><label>Prioridade</label><select class="form-control" id="rPrioridade"><option value="Baixa">Baixa</option><option value="Media">Média</option><option value="Alta">Alta</option></select></div>
+      <div class="form-group"><label>Departamento</label><input type="text" class="form-control" id="rDepartamento" placeholder="Ex: Financeiro"></div>
+      <div class="form-group"><label>Tag</label><input type="text" class="form-control" id="rTag" placeholder="Ex: fiscal, sap"></div>
     </div>
+
+    <!-- Onde rodar -->
+    <div class="modal-secao-titulo" style="border-color:#3b5bdb;color:#3b5bdb">Onde rodar</div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group"><label>Ambiente</label>
+        <select class="form-control" id="rAmbiente" onchange="atualizarCamposRobo()">
+          <option value="local">Local (máquina com Agent)</option>
+          <option value="nuvem">Nuvem (webhook)</option>
+        </select>
+      </div>
+      <div class="form-group" id="rGrupoMaquinaWrap"><label>Máquina</label>
+        <select class="form-control" id="rMaquina"><option value="">Qualquer disponível</option></select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Timeout máx. (min)</label><input type="number" class="form-control" id="rTimeout" value="30" min="1"></div>
+        <div class="form-group"><label>Duração estimada (min)</label><input type="number" class="form-control" id="rDuracaoEstimada" value="15" min="1" placeholder="ex: 15"></div>
+      </div>
+    </div>
+
+    <!-- Local: fonte do código -->
+    <div id="rSecaoLocal">
+      <div class="modal-secao-titulo" style="border-color:#38a169;color:#276749">Fonte do código</div>
+      <div class="form-row" style="margin-bottom:8px">
+        <div class="form-group form-full">
+          <div style="display:flex;gap:8px">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;flex:1">
+              <input type="radio" name="rVinculo" value="git" onchange="atualizarVinculo()" checked style="accent-color:#2d1b69"> 🔗 Git (GitHub, GitLab...)
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:8px 14px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;flex:1">
+              <input type="radio" name="rVinculo" value="zip" onchange="atualizarVinculo()" style="accent-color:#2d1b69"> 📦 Upload ZIP
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="rCamposGit" class="form-row" style="margin-bottom:8px">
+        <div class="form-group" style="flex:2"><label>URL do Repositório</label><input type="text" class="form-control" id="rGitUrl" placeholder="https://github.com/usuario/repo"></div>
+        <div class="form-group"><label>Branch</label><input type="text" class="form-control" id="rGitBranch" value="main"></div>
+      </div>
+      <div id="rCamposZip" class="form-row" style="display:none;margin-bottom:8px">
+        <div class="form-group form-full"><label>Arquivo ZIP</label>
+          <input type="file" class="form-control" id="rZipFile" accept=".zip">
+          <div id="rZipAtual" style="font-size:11px;color:#718096;margin-top:4px"></div>
+        </div>
+      </div>
+
+      <!-- Arquivo principal + auto-detect -->
+      <div class="form-row" style="margin-bottom:4px">
+        <div class="form-group" style="flex:1">
+          <label>Arquivo principal <span style="color:#718096;font-weight:400">(ex: main.py, bot.js, app.exe)</span></label>
+          <input type="text" class="form-control" id="rArquivoPrincipal" placeholder="main.py" oninput="atualizarComandoAuto()">
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Comando gerado <span style="color:#718096;font-weight:400">(editável se precisar)</span></label>
+          <input type="text" class="form-control" id="rComando" placeholder="Preenchido automaticamente" style="font-family:monospace;font-size:11px">
+        </div>
+      </div>
+    </div>
+
+    <!-- Nuvem: webhook -->
+    <div id="rSecaoNuvem" style="display:none">
+      <div class="modal-secao-titulo" style="border-color:#d69e2e;color:#b7791f">Webhook (Nuvem)</div>
+      <div class="form-row" style="margin-bottom:8px">
+        <div class="form-group form-full"><label>URL do Webhook</label><input type="text" class="form-control" id="rWebhookUrl" placeholder="https://plataforma.com/api/trigger/..."></div>
+        <div class="form-group form-full">
+          <label>Payload <span style="color:#718096;font-weight:400">(campos enviados no POST)</span></label>
+          <div id="rWebhookPayloadRows" style="margin-bottom:6px"></div>
+          <button type="button" onclick="addPayloadRow()" style="padding:5px 12px;background:#f5f0ff;color:#2d1b69;border:1px solid #c4b5fd;border-radius:6px;font-size:11px;cursor:pointer">+ Campo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dependências -->
+    <div id="rSecaoDeps" class="modal-secao-titulo" style="border-color:#805ad5;color:#553c9a">Dependências</div>
+    <div id="rSecaoDepsBody" class="form-row" style="margin-bottom:10px">
+      <div class="form-group form-full">
+        <label>Pacotes pip — Python <span style="color:#718096;font-weight:400">(um por linha, ex: requests, pandas==2.0)</span></label>
+        <textarea class="form-control" id="rPacotesPip" rows="3" placeholder="requests&#10;pandas==2.0&#10;openpyxl" style="font-family:monospace;font-size:11px"></textarea>
+      </div>
+      <div class="form-group form-full">
+        <label>Comando pré-execução <span style="color:#718096;font-weight:400">(qualquer linguagem — roda antes do script principal)</span></label>
+        <input type="text" class="form-control" id="rPreComando" placeholder="Node: npm install  |  Ruby: bundle install  |  Shell: ./setup.sh  |  Python: pip install -r requirements.txt" style="font-family:monospace;font-size:11px">
+      </div>
+    </div>
+
+    <!-- Agendamento -->
+    <div class="modal-secao-titulo" style="border-color:#e53e3e;color:#c53030">Agendamento</div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group form-full">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="rScheduleAtivo" onchange="atualizarSchedule()" style="width:15px;height:15px;accent-color:#e53e3e">
+          Habilitar execução automática por agendamento
+        </label>
+      </div>
+      <div id="rScheduleConfig" style="display:none;width:100%">
+        <div class="form-row" style="margin:6px 0 4px">
+          <div class="form-group"><label>Tipo</label>
+            <select class="form-control" id="rScheduleFreq" onchange="atualizarSchedule()">
+              <option value="diario">Todo dia</option>
+              <option value="semanal">Toda semana</option>
+              <option value="mensal">Todo mês</option>
+              <option value="intervalo">A cada X tempo</option>
+              <option value="unico">Data específica (uma vez)</option>
+            </select>
+          </div>
+          <!-- Horário (diario/semanal/mensal) -->
+          <div class="form-group" id="rScheduleHoraWrap"><label>Horário</label>
+            <input type="time" class="form-control" id="rScheduleHora" value="08:00" oninput="atualizarSchedule()">
+          </div>
+          <!-- Dia do mês (mensal) -->
+          <div class="form-group" id="rScheduleDiaMesWrap" style="display:none"><label>Dia do mês</label>
+            <input type="number" class="form-control" id="rScheduleDiaMes" value="1" min="1" max="28" oninput="atualizarSchedule()">
+          </div>
+          <!-- Intervalo -->
+          <div class="form-group" id="rScheduleIntervaloWrap" style="display:none"><label>Repetir a cada</label>
+            <div style="display:flex;gap:6px">
+              <input type="number" class="form-control" id="rScheduleIntervaloValor" value="1" min="1" style="width:70px" oninput="atualizarSchedule()">
+              <select class="form-control" id="rScheduleIntervaloUnidade" onchange="atualizarSchedule()">
+                <option value="minutos">minutos</option>
+                <option value="horas" selected>horas</option>
+                <option value="dias">dias</option>
+              </select>
+            </div>
+          </div>
+          <!-- Início (intervalo) -->
+          <div class="form-group" id="rScheduleInicioWrap" style="display:none"><label>A partir de</label>
+            <input type="datetime-local" class="form-control" id="rScheduleInicio" oninput="atualizarSchedule()">
+          </div>
+          <!-- Data específica -->
+          <div class="form-group" id="rScheduleDataUnicaWrap" style="display:none"><label>Data e hora</label>
+            <input type="datetime-local" class="form-control" id="rScheduleDataUnica" oninput="atualizarSchedule()">
+          </div>
+        </div>
+        <!-- Dias da semana (semanal) -->
+        <div id="rScheduleDiasWrap" style="display:none;margin-bottom:6px">
+          <label style="font-size:11px;color:#718096;display:block;margin-bottom:4px">Dias da semana</label>
+          <div style="display:flex;gap:6px">
+            <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:10px;color:#4a5568"><input type="checkbox" value="1" class="rDiaSemana" onchange="atualizarSchedule()" style="accent-color:#e53e3e">Seg</label>
+            <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:10px;color:#4a5568"><input type="checkbox" value="2" class="rDiaSemana" onchange="atualizarSchedule()" style="accent-color:#e53e3e">Ter</label>
+            <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:10px;color:#4a5568"><input type="checkbox" value="3" class="rDiaSemana" onchange="atualizarSchedule()" style="accent-color:#e53e3e">Qua</label>
+            <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:10px;color:#4a5568"><input type="checkbox" value="4" class="rDiaSemana" onchange="atualizarSchedule()" style="accent-color:#e53e3e">Qui</label>
+            <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:10px;color:#4a5568"><input type="checkbox" value="5" class="rDiaSemana" onchange="atualizarSchedule()" style="accent-color:#e53e3e">Sex</label>
+            <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:10px;color:#4a5568"><input type="checkbox" value="6" class="rDiaSemana" onchange="atualizarSchedule()" style="accent-color:#e53e3e">Sáb</label>
+            <label style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-size:10px;color:#4a5568"><input type="checkbox" value="0" class="rDiaSemana" onchange="atualizarSchedule()" style="accent-color:#e53e3e">Dom</label>
+          </div>
+        </div>
+        <div id="rProximaExecPreview" style="font-size:10px;color:#718096;background:#f8fafc;padding:6px 10px;border-radius:6px;margin-top:2px"></div>
+      </div>
+    </div>
+
+    <!-- Métricas -->
+    <div class="modal-secao-titulo" style="border-color:#cbd5e0;color:#718096">Métricas e Info</div>
+    <div class="form-row">
+<div class="form-group"><label>Tempo Humano (min)</label><input type="number" class="form-control" id="rTempoHumano" value="0" min="0"></div>
+      <div class="form-group"><label>SLA Ideal (min)</label><input type="number" class="form-control" id="rSla" value="0" min="0"></div>
+      <div class="form-group form-full"><label>Descrição</label><textarea class="form-control" id="rDescricao" rows="2" placeholder="O que este robô faz?"></textarea></div>
+    </div>
+
+    </div><!-- /scroll -->
+
     <input type="hidden" id="rEditId">
-    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalRobo')">Cancelar</button><button class="btn-confirmar" onclick="salvarRobo()">Salvar</button></div>
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalRobo')">Cancelar</button><button class="btn-confirmar" id="btnSalvarRobo" onclick="salvarRobo()">Salvar</button></div>
   </div>
 </div>
 
@@ -1731,7 +2203,7 @@
     if (id === 'comunicacao') { carregarContatos(); carregarEmailTemplates(); renderAssinaturas(); carregarSmtp(); }
     if (id === 'tarefas') carregarTarefas();
     if (id === 'processos') carregarProcessos();
-    if (id === 'robos') { carregarRobos(); carregarCredenciais(); }
+    if (id === 'robos') { carregarRobos(); carregarCredenciais(); carregarMaquinas(); }
   }
 
   function mudarComTab(id, btn) {
@@ -7043,18 +7515,35 @@
       const lbl = STATUS_LABEL[e.status]||e.status;
       const inicio = e.iniciadoEm ? new Date(e.iniciadoEm).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
       const dur = e.duracao ? (e.duracao<60?e.duracao+'s':Math.round(e.duracao/60)+'m') : '—';
-      return `<tr style="border-bottom:1px solid #f1f5f9;hover:background:#f8fafc">
+      const maqNome = maquinasData.find(m=>m.machineId===e.maquina)?.nome || e.maquina || '—';
+      return `<tr style="border-bottom:1px solid #f1f5f9">
         <td style="padding:10px 14px;font-size:12px;font-weight:600;color:#1e2a4a">${e.roboNome||'—'}</td>
         <td style="padding:10px 14px"><span style="padding:3px 9px;border-radius:12px;font-size:10px;font-weight:700;${style}">${lbl}</span></td>
-        <td style="padding:10px 14px;font-size:11px;color:#718096">${e.maquina||'—'}</td>
+        <td style="padding:10px 14px;font-size:11px;color:#718096">${maqNome}</td>
         <td style="padding:10px 14px;font-size:11px;color:#718096">${e.gatilho||'—'}</td>
         <td style="padding:10px 14px;font-size:11px;color:#718096">${inicio}</td>
         <td style="padding:10px 14px;font-size:11px;color:#718096">${dur}</td>
-        <td style="padding:10px 14px;text-align:right">
+        <td style="padding:10px 14px;text-align:right;display:flex;gap:4px;justify-content:flex-end">
           ${e.status==='em_execucao'?`<button onclick="interromperExecRobo('${e._id}')" style="padding:4px 10px;background:#fff5f5;color:#c53030;border:1px solid #feb2b2;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">⏹ Parar</button>`:''}
+          <button onclick="verLogsExec('${e._id}')" style="padding:4px 10px;background:#f8fafc;color:#4a5568;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;cursor:pointer">📋 Logs</button>
         </td>
       </tr>`;
     }).join('');
+  }
+
+  async function executarRobo(id, nome) {
+    if (!confirm(`Disparar "${nome}" agora?`)) return;
+    try {
+      const res = await fetch(`/api/robos/${id}/executar`, { method:'POST', headers:HEADERS });
+      const data = await res.json();
+      if (!res.ok) { alert('Erro: ' + (data.erro||res.status)); return; }
+      if (data.status === 'nao_disparado') {
+        alert('⚠️ Nenhuma máquina online disponível para este robô.\nVerifique a aba Ambiente.');
+      } else {
+        alert('✅ Robô disparado! Acompanhe em Produção.');
+        mudarRoboTab('producao', document.querySelector('.robo-subtab:nth-child(2)'));
+      }
+    } catch(e) { alert('Erro ao disparar: ' + e.message); }
   }
 
   async function interromperExecRobo(id) {
@@ -7063,6 +7552,30 @@
       await fetch(`/api/robos/execucoes/${id}/interromper`,{method:'POST',headers:HEADERS,body:JSON.stringify({motivo:'Interrompido pelo usuário'})});
       carregarExecsRobos();
     } catch(e) { alert('Erro ao interromper.'); }
+  }
+
+  async function verLogsExec(id) {
+    try {
+      const res = await fetch(`/api/robos/execucoes/${id}`, {headers: HEADERS});
+      const exec = await res.json();
+      const logs = exec.logs || [];
+      const STATUS_COLOR = {info:'#4a5568', success:'#276749', error:'#c53030'};
+      const linhas = logs.length
+        ? logs.map(l=>`<div style="padding:4px 0;border-bottom:1px solid #f1f5f9;font-family:monospace;font-size:11px;color:${STATUS_COLOR[l.status]||'#4a5568'}">
+            <span style="color:#a0aec0;margin-right:8px">${l.time?new Date(l.time).toLocaleTimeString('pt-BR'):''}</span>${_gesc(l.message||'')}</div>`).join('')
+        : '<div style="color:#a0aec0;padding:16px;text-align:center">Nenhum log disponível.</div>';
+      const overlay = document.createElement('div');
+      overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:3000;display:flex;align-items:center;justify-content:center';
+      overlay.innerHTML=`<div style="background:white;border-radius:12px;width:680px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden">
+        <div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:700;font-size:13px;color:#1e2a4a">📋 Logs — ${exec.roboNome||'Robô'}</span>
+          <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#718096">×</button>
+        </div>
+        <div style="overflow-y:auto;padding:10px 16px;flex:1">${linhas}</div>
+      </div>`;
+      overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+      document.body.appendChild(overlay);
+    } catch(e) { alert('Erro ao carregar logs.'); }
   }
 
   const RST_CLASS = {Executando:'rst-executando',Pausado:'rst-pausado',Erro:'rst-erro',Concluído:'rst-concluido'};
@@ -7083,32 +7596,531 @@
     const dados = lista || robos;
     document.getElementById('robosLista').innerHTML = dados.length===0
       ? `<div class="empty-ops"><div style="font-size:28px">🤖</div><div>Nenhum robô cadastrado.</div></div>`
-      : dados.map(r=>`<div class="robo-row">
-          <div>
+      : dados.map(r=>`<div class="robo-row" id="robo-row-${r._id}">
+          <div style="flex:2;min-width:110px">
             <div class="robo-nome">${r.nome}</div>
-            <div class="robo-cat">${r.categoria||'—'} • ${r.departamento||'—'}</div>
+            <div class="robo-cat">${r.tipo||'—'} • ${r.departamento||'—'}</div>
           </div>
-          <span class="robo-status-badge ${RST_CLASS[r.status]||'rst-pausado'}">${r.status}</span>
-          <div style="font-size:11px;color:#718096">🖥️ ${r.maquina||'—'}</div>
-          <div class="robo-prog-wrap">
-            <div class="robo-prog-bar"><div class="robo-prog-fill" style="width:${Math.min((r.totalExecucoes||0),100)}%"></div></div>
-            <div style="font-size:10px;color:#a0aec0;margin-top:2px">${r.totalExecucoes||0} execuções</div>
-          </div>
-          <span class="fila-badge">${(r.fila||[]).length} na fila</span>
-          <span style="font-size:11px;color:#718096">${r.prioridade||'—'}</span>
-          <div style="display:flex;gap:4px">
-            <button onclick="editarRobo('${r._id}')" style="padding:5px 10px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600">✏️ Editar</button>
-            <button onclick="alterarStatusRobo('${r._id}')" style="padding:5px 10px;background:#f0fff4;color:#276749;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600">▶ Executar</button>
-            <button onclick="deletarRobo('${r._id}')" style="padding:5px 10px;background:#fff5f5;color:#c53030;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600">🗑️</button>
+          <div style="font-size:11px;color:#718096;min-width:90px">🖥️ ${maquinasData.find(m=>m._id===r.maquinaId)?.nome||'Qualquer'}</div>
+          <span class="robo-status-badge ${RST_CLASS[r.status]||'rst-pausado'}">${r.status||'Ativo'}</span>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:#4a5568;white-space:nowrap">
+              <input type="checkbox" ${r.ativo!==false?'checked':''} onchange="ativarInativarRobo('${r._id}',this.checked)" style="accent-color:#2d1b69;width:13px;height:13px">
+              ${r.ativo!==false?'Ativo':'Inativo'}
+            </label>
+            <button onclick="executarRobo('${r._id}','${r.nome}')" title="Executar" style="padding:4px 9px;background:#f0fff4;color:#276749;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600">▶</button>
+            <button onclick="abrirDetalheRobo('${r._id}')" style="padding:4px 11px;background:#f5f0ff;color:#2d1b69;border:none;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600">Detalhes</button>
+            <button onclick="deletarRobo('${r._id}')" title="Excluir" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:5px;cursor:pointer;font-size:11px">🗑️</button>
           </div>
         </div>`).join('');
+  }
+
+  // ── Painel de Detalhes do Robô ─────────────────────────────────────────────
+  let detalheRoboAtual = null;
+  let filaAtual = [];
+
+  function abrirDetalheRobo(id) {
+    const painel = document.getElementById('roboDetalhePainel');
+    painel.style.display = 'flex';
+    painel.style.flexDirection = 'column';
+
+    document.querySelectorAll('.robo-row').forEach(r => r.classList.remove('ativo-detalhe'));
+    const rowEl = document.getElementById('robo-row-' + id);
+    if (rowEl) rowEl.classList.add('ativo-detalhe');
+
+    detalheRoboAtual = id;
+    const r = robos.find(x => x._id === id);
+    if (!r) return;
+
+    document.getElementById('rdpTitulo').textContent = r.nome;
+    dpCarregarConfigs(r);
+    document.getElementById('dpApiKey').textContent = r.apiKey || '—';
+
+    carregarFila(id);
+    carregarAuditoria(id);
+  }
+
+  function fecharDetalheRobo() {
+    document.getElementById('roboDetalhePainel').style.display = 'none';
+    document.querySelectorAll('.robo-row').forEach(r => r.classList.remove('ativo-detalhe'));
+    detalheRoboAtual = null;
+  }
+
+  function dpCarregarConfigs(r) {
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+    const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+
+    set('dpNome', r.nome);
+    set('dpVersao', r.versao);
+    const dpTipo = document.getElementById('dpTipo'); if (dpTipo) dpTipo.value = r.tipo || 'Background';
+    const dpPri  = document.getElementById('dpPrioridade'); if (dpPri) dpPri.value = r.prioridade || 'Baixa';
+    set('dpDepartamento', r.departamento);
+    set('dpTag', r.tag);
+
+    const dpAmb = document.getElementById('dpAmbiente'); if (dpAmb) dpAmb.value = r.ambiente || 'local';
+    dpAtualizarAmbiente();
+
+    const maqSel = document.getElementById('dpMaquina');
+    if (maqSel) {
+      maqSel.innerHTML = '<option value="">Qualquer disponível</option>' + maquinasData.map(m=>`<option value="${m._id}">${m.nome}</option>`).join('');
+      maqSel.value = r.maquinaId || '';
+    }
+
+    set('dpTimeout', r.timeout || 30);
+    set('dpDuracaoEstimada', r.duracaoEstimada || 15);
+
+    const vinculo = r.gitUrl ? 'git' : (r.zipPath ? 'zip' : 'git');
+    document.querySelectorAll('input[name="dpVinculo"]').forEach(el => el.checked = el.value === vinculo);
+    dpAtualizarVinculo();
+    set('dpGitUrl', r.gitUrl);
+    set('dpGitBranch', r.gitBranch || 'main');
+    const zipAt = document.getElementById('dpZipAtual'); if (zipAt) zipAt.textContent = r.zipPath ? 'ZIP: ' + r.zipPath : '';
+    set('dpArquivoPrincipal', r.arquivoPrincipal);
+    set('dpComando', r.comando);
+    set('dpPacotesPip', (r.pacotesPip||[]).join('\n'));
+    set('dpPreComando', r.preComando);
+    set('dpWebhookUrl', r.webhookUrl);
+
+    const sch = r.schedule || {};
+    setChk('dpScheduleAtivo', sch.ativo);
+    dpAtualizarSchedule();
+    if (sch.ativo) {
+      const dpFreq = document.getElementById('dpScheduleFreq'); if (dpFreq) dpFreq.value = sch.frequencia || 'diario';
+      set('dpScheduleHora', sch.hora);
+      set('dpScheduleDiaMes', sch.diaMes);
+      set('dpScheduleIntervaloValor', sch.intervaloValor);
+      const dpUnit = document.getElementById('dpScheduleIntervaloUnidade'); if (dpUnit) dpUnit.value = sch.intervaloUnidade || 'horas';
+      set('dpScheduleInicio', sch.inicio ? sch.inicio.slice(0,16) : '');
+      set('dpScheduleDataUnica', sch.dataUnica ? sch.dataUnica.slice(0,16) : '');
+      const dias = sch.diasSemana || [];
+      document.querySelectorAll('.dpDiaSemana').forEach(el => el.checked = dias.includes(Number(el.value)));
+      dpAtualizarSchedule();
+    }
+
+    set('dpTempoHumano', r.tempoHumano || 0);
+    set('dpSla', r.sla || 0);
+    set('dpDescricao', r.descricao);
+  }
+
+  function dpAtualizarAmbiente() {
+    const v = document.getElementById('dpAmbiente')?.value;
+    const local = document.getElementById('dpSecaoLocal');
+    const nuvem = document.getElementById('dpSecaoNuvem');
+    const maqW  = document.getElementById('dpGrupoMaquinaWrap');
+    if (local) local.style.display = v === 'local' ? '' : 'none';
+    if (nuvem) nuvem.style.display = v === 'nuvem' ? '' : 'none';
+    if (maqW)  maqW.style.display  = v === 'local' ? '' : 'none';
+  }
+
+  function dpAtualizarVinculo() {
+    const v = document.querySelector('input[name="dpVinculo"]:checked')?.value;
+    const git = document.getElementById('dpCamposGit');
+    const zip = document.getElementById('dpCamposZip');
+    if (git) git.style.display = v === 'git' ? '' : 'none';
+    if (zip) zip.style.display = v === 'zip' ? '' : 'none';
+  }
+
+  function dpAtualizarComandoAuto() {
+    const INTERPS = { py:'python', js:'node', ts:'npx ts-node', rb:'ruby', sh:'bash', php:'php', r:'Rscript' };
+    const arq = (document.getElementById('dpArquivoPrincipal')?.value||'').trim();
+    const cmd = document.getElementById('dpComando');
+    if (!cmd || !arq) return;
+    const ext = arq.split('.').pop().toLowerCase();
+    cmd.value = INTERPS[ext] ? `${INTERPS[ext]} ${arq}` : ['exe','bat','cmd'].includes(ext) ? arq : `python ${arq}`;
+  }
+
+  function dpAtualizarSchedule() {
+    const ativo = document.getElementById('dpScheduleAtivo')?.checked;
+    const config = document.getElementById('dpScheduleConfig');
+    if (config) config.style.display = ativo ? '' : 'none';
+    if (!ativo) return;
+    const freq = document.getElementById('dpScheduleFreq')?.value;
+    const show = (id, v) => { const el = document.getElementById(id); if (el) el.style.display = v ? '' : 'none'; };
+    show('dpScheduleHoraWrap',      ['diario','semanal','mensal'].includes(freq));
+    show('dpScheduleDiasWrap',      freq === 'semanal');
+    show('dpScheduleDiaMesWrap',    freq === 'mensal');
+    show('dpScheduleIntervaloWrap', freq === 'intervalo');
+    show('dpScheduleInicioWrap',    freq === 'intervalo');
+    show('dpScheduleDataUnicaWrap', freq === 'unico');
+  }
+
+  async function dpSalvarConfigs() {
+    if (!detalheRoboAtual) return;
+    const get  = id => (document.getElementById(id)?.value||'').trim();
+    const getN = id => parseInt(document.getElementById(id)?.value) || 0;
+    const sch = {
+      ativo:            document.getElementById('dpScheduleAtivo')?.checked || false,
+      frequencia:       get('dpScheduleFreq'),
+      hora:             get('dpScheduleHora'),
+      diaMes:           parseInt(get('dpScheduleDiaMes')) || 1,
+      intervaloValor:   parseInt(get('dpScheduleIntervaloValor')) || 1,
+      intervaloUnidade: get('dpScheduleIntervaloUnidade') || 'horas',
+      inicio:           get('dpScheduleInicio') || null,
+      dataUnica:        get('dpScheduleDataUnica') || null,
+      diasSemana:       [...document.querySelectorAll('.dpDiaSemana:checked')].map(el => Number(el.value))
+    };
+    const body = {
+      nome: get('dpNome'), versao: get('dpVersao'), tipo: get('dpTipo'),
+      prioridade: get('dpPrioridade'), departamento: get('dpDepartamento'), tag: get('dpTag'),
+      ambiente: get('dpAmbiente'), maquinaId: get('dpMaquina') || null,
+      timeout: getN('dpTimeout') || 30, duracaoEstimada: getN('dpDuracaoEstimada') || 15,
+      gitUrl: get('dpGitUrl'), gitBranch: get('dpGitBranch') || 'main',
+      arquivoPrincipal: get('dpArquivoPrincipal'), comando: get('dpComando'),
+      pacotesPip: get('dpPacotesPip').split('\n').map(s=>s.trim()).filter(Boolean),
+      preComando: get('dpPreComando'), webhookUrl: get('dpWebhookUrl'),
+      schedule: sch, tempoHumano: getN('dpTempoHumano'), sla: getN('dpSla'),
+      descricao: get('dpDescricao'),
+    };
+    const res = await fetch('/api/robos/' + detalheRoboAtual, { method: 'PUT', headers: HEADERS, body: JSON.stringify(body) });
+    if (res.ok) {
+      alert('Robô atualizado com sucesso!');
+      await carregarRobos();
+      document.getElementById('rdpTitulo').textContent = body.nome;
+      document.getElementById('robo-row-' + detalheRoboAtual)?.classList.add('ativo-detalhe');
+    } else {
+      alert('Erro ao salvar configurações.');
+    }
+  }
+
+  function dpCopiarApiKey() {
+    const key = document.getElementById('dpApiKey')?.textContent;
+    if (!key || key === '—') return;
+    navigator.clipboard.writeText(key).then(() => alert('Chave copiada para a área de transferência!'));
+  }
+
+  // ── Fila ──────────────────────────────────────────────────────────────────
+  async function carregarFila(roboId) {
+    try {
+      const res = await fetch('/api/robos/' + roboId + '/fila', { headers: HEADERS });
+      filaAtual = await res.json();
+      renderFila();
+    } catch(e) {
+      const el = document.getElementById('dpFilaLista');
+      if (el) el.innerHTML = '<div style="font-size:12px;color:#c53030;padding:8px">Erro ao carregar fila</div>';
+    }
+  }
+
+  function renderFila() {
+    const contEl = document.getElementById('dpFilaCount');
+    const lista  = document.getElementById('dpFilaLista');
+    if (contEl) contEl.textContent = filaAtual.length + ' item' + (filaAtual.length !== 1 ? 's' : '');
+    if (!lista) return;
+    const FST_LBL = { aguardando:'aguardando', em_execucao:'em execução', concluido:'concluído', erro:'erro' };
+    const FST_CLS = { aguardando:'fst-aguardando', em_execucao:'fst-em_execucao', concluido:'fst-concluido', erro:'fst-erro' };
+    if (filaAtual.length === 0) {
+      lista.innerHTML = '<div style="font-size:12px;color:#a0aec0;text-align:center;padding:18px">Nenhum item na fila</div>';
+      return;
+    }
+    lista.innerHTML = `<table class="fila-tbl">
+      <thead><tr><th>#</th><th>Nome</th><th>Status</th><th>Conteúdo</th><th></th></tr></thead>
+      <tbody>${filaAtual.map((item, i) => `<tr>
+        <td style="color:#a0aec0;width:28px">${item.posicao ?? i+1}</td>
+        <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.nome||''}">${item.nome||'—'}</td>
+        <td>
+          <select onchange="dpMudarStatusFila('${item._id}',this.value)"
+            style="border:none;background:transparent;font-size:10px;font-weight:700;cursor:pointer;padding:2px 4px;border-radius:12px"
+            class="fst-badge ${FST_CLS[item.status]||'fst-aguardando'}">
+            ${['aguardando','em_execucao','concluido','erro'].map(s=>`<option value="${s}"${item.status===s?' selected':''}>${FST_LBL[s]}</option>`).join('')}
+          </select>
+        </td>
+        <td style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:monospace;font-size:10px;color:#718096" title='${JSON.stringify(item.conteudo||{})}'>${JSON.stringify(item.conteudo||{})}</td>
+        <td style="white-space:nowrap">
+          ${i>0 ? `<button onclick="dpMoverFila('${item._id}',-1)" style="padding:2px 5px;border:none;background:#f0f2f5;border-radius:4px;cursor:pointer;font-size:11px">↑</button>` : ''}
+          ${i<filaAtual.length-1 ? `<button onclick="dpMoverFila('${item._id}',1)" style="padding:2px 5px;border:none;background:#f0f2f5;border-radius:4px;cursor:pointer;font-size:11px;margin:0 2px">↓</button>` : ''}
+          <button onclick="dpExcluirItemFila('${item._id}')" style="padding:2px 5px;border:none;background:#fff5f5;color:#c53030;border-radius:4px;cursor:pointer;font-size:11px">✕</button>
+        </td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  function dpMostrarFormFila() {
+    document.getElementById('dpFormFila').style.display = '';
+    document.getElementById('dpFilaNome').focus();
+  }
+
+  function dpFormFilaCancelar() {
+    document.getElementById('dpFormFila').style.display = 'none';
+    document.getElementById('dpFilaNome').value = '';
+    document.getElementById('dpFilaConteudo').value = '';
+    document.getElementById('dpFilaStatus').value = 'aguardando';
+  }
+
+  async function dpAdicionarItemFila() {
+    if (!detalheRoboAtual) return;
+    const nome = document.getElementById('dpFilaNome').value.trim();
+    const status = document.getElementById('dpFilaStatus').value;
+    const conteudoStr = document.getElementById('dpFilaConteudo').value.trim();
+    let conteudo = {};
+    if (conteudoStr) {
+      try { conteudo = JSON.parse(conteudoStr); }
+      catch { alert('Conteúdo JSON inválido. Corrija e tente novamente.'); return; }
+    }
+    const res = await fetch('/api/robos/' + detalheRoboAtual + '/fila', {
+      method: 'POST', headers: HEADERS, body: JSON.stringify({ nome, status, conteudo })
+    });
+    if (res.ok) {
+      dpFormFilaCancelar();
+      await carregarFila(detalheRoboAtual);
+    } else { alert('Erro ao adicionar item.'); }
+  }
+
+  async function dpMudarStatusFila(mongoId, novoStatus) {
+    if (!detalheRoboAtual) return;
+    await fetch('/api/robos/' + detalheRoboAtual + '/fila/' + mongoId, {
+      method: 'PATCH', headers: HEADERS, body: JSON.stringify({ status: novoStatus })
+    });
+    await carregarFila(detalheRoboAtual);
+  }
+
+  async function dpExcluirItemFila(mongoId) {
+    if (!detalheRoboAtual) return;
+    if (!confirm('Excluir este item da fila?')) return;
+    await fetch('/api/robos/' + detalheRoboAtual + '/fila/' + mongoId, { method: 'DELETE', headers: HEADERS });
+    await carregarFila(detalheRoboAtual);
+  }
+
+  async function dpMoverFila(mongoId, dir) {
+    if (!detalheRoboAtual) return;
+    const idx = filaAtual.findIndex(x => x._id === mongoId);
+    if (idx === -1) return;
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= filaAtual.length) return;
+    const ordered = [...filaAtual];
+    [ordered[idx], ordered[newIdx]] = [ordered[newIdx], ordered[idx]];
+    await fetch('/api/robos/' + detalheRoboAtual + '/fila/reorder', {
+      method: 'PUT', headers: HEADERS, body: JSON.stringify({ ids: ordered.map(x => x._id) })
+    });
+    await carregarFila(detalheRoboAtual);
+  }
+
+  // ── Auditoria ─────────────────────────────────────────────────────────────
+  async function carregarAuditoria(roboId) {
+    try {
+      const res = await fetch('/api/robos/' + roboId + '/auditoria', { headers: HEADERS });
+      renderAuditoria(await res.json());
+    } catch(e) {
+      const el = document.getElementById('dpAuditoriaLista');
+      if (el) el.innerHTML = '<div style="font-size:12px;color:#c53030;padding:8px">Erro ao carregar auditoria</div>';
+    }
+  }
+
+  function renderAuditoria(items) {
+    const lista = document.getElementById('dpAuditoriaLista');
+    if (!lista) return;
+    if (!items || items.length === 0) {
+      lista.innerHTML = '<div style="font-size:12px;color:#a0aec0;text-align:center;padding:18px">Nenhum registro ainda</div>';
+      return;
+    }
+    lista.innerHTML = items.map(a => `<div class="audit-item">
+      <div class="audit-dot"></div>
+      <div class="audit-content">
+        <div class="audit-time">${new Date(a.timestamp).toLocaleString('pt-BR')}</div>
+        <div class="audit-user">${a.usuarioNome || a.usuarioEmail || 'Sistema'}</div>
+        <div class="audit-acao">${a.acao}${a.detalhes ? ' — <span style="color:#718096">' + a.detalhes + '</span>' : ''}</div>
+      </div>
+    </div>`).join('');
+  }
+
+  // ── Ativar / Inativar ─────────────────────────────────────────────────────
+  async function ativarInativarRobo(id, ativo) {
+    await fetch('/api/robos/' + id + '/ativar', { method: 'PATCH', headers: HEADERS, body: JSON.stringify({ ativo }) });
+    await carregarRobos();
+    if (detalheRoboAtual === id) {
+      document.getElementById('robo-row-' + id)?.classList.add('ativo-detalhe');
+    }
+  }
+
+  // ── Auto-detect comando pelo arquivo principal ────────────────────────────
+  const INTERPRETERS = { py:'python', js:'node', ts:'npx ts-node', rb:'ruby', sh:'bash', php:'php', r:'Rscript' };
+
+  function atualizarComandoAuto() {
+    const arq = (document.getElementById('rArquivoPrincipal')?.value||'').trim();
+    const cmd = document.getElementById('rComando');
+    if (!cmd) return;
+    if (!arq) { cmd.placeholder = 'Preenchido automaticamente'; cmd.value = ''; return; }
+    const ext = arq.split('.').pop().toLowerCase();
+    if (INTERPRETERS[ext]) {
+      cmd.value = `${INTERPRETERS[ext]} ${arq}`;
+    } else if (['exe','bat','cmd'].includes(ext)) {
+      cmd.value = arq;
+    } else {
+      cmd.value = `python ${arq}`;
+    }
+  }
+
+  // ── Schedule UI ───────────────────────────────────────────────────────────
+  function atualizarSchedule() {
+    const ativo = document.getElementById('rScheduleAtivo')?.checked;
+    const config = document.getElementById('rScheduleConfig');
+    if (config) config.style.display = ativo ? '' : 'none';
+    if (!ativo) return;
+    const freq = document.getElementById('rScheduleFreq')?.value;
+    const show = (id, v) => { const el=document.getElementById(id); if(el) el.style.display=v?'':'none'; };
+    show('rScheduleHoraWrap',       ['diario','semanal','mensal'].includes(freq));
+    show('rScheduleDiasWrap',       freq==='semanal');
+    show('rScheduleDiaMesWrap',     freq==='mensal');
+    show('rScheduleIntervaloWrap',  freq==='intervalo');
+    show('rScheduleInicioWrap',     freq==='intervalo');
+    show('rScheduleDataUnicaWrap',  freq==='unico');
+    _atualizarProximaExec();
+  }
+
+  function _atualizarProximaExec() {
+    const el = document.getElementById('rProximaExecPreview');
+    if (!el) return;
+    const freq = document.getElementById('rScheduleFreq')?.value;
+    const now  = new Date();
+
+    if (freq === 'unico') {
+      const val = document.getElementById('rScheduleDataUnica')?.value;
+      if (!val) { el.textContent = ''; return; }
+      const d = new Date(val);
+      el.textContent = d <= now ? '⚠️ Data já passou.' : '⏰ Execução em: ' + d.toLocaleString('pt-BR');
+      return;
+    }
+
+    if (freq === 'intervalo') {
+      const val  = parseInt(document.getElementById('rScheduleIntervaloValor')?.value)||1;
+      const unit = document.getElementById('rScheduleIntervaloUnidade')?.value||'horas';
+      const ini  = document.getElementById('rScheduleInicio')?.value;
+      const ms   = unit==='minutos' ? val*60000 : unit==='horas' ? val*3600000 : val*86400000;
+      let prox   = ini ? new Date(ini) : new Date();
+      while (prox <= now) prox = new Date(prox.getTime() + ms);
+      el.textContent = `⏰ Próxima: ${prox.toLocaleString('pt-BR')} (depois a cada ${val} ${unit})`;
+      return;
+    }
+
+    const hora  = document.getElementById('rScheduleHora')?.value || '08:00';
+    const [h,m] = hora.split(':').map(Number);
+    let prox    = new Date(); prox.setHours(h, m, 0, 0);
+
+    if (freq === 'diario') {
+      if (prox <= now) prox.setDate(prox.getDate()+1);
+    } else if (freq === 'semanal') {
+      const dias = [...document.querySelectorAll('.rDiaSemana:checked')].map(c=>+c.value);
+      if (!dias.length) { el.textContent = 'Selecione ao menos um dia da semana.'; return; }
+      // verifica hoje primeiro, depois dias futuros
+      for (let i=0; i<=7; i++) {
+        const c = new Date(); c.setDate(now.getDate()+i); c.setHours(h,m,0,0);
+        if (dias.includes(c.getDay()) && c > now) { prox = c; break; }
+      }
+    } else if (freq === 'mensal') {
+      const dia = parseInt(document.getElementById('rScheduleDiaMes')?.value)||1;
+      prox = new Date(now.getFullYear(), now.getMonth(), dia, h, m, 0);
+      if (prox <= now) prox = new Date(now.getFullYear(), now.getMonth()+1, dia, h, m, 0);
+    }
+    el.textContent = '⏰ Próxima execução: ' + prox.toLocaleString('pt-BR');
+  }
+
+  // ── Helpers do modal de robô ───────────────────────────────────────────────
+
+  function _popularMaquinaSelect(valorAtual) {
+    const sel = document.getElementById('rMaquina');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Qualquer máquina disponível</option>' +
+      maquinasData.map(m=>`<option value="${m._id}" ${m._id===valorAtual?'selected':''}>${m.nome} ${m.status==='online'?'● Online':m.status==='offline'?'○ Offline':'⊘ '+m.status}</option>`).join('');
+  }
+
+  function atualizarCamposRobo() {
+    const amb = document.getElementById('rAmbiente').value;
+    document.getElementById('rSecaoLocal').style.display  = amb==='local'  ? '' : 'none';
+    document.getElementById('rSecaoNuvem').style.display  = amb==='nuvem'  ? '' : 'none';
+    document.getElementById('rGrupoMaquinaWrap').style.display = amb==='local' ? '' : 'none';
+  }
+
+  function atualizarVinculo() {
+    const v = document.querySelector('input[name="rVinculo"]:checked')?.value || 'git';
+    document.getElementById('rCamposGit').style.display = v==='git' ? '' : 'none';
+    document.getElementById('rCamposZip').style.display = v==='zip' ? '' : 'none';
+  }
+
+  function addPayloadRow(k, v) {
+    const cont = document.getElementById('rWebhookPayloadRows');
+    if (!cont) return;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:6px;margin-bottom:5px';
+    row.innerHTML = `<input type="text" placeholder="chave" value="${k||''}" style="flex:1;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px">
+      <input type="text" placeholder="valor" value="${v||''}" style="flex:2;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px">
+      <button type="button" onclick="this.parentElement.remove()" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:6px;cursor:pointer;font-size:12px">✕</button>`;
+    cont.appendChild(row);
+  }
+
+  function _lerPayload() {
+    const rows = document.querySelectorAll('#rWebhookPayloadRows > div');
+    const obj = {};
+    rows.forEach(row => {
+      const ins = row.querySelectorAll('input');
+      const k = ins[0]?.value.trim(), v = ins[1]?.value.trim();
+      if (k) obj[k] = v||'';
+    });
+    return obj;
   }
 
   function abrirModalRobo(id) {
     document.getElementById('rEditId').value = id||'';
     document.getElementById('modalRoboTitulo').textContent = id ? 'Editar Robô' : 'Novo Robô';
-    if (id) { const r=robos.find(r=>r._id===id); if(r){document.getElementById('rNome').value=r.nome;document.getElementById('rVersao').value=r.versao||'v1.0';document.getElementById('rTipo').value=r.tipo;document.getElementById('rPrioridade').value=r.prioridade;document.getElementById('rCategoria').value=r.categoria||'';document.getElementById('rDepartamento').value=r.departamento||'';document.getElementById('rMaquina').value=r.maquina||'';document.getElementById('rTimeout').value=r.timeout||30;document.getElementById('rComando').value=r.comandoExecucao||'';document.getElementById('rDescricao').value=r.descricao||'';document.getElementById('rTempoHumano').value=r.tempoHumanoMinutos||0;document.getElementById('rStatus').value=r.status;} }
-    else { ['rNome','rCategoria','rDepartamento','rMaquina','rComando','rDescricao'].forEach(id=>document.getElementById(id).value=''); document.getElementById('rVersao').value='v1.0'; document.getElementById('rTipo').value='Background'; document.getElementById('rPrioridade').value='Media'; document.getElementById('rTimeout').value=30; document.getElementById('rTempoHumano').value=0; document.getElementById('rStatus').value='Pausado'; }
+    const pr = document.getElementById('rWebhookPayloadRows');
+    if (pr) pr.innerHTML = '';
+    document.querySelectorAll('.rDiaSemana').forEach(c=>c.checked=false);
+
+    const r = id ? robos.find(r=>r._id===id) : null;
+
+    const set = (elId, val) => { const el=document.getElementById(elId); if(el) el.value=val??''; };
+    const setN = (elId, val, def=0) => { const el=document.getElementById(elId); if(el) el.value=val??def; };
+
+    set('rNome',            r?.nome||'');
+    set('rVersao',          r?.versao||'v1.0');
+    set('rDepartamento',    r?.departamento||'');
+    set('rTag',             r?.tag||'');
+    set('rGitUrl',          r?.gitUrl||'');
+    set('rGitBranch',       r?.gitBranch||'main');
+    set('rWebhookUrl',      r?.webhookUrl||'');
+    set('rDescricao',       r?.descricao||'');
+    set('rPacotesPip',      r?.pacotesPip||'');
+    set('rPreComando',      r?.preComando||'');
+    set('rArquivoPrincipal',r?.arquivoPrincipal||'');
+    set('rComando',         r?.comandoExecucao||'');
+    set('rScheduleHora',             r?.schedule?.horario||'08:00');
+    setN('rTimeout',                 r?.timeout, 30);
+    setN('rDuracaoEstimada',         r?.duracaoEstimada, 15);
+    setN('rTempoHumano',             r?.tempoHumanoMinutos, 0);
+    setN('rSla',                     r?.slaMinutos, 0);
+    setN('rScheduleDiaMes',          r?.schedule?.diaMes, 1);
+    setN('rScheduleIntervaloValor',  r?.schedule?.intervaloValor, 1);
+    set('rScheduleIntervaloUnidade', r?.schedule?.intervaloUnidade||'horas');
+    set('rScheduleInicio',           r?.schedule?.inicio ? r.schedule.inicio.slice(0,16) : '');
+    set('rScheduleDataUnica',        r?.schedule?.dataUnica ? r.schedule.dataUnica.slice(0,16) : '');
+
+    document.getElementById('rTipo').value       = r?.tipo||'Background';
+    document.getElementById('rPrioridade').value = r?.prioridade||'Media';
+    document.getElementById('rAmbiente').value   = r?.ambiente||'local';
+    document.getElementById('rScheduleAtivo').checked = r?.schedule?.ativo||false;
+    document.getElementById('rScheduleFreq').value    = r?.schedule?.frequencia||'diario';
+
+    // Dias da semana
+    (r?.schedule?.diasSemana||[]).forEach(d => {
+      const cb = document.querySelector(`.rDiaSemana[value="${d}"]`);
+      if (cb) cb.checked = true;
+    });
+
+    // Vínculo radio
+    const vt = r?.vinculoTipo||'git';
+    const radio = document.querySelector(`input[name="rVinculo"][value="${vt}"]`);
+    if (radio) radio.checked = true;
+
+    // Payload webhook
+    const payload = r?.webhookPayload||{};
+    Object.entries(payload).forEach(([k,v])=>addPayloadRow(k,v));
+
+    // Zip atual
+    const za = document.getElementById('rZipAtual');
+    if (za) za.textContent = r?.zipNome ? 'Atual: '+r.zipNome : '';
+
+    _popularMaquinaSelect(r?.maquinaId||'');
+    atualizarCamposRobo();
+    atualizarVinculo();
+    atualizarSchedule();
+    if (!r?.comandoExecucao && r?.arquivoPrincipal) atualizarComandoAuto();
     document.getElementById('modalRobo').classList.add('aberto');
   }
   function editarRobo(id) { abrirModalRobo(id); }
@@ -7116,14 +8128,81 @@
   async function salvarRobo() {
     const nome = document.getElementById('rNome').value.trim();
     if (!nome) { alert('Nome obrigatório.'); return; }
-    const dados = { nome, versao:document.getElementById('rVersao').value, tipo:document.getElementById('rTipo').value, prioridade:document.getElementById('rPrioridade').value, categoria:document.getElementById('rCategoria').value, departamento:document.getElementById('rDepartamento').value, maquina:document.getElementById('rMaquina').value, timeout:parseInt(document.getElementById('rTimeout').value)||30, comandoExecucao:document.getElementById('rComando').value, descricao:document.getElementById('rDescricao').value, tempoHumanoMinutos:parseInt(document.getElementById('rTempoHumano').value)||0, status:document.getElementById('rStatus').value };
-    const id = document.getElementById('rEditId').value;
+    const id  = document.getElementById('rEditId').value;
+    const amb = document.getElementById('rAmbiente').value;
+    const vt  = document.querySelector('input[name="rVinculo"]:checked')?.value||'git';
+
+    // Schedule
+    const schedAtivo = document.getElementById('rScheduleAtivo').checked;
+    const schedFreq  = document.getElementById('rScheduleFreq').value;
+    const diasSemana = [...document.querySelectorAll('.rDiaSemana:checked')].map(c=>+c.value);
+
+    const dados = {
+      nome,
+      versao:             document.getElementById('rVersao').value,
+      tipo:               document.getElementById('rTipo').value,
+      prioridade:         document.getElementById('rPrioridade').value,
+      departamento:       document.getElementById('rDepartamento').value,
+      tag:                document.getElementById('rTag').value,
+      ambiente:           amb,
+      vinculoTipo:        amb==='local' ? vt : 'webhook',
+      maquinaId:          amb==='local' ? document.getElementById('rMaquina').value : '',
+      arquivoPrincipal:   document.getElementById('rArquivoPrincipal').value.trim(),
+      comandoExecucao:    document.getElementById('rComando').value.trim(),
+      gitUrl:             vt==='git' ? document.getElementById('rGitUrl').value : '',
+      gitBranch:          vt==='git' ? (document.getElementById('rGitBranch').value||'main') : '',
+      webhookUrl:         amb==='nuvem' ? document.getElementById('rWebhookUrl').value : '',
+      webhookPayload:     amb==='nuvem' ? _lerPayload() : {},
+      pacotesPip:         document.getElementById('rPacotesPip').value.trim(),
+      preComando:         document.getElementById('rPreComando').value.trim(),
+      timeout:            parseInt(document.getElementById('rTimeout').value)||30,
+      duracaoEstimada:    parseInt(document.getElementById('rDuracaoEstimada').value)||15,
+      descricao:          document.getElementById('rDescricao').value,
+      tempoHumanoMinutos: parseInt(document.getElementById('rTempoHumano').value)||0,
+      slaMinutos:         parseInt(document.getElementById('rSla').value)||0,
+      schedule: {
+        ativo:           schedAtivo,
+        frequencia:      schedFreq,
+        horario:         document.getElementById('rScheduleHora').value||'08:00',
+        diasSemana,
+        diaMes:          parseInt(document.getElementById('rScheduleDiaMes').value)||1,
+        intervaloValor:  parseInt(document.getElementById('rScheduleIntervaloValor').value)||1,
+        intervaloUnidade:document.getElementById('rScheduleIntervaloUnidade').value||'horas',
+        inicio:          document.getElementById('rScheduleInicio').value||'',
+        dataUnica:       document.getElementById('rScheduleDataUnica').value||'',
+      }
+    };
+
+    const btn = document.getElementById('btnSalvarRobo');
     try {
-      if (id) await fetch(`/api/robos/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
-      else await fetch('/api/robos', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+      if (btn) { btn.disabled=true; btn.textContent='Salvando...'; }
+
+      let savedId = id;
+      const zipFile = document.getElementById('rZipFile')?.files?.[0];
+      const authH = {'Authorization': HEADERS.Authorization||HEADERS.authorization||''};
+
+      if (!id) {
+        const res = await fetch('/api/robos', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
+        const created = await res.json();
+        if (!res.ok) { alert(created.erro||'Erro ao salvar'); return; }
+        savedId = created._id;
+      } else {
+        const res = await fetch(`/api/robos/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify(dados) });
+        if (!res.ok) { const e=await res.json(); alert(e.erro||'Erro ao salvar'); return; }
+      }
+
+      if (zipFile && savedId) {
+        const fd = new FormData(); fd.append('zip', zipFile);
+        await fetch(`/api/robos/${savedId}/package`, { method:'POST', headers:authH, body:fd });
+      }
+
       fecharModal('modalRobo');
       await carregarRobos();
-    } catch(err) { console.error(err); }
+    } catch(err) {
+      console.error(err); alert('Erro ao salvar robô.');
+    } finally {
+      if (btn) { btn.disabled=false; btn.textContent='Salvar'; }
+    }
   }
 
   async function alterarStatusRobo(id) {
@@ -7198,14 +8277,172 @@
   }
 
   // ===== CALENDÁRIO =====
+  let calWeekOffset = 0;
+  const CAL_HOUR_H  = 64;  // px por hora
+  const CAL_START   = 6;   // hora inicial exibida
+  const CAL_END     = 23;  // hora final exibida
+  const CAL_COLORS  = [
+    {bg:'#ebf4ff',border:'#3b82f6',text:'#1e40af'},
+    {bg:'#f0fdf4',border:'#22c55e',text:'#15803d'},
+    {bg:'#fdf4ff',border:'#a855f7',text:'#7e22ce'},
+    {bg:'#fff7ed',border:'#f97316',text:'#c2410c'},
+    {bg:'#fef2f2',border:'#ef4444',text:'#991b1b'},
+    {bg:'#f0fdfa',border:'#14b8a6',text:'#0f766e'},
+    {bg:'#fffbeb',border:'#eab308',text:'#a16207'},
+    {bg:'#f5f3ff',border:'#8b5cf6',text:'#6d28d9'},
+  ];
+
+  function calGetMonday(date) {
+    const d = new Date(date); d.setHours(0,0,0,0);
+    const day = d.getDay();
+    d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
+    return d;
+  }
+
+  function calHoje() { calWeekOffset = 0; renderCalendario(); }
+  function calNavSemana(dir) { calWeekOffset += dir; renderCalendario(); }
+  function calIrParaData(val) {
+    if (!val) return;
+    const mon = calGetMonday(new Date(val + 'T00:00:00'));
+    const thisMon = calGetMonday(new Date());
+    calWeekOffset = Math.round((mon - thisMon) / (7 * 86400000));
+    renderCalendario();
+  }
+
+  function calGetOccurrences(robo, weekDays) {
+    const s = robo.schedule;
+    if (!s?.ativo || !s?.frequencia) return [];
+    const dur = robo.duracaoEstimada || robo.timeout || 30;
+    const freq = s.frequencia;
+    const parseH = h => { const [hh,mm]=(h||'08:00').split(':').map(Number); return {h:hh||8,m:mm||0}; };
+    const occ = [];
+
+    weekDays.forEach((day, di) => {
+      const dow = day.getDay();
+      if (freq === 'unico' && s.dataUnica) {
+        const dt = new Date(s.dataUnica);
+        if (day.toDateString() === dt.toDateString())
+          occ.push({di, h:dt.getHours(), m:dt.getMinutes(), dur});
+      } else if (freq === 'diario') {
+        const {h,m} = parseH(s.horario); occ.push({di, h, m, dur});
+      } else if (freq === 'semanal') {
+        const dias = s.diasSemana?.length ? s.diasSemana : [1];
+        if (dias.includes(dow)) { const {h,m}=parseH(s.horario); occ.push({di, h, m, dur}); }
+      } else if (freq === 'mensal') {
+        if (day.getDate() === (s.diaMes||1)) { const {h,m}=parseH(s.horario); occ.push({di, h, m, dur}); }
+      } else if (freq === 'intervalo' && s.intervaloValor) {
+        const val = parseInt(s.intervaloValor)||1;
+        const ms = s.intervaloUnidade==='minutos' ? val*60000 : s.intervaloUnidade==='horas' ? val*3600000 : val*86400000;
+        const inicio = s.inicio ? new Date(s.inicio) : new Date(day);
+        const dayStart = new Date(day); dayStart.setHours(0,0,0,0);
+        const dayEnd   = new Date(day); dayEnd.setHours(23,59,59,999);
+        let t = new Date(inicio);
+        if (t > dayEnd) return;
+        while (t < dayStart) t = new Date(t.getTime() + ms);
+        let guard = 0;
+        while (t <= dayEnd && guard++ < 200) {
+          occ.push({di, h:t.getHours(), m:t.getMinutes(), dur});
+          t = new Date(t.getTime() + ms);
+        }
+      }
+    });
+    return occ;
+  }
+
   function renderCalendario() {
-    const comSchedule = robos.filter(r=>(r.schedules||[]).length>0);
-    const hoje = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
-    document.getElementById('calLista').innerHTML = robos.length===0
-      ? '<div style="color:#a0aec0;font-size:12px">Nenhum robô com agendamento.</div>'
-      : `<div style="font-size:12px;font-weight:700;color:#2d1b69;margin-bottom:10px">Hoje — ${hoje}</div>` +
-        robos.map(r=>`<div class="cal-item"><span class="cal-hora">--:--</span><div><div class="cal-nome">${r.nome}</div><div class="cal-dur">${r.timeout||30} min • ${r.tipo}</div><div class="cal-maq">${r.maquina||'—'}</div></div><span style="font-size:10px;padding:2px 6px;background:#f5f0ff;color:#2d1b69;border-radius:3px">Agendado</span></div>`).join('');
-    document.getElementById('proxExecucoes').innerHTML = robos.slice(0,4).map(r=>`<div class="prox-item"><div><div class="prox-hora">--:--</div></div><div><div class="prox-nome">${r.nome}</div><div class="prox-maq">${r.maquina||'—'}</div></div></div>`).join('') || '<div style="color:#a0aec0;font-size:12px">Nenhum agendamento.</div>';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const monday = calGetMonday(today);
+    monday.setDate(monday.getDate() + calWeekOffset * 7);
+
+    const weekDays = Array.from({length:7}, (_, i) => {
+      const d = new Date(monday); d.setDate(monday.getDate() + i); return d;
+    });
+
+    // Período
+    const fmt = (d, y) => d.toLocaleDateString('pt-BR', {day:'numeric', month:'short', ...(y?{year:'numeric'}:{})});
+    const periodoEl = document.getElementById('calPeriodo');
+    if (periodoEl) periodoEl.textContent = `${fmt(weekDays[0])} – ${fmt(weekDays[6], true)}`;
+
+    // Cabeçalho dos dias
+    const DIAS = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+    const headEl = document.getElementById('calDayHeaders');
+    if (headEl) headEl.innerHTML = '<div class="cal-gutter-top"></div>' +
+      weekDays.map((d,i) => {
+        const isToday = d.toDateString() === new Date().toDateString();
+        return `<div class="cal-day-head${isToday?' cal-day-head-today':''}">
+          <div class="cal-day-name">${DIAS[i]}</div>
+          <div class="cal-day-num${isToday?' cal-day-num-today':''}">${d.getDate()}</div>
+        </div>`;
+      }).join('');
+
+    // Cores por robô
+    const robosAgendados = robos.filter(r => r.schedule?.ativo && r.schedule?.frequencia);
+    const colorMap = {};
+    robosAgendados.forEach((r,i) => { colorMap[r._id] = CAL_COLORS[i % CAL_COLORS.length]; });
+
+    // Eventos por coluna
+    const dayEvents = Array.from({length:7}, () => []);
+    robosAgendados.forEach(robo => {
+      calGetOccurrences(robo, weekDays).forEach(occ => {
+        dayEvents[occ.di].push({...occ, robo, color: colorMap[robo._id]});
+      });
+    });
+
+    const totalH = CAL_END - CAL_START;
+    const totalPx = totalH * CAL_HOUR_H;
+
+    // Calha de horários
+    const timeGutter = `<div class="cal-time-gutter">${
+      Array.from({length:totalH}, (_,i) =>
+        `<div class="cal-hour-label">${String(CAL_START+i).padStart(2,'0')}:00</div>`
+      ).join('')
+    }</div>`;
+
+    // Colunas de dias
+    const dayCols = weekDays.map((day, di) => {
+      const isToday = day.toDateString() === new Date().toDateString();
+      const hourLines = Array.from({length:totalH}, (_,i) =>
+        `<div class="cal-hour-line" style="top:${i*CAL_HOUR_H}px"></div>`
+      ).join('');
+
+      let nowLine = '';
+      if (isToday) {
+        const now = new Date();
+        const minFromStart = (now.getHours() - CAL_START) * 60 + now.getMinutes();
+        const top = (minFromStart / 60) * CAL_HOUR_H;
+        if (top >= 0 && top <= totalPx)
+          nowLine = `<div class="cal-now-line" style="top:${top}px"></div>`;
+      }
+
+      const events = dayEvents[di].map(ev => {
+        const startMin = (ev.h - CAL_START) * 60 + ev.m;
+        const top = (startMin / 60) * CAL_HOUR_H;
+        if (top < 0 || top > totalPx) return '';
+        const height = Math.max((ev.dur / 60) * CAL_HOUR_H, 22);
+        const c = ev.color;
+        const startLbl = `${String(ev.h).padStart(2,'0')}:${String(ev.m).padStart(2,'0')}`;
+        return `<div class="cal-event" style="top:${top}px;height:${height}px;background:${c.bg};border-left:3px solid ${c.border};color:${c.text}" title="${ev.robo.nome} — ${startLbl}">
+          <div class="cal-event-nome">${ev.robo.nome}</div>
+          ${height > 32 ? `<div class="cal-event-hora">${startLbl} · ${ev.dur}min</div>` : ''}
+        </div>`;
+      }).join('');
+
+      return `<div class="cal-day-col${isToday?' cal-day-col-today':''}" style="height:${totalPx}px">
+        ${hourLines}${nowLine}${events}
+      </div>`;
+    }).join('');
+
+    const bodyEl = document.getElementById('calBodyGrid');
+    if (bodyEl) {
+      bodyEl.innerHTML = timeGutter + dayCols;
+      // Estado vazio
+      if (robosAgendados.length === 0) {
+        const empty = document.createElement('div');
+        empty.style.cssText = 'grid-column:1/-1;padding:60px 0;text-align:center;color:#a0aec0;font-size:13px';
+        empty.innerHTML = '<div style="font-size:32px;margin-bottom:8px">📅</div><div>Nenhum robô com agendamento ativo</div><div style="font-size:11px;margin-top:4px">Ative o agendamento no cadastro do robô</div>';
+        bodyEl.appendChild(empty);
+      }
+    }
   }
 
   // ===== AMBIENTE =====
@@ -7244,7 +8481,15 @@
   }
 
   function renderMaquinas() {
-    const lista = maquinasData;
+    const filtroNome   = (document.getElementById('mqFiltroNome')?.value||'').toLowerCase();
+    const filtroGrupo  = (document.getElementById('mqFiltroGrupo')?.value||'').toLowerCase();
+    const filtroStatus = document.getElementById('mqFiltroStatus')?.value||'';
+    const lista = maquinasData.filter(m => {
+      if (filtroNome  && !((m.nome||'').toLowerCase().includes(filtroNome) || (m.machineId||'').toLowerCase().includes(filtroNome))) return false;
+      if (filtroGrupo && !(m.grupo||'').toLowerCase().includes(filtroGrupo)) return false;
+      if (filtroStatus && m.status !== filtroStatus) return false;
+      return true;
+    });
     const el = document.getElementById('maquinasLista');
     if (!el) return;
 
@@ -7354,6 +8599,11 @@
     document.getElementById('maqEditId').value = id||'';
     document.getElementById('maqChaveInfo').style.display = 'none';
     document.getElementById('modalMaqTitulo').textContent = id ? 'Editar Máquina' : 'Nova Máquina';
+    // Sempre reseta estado dos botões (pode ter ficado oculto após criação)
+    const btnSalvar = document.querySelector('#modalMaquina .btn-confirmar');
+    const btnCancelar = document.querySelector('#modalMaquina .btn-cancelar');
+    if (btnSalvar) btnSalvar.style.display = '';
+    if (btnCancelar) btnCancelar.textContent = 'Cancelar';
     if (id) {
       const m = maquinasData.find(m=>m._id===id);
       if (m) {
@@ -7461,16 +8711,16 @@
       dl(configUrl, 'config.json', 0);
       setTimeout(() => URL.revokeObjectURL(configUrl), 5000);
 
-      // agent.py e iniciar.bat estáticos
+      // arquivos estáticos do agent
       dl('/agent.py',    'agent.py',    600);
-      dl('/iniciar.bat', 'iniciar.bat', 1200);
+      dl('/iniciar.vbs', 'iniciar.vbs', 1200);
 
-      alert('✅ 3 arquivos baixando: config.json, agent.py e iniciar.bat\n\nPara instalar na máquina:\n→ Coloque os 3 na mesma pasta\n→ Dê duplo clique em iniciar.bat\n→ Pronto!');
+      alert('✅ 3 arquivos baixando: config.json, agent.py e iniciar.vbs\n\nColoque os 3 na mesma pasta e dê duplo clique em iniciar.vbs.\n\nSem janela CMD. Instala Python se precisar, sobe o Agent em background e configura auto-início no boot.');
     } catch(e) { alert('Erro ao gerar pacote: '+e.message); }
   }
 
   // ===== UTILS GERAIS =====
-  function fecharModal(id) { const el=document.getElementById(id); if(!el)return; el.classList.remove('aberto'); el.style.display='none'; }
+  function fecharModal(id) { const el=document.getElementById(id); if(!el)return; el.classList.remove('aberto'); }
   document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target === m) m.classList.remove('aberto'); }); });
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href = '/'; }
 

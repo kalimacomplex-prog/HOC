@@ -869,7 +869,7 @@
 
         <div class="robos-subtabs">
           <button class="robo-subtab active" onclick="mudarRoboTab('dashboard',this)">📊 Resumo</button>
-          <button class="robo-subtab" onclick="mudarRoboTab('producao',this)">⚙️ Produção</button>
+          <button class="robo-subtab" onclick="mudarRoboTab('producao',this)">⚙️ Execuções</button>
           <button class="robo-subtab" onclick="mudarRoboTab('robos-lista',this)">🤖 Robôs</button>
           <button class="robo-subtab" onclick="mudarRoboTab('credenciais',this)">🔐 Credenciais</button>
           <button class="robo-subtab" onclick="mudarRoboTab('calendario',this)">📅 Calendário</button>
@@ -1032,10 +1032,10 @@
               <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.4" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1e2a4a" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               <input type="text" id="searchRobo" placeholder="Buscar..." oninput="filtrarRobos()" style="width:100%;padding:7px 8px 7px 28px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;box-sizing:border-box;font-family:inherit;color:#1e2a4a">
             </div>
-            <select id="filtroStatusRobo" onchange="filtrarRobos()" style="padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit;white-space:nowrap">
-              <option value="">Todos os Status</option>
-              <option>Executando</option><option>Pausado</option><option>Erro</option><option>Concluído</option>
-            </select>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:#4a5568;white-space:nowrap;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;background:white">
+              <input type="checkbox" id="filtroInativos" onchange="filtrarRobos()" style="accent-color:#2d1b69;width:14px;height:14px;cursor:pointer">
+              Mostrar inativos
+            </label>
             <select id="filtroTipoRobo" onchange="filtrarRobos()" style="padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#4a5568;background:white;outline:none;cursor:pointer;font-family:inherit;white-space:nowrap">
               <option value="">Todos os Tipos</option>
               <option value="Background">Background</option>
@@ -1246,8 +1246,12 @@
 
                 <div id="dpFilaLista"></div>
 
-                <!-- ── SEÇÃO 3: AUDITORIA ── -->
-                <div class="rdp-secao-titulo" style="margin-top:20px">Auditoria</div>
+                <!-- ── SEÇÃO 3: HISTÓRICO DE EXECUÇÕES ── -->
+                <div class="rdp-secao-titulo" style="margin-top:20px">Histórico de Execuções</div>
+                <div id="dpExecHistLista" style="margin-bottom:8px"></div>
+
+                <!-- ── SEÇÃO 4: AUDITORIA ── -->
+                <div class="rdp-secao-titulo" style="margin-top:20px">Auditoria de Configuração</div>
                 <div id="dpAuditoriaLista" style="padding-bottom:24px"></div>
 
               </div><!-- /rdp-body -->
@@ -7611,13 +7615,13 @@
   const RST_CLASS = {Executando:'rst-executando',Pausado:'rst-pausado',Erro:'rst-erro',Concluído:'rst-concluido'};
 
   function filtrarRobos() {
-    const q  = (document.getElementById('searchRobo')?.value||'').toLowerCase();
-    const st = document.getElementById('filtroStatusRobo')?.value||'';
-    const tp = document.getElementById('filtroTipoRobo')?.value||'';
-    const dp = (document.getElementById('filtroDeptRobo')?.value||'').toLowerCase();
+    const q         = (document.getElementById('searchRobo')?.value||'').toLowerCase();
+    const tp        = document.getElementById('filtroTipoRobo')?.value||'';
+    const dp        = (document.getElementById('filtroDeptRobo')?.value||'').toLowerCase();
+    const mostrarIn = document.getElementById('filtroInativos')?.checked || false;
     const lista = robos.filter(r=>
+      (mostrarIn || r.ativo !== false) &&
       (!q  || r.nome.toLowerCase().includes(q)) &&
-      (!st || r.status===st) &&
       (!tp || r.tipo===tp) &&
       (!dp || (r.departamento||'').toLowerCase().includes(dp))
     );
@@ -7702,6 +7706,7 @@
     dpCarregarConfigs(r);
     document.getElementById('dpApiKey').textContent = r.apiKey || '—';
     carregarFila(id);
+    carregarHistoricoExecucoes(id);
     carregarAuditoria(id);
   }
 
@@ -7977,13 +7982,65 @@
     await carregarFila(detalheRoboAtual);
   }
 
-  // ── Auditoria ─────────────────────────────────────────────────────────────
+  // ── Histórico de Execuções ────────────────────────────────────────────────
+  const EXEC_STATUS_STYLE = {
+    em_execucao:  { bg:'#f0fff4', color:'#276749', label:'Em execução' },
+    concluido:    { bg:'#ebf0ff', color:'#3b5bdb', label:'Concluído' },
+    erro:         { bg:'#fff5f5', color:'#c53030', label:'Erro' },
+    interrompido: { bg:'#fffaf0', color:'#c05621', label:'Interrompido' },
+    nao_disparado:{ bg:'#f0f2f5', color:'#718096', label:'Não disparado' },
+  };
+
+  async function carregarHistoricoExecucoes(roboId) {
+    const el = document.getElementById('dpExecHistLista');
+    if (!el) return;
+    el.innerHTML = '<div style="font-size:12px;color:#a0aec0;padding:8px">Carregando...</div>';
+    try {
+      const res = await fetch('/api/robos/execucoes?roboId=' + roboId, { headers: HEADERS });
+      renderHistoricoExecucoes(await res.json());
+    } catch(e) {
+      el.innerHTML = '<div style="font-size:12px;color:#c53030;padding:8px">Erro ao carregar execuções</div>';
+    }
+  }
+
+  function renderHistoricoExecucoes(items) {
+    const el = document.getElementById('dpExecHistLista');
+    if (!el) return;
+    if (!items || items.length === 0) {
+      el.innerHTML = '<div style="font-size:12px;color:#a0aec0;text-align:center;padding:18px">Nenhuma execução registrada</div>';
+      return;
+    }
+    el.innerHTML = `<table class="fila-tbl">
+      <thead><tr>
+        <th>Início</th><th>Fim</th><th>Duração</th><th>Gatilho</th><th>Máquina</th><th>Status</th><th></th>
+      </tr></thead>
+      <tbody>${items.map(e => {
+        const st  = EXEC_STATUS_STYLE[e.status] || EXEC_STATUS_STYLE.nao_disparado;
+        const ini = e.iniciadoEm ? new Date(e.iniciadoEm).toLocaleString('pt-BR') : '—';
+        const fim = e.finalizadoEm ? new Date(e.finalizadoEm).toLocaleString('pt-BR') : '—';
+        const dur = e.duracao ? (e.duracao < 60 ? e.duracao + 's' : Math.round(e.duracao/60) + 'min') : '—';
+        const gatilhoIcon = { manual:'👆', schedule:'⏰', webhook:'🔗', workflow:'🔄' }[e.gatilho] || '—';
+        return `<tr>
+          <td style="white-space:nowrap;font-size:11px">${ini}</td>
+          <td style="white-space:nowrap;font-size:11px;color:#718096">${fim}</td>
+          <td style="font-size:11px;color:#4a5568">${dur}</td>
+          <td style="font-size:11px" title="${e.gatilho||''}">${gatilhoIcon} ${e.gatilho||'—'}</td>
+          <td style="font-size:11px;color:#718096;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${e.maquina||''}">${e.maquina||'—'}</td>
+          <td><span style="padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;background:${st.bg};color:${st.color}">${st.label}</span></td>
+          <td><button onclick="verLogsExec('${e._id}')" style="padding:3px 8px;border:none;background:#f5f0ff;color:#2d1b69;border-radius:5px;cursor:pointer;font-size:11px">Logs</button></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  }
+
+  // ── Auditoria de Configuração ─────────────────────────────────────────────
   async function carregarAuditoria(roboId) {
+    const el = document.getElementById('dpAuditoriaLista');
+    if (el) el.innerHTML = '<div style="font-size:12px;color:#a0aec0;padding:8px">Carregando...</div>';
     try {
       const res = await fetch('/api/robos/' + roboId + '/auditoria', { headers: HEADERS });
       renderAuditoria(await res.json());
     } catch(e) {
-      const el = document.getElementById('dpAuditoriaLista');
       if (el) el.innerHTML = '<div style="font-size:12px;color:#c53030;padding:8px">Erro ao carregar auditoria</div>';
     }
   }
@@ -7995,14 +8052,27 @@
       lista.innerHTML = '<div style="font-size:12px;color:#a0aec0;text-align:center;padding:18px">Nenhum registro ainda</div>';
       return;
     }
-    lista.innerHTML = items.map(a => `<div class="audit-item">
-      <div class="audit-dot"></div>
-      <div class="audit-content">
-        <div class="audit-time">${new Date(a.timestamp).toLocaleString('pt-BR')}</div>
-        <div class="audit-user">${a.usuarioNome || a.usuarioEmail || 'Sistema'}</div>
-        <div class="audit-acao">${a.acao}${a.detalhes ? ' — <span style="color:#718096">' + a.detalhes + '</span>' : ''}</div>
-      </div>
-    </div>`).join('');
+    lista.innerHTML = items.map((a, i, arr) => {
+      const isLast = i === arr.length - 1;
+      const dt = new Date(a.timestamp);
+      const data  = dt.toLocaleDateString('pt-BR');
+      const hora  = dt.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+      const quem  = a.usuarioNome || a.usuarioEmail || 'Sistema';
+      return `<div class="audit-item">
+        <div class="audit-line">
+          <div class="audit-dot"></div>
+          ${!isLast ? '<div class="audit-vline"></div>' : ''}
+        </div>
+        <div class="audit-content" style="padding-bottom:${isLast?'0':'10px'}">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px">
+            <span class="audit-user">${quem}</span>
+            <span style="font-size:10px;background:#f0f2f5;color:#718096;padding:1px 7px;border-radius:10px">${data} ${hora}</span>
+          </div>
+          <div class="audit-acao" style="font-weight:600">${a.acao}</div>
+          ${a.detalhes ? `<div style="font-size:11px;color:#718096;margin-top:2px;background:#f8fafc;padding:4px 8px;border-radius:5px;border-left:2px solid #c4b5fd">${a.detalhes}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
   }
 
   // ── Ativar / Inativar ─────────────────────────────────────────────────────

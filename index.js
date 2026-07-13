@@ -700,6 +700,7 @@ async function filaAuth(req, res, next) {
       if (req.params.id && req.params.id !== robo._id.toString() && req.params.id !== robo.apiKey)
         return res.status(403).json({ erro: 'Chave não autorizada para este robô' });
       req.roboFromKey = robo;
+      req.roboId = robo._id;          // sempre o ObjectId real
       req.filaEmpresa = robo.empresa;
       return next();
     } catch (e) { return res.status(500).json({ erro: e.message }); }
@@ -2134,7 +2135,8 @@ app.patch('/api/robos/:id/ativar', authMiddleware, verificarAssinatura, async (r
 // GET /api/robos/:id/fila — lista itens (JWT ou x-robot-key)
 app.get('/api/robos/:id/fila', filaAuth, async (req, res) => {
   try {
-    const items = await FilaItem.find({ roboId: req.params.id, empresaId: req.filaEmpresa }).sort({ posicao: 1, criadoEm: 1 });
+    const roboId = req.roboId || req.params.id;
+    const items = await FilaItem.find({ roboId, empresaId: req.filaEmpresa }).sort({ posicao: 1, criadoEm: 1 });
     res.json(items);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -2142,7 +2144,8 @@ app.get('/api/robos/:id/fila', filaAuth, async (req, res) => {
 // GET /api/robos/:id/fila/proximo — próximo item aguardando (ANTES de /:itemId para não conflitar)
 app.get('/api/robos/:id/fila/proximo', filaAuth, async (req, res) => {
   try {
-    const item = await FilaItem.findOne({ roboId: req.params.id, empresaId: req.filaEmpresa, status: 'aguardando' }).sort({ posicao: 1, criadoEm: 1 });
+    const roboId = req.roboId || req.params.id;
+    const item = await FilaItem.findOne({ roboId, empresaId: req.filaEmpresa, status: 'aguardando' }).sort({ posicao: 1, criadoEm: 1 });
     if (!item) return res.json(null);
     res.json(item);
   } catch (err) { res.status(500).json({ erro: err.message }); }
@@ -2151,11 +2154,12 @@ app.get('/api/robos/:id/fila/proximo', filaAuth, async (req, res) => {
 // POST /api/robos/:id/fila — adiciona item
 app.post('/api/robos/:id/fila', filaAuth, async (req, res) => {
   try {
-    const robo = await Robot.findById(req.params.id).lean();
+    const robo = req.roboFromKey || await Robot.findById(req.params.id).lean();
     if (!robo || robo.empresa.toString() !== req.filaEmpresa.toString()) return res.status(404).json({ erro: 'Robô não encontrado' });
-    const count = await FilaItem.countDocuments({ roboId: req.params.id, empresaId: req.filaEmpresa });
+    const roboId = robo._id;
+    const count = await FilaItem.countDocuments({ roboId, empresaId: req.filaEmpresa });
     const item = await FilaItem.create({
-      roboId: req.params.id,
+      roboId,
       empresaId: req.filaEmpresa,
       itemId: req.body.itemId || crypto.randomUUID(),
       nome: req.body.nome || '',
@@ -2170,9 +2174,10 @@ app.post('/api/robos/:id/fila', filaAuth, async (req, res) => {
 // PATCH /api/robos/:id/fila/:itemId — atualiza status ou campos
 app.patch('/api/robos/:id/fila/:itemId', filaAuth, async (req, res) => {
   try {
+    const roboId = req.roboId || req.params.id;
     const updates = { ...req.body, atualizadoEm: new Date() };
     const item = await FilaItem.findOneAndUpdate(
-      { _id: req.params.itemId, roboId: req.params.id, empresaId: req.filaEmpresa },
+      { _id: req.params.itemId, roboId, empresaId: req.filaEmpresa },
       updates, { new: true }
     );
     if (!item) return res.status(404).json({ erro: 'Item não encontrado' });
@@ -2183,7 +2188,8 @@ app.patch('/api/robos/:id/fila/:itemId', filaAuth, async (req, res) => {
 // DELETE /api/robos/:id/fila/:itemId — remove item
 app.delete('/api/robos/:id/fila/:itemId', filaAuth, async (req, res) => {
   try {
-    await FilaItem.findOneAndDelete({ _id: req.params.itemId, roboId: req.params.id, empresaId: req.filaEmpresa });
+    const roboId = req.roboId || req.params.id;
+    await FilaItem.findOneAndDelete({ _id: req.params.itemId, roboId, empresaId: req.filaEmpresa });
     res.json({ ok: true });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });

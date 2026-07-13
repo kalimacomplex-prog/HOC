@@ -1068,11 +1068,6 @@
                 <div class="rdp-subsecao">Identificação</div>
                 <div class="form-row" style="margin-bottom:8px">
                   <div class="form-group" style="flex:2"><label>Nome *</label><input type="text" class="form-control" id="dpNome" placeholder="Ex: Validador Fiscal"></div>
-                  <div class="form-group">
-                    <label>Versão</label>
-                    <input type="text" class="form-control" id="dpVersao" placeholder="v1.0">
-                    <div id="dpVersaoHist" style="margin-top:6px;background:#f8fafc;border:1px solid #e8ecf3;border-radius:6px;padding:6px 8px;max-height:90px;overflow-y:auto"></div>
-                  </div>
                   <div class="form-group"><label>Tipo</label><select class="form-control" id="dpTipo"><option value="Background">Background (sem tela)</option><option value="Interface">Interface (com tela)</option></select></div>
                   <div class="form-group"><label>Prioridade</label><select class="form-control" id="dpPrioridade"><option value="Baixa">Baixa</option><option value="Media">Média</option><option value="Alta">Alta</option></select></div>
                   <div class="form-group"><label>Departamento</label><input type="text" class="form-control" id="dpDepartamento"></div>
@@ -1113,9 +1108,14 @@
                     <div class="form-group"><label>Branch</label><input type="text" class="form-control" id="dpGitBranch" value="main"></div>
                   </div>
                   <div id="dpCamposZip" class="form-row" style="display:none;margin-bottom:6px">
-                    <div class="form-group form-full"><label>Arquivo ZIP</label>
+                    <div class="form-group form-full">
+                      <label>Arquivo ZIP</label>
                       <input type="file" class="form-control" id="dpZipFile" accept=".zip">
                       <div id="dpZipAtual" style="font-size:11px;color:#718096;margin-top:3px"></div>
+                      <div style="margin-top:8px">
+                        <div style="font-size:10px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px">ZIPs aplicados</div>
+                        <div id="dpZipHistorico" style="background:#f8fafc;border:1px solid #e8ecf3;border-radius:6px;padding:6px 8px;max-height:100px;overflow-y:auto"></div>
+                      </div>
                     </div>
                   </div>
                   <div class="form-row" style="margin-bottom:4px">
@@ -7717,7 +7717,6 @@
     const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
 
     set('dpNome', r.nome);
-    set('dpVersao', r.versao);
     const dpTipo = document.getElementById('dpTipo'); if (dpTipo) dpTipo.value = r.tipo || 'Background';
     const dpPri  = document.getElementById('dpPrioridade'); if (dpPri) dpPri.value = r.prioridade || 'Baixa';
     set('dpDepartamento', r.departamento);
@@ -7767,25 +7766,23 @@
     set('dpSla', r.sla || 0);
     set('dpDescricao', r.descricao);
 
-    // Histórico de versões — placeholder com dados disponíveis
-    const histEl = document.getElementById('dpVersaoHist');
-    if (histEl) {
-      const criadoEm = r.criadoEm ? new Date(r.criadoEm).toLocaleString('pt-BR') : '—';
-      const atualEm  = r.atualizadoEm ? new Date(r.atualizadoEm).toLocaleString('pt-BR') : null;
-      const versaoAtual = r.versao || '—';
-      histEl.innerHTML = `
-        <div style="font-size:9px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Histórico de versões</div>
-        ${atualEm && atualEm !== criadoEm ? `
-        <div class="versao-hist-item">
-          <span style="font-weight:700;color:#2d1b69;min-width:36px">${versaoAtual}</span>
-          <span style="color:#4a5568;flex:1">Última atualização</span>
-          <span style="color:#a0aec0">${atualEm}</span>
-        </div>` : ''}
-        <div class="versao-hist-item">
-          <span style="font-weight:700;color:#718096;min-width:36px">${versaoAtual}</span>
-          <span style="color:#4a5568;flex:1">Criado</span>
-          <span style="color:#a0aec0">${criadoEm}</span>
-        </div>`;
+    // Histórico de ZIPs aplicados
+    const zipHistEl = document.getElementById('dpZipHistorico');
+    if (zipHistEl) {
+      const hist = r.zipHistorico || [];
+      if (hist.length === 0 && !r.zipPath) {
+        zipHistEl.innerHTML = '<div style="font-size:10px;color:#a0aec0">Nenhum ZIP aplicado ainda</div>';
+      } else {
+        const entries = hist.length > 0 ? hist : (r.zipPath ? [{ nome: r.zipPath, aplicadoEm: r.atualizadoEm || r.criadoEm }] : []);
+        zipHistEl.innerHTML = entries.slice().reverse().map((z, i) =>
+          `<div class="versao-hist-item">
+            <span style="font-size:10px">📦</span>
+            <span style="flex:1;color:#1e2a4a;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${z.nome||z}">${z.nome||z}</span>
+            ${i===0?'<span style="font-size:9px;background:#f0fff4;color:#276749;padding:1px 6px;border-radius:10px;font-weight:700;flex-shrink:0">atual</span>':''}
+            <span style="color:#a0aec0;font-size:10px;white-space:nowrap">${z.aplicadoEm ? new Date(z.aplicadoEm).toLocaleString('pt-BR') : '—'}</span>
+          </div>`
+        ).join('');
+      }
     }
   }
 
@@ -7847,7 +7844,7 @@
       diasSemana:       [...document.querySelectorAll('.dpDiaSemana:checked')].map(el => Number(el.value))
     };
     const body = {
-      nome: get('dpNome'), versao: get('dpVersao'), tipo: get('dpTipo'),
+      nome: get('dpNome'), tipo: get('dpTipo'),
       prioridade: get('dpPrioridade'), departamento: get('dpDepartamento'), tag: get('dpTag'),
       ambiente: get('dpAmbiente'), maquinaId: get('dpMaquina') || null,
       timeout: getN('dpTimeout') || 30, duracaoEstimada: getN('dpDuracaoEstimada') || 15,

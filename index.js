@@ -2384,10 +2384,13 @@ app.post('/api/robos/execucoes/:id/logs', async (req, res) => {
       const dur = exec?.iniciadoEm ? Math.round((Date.now() - new Date(exec.iniciadoEm).getTime()) / 1000) : 0;
       Object.assign(updates, { $set: { status: 'concluido', finalizadoEm: new Date(), duracao: dur } });
     }
-    if (status === 'error') Object.assign(updates, { $set: { status: 'erro', finalizadoEm: new Date() } });
+    // Só muda status para 'erro' se não estiver já 'interrompido' (evita sobrescrever)
+    if (status === 'error' && exec?.status !== 'interrompido') {
+      Object.assign(updates, { $set: { status: 'erro', finalizadoEm: new Date() } });
+    }
     await ExecucaoRobo.findByIdAndUpdate(req.params.id, updates);
     if (status === 'success') await Robot.findByIdAndUpdate(exec?.roboId, { $inc: { totalExecucoes: 1 } });
-    if (status === 'success' || status === 'error') {
+    if (status === 'success' || (status === 'error' && exec?.status !== 'interrompido')) {
       await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: -1 } });
     }
     res.json({ ok: true });
@@ -2493,7 +2496,7 @@ setInterval(async () => {
       if (maquina) await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
       const proxima = calcularProximaExec(robo.schedule);
       if (proxima) await Robot.findByIdAndUpdate(robo._id, { 'schedule.proximaExec': proxima });
-      else await Robot.findByIdAndUpdate(robo._id, { 'schedule.ativo': false });
+      else await Robot.findByIdAndUpdate(robo._id, { 'schedule.ativo': false }); // unico: desativa após disparar
     }
   } catch (e) { /* silent */ }
 }, 60000);
@@ -2508,7 +2511,7 @@ const uploadRobotZip = multer({
     destination: (req, file, cb) => cb(null, robotPackagesDir),
     filename: (req, file, cb) => cb(null, `${req.params.id}.zip`)
   }),
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
+  limits: { fileSize: 100 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.originalname.endsWith('.zip') || file.mimetype === 'application/zip') cb(null, true);
     else cb(new Error('Apenas arquivos .zip são aceitos'));

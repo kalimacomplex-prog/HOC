@@ -87,7 +87,8 @@ def check_interrupt(exec_id):
 
 
 def kill_proc(proc):
-    """Mata o processo e todos os filhos usando psutil; fecha stdout para desbloquear readline."""
+    """Mata o processo e todos os filhos; fecha stdout para desbloquear o reader."""
+    # 1. psutil: mata toda a árvore recursivamente
     try:
         import psutil
         parent = psutil.Process(proc.pid)
@@ -97,9 +98,20 @@ def kill_proc(proc):
         try: parent.kill()
         except Exception: pass
     except Exception:
-        try: proc.kill()
-        except Exception: pass
-    # Fecha o pipe para desbloquear qualquer readline em espera
+        pass
+    # 2. CTRL_BREAK_EVENT para o grupo de processos (Windows, funciona com CREATE_NEW_PROCESS_GROUP)
+    if sys.platform == 'win32':
+        try:
+            import signal as _sig
+            os.kill(proc.pid, _sig.CTRL_BREAK_EVENT)
+        except Exception:
+            pass
+    # 3. Fallback direto
+    try: proc.terminate()
+    except Exception: pass
+    try: proc.kill()
+    except Exception: pass
+    # 4. Fecha o pipe para desbloquear readline
     try: proc.stdout.close()
     except Exception: pass
 
@@ -285,7 +297,7 @@ def run_robot(exec_id, command, timeout_min=30, git_url=None, git_branch='main',
 
         if _killed_by[0] == 'interrupt':
             log('INFO', f"[{exec_id}] interrompido pelo SaaS")
-            post_log(exec_id, 'Execução interrompida pelo orquestrador.', 'error')
+            post_log(exec_id, 'Execução interrompida pelo orquestrador.', 'info')
             notify(f"HOC — {robo_nome}", "Execução interrompida.")
         elif _killed_by[0] == 'timeout':
             log('WARN', f"[{exec_id}] timeout após {timeout_min}min")

@@ -68,6 +68,10 @@
     .status-nao-iniciada { background: #f0f2f5; color: #718096; }
     .status-em-implementacao { background: #f5f0ff; color: #2d1b69; }
     .status-concluida { background: #f0fff4; color: #276749; }
+    .status-cancelada { background: #fff5f5; color: #c53030; }
+    .ideia-card.aprovada { cursor: default; }
+    .drawer-aviso-aprovada { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 7px; padding: 10px 14px; font-size: 12px; color: #276749; font-weight: 600; margin-bottom: 14px; display: none; }
+    .drawer-aviso-aprovada.visivel { display: flex; align-items: center; gap: 8px; }
     .btn-aprovar { padding: 4px 8px; background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
     .btn-dispensar { padding: 4px 8px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
     .btn-editar-card { padding: 4px 8px; background: #f5f0ff; color: #2d1b69; border: none; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
@@ -111,6 +115,25 @@
     .btn-rascunho { flex: 1; padding: 10px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
     .btn-enviar { flex: 2; padding: 10px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
     .btn-cancelar-drawer { padding: 10px 16px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-publicar { flex: 1; padding: 10px; background: #276749; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .badge-publicada { background: #e6f4ff; color: #0969da; }
+    .anexos-area { margin-top: 8px; }
+    .anexo-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #f8fafc; border-radius: 6px; margin-bottom: 4px; font-size: 12px; border: 1px solid #e2e8f0; }
+    .anexo-nome { flex: 1; color: #1e2a4a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: none; }
+    .anexo-nome:hover { text-decoration: underline; color: #2d1b69; }
+    .anexo-del { background: none; border: none; color: #c53030; cursor: pointer; font-size: 16px; padding: 0 4px; line-height: 1; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 2000; align-items: center; justify-content: center; }
+    .modal-overlay.aberto { display: flex; }
+    .modal-card { background: white; border-radius: 12px; padding: 24px; width: 420px; max-width: 95vw; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+    .modal-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
+    .modal-sub { font-size: 12px; color: #718096; margin-bottom: 16px; }
+    .modal-lista { flex: 1; overflow-y: auto; border: 1.5px solid #e2e8f0; border-radius: 8px; margin-bottom: 14px; max-height: 320px; }
+    .modal-user-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f2f5; transition: background 0.15s; }
+    .modal-user-item:last-child { border-bottom: none; }
+    .modal-user-item:hover { background: #f5f0ff; }
+    .modal-user-item.selecionado { background: #f5f0ff; outline: 2px solid #2d1b69; outline-offset: -2px; }
+    .modal-avatar { width: 32px; height: 32px; border-radius: 50%; background: #2d1b69; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+    .modal-footer { display: flex; gap: 8px; }
   </style>
 </head>
 <body>
@@ -179,11 +202,10 @@
     <div class="painel">
       <div class="painel-header">📊 Resumo</div>
       <div class="painel-content">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
           <div class="stat-box"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Total de Ideias</div></div>
           <div class="stat-box"><div class="stat-val" id="statImplementadas">0</div><div class="stat-lbl">Implementadas</div></div>
           <div class="stat-box"><div class="stat-val" id="statProgresso">0</div><div class="stat-lbl">Em Progresso</div></div>
-          <div class="stat-box"><div class="stat-val stat-saving" id="statSaving">—</div><div class="stat-lbl">Saving Total</div></div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
           <div style="background:#f8fafc;border-radius:8px;padding:12px">
@@ -195,7 +217,7 @@
             <div id="listaImplementadores"></div>
           </div>
           <div style="background:#f8fafc;border-radius:8px;padding:12px">
-            <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:10px">💰 Maior Saving</div>
+            <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:10px">💰 Maior Ganho Financeiro Mensal</div>
             <div id="listaSaving"></div>
           </div>
           <div style="background:#f8fafc;border-radius:8px;padding:12px">
@@ -216,14 +238,14 @@
 
     <div class="filtros-panel" id="filtrosPanel">
       <div class="filtros-grid">
-        <div class="filtro-group"><label>Categoria</label><select class="filtro-select" id="filtroCategoria"><option value="">Todas</option><option>Inovação</option><option>Sustentabilidade</option><option>Resolução de Problema</option><option>Segurança e Saúde</option><option>Poka Yoke - Prevenção</option><option>Poka Yoke - Detecção</option><option>Gestão de Riscos</option><option>Melhoria no HOC</option><option>Outros</option></select></div>
-        <div class="filtro-group"><label>Aprovação</label><select class="filtro-select" id="filtroAprovacao"><option value="">Todos</option><option>pendente</option><option>aprovada</option><option>dispensada</option><option>rascunho</option></select></div>
-        <div class="filtro-group"><label>Status</label><select class="filtro-select" id="filtroStatus"><option value="">Todos</option><option>Não Iniciada</option><option>Em Implementação</option><option>Concluída</option></select></div>
-        <div class="filtro-group"><label>Complexidade</label><select class="filtro-select" id="filtroComplexidade"><option value="">Todas</option><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
-        <div class="filtro-group"><label>Área</label><input type="text" id="filtroArea" class="filtro-select" placeholder="Ex: Comercial..."></div>
+        <div class="filtro-group"><label>Categoria</label><select class="filtro-select" id="filtroCategoria" onchange="filtrarIdeias()"><option value="">Todas</option><option>Inovação</option><option>Sustentabilidade</option><option>Resolução de Problema</option><option>Segurança e Saúde</option><option>Poka Yoke - Prevenção</option><option>Poka Yoke - Detecção</option><option>Gestão de Riscos</option><option>Melhoria no HOC</option><option>Outros</option></select></div>
+        <div class="filtro-group"><label>Nome da Ideia</label><input type="text" id="filtroNome" class="filtro-select" placeholder="Buscar por título..." oninput="filtrarIdeias()"></div>
+        <div class="filtro-group"><label>Aprovação</label><select class="filtro-select" id="filtroAprovacao" onchange="filtrarIdeias()"><option value="">Todos</option><option value="pendente">Pendente</option><option value="aprovada">Aprovada</option><option value="dispensada">Recusada</option><option value="rascunho">Rascunho</option></select></div>
+        <div class="filtro-group"><label>Status</label><select class="filtro-select" id="filtroStatus" onchange="filtrarIdeias()"><option value="">Todos</option><option>Não Iniciada</option><option>Em Implementação</option><option>Concluída</option><option>Cancelada</option></select></div>
+        <div class="filtro-group"><label>Complexidade</label><select class="filtro-select" id="filtroComplexidade" onchange="filtrarIdeias()"><option value="">Todas</option><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+        <div class="filtro-group"><label>Área</label><input type="text" id="filtroArea" class="filtro-select" placeholder="Ex: Comercial..." oninput="filtrarIdeias()"></div>
       </div>
       <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="btn-primary" onclick="filtrarIdeias()" style="font-size:12px;padding:7px 14px">Aplicar</button>
         <button class="btn-secondary" onclick="limparFiltros()" style="font-size:12px;padding:7px 14px">Limpar</button>
       </div>
     </div>
@@ -245,6 +267,7 @@
       <button class="btn-fechar" onclick="fecharDrawer()" style="font-size:20px;background:none;border:none;cursor:pointer;color:#a0aec0">×</button>
     </div>
     <div class="rascunho-aviso" id="rascunhoAviso">✓ Rascunho salvo</div>
+    <div class="drawer-aviso-aprovada" id="drawerAvisoAprovada">✅ Esta ideia está aprovada e não pode ser editada. Apenas o status de implementação pode ser alterado no card.</div>
     <div style="margin-bottom:16px">
       <div class="sec-titulo">Informações Básicas</div>
       <div class="form-group"><label>Título da Ideia *</label><input type="text" id="ideaTitulo" placeholder="Ex: Automação de Relatórios"></div>
@@ -277,14 +300,18 @@
         <button class="toolbar-btn" onclick="fmt('underline')"><u>U</u></button>
         <button class="toolbar-btn" onclick="fmt('insertUnorderedList')">• Lista</button>
         <button class="toolbar-btn" onclick="fmt('formatBlock','h3')">H3</button>
+        <button class="toolbar-btn" onclick="document.getElementById('ideaAnexoInput').click()" style="margin-left:auto;border:1px solid #e2e8f0">📎 Anexar</button>
       </div>
       <div class="editor-area" id="ideaDescricao" contenteditable="true"></div>
+      <input type="file" id="ideaAnexoInput" multiple accept=".pdf,.doc,.docx,.xlsx,.xls,.pptx,.png,.jpg,.jpeg,.zip,.txt" style="display:none" onchange="subirArquivos(this.files)">
+      <div class="anexos-area" id="anexosFormLista"></div>
     </div>
     <div style="margin-bottom:16px">
       <div class="sec-titulo">Classificação</div>
       <div class="form-grid">
-        <div class="form-group"><label>Ganho Estimado</label><input type="text" id="ideaGanho" placeholder="Ex: R$ 5.000/mês"></div>
+        <div class="form-group"><label>Ganho Financeiro</label><input type="text" id="ideaGanhoFin" placeholder="Ex: R$ 5.000"></div>
         <div class="form-group"><label>Período</label><select id="ideaPeriodo"><option value="">Selecione...</option><option>Dia</option><option>Mês</option><option>Semestre</option><option>Ano</option></select></div>
+        <div class="form-group full"><label>Outros Ganhos</label><input type="text" id="ideaOutrosGanhos" placeholder="Ex: Redução de retrabalho, melhora de qualidade"></div>
         <div class="form-group full"><label>Tags (separadas por vírgula)</label><input type="text" id="ideaTags" placeholder="Ex: automação, eficiência"></div>
       </div>
     </div>
@@ -292,7 +319,20 @@
     <div class="drawer-footer">
       <button class="btn-cancelar-drawer" onclick="fecharDrawer()">Cancelar</button>
       <button class="btn-rascunho" onclick="salvarIdeia('rascunho')">💾 Rascunho</button>
-      <button class="btn-enviar" onclick="salvarIdeia('pendente')">✓ Enviar para Aprovação</button>
+      <button class="btn-publicar" id="btnPublicarImediato" onclick="salvarIdeia('aprovada')" style="display:none">✅ Registrar como Aprovada</button>
+      <button class="btn-enviar" onclick="abrirModalNotif()">✓ Enviar para Aprovação</button>
+    </div>
+  </div>
+</div>
+<!-- Modal seleção de usuário para notificação -->
+<div class="modal-overlay" id="modalNotifOverlay">
+  <div class="modal-card">
+    <div class="modal-titulo">Enviar para Aprovação</div>
+    <div class="modal-sub">Selecione um membro para ser notificado sobre esta ideia (opcional)</div>
+    <div class="modal-lista" id="modalUserLista"></div>
+    <div class="modal-footer">
+      <button class="btn-cancelar-drawer" onclick="fecharModalNotif()" style="flex:1">Cancelar</button>
+      <button class="btn-enviar" onclick="confirmarEnvioAprovacao()" style="flex:2">Enviar para Aprovação</button>
     </div>
   </div>
 </div>
@@ -316,6 +356,11 @@
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
   const isAdmin = usuario.perfil === 'Admin';
   let ideias = [];
+  let podePublicar = isAdmin;
+  let podeAprovarIdeias = isAdmin;
+  let anexosForm = [];
+  let modalUserSelecionado = null;
+  let usuariosCache = [];
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
   const TIPOS_CLASSE = { 'Inovação':'tipo-inovacao','Sustentabilidade':'tipo-sustentabilidade','Resolução de Problema':'tipo-resolucao','Segurança e Saúde':'tipo-seguranca','Poka Yoke - Prevenção':'tipo-pokayoke-prev','Poka Yoke - Detecção':'tipo-pokayoke-det','Gestão de Riscos':'tipo-riscos','Melhoria no HOC':'tipo-melhoria','Outros':'tipo-outros' };
@@ -375,35 +420,38 @@
     document.getElementById('statImplementadas').textContent = pub.filter(i=>i.status==='Concluída').length;
     document.getElementById('statProgresso').textContent = pub.filter(i=>i.status==='Em Implementação').length;
 
-    const parseGanho = g => { if (!g) return 0; const n = parseFloat(g.replace(/[^\d,\.]/g,'').replace(',','.')); return isNaN(n) ? 0 : n; };
-    const savingTotal = pub.reduce((s,i) => s + parseGanho(i.ganho), 0);
-    document.getElementById('statSaving').textContent = savingTotal > 0 ? `R$ ${savingTotal.toLocaleString('pt-BR',{maximumFractionDigits:0})}` : '—';
+    const parseGanho = g => { if (!g) return 0; const n = parseFloat(String(g).replace(/[^\d,\.]/g,'').replace(',','.')); return isNaN(n) ? 0 : n; };
 
-    // Top 5 propositores
+    // Top 5 propositores — quem mais enviou ideia para aprovação
     const porProp = {};
     pub.forEach(i => { if (!i.responsavel) return; porProp[i.responsavel]=(porProp[i.responsavel]||0)+1; });
     miniLista('listaPropositores', Object.entries(porProp).sort((a,b)=>b[1]-a[1]).slice(0,5)
-      .map(([n]) => ({ nome:n, valor:'' })));
+      .map(([n,c]) => ({ nome:n, valor: c + (c===1?' ideia':' ideias') })));
 
-    // Top 5 implementadores (concluídas)
+    // Top 5 implementadores — quem mais teve ideia concluída
     const porImpl = {};
     pub.filter(i=>i.status==='Concluída').forEach(i => { if (!i.responsavel) return; porImpl[i.responsavel]=(porImpl[i.responsavel]||0)+1; });
     miniLista('listaImplementadores', Object.entries(porImpl).sort((a,b)=>b[1]-a[1]).slice(0,5)
-      .map(([n]) => ({ nome:n, valor:'' })));
+      .map(([n,c]) => ({ nome:n, valor: c + (c===1?' ideia':' ideias') })));
 
-    // Top 5 maior saving
-    const comSaving = pub.filter(i=>parseGanho(i.ganho)>0).sort((a,b)=>parseGanho(b.ganho)-parseGanho(a.ganho)).slice(0,5);
-    miniLista('listaSaving', comSaving.map(i => ({ nome:i.titulo, sub:i.responsavel||'—', valor:i.ganho })));
+    // Top 5 maior ganho financeiro mensal — ideias implementadas (Concluída), periodo=Mês, por pessoa
+    const porGanho = {};
+    pub.filter(i => i.status==='Concluída' && i.periodo==='Mês' && parseGanho(i.ganho) > 0).forEach(i => {
+      const nome = i.responsavel || '—';
+      porGanho[nome] = (porGanho[nome] || 0) + parseGanho(i.ganho);
+    });
+    miniLista('listaSaving', Object.entries(porGanho).sort((a,b)=>b[1]-a[1]).slice(0,5)
+      .map(([nome, total]) => ({ nome, valor: 'R$ ' + total.toLocaleString('pt-BR',{maximumFractionDigits:0}) })));
 
-    // Destaques (sem ranking, sem valor)
-    const destaques = ideias.filter(i=>i.destacada).sort((a,b)=>new Date(b.destacadaEm)-new Date(a.destacadaEm)).slice(0,5);
+    // 3 últimos destaques criados
+    const destaques = ideias.filter(i=>i.destacada).sort((a,b)=>new Date(b.destacadaEm)-new Date(a.destacadaEm)).slice(0,3);
     miniLista('listaDestaques', destaques.map(i => ({ nome:i.titulo, sub:i.responsavel||'—', valor:'' })), { rank: false });
 
-    // Top 3 categorias valorizadas (exceto Melhoria no HOC e Outros) — sem contagem
+    // Top 5 categorias mais presentes nas ideias enviadas para aprovação
     const porCat = {};
-    pub.filter(i=>i.tipo&&i.tipo!=='Melhoria no HOC'&&i.tipo!=='Outros').forEach(i => { porCat[i.tipo]=(porCat[i.tipo]||0)+1; });
-    const catTop = Object.entries(porCat).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([cat]) => ({ nome:cat, valor:'' }));
-    miniLista('listaCategorias', catTop);
+    pub.filter(i => i.tipo).forEach(i => { porCat[i.tipo]=(porCat[i.tipo]||0)+1; });
+    miniLista('listaCategorias', Object.entries(porCat).sort((a,b)=>b[1]-a[1]).slice(0,5)
+      .map(([cat,c]) => ({ nome:cat, valor: c + (c===1?' ideia':' ideias') })));
   }
 
   function tempoRelativo(d) {
@@ -426,19 +474,22 @@
     grid.innerHTML = filtradas.map(ideia => {
       const isRascunho = ideia.aprovacao === 'rascunho';
       if (isRascunho && ideia.autor !== usuario.nome) return '';
-      const badgeAprov = { pendente:'<span class="badge-aprovacao badge-pendente">Pendente</span>', aprovada:'<span class="badge-aprovacao badge-aprovado">Aprovada</span>', dispensada:'<span class="badge-aprovacao badge-dispensado">Dispensada</span>', rascunho:'<span class="badge-aprovacao badge-rascunho">Rascunho</span>' }[ideia.aprovacao]||'';
-      const statusCls = { 'Não Iniciada':'status-nao-iniciada','Em Implementação':'status-em-implementacao','Concluída':'status-concluida' }[ideia.status]||'status-nao-iniciada';
+      const badgeAprov = { pendente:'<span class="badge-aprovacao badge-pendente">Pendente</span>', aprovada:'<span class="badge-aprovacao badge-aprovado">Aprovada</span>', dispensada:'<span class="badge-aprovacao badge-dispensado">Recusada</span>', rascunho:'<span class="badge-aprovacao badge-rascunho">Rascunho</span>' }[ideia.aprovacao]||'';
+      const isAprovada = ideia.aprovacao === 'aprovada';
+      const statusCls = { 'Não Iniciada':'status-nao-iniciada','Em Implementação':'status-em-implementacao','Concluída':'status-concluida','Cancelada':'status-cancelada' }[ideia.status]||'status-nao-iniciada';
       const tags = ideia.tags ? ideia.tags.split(',').map(t=>`<span class="tag">${t.trim()}</span>`).join('') : '';
-      const btnAprovar = (isAdmin && ideia.aprovacao==='pendente') ? `<button class="btn-aprovar" onclick="aprovar('${ideia._id}',event)">✓ Aprovar</button><button class="btn-dispensar" onclick="dispensar('${ideia._id}',event)">✕</button>` : '';
+      const btnAprovar = (podeAprovarIdeias && ideia.aprovacao==='pendente') ? `<button class="btn-aprovar" onclick="aprovar('${ideia._id}',event)">✓ Aprovar</button><button class="btn-dispensar" onclick="dispensar('${ideia._id}',event)">✕</button>` : '';
+      const btnEditar = isAprovada ? '' : `<button class="btn-editar-card" onclick="editarIdeia('${ideia._id}',event)">✏️</button>`;
       return `
-        <div class="ideia-card ${isRascunho?'rascunho':''}" onclick="editarIdeia('${ideia._id}')">
-          <div class="ideia-card-top"><div class="ideia-badges">${ideia.tipo?`<span class="badge-tipo ${TIPOS_CLASSE[ideia.tipo]||'tipo-outros'}">${ideia.tipo}</span>`:''} ${badgeAprov}</div></div>
+        <div class="ideia-card ${isRascunho?'rascunho':''} ${isAprovada?'aprovada':''}" onclick="${isAprovada?'':'editarIdeia(\''+ideia._id+'\')'}">
+          <div class="ideia-card-top"><div class="ideia-badges">${ideia.tipo?`<span class="badge-tipo ${TIPOS_CLASSE[ideia.tipo]||'tipo-outros'}">${ideia.tipo}</span>`:''}</div>${badgeAprov}</div>
           <div class="ideia-titulo">${ideia.titulo}</div>
           <div class="ideia-desc">${ideia.descricao?ideia.descricao.replace(/<[^>]*>/g,''):'—'}</div>
           <div class="ideia-meta">
             ${ideia.responsavel?`<span class="ideia-meta-item">👤 ${ideia.responsavel}</span>`:''}
             ${ideia.data?`<span class="ideia-meta-item">📅 ${tempoRelativo(ideia.data)}</span>`:''}
             ${ideia.ganho?`<span class="ideia-meta-item">💰 ${ideia.ganho}${ideia.periodo?'/'+ideia.periodo.toLowerCase():''}</span>`:''}
+            ${ideia.outrosGanhos?`<span class="ideia-meta-item">✨ ${ideia.outrosGanhos}</span>`:''}
             ${ideia.complexidade?`<span class="ideia-meta-item">🎯 ${ideia.complexidade}</span>`:''}
           </div>
           ${tags?`<div class="tags-lista">${tags}</div>`:''}
@@ -449,8 +500,9 @@
                 <option ${ideia.status==='Não Iniciada'?'selected':''}>Não Iniciada</option>
                 <option ${ideia.status==='Em Implementação'?'selected':''}>Em Implementação</option>
                 <option ${ideia.status==='Concluída'?'selected':''}>Concluída</option>
+                <option ${ideia.status==='Cancelada'?'selected':''}>Cancelada</option>
               </select>
-              <button class="btn-editar-card" onclick="editarIdeia('${ideia._id}',event)">✏️</button>
+              ${btnEditar}
               <button class="btn-deletar-card" onclick="deletarIdeia('${ideia._id}',event)">🗑️</button>
               <button onclick="toggleDestaque('${ideia._id}',event)" style="padding:4px 8px;border:none;border-radius:4px;font-size:13px;cursor:pointer;background:${ideia.destacada?'#fffbeb':'#f0f2f5'}" title="${ideia.destacada?'Remover destaque':'Destacar ideia'}">${ideia.destacada?'⭐':'☆'}</button>
               ${btnAprovar}
@@ -467,6 +519,7 @@
     const status = document.getElementById('filtroStatus').value;
     const complex = document.getElementById('filtroComplexidade').value;
     const area = document.getElementById('filtroArea').value.toLowerCase();
+    const nome = document.getElementById('filtroNome').value.toLowerCase().trim();
     return ideias.filter(i => {
       if (i.aprovacao==='rascunho'&&i.autor!==usuario.nome) return false;
       if (cat&&i.tipo!==cat) return false;
@@ -474,6 +527,7 @@
       if (status&&i.status!==status) return false;
       if (complex&&i.complexidade!==complex) return false;
       if (area&&!(i.area||'').toLowerCase().includes(area)) return false;
+      if (nome&&!(i.titulo||'').toLowerCase().includes(nome)) return false;
       return true;
     });
   }
@@ -483,30 +537,45 @@
     const ideia = ideias.find(i => i._id === id);
     if (!ideia) return;
     if (ideia.destacada) {
-      await atualizarIdeia(id, { destacada: false, destacadaEm: null });
       ideia.destacada = false; ideia.destacadaEm = null;
+      renderIdeias();
+      await atualizarIdeia(id, { ...ideia });
     } else {
       const ativos = ideias.filter(i => i.destacada);
       if (ativos.length >= 5) {
         const oldest = ativos.reduce((a,b) => new Date(a.destacadaEm) < new Date(b.destacadaEm) ? a : b);
-        await atualizarIdeia(oldest._id, { destacada: false, destacadaEm: null });
         oldest.destacada = false; oldest.destacadaEm = null;
+        await atualizarIdeia(oldest._id, { ...oldest });
       }
       const agora = new Date().toISOString();
-      await atualizarIdeia(id, { destacada: true, destacadaEm: agora });
       ideia.destacada = true; ideia.destacadaEm = agora;
+      renderIdeias();
+      await atualizarIdeia(id, { ...ideia });
     }
-    renderIdeias();
   }
 
   function filtrarIdeias() { renderIdeias(); }
-  function limparFiltros() { ['filtroCategoria','filtroAprovacao','filtroStatus','filtroComplexidade','filtroArea'].forEach(id=>document.getElementById(id).value=''); renderIdeias(); }
+  function limparFiltros() { ['filtroCategoria','filtroAprovacao','filtroStatus','filtroComplexidade','filtroArea','filtroNome'].forEach(id=>document.getElementById(id).value=''); renderIdeias(); }
   function toggleFiltros() { document.getElementById('filtrosPanel').classList.toggle('aberto'); }
 
   function abrirDrawer(id) {
     document.getElementById('ideaEditId').value = id||'';
-    document.getElementById('drawerTitulo').textContent = id ? 'Editar Ideia' : 'Nova Ideia de Melhoria';
     document.getElementById('rascunhoAviso').classList.remove('visivel');
+    document.getElementById('drawerAvisoAprovada').classList.remove('visivel');
+    const soLeitura = id && ideias.find(i=>i._id===id)?.aprovacao === 'aprovada';
+    document.getElementById('drawerTitulo').textContent = soLeitura ? 'Visualizar Ideia' : (id ? 'Editar Ideia' : 'Nova Ideia de Melhoria');
+    document.querySelector('.drawer-footer').style.display = soLeitura ? 'none' : '';
+    if (soLeitura) document.getElementById('drawerAvisoAprovada').classList.add('visivel');
+    const setReadOnly = (disabled) => {
+      ['ideaTitulo','ideaResponsavel','ideaArea','ideaData','ideaComplexidade','ideaGanhoFin','ideaOutrosGanhos','ideaPeriodo','ideaTags'].forEach(fid => {
+        const el = document.getElementById(fid);
+        if (disabled) el.setAttribute('disabled',''); else el.removeAttribute('disabled');
+      });
+      document.getElementById('ideaDescricao').contentEditable = disabled ? 'false' : 'true';
+      document.querySelectorAll('.tipo-option').forEach(el => { el.style.pointerEvents = disabled ? 'none' : ''; });
+      document.getElementById('ideaAnexoInput').disabled = disabled;
+      document.querySelector('.toolbar-btn[onclick*="ideaAnexoInput"]').style.display = disabled ? 'none' : '';
+    };
     if (id) {
       const ideia = ideias.find(i=>i._id===id);
       if (ideia) {
@@ -516,20 +585,25 @@
         document.getElementById('ideaData').value = ideia.data||'';
         document.getElementById('ideaComplexidade').value = ideia.complexidade||'';
         document.getElementById('ideaDescricao').innerHTML = ideia.descricao||'';
-        document.getElementById('ideaGanho').value = ideia.ganho||'';
+        document.getElementById('ideaGanhoFin').value = ideia.ganho||'';
+        document.getElementById('ideaOutrosGanhos').value = ideia.outrosGanhos||'';
         document.getElementById('ideaPeriodo').value = ideia.periodo||'';
         document.getElementById('ideaTags').value = ideia.tags||'';
         document.querySelectorAll('.tipo-option').forEach(el => { el.classList.remove('selecionado'); if (el.querySelector('input').value===ideia.tipo) el.classList.add('selecionado'); });
+        anexosForm = [...(ideia.anexos || [])];
       }
     } else {
-      ['ideaTitulo','ideaArea','ideaGanho','ideaTags'].forEach(id=>{ document.getElementById(id).value=''; });
+      ['ideaTitulo','ideaArea','ideaGanhoFin','ideaOutrosGanhos','ideaTags'].forEach(fid=>{ document.getElementById(fid).value=''; });
       document.getElementById('ideaDescricao').innerHTML='';
       document.getElementById('ideaResponsavel').value = usuario.nome||'';
       document.getElementById('ideaData').value = new Date().toISOString().split('T')[0];
       document.getElementById('ideaComplexidade').value = '';
       document.getElementById('ideaPeriodo').value = '';
-      document.querySelectorAll('.tipo-option').forEach(el=>el.classList.remove('selecionado'));
+      document.querySelectorAll('.tipo-option').forEach(el=>{ el.classList.remove('selecionado'); el.querySelector('input').checked=false; });
+      anexosForm = [];
     }
+    setReadOnly(soLeitura);
+    renderAnexosForm();
     document.getElementById('drawerOverlay').classList.add('aberto');
   }
 
@@ -537,11 +611,12 @@
   function fecharDrawerFora(e) { if (e.target===document.getElementById('drawerOverlay')) fecharDrawer(); }
   function selecionarTipo(el, val) { document.querySelectorAll('.tipo-option').forEach(o=>o.classList.remove('selecionado')); el.classList.add('selecionado'); }
 
-  async function salvarIdeia(modo) {
+  async function salvarIdeia(modo, notificarUserId) {
     const titulo = document.getElementById('ideaTitulo').value.trim();
     if (!titulo) { alert('Título é obrigatório.'); return; }
     const tipoSel = document.querySelector('.tipo-option.selecionado input');
     const id = document.getElementById('ideaEditId').value;
+    const aprovacaoFinal = modo === 'rascunho' ? 'rascunho' : modo === 'aprovada' ? 'aprovada' : 'pendente';
     const dados = {
       titulo, tipo: tipoSel?tipoSel.value:'',
       responsavel: document.getElementById('ideaResponsavel').value.trim(),
@@ -549,26 +624,46 @@
       data: document.getElementById('ideaData').value,
       complexidade: document.getElementById('ideaComplexidade').value,
       descricao: document.getElementById('ideaDescricao').innerHTML,
-      ganho: document.getElementById('ideaGanho').value.trim(),
+      ganho: document.getElementById('ideaGanhoFin').value.trim(),
+      outrosGanhos: document.getElementById('ideaOutrosGanhos').value.trim(),
       periodo: document.getElementById('ideaPeriodo').value,
       tags: document.getElementById('ideaTags').value.trim(),
-      aprovacao: modo==='rascunho'?'rascunho':'pendente',
+      aprovacao: aprovacaoFinal,
       status: 'Não Iniciada',
-      autor: usuario.nome
+      autor: usuario.nome,
+      anexos: [...anexosForm]
     };
     try {
       if (id) {
         const ideia = ideias.find(i=>i._id===id);
         if (ideia) {
           dados.status = ideia.status;
-          dados.aprovacao = modo==='rascunho'?'rascunho':ideia.aprovacao==='rascunho'?'pendente':ideia.aprovacao;
+          if (modo === 'rascunho') dados.aprovacao = 'rascunho';
+          else if (modo === 'aprovada') dados.aprovacao = 'aprovada';
+          else dados.aprovacao = ideia.aprovacao === 'rascunho' ? 'pendente' : ideia.aprovacao;
+          dados.destacada = ideia.destacada || false;
+          dados.destacadaEm = ideia.destacadaEm || null;
         }
         await atualizarIdeia(id, dados);
       } else {
         await criarIdeia(dados);
       }
-      if (modo==='rascunho') { document.getElementById('rascunhoAviso').classList.add('visivel'); setTimeout(()=>document.getElementById('rascunhoAviso').classList.remove('visivel'),2000); }
-      else fecharDrawer();
+      if (modo === 'rascunho') {
+        document.getElementById('rascunhoAviso').classList.add('visivel');
+        setTimeout(()=>document.getElementById('rascunhoAviso').classList.remove('visivel'), 2000);
+      } else {
+        fecharDrawer();
+      }
+      if (notificarUserId) {
+        try {
+          await fetch('/api/notificacoes', { method: 'POST', headers: HEADERS, body: JSON.stringify({
+            titulo: `💡 Nova ideia para revisar: ${titulo}`,
+            mensagem: `${usuario.nome} enviou uma ideia para sua aprovação.`,
+            tipo: 'info', icone: '💡', link: '/ideias-livres',
+            destinatario: notificarUserId
+          })});
+        } catch(e) {}
+      }
       await carregarIdeias();
     } catch(err) { console.error(err); alert('Erro ao salvar ideia.'); }
   }
@@ -584,26 +679,119 @@
 
   async function aprovar(id, e) {
     if (e) e.stopPropagation();
-    await atualizarIdeia(id, { aprovacao: 'aprovada' });
-    await carregarIdeias();
+    const ideia = ideias.find(i => i._id === id);
+    if (!ideia) return;
+    ideia.aprovacao = 'aprovada';
+    renderIdeias();
+    await atualizarIdeia(id, { ...ideia });
   }
 
   async function dispensar(id, e) {
     if (e) e.stopPropagation();
-    await atualizarIdeia(id, { aprovacao: 'dispensada' });
-    await carregarIdeias();
+    const ideia = ideias.find(i => i._id === id);
+    if (!ideia) return;
+    ideia.aprovacao = 'dispensada';
+    renderIdeias();
+    await atualizarIdeia(id, { ...ideia });
   }
 
   async function mudarStatus(id, status, e) {
     if (e) e.stopPropagation();
-    await atualizarIdeia(id, { status });
-    await carregarIdeias();
+    const ideia = ideias.find(i => i._id === id);
+    if (!ideia) return;
+    ideia.status = status;
+    renderIdeias();
+    await atualizarIdeia(id, { ...ideia });
   }
 
   function fmt(cmd, val) { document.execCommand(cmd,false,val||null); document.getElementById('ideaDescricao').focus(); }
+
+  function renderAnexosForm() {
+    const el = document.getElementById('anexosFormLista');
+    if (!anexosForm.length) { el.innerHTML = ''; return; }
+    const icone = nome => nome.match(/\.pdf$/i)?'📄':nome.match(/\.(doc|docx)$/i)?'📝':nome.match(/\.(xls|xlsx)$/i)?'📊':nome.match(/\.(ppt|pptx)$/i)?'📑':nome.match(/\.(png|jpg|jpeg|gif)$/i)?'🖼️':'📎';
+    el.innerHTML = anexosForm.map((a, i) => `
+      <div class="anexo-item">
+        <span style="font-size:15px">${icone(a.nome)}</span>
+        <a class="anexo-nome" href="${a.url}" target="_blank" title="${a.nome}">${a.nome}</a>
+        <button class="anexo-del" onclick="removerAnexo(${i})" title="Remover">×</button>
+      </div>`).join('');
+  }
+
+  function removerAnexo(i) { anexosForm.splice(i, 1); renderAnexosForm(); }
+
+  async function subirArquivos(files) {
+    for (const file of files) {
+      const fd = new FormData();
+      fd.append('arquivo', file);
+      try {
+        const res = await fetch('/api/uploads', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: fd });
+        if (res.ok) {
+          const d = await res.json();
+          anexosForm.push({ url: d.url, nome: d.nomeOriginal, tamanho: d.tamanho });
+          renderAnexosForm();
+        }
+      } catch(e) { console.error('Erro no upload:', e); }
+    }
+    document.getElementById('ideaAnexoInput').value = '';
+  }
+
+  function abrirModalNotif() {
+    if (!document.getElementById('ideaTitulo').value.trim()) { alert('Título é obrigatório.'); return; }
+    modalUserSelecionado = null;
+    document.getElementById('modalNotifOverlay').classList.add('aberto');
+    carregarUsuariosModal();
+  }
+
+  function fecharModalNotif() { document.getElementById('modalNotifOverlay').classList.remove('aberto'); }
+
+  async function carregarUsuariosModal() {
+    const lista = document.getElementById('modalUserLista');
+    lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Carregando...</div>';
+    try {
+      if (!usuariosCache.length) {
+        const res = await fetch('/api/usuarios', { headers: HEADERS });
+        usuariosCache = await res.json();
+      }
+      const outros = usuariosCache.filter(u => u._id !== (usuario.id || usuario._id));
+      if (!outros.length) { lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Nenhum outro usuário encontrado.</div>'; return; }
+      lista.innerHTML = outros.map(u => `
+        <div class="modal-user-item" onclick="selecionarUserModal('${u._id}', this)">
+          <div class="modal-avatar">${(u.nome||'?')[0].toUpperCase()}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#1e2a4a">${u.nome}</div>
+            <div style="font-size:11px;color:#718096">${u.email||''}</div>
+          </div>
+        </div>`).join('');
+    } catch(e) { lista.innerHTML = '<div style="padding:12px;color:#c53030;font-size:12px">Erro ao carregar usuários.</div>'; }
+  }
+
+  function selecionarUserModal(id, el) {
+    document.querySelectorAll('.modal-user-item').forEach(i => i.classList.remove('selecionado'));
+    el.classList.add('selecionado');
+    modalUserSelecionado = id;
+  }
+
+  async function confirmarEnvioAprovacao() {
+    if (!modalUserSelecionado) { alert('Selecione um usuário para notificar antes de enviar.'); return; }
+    fecharModalNotif();
+    await salvarIdeia('pendente', modalUserSelecionado);
+  }
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href='/'; }
 
   carregarIdeias();
+
+  (async () => {
+    try {
+      const r = await fetch('/api/usuarios/minhas-permissoes', { headers: HEADERS });
+      if (r.ok) {
+        const p = await r.json();
+        podePublicar = p.isAdmin || !!(p.permissoes?.ideiasLivres?.aprovar);
+        podeAprovarIdeias = p.isAdmin || !!(p.permissoes?.ideiasLivres?.aprovar);
+        if (podePublicar) document.getElementById('btnPublicarImediato').style.display = '';
+      }
+    } catch(e) {}
+  })();
 
   function fecharBanner() {
     const banner = document.getElementById('bannerAssinatura');

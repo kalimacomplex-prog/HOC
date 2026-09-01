@@ -39,7 +39,7 @@ if errorlevel 1 (
 
 :: Instala dependencias
 echo  Instalando dependencias...
-python -m pip install requests psutil
+python -m pip install requests psutil pystray pillow
 if errorlevel 1 (
     echo.
     echo  ERRO ao instalar dependencias. Verifique sua conexao com a internet.
@@ -47,6 +47,9 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
+
+:: Encerra instancias antigas do Agent (evita processos duplicados disputando comandos)
+wmic process where "CommandLine like '%%agent.py%%' and not CommandLine like '%%wmic%%'" call terminate >nul 2>&1
 
 echo.
 echo  Iniciando HOC Agent...

@@ -25,11 +25,8 @@
     .sub-amarelo { color: #c05621; }
     .sub-vermelho { color: #c53030; }
 
-    .lic-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-    .lic-search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; padding: 6px 14px; }
-    .lic-search input { border: none; outline: none; font-size: 13px; color: #1e2a4a; width: 100%; font-family: inherit; }
-    .lic-search svg { width: 14px; height: 14px; color: #a0aec0; flex-shrink: 0; }
-    .btn-mais-filtros { padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; color: #4a5568; display: flex; align-items: center; gap: 5px; }
+    .lic-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; justify-content: flex-end; }
+    .btn-mais-filtros { padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: #4a5568; }
     .btn-mais-filtros:hover { border-color: #2d1b69; color: #2d1b69; }
 
     .filtros-avancados { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; display: none; }
@@ -57,6 +54,7 @@
     .status-vencendo { background: #fffaf0; color: #c05621; }
     .status-vencida { background: #fff5f5; color: #c53030; }
     .status-renovacao { background: #ebf0ff; color: #3b5bdb; }
+    .status-em-breve { background: #f3f0ff; color: #7048e8; }
 
     .pen-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; }
     .pen-financeira { background: #fffaf0; color: #c05621; }
@@ -85,6 +83,10 @@
     .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; color: #1e2a4a; background: white; }
     .form-control:focus { border-color: #2d1b69; }
     .form-full { grid-column: 1 / -1; }
+    .renov-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 14px; }
+    .renov-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 7px; margin-bottom: 6px; border: 1px solid #e2e8f0; }
+    .renov-item-datas { font-size: 12px; font-weight: 700; color: #1e2a4a; }
+    .renov-item-meta { font-size: 11px; color: #718096; margin-top: 2px; }
 
     /* Upload */
     .upload-area { border: 2px dashed #e2e8f0; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; background: #f8fafc; }
@@ -211,27 +213,41 @@
     <!-- VISTA TABELA -->
     <div id="vistaTabela">
       <div class="lic-toolbar">
-        <div class="lic-search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchLic" placeholder="Buscar licença..." oninput="filtrarLicencas()">
-        </div>
-        <button class="btn-mais-filtros" onclick="toggleFiltros()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-          Mais Filtros
-        </button>
+        <button class="btn-mais-filtros" onclick="toggleFiltros()">⚙️ Filtros</button>
       </div>
 
       <div class="filtros-avancados" id="filtrosAvancados">
         <div class="filtros-grid">
+          <div class="filtro-group"><label>Nome da Licença</label><input type="text" class="filtro-input" id="fNome" placeholder="Ex: Office 365" oninput="filtrarLicencas()"></div>
           <div class="filtro-group"><label>Categoria</label><select class="filtro-input" id="fCategoria" onchange="filtrarLicencas()"><option value="">Todas</option><option>Software</option><option>SaaS</option><option>Cloud</option><option>Hardware</option><option>Serviço</option><option>Outros</option></select></div>
-          <div class="filtro-group"><label>Status</label><select class="filtro-input" id="fStatus" onchange="filtrarLicencas()"><option value="">Todos</option><option>Ativa</option><option>Vencendo</option><option>Vencida</option><option>Em Renovação</option></select></div>
+          <div class="filtro-group"><label>Status</label><select class="filtro-input" id="fStatus" onchange="filtrarLicencas()"><option value="">Todos</option><option>Ativa</option><option>Ativa em Breve</option><option>Vencendo</option><option>Vencida</option><option>Em Renovação</option></select></div>
           <div class="filtro-group"><label>Penalidade</label><select class="filtro-input" id="fPenalidade" onchange="filtrarLicencas()"><option value="">Todas</option><option>Financeira</option><option>Reputacional</option><option>Jurídica</option><option>Operacional</option><option>Comercial</option></select></div>
           <div class="filtro-group"><label>Fornecedor</label><input type="text" class="filtro-input" id="fFornecedor" placeholder="Ex: Microsoft" oninput="filtrarLicencas()"></div>
           <div class="filtro-group"><label>Unidade / Filial</label><input type="text" class="filtro-input" id="fUnidade" placeholder="Ex: Matriz" oninput="filtrarLicencas()"></div>
           <div class="filtro-group"><label>Responsável</label><input type="text" class="filtro-input" id="fResponsavel" placeholder="Ex: João" oninput="filtrarLicencas()"></div>
         </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f2f5">
+          <div style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">Range de Custo</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+            <div class="filtro-group">
+              <label>Custo Unitário — De</label>
+              <input type="number" class="filtro-input" id="fCustoUnitMin" placeholder="R$ mínimo" min="0" step="0.01" oninput="filtrarLicencas()">
+            </div>
+            <div class="filtro-group">
+              <label>Custo Unitário — Até</label>
+              <input type="number" class="filtro-input" id="fCustoUnitMax" placeholder="R$ máximo" min="0" step="0.01" oninput="filtrarLicencas()">
+            </div>
+            <div class="filtro-group">
+              <label>Custo Total — De</label>
+              <input type="number" class="filtro-input" id="fCustoTotMin" placeholder="R$ mínimo" min="0" step="0.01" oninput="filtrarLicencas()">
+            </div>
+            <div class="filtro-group">
+              <label>Custo Total — Até</label>
+              <input type="number" class="filtro-input" id="fCustoTotMax" placeholder="R$ máximo" min="0" step="0.01" oninput="filtrarLicencas()">
+            </div>
+          </div>
+        </div>
         <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn-primary" onclick="filtrarLicencas()" style="font-size:12px;padding:6px 14px">Aplicar</button>
           <button class="btn-secondary" onclick="limparFiltros()" style="font-size:12px;padding:6px 14px">Limpar</button>
         </div>
       </div>
@@ -300,7 +316,7 @@
         </div>
         <div class="form-group"><label>Penalidade</label>
           <select class="form-control" id="licPenalidade">
-            <option value="">Selecione...</option><option>Financeira</option><option>Reputacional</option><option>Jurídica</option><option>Operacional</option><option>Comercial</option>
+            <option value="">Selecione...</option><option>Financeira</option><option>Reputacional</option><option>Jurídica</option><option>Operacional</option><option>Comercial</option><option>Outros</option>
           </select>
         </div>
       </div>
@@ -323,6 +339,16 @@
         <div style="font-size:11px;color:#a0aec0;margin-top:3px">PDF, DOC, DOCX, PNG, JPG — máx 5MB por arquivo</div>
       </div>
       <div class="upload-lista" id="uploadLista"></div>
+    </div>
+
+    <div class="form-sec" id="secRenovacoes" style="display:none">
+      <div class="form-sec-titulo">Registrar Renovação</div>
+      <div class="renov-form">
+        <div class="form-group"><label>Data de Início</label><input type="date" class="form-control" id="renInicio"></div>
+        <div class="form-group"><label>Data de Fim</label><input type="date" class="form-control" id="renFim"></div>
+        <button class="btn-confirmar" onclick="registrarRenovacao()" style="padding:8px 16px;font-size:12px;white-space:nowrap">+ Registrar</button>
+      </div>
+      <div id="historicoRenovacoes"></div>
     </div>
 
     <input type="hidden" id="licEditId">
@@ -401,11 +427,31 @@
     return `<span class="val-ok">${fmtData(validade)}</span>`;
   }
 
-  const STATUS_CLASS = { 'Ativa':'status-ativa', 'Vencendo':'status-vencendo', 'Vencida':'status-vencida', 'Em Renovação':'status-renovacao' };
-  const STATUS_ICON = { 'Ativa':'🟢', 'Vencendo':'🟡', 'Vencida':'🔴', 'Em Renovação':'🔄' };
+  const STATUS_CLASS = { 'Ativa':'status-ativa', 'Vencendo':'status-vencendo', 'Vencida':'status-vencida', 'Em Renovação':'status-renovacao', 'Ativa em Breve':'status-em-breve' };
+  const STATUS_ICON = { 'Ativa':'🟢', 'Vencendo':'🟡', 'Vencida':'🔴', 'Em Renovação':'🔄', 'Ativa em Breve':'🕐' };
   const PEN_CLASS = { 'Financeira':'pen-financeira', 'Reputacional':'pen-reputacional', 'Jurídica':'pen-juridica', 'Operacional':'pen-operacional', 'Comercial':'pen-comercial' };
   const PEN_ICON = { 'Financeira':'💰', 'Reputacional':'👁️', 'Jurídica':'⚖️', 'Operacional':'⚙️', 'Comercial':'🤝' };
   const CAT_ICON = { 'Software':'💻', 'SaaS':'📦', 'Cloud':'☁️', 'Hardware':'🖥️', 'Serviço':'🔧', 'Outros':'📄' };
+
+  // ===== RENOVAÇÃO STATUS HELPERS =====
+  function getUltimaRenovacao(l) {
+    if (!l.renovacoes || !l.renovacoes.length) return null;
+    return l.renovacoes.reduce((a, b) => new Date(a.registradoEm) > new Date(b.registradoEm) ? a : b);
+  }
+  function getStatusEfetivo(l) {
+    const ren = getUltimaRenovacao(l);
+    if (!ren) return l.status || 'Ativa';
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const inicio = new Date(ren.inicio + 'T12:00:00');
+    const fim = new Date(ren.fim + 'T12:00:00');
+    if (inicio > hoje) return 'Ativa em Breve';
+    if (fim >= hoje) return 'Ativa';
+    return 'Vencida';
+  }
+  function getValidadeEfetiva(l) {
+    const ren = getUltimaRenovacao(l);
+    return ren ? ren.fim : (l.validade || null);
+  }
 
   // ===== API =====
   async function carregarLicencas() {
@@ -444,9 +490,9 @@
   // ===== RESUMO =====
   function renderResumo() {
     const total = licencas.length;
-    const ativas = licencas.filter(l => l.status === 'Ativa').length;
-    const vencendo = licencas.filter(l => { const d = diasParaVencer(l.validade); return d !== null && d >= 0 && d <= 30 && l.status !== 'Vencida'; }).length;
-    const vencidas = licencas.filter(l => l.status === 'Vencida' || (diasParaVencer(l.validade) !== null && diasParaVencer(l.validade) < 0)).length;
+    const ativas = licencas.filter(l => getStatusEfetivo(l) === 'Ativa').length;
+    const vencendo = licencas.filter(l => { const d = diasParaVencer(getValidadeEfetiva(l)); return d !== null && d >= 0 && d <= 30 && getStatusEfetivo(l) !== 'Vencida'; }).length;
+    const vencidas = licencas.filter(l => { const s = getStatusEfetivo(l); const d = diasParaVencer(getValidadeEfetiva(l)); return s === 'Vencida' || (d !== null && d < 0); }).length;
     const custoMensal = licencas.reduce((s, l) => s + getCustoMensal(l), 0);
     document.getElementById('resTotal').textContent = total;
     document.getElementById('resAtivas').textContent = ativas;
@@ -471,12 +517,12 @@
         <td><span class="lic-cat">${CAT_ICON[l.categoria]||'📄'} ${l.categoria||'—'}</span></td>
         <td>${l.fornecedor||'—'}</td>
         <td>${l.quantidade||'—'}</td>
-        <td>${fmtValidade(l.validade, l.status)}</td>
+        <td>${fmtValidade(getValidadeEfetiva(l), getStatusEfetivo(l))}</td>
         <td>${custoUnit ? fmtMoeda(custoUnit) : '—'}</td>
         <td>${custoTotal ? fmtMoeda(custoTotal) : '—'}</td>
         <td>${freq||'—'}</td>
         <td>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${PEN_ICON[l.penalidade]||''} ${l.penalidade}</span>` : '—'}</td>
-        <td><span class="status-badge ${STATUS_CLASS[l.status]||'status-ativa'}">${STATUS_ICON[l.status]||''} ${l.status||'Ativa'}</span></td>
+        <td><span class="status-badge ${STATUS_CLASS[getStatusEfetivo(l)]||'status-ativa'}">${STATUS_ICON[getStatusEfetivo(l)]||''} ${getStatusEfetivo(l)}</span></td>
         <td><button class="btn-acao btn-acao-det" onclick="verDetalhes('${l._id}')" title="Ver detalhes">👁️</button></td>
         <td style="display:flex;gap:4px">
           <button class="btn-acao btn-acao-edit" onclick="editarLicenca('${l._id}')" title="Editar">✏️</button>
@@ -487,27 +533,37 @@
   }
 
   function getLicencasFiltradas() {
-    const q = (document.getElementById('searchLic').value || '').toLowerCase();
+    const fNome = (document.getElementById('fNome').value || '').toLowerCase();
     const fCat = document.getElementById('fCategoria').value;
     const fStat = document.getElementById('fStatus').value;
     const fPen = document.getElementById('fPenalidade').value;
     const fFor = (document.getElementById('fFornecedor').value || '').toLowerCase();
     const fUni = (document.getElementById('fUnidade').value || '').toLowerCase();
     const fRes = (document.getElementById('fResponsavel').value || '').toLowerCase();
+    const fCuUnitMin = document.getElementById('fCustoUnitMin').value !== '' ? parseFloat(document.getElementById('fCustoUnitMin').value) : null;
+    const fCuUnitMax = document.getElementById('fCustoUnitMax').value !== '' ? parseFloat(document.getElementById('fCustoUnitMax').value) : null;
+    const fCuTotMin  = document.getElementById('fCustoTotMin').value  !== '' ? parseFloat(document.getElementById('fCustoTotMin').value)  : null;
+    const fCuTotMax  = document.getElementById('fCustoTotMax').value  !== '' ? parseFloat(document.getElementById('fCustoTotMax').value)  : null;
     return licencas.filter(l => {
-      if (q && !l.nome.toLowerCase().includes(q) && !(l.fornecedor||'').toLowerCase().includes(q) && !(l.categoria||'').toLowerCase().includes(q)) return false;
+      if (fNome && !l.nome.toLowerCase().includes(fNome)) return false;
       if (fCat && l.categoria !== fCat) return false;
-      if (fStat && l.status !== fStat) return false;
+      if (fStat && getStatusEfetivo(l) !== fStat) return false;
       if (fPen && l.penalidade !== fPen) return false;
       if (fFor && !(l.fornecedor||'').toLowerCase().includes(fFor)) return false;
       if (fUni && !(l.unidade||'').toLowerCase().includes(fUni)) return false;
       if (fRes && !(l.responsavel||'').toLowerCase().includes(fRes)) return false;
+      const custoUnit = parseFloat(l.custoUnitario) || parseFloat(l.custo) || 0;
+      const custoTot  = getCustoTotal(l);
+      if (fCuUnitMin !== null && custoUnit < fCuUnitMin) return false;
+      if (fCuUnitMax !== null && custoUnit > fCuUnitMax) return false;
+      if (fCuTotMin  !== null && custoTot  < fCuTotMin)  return false;
+      if (fCuTotMax  !== null && custoTot  > fCuTotMax)  return false;
       return true;
     });
   }
 
   function filtrarLicencas() { renderLicencas(); }
-  function limparFiltros() { ['fCategoria','fStatus','fPenalidade','fFornecedor','fUnidade','fResponsavel'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); document.getElementById('searchLic').value = ''; renderLicencas(); }
+  function limparFiltros() { ['fNome','fCategoria','fStatus','fPenalidade','fFornecedor','fUnidade','fResponsavel','fCustoUnitMin','fCustoUnitMax','fCustoTotMin','fCustoTotMax'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); renderLicencas(); }
   function toggleFiltros() { document.getElementById('filtrosAvancados').classList.toggle('aberto'); }
 
   // ===== UPLOAD =====
@@ -539,9 +595,105 @@
   function removerDoc(i) { documentosTemp.splice(i, 1); renderUploadLista(); }
 
   // ===== MODAL LICENÇA =====
+  function fmtDataBr(s) {
+    if (!s) return '—';
+    const d = new Date(s + (s.length === 10 ? 'T12:00:00' : ''));
+    if (isNaN(d)) return s;
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function renderHistoricoRenovacoes(renovacoes, licId) {
+    const el = document.getElementById('historicoRenovacoes');
+    if (!renovacoes || !renovacoes.length) {
+      el.innerHTML = '<div style="font-size:12px;color:#a0aec0;padding:6px 0">Nenhuma renovação registrada ainda.</div>';
+      return;
+    }
+    const sorted = [...renovacoes].sort((a, b) => new Date(b.registradoEm) - new Date(a.registradoEm));
+    el.innerHTML = sorted.map(r => `
+      <div class="renov-item" id="renov-${r._id}">
+        <span style="font-size:18px;line-height:1">🔄</span>
+        <div style="flex:1">
+          <div class="renov-item-datas">${fmtDataBr(r.inicio)} → ${fmtDataBr(r.fim)}</div>
+          <div class="renov-item-meta">Registrado em ${r.registradoEm ? new Date(r.registradoEm).toLocaleDateString('pt-BR') : '—'}${r.registradoPor ? ' · ' + r.registradoPor : ''}</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-shrink:0">
+          <button class="btn-acao btn-acao-edit" onclick="iniciarEditRenovacao('${licId}','${r._id}','${r.inicio}','${r.fim}')" title="Editar">✏️</button>
+          <button class="btn-acao btn-acao-del" onclick="removerRenovacao('${licId}','${r._id}')" title="Remover">🗑️</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function iniciarEditRenovacao(licId, renovId, inicio, fim) {
+    const el = document.getElementById(`renov-${renovId}`);
+    el.innerHTML = `
+      <span style="font-size:18px;line-height:1">🔄</span>
+      <div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="date" id="editRenInicio-${renovId}" value="${inicio}" class="form-control" style="width:140px;padding:4px 8px;font-size:12px">
+        <span style="font-size:12px">→</span>
+        <input type="date" id="editRenFim-${renovId}" value="${fim}" class="form-control" style="width:140px;padding:4px 8px;font-size:12px">
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="btn-confirmar" onclick="salvarEditRenovacao('${licId}','${renovId}')" style="padding:4px 10px;font-size:12px">Salvar</button>
+        <button class="btn-cancelar-drawer" onclick="cancelarEditRenovacao('${licId}')" style="padding:4px 10px;font-size:12px">Cancelar</button>
+      </div>`;
+  }
+
+  async function salvarEditRenovacao(licId, renovId) {
+    const inicio = document.getElementById(`editRenInicio-${renovId}`).value;
+    const fim = document.getElementById(`editRenFim-${renovId}`).value;
+    if (!inicio || !fim) { alert('Preencha as datas.'); return; }
+    if (fim < inicio) { alert('A data de fim deve ser igual ou posterior ao início.'); return; }
+    try {
+      const res = await fetch(`/api/licencas/${licId}/renovacoes/${renovId}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ inicio, fim }) });
+      if (!res.ok) { const e = await res.json(); alert(e.erro || 'Erro ao editar renovação.'); return; }
+      const licAtualizada = await res.json();
+      const idx = licencas.findIndex(l => l._id === licId);
+      if (idx !== -1) licencas[idx] = licAtualizada;
+      renderResumo(); renderLicencas();
+      renderHistoricoRenovacoes(licAtualizada.renovacoes, licId);
+    } catch (e) { alert('Erro ao editar renovação.'); }
+  }
+
+  function cancelarEditRenovacao(licId) {
+    const l = licencas.find(l => l._id === licId);
+    if (l) renderHistoricoRenovacoes(l.renovacoes, licId);
+  }
+
+  async function removerRenovacao(licId, renovId) {
+    if (!confirm('Remover esta renovação?')) return;
+    try {
+      const res = await fetch(`/api/licencas/${licId}/renovacoes/${renovId}`, { method: 'DELETE', headers: HEADERS });
+      if (!res.ok) { const e = await res.json(); alert(e.erro || 'Erro ao remover renovação.'); return; }
+      const licAtualizada = await res.json();
+      const idx = licencas.findIndex(l => l._id === licId);
+      if (idx !== -1) licencas[idx] = licAtualizada;
+      renderResumo(); renderLicencas();
+      renderHistoricoRenovacoes(licAtualizada.renovacoes, licId);
+    } catch (e) { alert('Erro ao remover renovação.'); }
+  }
+
+  async function registrarRenovacao() {
+    const id = document.getElementById('licEditId').value;
+    const inicio = document.getElementById('renInicio').value;
+    const fim = document.getElementById('renFim').value;
+    if (!inicio || !fim) { alert('Preencha a data de início e a data de fim.'); return; }
+    if (fim < inicio) { alert('A data de fim deve ser igual ou posterior à data de início.'); return; }
+    try {
+      const res = await fetch(`/api/licencas/${id}/renovacoes`, { method: 'POST', headers: HEADERS, body: JSON.stringify({ inicio, fim }) });
+      if (!res.ok) { const e = await res.json(); alert(e.erro || 'Erro ao registrar renovação.'); return; }
+      const licAtualizada = await res.json();
+      const idx = licencas.findIndex(l => l._id === id);
+      if (idx !== -1) licencas[idx] = licAtualizada;
+      document.getElementById('renInicio').value = '';
+      document.getElementById('renFim').value = '';
+      renderHistoricoRenovacoes(licAtualizada.renovacoes, id);
+    } catch (e) { alert('Erro ao registrar renovação.'); }
+  }
+
   function abrirModalLicenca() {
     document.getElementById('licEditId').value = '';
     document.getElementById('modalLicTitulo').textContent = 'Nova Licença';
+    document.getElementById('secRenovacoes').style.display = 'none';
     ['licNome','licFornecedor','licUnidade','licResponsavel','licResponsavelEmail','licQuantidade','licObservacoes','licCustoUnitario','licCustoTotal'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('licCategoria').value = '';
     document.getElementById('licPenalidade').value = '';
@@ -578,6 +730,10 @@
     document.getElementById('licObservacoes').value = l.observacoes || '';
     documentosTemp = (l.documentos || []).map(d => ({ nome: d.nome, tipo: d.tipo, tamanho: d.tamanho, base64: d.base64 }));
     renderUploadLista();
+    document.getElementById('renInicio').value = '';
+    document.getElementById('renFim').value = '';
+    document.getElementById('secRenovacoes').style.display = '';
+    renderHistoricoRenovacoes(l.renovacoes || [], id);
     document.getElementById('modalLicenca').classList.add('aberto');
   }
 
@@ -636,8 +792,8 @@
           <div class="det-item"><label>Unidade / Filial</label><span>${l.unidade||'—'}</span></div>
           <div class="det-item"><label>Quantidade</label><span>${l.quantidade||'—'}</span></div>
           <div class="det-item"><label>Data de Emissão</label><span>${fmtData(l.dataEmissao)}</span></div>
-          <div class="det-item"><label>Data de Validade</label><span>${fmtData(l.validade)}</span></div>
-          <div class="det-item"><label>Status</label><span class="status-badge ${STATUS_CLASS[l.status]||''}">${STATUS_ICON[l.status]||''} ${l.status||'—'}</span></div>
+          <div class="det-item"><label>Data de Validade</label><span>${fmtData(getValidadeEfetiva(l))}</span></div>
+          <div class="det-item"><label>Status</label><span class="status-badge ${STATUS_CLASS[getStatusEfetivo(l)]||''}">${STATUS_ICON[getStatusEfetivo(l)]||''} ${getStatusEfetivo(l)||'—'}</span></div>
           <div class="det-item"><label>Custo Unitário</label><span>${detCustoUnit ? fmtMoeda(detCustoUnit) : '—'}</span></div>
           <div class="det-item"><label>Custo Total</label><span>${detCustoTotal ? fmtMoeda(detCustoTotal) : '—'}</span></div>
           <div class="det-item"><label>Frequência</label><span>${detFreq}</span></div>
@@ -688,7 +844,7 @@
         <div class="alerta-item">
           <div>
             <div class="alerta-nome">${l.nome}</div>
-            <div style="font-size:11px;color:#718096">${l.validade ? 'Vence em: ' + fmtData(l.validade) : 'Sem validade'}</div>
+            <div style="font-size:11px;color:#718096">${getValidadeEfetiva(l) ? 'Vence em: ' + fmtData(getValidadeEfetiva(l)) : 'Sem validade'}</div>
           </div>
           <div class="alerta-dias">
             <span style="font-size:12px;color:#718096">Alertar com</span>

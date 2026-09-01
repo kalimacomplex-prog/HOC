@@ -73,8 +73,6 @@
     .modo-conexao-aviso.ativo { display: block; }
     .org-node.selecionado-conexao { border-color: #38a169; box-shadow: 0 0 0 3px rgba(56,161,105,0.3); }
     .conn-del-btn { opacity: 0; transition: opacity 0.15s; }
-    .org-container:hover .conn-del-btn { opacity: 0.45; }
-    .conn-del-btn:hover { opacity: 1 !important; }
     .bib-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
     .bib-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
     .pasta-sidebar-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 7px 8px 7px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #718096; margin-bottom: 2px; transition: all 0.2s; gap: 4px; }
@@ -199,9 +197,58 @@
     .org-node:hover .conn-handle { opacity:1; }
     .org-container { overflow:visible !important; }
     .org-nome-wrap { position:relative; }
+    .secao-tbl { border-radius:8px; border:1px solid #e2e8f0; overflow:hidden; }
+    .secao-tbl table { width:100%; border-collapse:collapse; }
+    .secao-tbl-wrap { overflow-x:auto; }
+    .mvv-titulo { overflow:hidden; }
     .org-nome-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1.5px solid #e2e8f0; border-top:none; border-radius:0 0 6px 6px; max-height:160px; overflow-y:auto; display:none; z-index:200; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
     .org-nome-item { padding:8px 12px; cursor:pointer; border-bottom:1px solid #f0f2f5; }
     .org-nome-item:hover { background:#f8fafc; }
+
+    /* ===== FLUXO DE VALOR ===== */
+    .fv-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .fv-toolbar-left { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+    .btn-fv { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #4a5568; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
+    .btn-fv:hover { border-color: #2d1b69; color: #2d1b69; }
+    .btn-fv.primary { background: #2d1b69; color: white; border-color: #2d1b69; }
+    .btn-fv.primary:hover { background: #3d2b89; }
+    .btn-fv.danger { background: #fff5f5; color: #c53030; border-color: #feb2b2; }
+    .modo-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .modo-edicao { background: #f5f0ff; color: #2d1b69; }
+    .modo-viz { background: #f0f2f5; color: #718096; }
+    .fv-layout { display: flex; gap: 0; align-items: flex-start; }
+    .fv-main { flex: 1; min-width: 0; transition: all 0.3s; }
+    .fv-picker-panel { width: 0; overflow: hidden; transition: width 0.3s ease; flex-shrink: 0; }
+    .fv-picker-panel.open { width: 360px; }
+    .fv-picker-inner { width: 360px; background: white; border-left: 1.5px solid #e2e8f0; border-radius: 0 10px 10px 0; min-height: 540px; max-height: calc(100vh - 140px); overflow-y: auto; padding: 18px; box-shadow: 4px 0 20px rgba(0,0,0,.06) inset; display: flex; flex-direction: column; }
+    .fv-canvas-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; position: relative; transition: border-radius 0.3s; }
+    .fv-picker-panel.open + * { display:none; } /* no sibling needed */
+    .fv-layout:has(.fv-picker-panel.open) .fv-canvas-wrap { border-radius: 10px 0 0 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .fv-canvas { width: 100%; height: 520px; position: relative; background: #f8fafc; background-image: radial-gradient(circle, #cbd5e0 1px, transparent 1px); background-size: 24px 24px; overflow: hidden; }
+    .fv-block { position: absolute; min-width: 140px; background: white; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); border: 2px solid #e2e8f0; cursor: move; user-select: none; transition: box-shadow 0.2s; z-index: 10; }
+    .fv-block:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-color: #2d1b69; }
+    .fv-block.selected { border-color: #2d1b69; box-shadow: 0 0 0 3px rgba(45,27,105,0.2); }
+    .fv-block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .fv-block-icon { font-size: 18px; }
+    .fv-block-del { background: #fff5f5; border: none; color: #c53030; border-radius: 4px; cursor: pointer; padding: 2px 5px; font-size: 10px; opacity: 0; transition: opacity 0.2s; }
+    .fv-block:hover .fv-block-del { opacity: 1; }
+    .fv-block-nome { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
+    .fv-block-obs { font-size:10px;color:#718096;margin-top:4px;font-style:italic;line-height:1.4; }
+    .fv-block-tipo { font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.3px;margin-top:2px; }
+    .fv-port { position:absolute;width:12px;height:12px;border-radius:50%;background:#2d1b69;border:2px solid white;cursor:crosshair;opacity:0;transition:opacity .15s;z-index:15;box-shadow:0 1px 4px rgba(0,0,0,.2);pointer-events:none; }
+    .fv-block:hover .fv-port { opacity:1;pointer-events:auto; }
+    .fv-port.pending { opacity:1;background:#f6c90e;border-color:#2d1b69;pointer-events:auto; }
+    .fv-port-right  { right:-7px;top:50%;transform:translateY(-50%); }
+    .fv-port-left   { left:-7px;top:50%;transform:translateY(-50%); }
+    .fv-port-top    { top:-7px;left:50%;transform:translateX(-50%); }
+    .fv-port-bot    { bottom:-7px;left:50%;transform:translateX(-50%); }
+    .fv-text-node { position: absolute; background: transparent; border: none; font-size: 13px; color: #1e2a4a; cursor: move; z-index: 10; min-width: 80px; padding: 4px; }
+    .fv-text-node.editing { background: white; border: 1.5px solid #2d1b69; border-radius: 4px; outline: none; }
+    .fv-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 5; }
+    .fv-svg foreignObject { pointer-events: all; }
+    .fv-minimap { position: absolute; bottom: 10px; right: 10px; width: 120px; height: 70px; background: rgba(255,255,255,0.9); border: 1px solid #e2e8f0; border-radius: 6px; font-size: 9px; color: #a0aec0; display: flex; align-items: center; justify-content: center; }
+    .sem-permissao-overlay { position: absolute; inset: 0; background: rgba(248,250,252,0.7); display: flex; align-items: center; justify-content: center; z-index: 20; border-radius: 10px; }
+    .sem-permissao-card { background: white; border-radius: 10px; padding: 24px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
   </style>
 </head>
 <body>
@@ -275,126 +322,114 @@
 
     <!-- VISÃO GERAL -->
     <div class="tab-content active" id="tab-visao-geral">
-
       <div class="edit-barra-global">
         <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()" style="font-size:12px;padding:6px 12px">✏️ Editar</button>
         <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none;font-size:12px;padding:6px 12px">💾 Salvar</button>
+        <button id="btnNovaSecao" onclick="abrirModalNovaSecao()" style="display:none;font-size:12px;padding:6px 12px;background:white;border:1.5px solid #2d1b69;color:#2d1b69;border-radius:6px;cursor:pointer;font-weight:600">+ Nova Seção</button>
       </div>
+      <!-- ===== FLUXO DE VALOR (gerenciado por renderSecoes) ===== -->
+      <div id="fvSecaoWrap" style="display:none;margin-bottom:24px">
+        <div style="background:white;border-radius:12px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div style="font-size:15px;font-weight:700;color:#1e2a4a">🗺️ Fluxo de Valor do Negócio</div>
+            <div id="fvCtrl"></div>
+          </div>
+          <div id="fvOcultoMsg" style="display:none;background:#f8fafc;border:2px dashed #e2e8f0;border-radius:8px;padding:20px;text-align:center;color:#a0aec0">
+            <div style="font-size:22px;margin-bottom:6px">🗺️</div>
+            <div style="font-size:13px;font-weight:600;color:#718096;margin-bottom:4px">Seção oculta no modo visualização</div>
+            <div style="font-size:12px">Use o botão <b>Mostrar</b> acima para reexibir no modo de visualização.</div>
+          </div>
+          <div id="fvSecaoInner">
+            <div class="fv-toolbar">
+              <div class="fv-toolbar-left" id="fvToolbarEdicao" style="display:none">
+                <button class="btn-fv primary" id="btnElemento" onclick="toggleElementoPicker()">+ Elemento ▾</button>
+                <div style="display:flex;align-items:center;gap:3px;border-left:1.5px solid #e2e8f0;margin-left:4px;padding-left:10px">
+                  <span style="font-size:10px;color:#a0aec0;font-weight:700;letter-spacing:.4px;margin-right:2px">CONEXÃO</span>
+                  <button class="btn-fv primary" id="btnConPush"  onclick="setConStyle('push')"  title="Push — fluxo empurrado (seta sólida)"
+                    style="padding:5px 10px;font-size:11px;display:flex;align-items:center;gap:4px">
+                    <svg width="22" height="10" viewBox="0 0 22 10"><line x1="1" y1="5" x2="16" y2="5" stroke="currentColor" stroke-width="2"/><polygon points="14,2 20,5 14,8" fill="currentColor"/></svg>Push
+                  </button>
+                  <button class="btn-fv" id="btnConPull"  onclick="setConStyle('pull')"  title="Pull — fluxo puxado (seta tracejada)"
+                    style="padding:5px 10px;font-size:11px;display:flex;align-items:center;gap:4px">
+                    <svg width="22" height="10" viewBox="0 0 22 10"><line x1="1" y1="5" x2="16" y2="5" stroke="currentColor" stroke-width="2" stroke-dasharray="4,3"/><polygon points="14,2 20,5 14,8" fill="currentColor"/></svg>Pull
+                  </button>
+                  <button class="btn-fv" id="btnConSinal" onclick="setConStyle('sinal')" title="Sinal — eletrônico / empurrado (zigzag)"
+                    style="padding:5px 10px;font-size:11px;display:flex;align-items:center;gap:4px">
+                    <svg width="22" height="10" viewBox="0 0 22 10"><polyline points="1,5 4,1 8,9 12,1 16,5" stroke="currentColor" stroke-width="2" fill="none"/><polygon points="14,2 20,5 14,8" fill="currentColor"/></svg>Sinal
+                  </button>
+                </div>
+                <button class="btn-fv danger" onclick="limparCanvas()">🗑️ Limpar</button>
+              </div>
+              <div style="margin-left:auto">
+                <button class="btn-fv" id="btnModoFv" onclick="toggleModoFv()">✏️ Modo Edição</button>
+              </div>
+            </div>
 
-      <!-- SOBRE A EMPRESA -->
-      <div class="section-bloco">
-        <div class="section-header">
-          <div class="section-icon">🏢</div>
-          <span class="section-titulo-text">Sobre a Empresa</span>
-        </div>
-        <div class="info-grid">
-          <div class="info-item"><div class="info-label">Resumo</div><div class="info-value" id="val-definicao">Clique em Editar para adicionar.</div><textarea class="info-textarea" id="inp-definicao" style="display:none" placeholder="Descreva sua empresa..."></textarea></div>
-          <div class="info-item"><div class="info-label">Data de Fundação</div><div class="info-value" id="val-fundacao">—</div><input type="text" class="info-input" id="inp-fundacao" style="display:none" placeholder="Ex: 12/03/2020"></div>
-          <div class="info-item"><div class="info-label">Setor de Atuação</div><div class="info-value" id="val-setor">—</div><input type="text" class="info-input" id="inp-setor" style="display:none" placeholder="Ex: Tecnologia da Informação"></div>
-          <div class="info-item"><div class="info-label">Site / Contato</div><div class="info-value" id="val-site">—</div><input type="text" class="info-input" id="inp-site" style="display:none" placeholder="Ex: www.empresa.com.br"></div>
-        </div>
-        <div id="customCamposContainer"></div>
-        <div id="btnNovaCatWrap" style="display:none;margin-top:16px;padding-top:14px;border-top:1px dashed #e2e8f0">
-          <button onclick="abrirModalNovaCategoria()" style="font-size:12px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:600">+ Nova Categoria</button>
-        </div>
-      </div>
+            <div class="fv-layout">
+              <!-- Canvas principal -->
+              <div class="fv-main">
+                <div class="fv-canvas-wrap">
+                  <div class="fv-canvas" id="fvCanvas">
+                    <svg class="fv-svg" id="fvSvg"></svg>
+                    <div id="fvEmpty" style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:10px;color:#a0aec0">
+                      <div style="font-size:36px">🗺️</div>
+                      <div style="font-size:13px">Nenhum bloco adicionado.</div>
+                      <div style="font-size:11px">Clique em "Editar" para começar a mapear o fluxo de valor.</div>
+                    </div>
+                  </div>
+                  <div class="fv-minimap" id="fvMinimap">Mini Mapa</div>
+                  <div class="sem-permissao-overlay" id="semPermissaoOverlay" style="display:none">
+                    <div class="sem-permissao-card">
+                      <div style="font-size:32px;margin-bottom:8px">🔒</div>
+                      <div style="font-size:14px;font-weight:700;color:#1e2a4a;margin-bottom:4px">Sem permissão de edição</div>
+                      <div style="font-size:12px;color:#718096">Apenas usuários com permissão podem editar o fluxo de valor.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-      <!-- MISSÃO, VISÃO E VALORES -->
-      <div class="section-bloco">
-        <div class="section-header">
-          <div class="section-icon" style="background:#f0fff4">🎯</div>
-          <span class="section-titulo-text">Missão, Visão e Valores</span>
-        </div>
-        <div class="mvv-grid">
-          <div class="mvv-card">
-            <div class="mvv-titulo">🎯 Missão</div>
-            <div class="rich-toolbar" id="tb-missao" style="display:none;margin-top:8px">
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','bold')" title="Negrito"><b>B</b></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','italic')" title="Itálico"><i>I</i></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','insertUnorderedList')" title="Lista">• Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-missao','insertOrderedList')" title="Numerada">1. Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-missao')" title="Link">🔗</button>
+              <!-- Painel lateral de elementos -->
+              <div class="fv-picker-panel" id="fvPickerPanel">
+                <div class="fv-picker-inner" id="fvElementoPicker">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                    <div style="font-size:13px;font-weight:700;color:#1e2a4a">Biblioteca de Elementos</div>
+                    <button onclick="fecharElementoPicker()" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:18px;line-height:1;padding:0">×</button>
+                  </div>
+                  <div id="fvElementoGrid" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
+                  <div style="border-top:1px solid #f0f2f5;padding-top:14px">
+                    <div id="fvPickerNomeRow" style="margin-bottom:10px">
+                      <div style="font-size:11px;font-weight:600;color:#4a5568;margin-bottom:5px">Nome do Elemento *</div>
+                      <input type="text" id="fvElNome" class="form-control" placeholder="Ex: Receber Pedido" style="font-size:12px">
+                    </div>
+                    <div id="fvPickerTabelaRow" style="display:none;margin-bottom:10px">
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                        <div>
+                          <div style="font-size:11px;font-weight:600;color:#4a5568;margin-bottom:4px">Colunas</div>
+                          <input type="number" id="fvTabelaCols" class="form-control" value="3" min="1" max="8" style="font-size:12px">
+                        </div>
+                        <div>
+                          <div style="font-size:11px;font-weight:600;color:#4a5568;margin-bottom:4px">Linhas</div>
+                          <input type="number" id="fvTabelaRows" class="form-control" value="3" min="1" max="20" style="font-size:12px">
+                        </div>
+                      </div>
+                    </div>
+                    <div id="fvPickerObsRow">
+                      <div style="font-size:11px;font-weight:600;color:#4a5568;margin-bottom:5px" id="fvPickerObsLabel">Observação</div>
+                      <textarea id="fvElObs" class="form-control" rows="2" placeholder="Anotação sobre o elemento..." style="font-size:12px;resize:vertical;margin-bottom:12px"></textarea>
+                    </div>
+                    <div style="display:flex;gap:8px">
+                      <button class="btn-fv primary" onclick="confirmarElemento()" style="flex:1">Adicionar</button>
+                      <button class="btn-fv" onclick="fecharElementoPicker()" style="flex:1">Fechar</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="mvv-texto rich-editor" id="val-missao" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossa missão é...">Clique em Editar para adicionar.</div>
-          </div>
-          <div class="mvv-card" style="border-top-color:#38a169">
-            <div class="mvv-titulo" style="color:#38a169">👁️ Visão</div>
-            <div class="rich-toolbar" id="tb-visao" style="display:none;margin-top:8px">
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','bold')" title="Negrito"><b>B</b></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','italic')" title="Itálico"><i>I</i></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','insertUnorderedList')" title="Lista">• Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-visao','insertOrderedList')" title="Numerada">1. Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-visao')" title="Link">🔗</button>
-            </div>
-            <div class="mvv-texto rich-editor" id="val-visao" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossa visão é...">Clique em Editar para adicionar.</div>
-          </div>
-          <div class="mvv-card" style="border-top-color:#6b46c1">
-            <div class="mvv-titulo" style="color:#6b46c1">💎 Valores</div>
-            <div class="rich-toolbar" id="tb-valores" style="display:none;margin-top:8px">
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','bold')" title="Negrito"><b>B</b></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','italic')" title="Itálico"><i>I</i></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','insertUnorderedList')" title="Lista">• Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-valores','insertOrderedList')" title="Numerada">1. Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-valores')" title="Link">🔗</button>
-            </div>
-            <div class="mvv-texto rich-editor" id="val-valores" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Nossos valores são...">Clique em Editar para adicionar.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- HISTÓRIA -->
-      <div class="section-bloco">
-        <div class="section-header">
-          <div class="section-icon" style="background:#fff8f0">📅</div>
-          <span class="section-titulo-text">História</span>
-          <button class="btn-add-timeline" id="btnAddTimeline" onclick="abrirModalTimeline()" style="display:none">+ Adicionar Marco</button>
-        </div>
-        <div class="timeline" id="timeline"><p style="color:#a0aec0;font-size:13px">Nenhum marco histórico adicionado ainda.</p></div>
-      </div>
-
-      <!-- HIGHLIGHTS ESG -->
-      <div class="section-bloco">
-        <div class="section-header">
-          <div class="section-icon" style="background:#f0fff4">🌱</div>
-          <span class="section-titulo-text">Highlights ESG</span>
-        </div>
-        <div class="esg-grid">
-          <div class="esg-card">
-            <div class="esg-badge esg-e">E — Ambiental</div>
-            <div class="rich-toolbar" id="tb-esg-e" style="display:none">
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','bold')"><b>B</b></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','italic')"><i>I</i></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','insertUnorderedList')">• Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-e','insertOrderedList')">1. Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-e')">🔗</button>
-            </div>
-            <div class="esg-texto rich-editor" id="val-esg-e" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Iniciativas ambientais...">Clique em Editar para adicionar.</div>
-          </div>
-          <div class="esg-card">
-            <div class="esg-badge esg-s">S — Social</div>
-            <div class="rich-toolbar" id="tb-esg-s" style="display:none">
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','bold')"><b>B</b></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','italic')"><i>I</i></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','insertUnorderedList')">• Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-s','insertOrderedList')">1. Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-s')">🔗</button>
-            </div>
-            <div class="esg-texto rich-editor" id="val-esg-s" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Iniciativas sociais...">Clique em Editar para adicionar.</div>
-          </div>
-          <div class="esg-card">
-            <div class="esg-badge esg-g">G — Governança</div>
-            <div class="rich-toolbar" id="tb-esg-g" style="display:none">
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','bold')"><b>B</b></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','italic')"><i>I</i></button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','insertUnorderedList')">• Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('val-esg-g','insertOrderedList')">1. Lista</button>
-              <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('val-esg-g')">🔗</button>
-            </div>
-            <div class="esg-texto rich-editor" id="val-esg-g" contenteditable="false" onkeydown="_ovRichKeydown(event)" placeholder="Práticas de governança...">Clique em Editar para adicionar.</div>
           </div>
         </div>
       </div>
 
+      <div id="secoesContainer"></div>
     </div>
 
     <!-- NOSSO TIME -->
@@ -489,13 +524,26 @@
         <div style="display:flex;gap:16px;margin-top:14px;align-items:flex-start">
           <div style="flex:1;min-width:0">
             <div class="editor-toolbar">
-              <select class="toolbar-select" id="fmtBlockSelect" onmousedown="salvarSelecao()" onchange="fmtBlock(this.value)" title="Estilo do bloco">
-                <option value="p">Parágrafo</option>
-                <option value="h1">Título 1</option>
-                <option value="h2">Título 2</option>
-                <option value="h3">Título 3</option>
-                <option value="h4">Título 4</option>
-                <option value="pre">Código</option>
+              <select class="toolbar-select" onmousedown="salvarSelecao()" onchange="fmtFontSize(this.value)" title="Tamanho da fonte">
+                <option value="">Tamanho</option>
+                <option value="10px">10</option>
+                <option value="12px">12</option>
+                <option value="14px">14</option>
+                <option value="16px">16</option>
+                <option value="18px">18</option>
+                <option value="20px">20</option>
+                <option value="24px">24</option>
+                <option value="28px">28</option>
+                <option value="36px">36</option>
+                <option value="48px">48</option>
+              </select>
+              <select class="toolbar-select" onmousedown="salvarSelecao()" onchange="fmtFontFamily(this.value)" title="Fonte">
+                <option value="">Fonte</option>
+                <option value="inherit">Padrão</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', serif">Times</option>
+                <option value="'Courier New', monospace">Courier</option>
+                <option value="Georgia, serif">Georgia</option>
               </select>
               <div class="toolbar-sep"></div>
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('bold')" title="Negrito"><b>B</b></button>
@@ -514,6 +562,8 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyLeft')" title="Alinhar à esquerda">⬅</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyCenter')" title="Centralizar">☰</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyRight')" title="Alinhar à direita">➡</button>
+              <div class="toolbar-sep"></div>
+              <button class="toolbar-btn" onmousedown="event.preventDefault();fmtInserirLink()" title="Inserir link">🔗 Link</button>
             </div>
             <div class="editor-wrap">
               <div class="editor-area" id="editorArea" contenteditable="true"></div>
@@ -579,13 +629,41 @@
   </div>
 </div>
 
-<!-- Modal Nova Categoria -->
-<div class="modal-overlay" id="modalNovaCategoria">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-header"><span class="modal-titulo">Nova Categoria</span><button class="btn-fechar" onclick="fecharModal('modalNovaCategoria')">×</button></div>
-    <div class="form-group"><label>Nome da Categoria</label><input type="text" id="novaCatLabel" placeholder="Ex: Número de Funcionários"></div>
-    <div class="form-group"><label>Valor</label><input type="text" id="novaCatValue" placeholder="Ex: 150 colaboradores"></div>
-    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalNovaCategoria')">Cancelar</button><button class="btn-confirmar" onclick="confirmarNovaCategoria()">Adicionar</button></div>
+<!-- Modal Nova Seção -->
+<div class="modal-overlay" id="modalNovaSecao">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><span class="modal-titulo">Nova Seção</span><button class="btn-fechar" onclick="fecharModal('modalNovaSecao')">×</button></div>
+    <div style="display:flex;gap:10px;align-items:flex-end">
+      <div class="form-group" style="width:72px;margin-bottom:0">
+        <label>Ícone</label>
+        <input type="text" id="novaSecaoEmoji" maxlength="2" placeholder="📋" style="text-align:center;font-size:20px;padding:6px">
+      </div>
+      <div class="form-group" style="flex:1;margin-bottom:0">
+        <label>Nome da Seção</label>
+        <input type="text" id="novaSecaoNome" placeholder="Ex: Diferenciais" onkeypress="if(event.key==='Enter')confirmarNovaSecao()">
+      </div>
+    </div>
+    <p style="font-size:12px;color:#718096;margin:10px 0 0">Após criar, use os botões "+ Adicionar" para incluir campos, cards, tabelas ou linha do tempo.</p>
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalNovaSecao')">Cancelar</button><button class="btn-confirmar" onclick="confirmarNovaSecao()">Criar Seção</button></div>
+  </div>
+</div>
+
+<!-- Modal Editar Seção -->
+<div class="modal-overlay" id="modalEditSecao">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><span class="modal-titulo">Editar Seção</span><button class="btn-fechar" onclick="fecharModal('modalEditSecao')">×</button></div>
+    <div style="display:flex;gap:10px;align-items:flex-end">
+      <div class="form-group" style="width:72px;margin-bottom:0">
+        <label>Ícone</label>
+        <input type="text" id="editSecaoEmoji" maxlength="2" style="text-align:center;font-size:20px;padding:6px">
+      </div>
+      <div class="form-group" style="flex:1;margin-bottom:0">
+        <label>Nome</label>
+        <input type="text" id="editSecaoNome" onkeypress="if(event.key==='Enter')confirmarEditSecao()">
+      </div>
+    </div>
+    <input type="hidden" id="editSecaoIdx">
+    <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalEditSecao')">Cancelar</button><button class="btn-confirmar" onclick="confirmarEditSecao()">Salvar</button></div>
   </div>
 </div>
 
@@ -608,7 +686,6 @@
       <div class="org-nome-dropdown" id="membroNomeDropdown"></div>
     </div>
     <div class="form-group"><label>Cargo / Função *</label><input type="text" id="membroCargo" placeholder="Ex: Desenvolvedor Sênior"></div>
-    <div class="form-group"><label>Departamento</label><select id="membroDep"><option value="">Selecione...</option></select></div>
     <div class="form-group"><label>Email</label><input type="email" id="membroEmail" placeholder="email@empresa.com"></div>
     <input type="hidden" id="membroEditId">
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalMembro')">Cancelar</button><button class="btn-confirmar" onclick="salvarMembro()">Salvar</button></div>
@@ -700,6 +777,19 @@
   </div>
 </div>
 
+<!-- Modal Editar Bloco Fluxo de Valor -->
+<div class="modal-overlay" id="modalFvEditar">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><span class="modal-titulo">Editar Elemento</span><button class="btn-fechar" onclick="fecharModal('modalFvEditar')">×</button></div>
+    <div class="form-group"><label>Nome *</label><input type="text" id="fvEditNome" class="form-control" placeholder="Nome do elemento" onkeydown="if(event.key==='Enter')salvarEditarFvBloco()"></div>
+    <div class="form-group" style="margin-top:12px"><label>Observação</label><textarea id="fvEditObs" class="form-control" rows="3" placeholder="Descrição ou anotação (opcional)" style="resize:vertical"></textarea></div>
+    <div class="modal-footer" style="margin-top:16px">
+      <button class="btn-cancelar" onclick="fecharModal('modalFvEditar')">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarEditarFvBloco()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <div class="bloqueio-overlay" id="bloqueioOverlay">
   <div class="bloqueio-card">
     <div class="bloqueio-icone">🔒</div>
@@ -730,217 +820,417 @@
     document.getElementById('tab-' + id).style.display = 'block';
     btn.classList.add('active');
     if (id === 'biblioteca') { if (pastas.length === 0) carregarPastas(); else carregarWikis(); }
+    if (id === 'nosso-time') requestAnimationFrame(fitOrgNodes);
   }
 
-  // ===== VISÃO GERAL — API =====
+  // ===== VISÃO GERAL — Sistema de Seções Dinâmicas =====
   let modoEdicao = false;
-  const campos = ['definicao','fundacao','setor','site','missao','visao','valores','esg-e','esg-s','esg-g'];
-  let timelineData = [];
-  let customCampos = [];
+  let secoesData = [];
   let timelineEditIdx = null;
+  let _tlRi = -1, _tlCi = -1;
+
+  function _esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function migrarLegacyParaSecoes(data) {
+    const info=data.info||{},mvv=data.mvv||{},esg=data.esg||{};
+    const camposSobre=[
+      {id:'definicao',tipo:'textarea',label:'Resumo',valor:info.definicao||''},
+      {id:'fundacao',tipo:'texto',label:'Data de Fundação',valor:info.fundacao||''},
+      {id:'setor',tipo:'texto',label:'Setor de Atuação',valor:info.setor||''},
+      {id:'site',tipo:'texto',label:'Site / Contato',valor:info.site||''},
+      ...(info.customCampos||[]).map((c,i)=>({id:'custom_'+i,tipo:'texto',label:c.label,valor:c.value||''}))
+    ];
+    return [
+      {id:'resumo',emoji:'🏢',nome:'Sobre a Empresa',campos:camposSobre},
+      {id:'mvv',emoji:'🎯',nome:'Missão, Visão e Valores',campos:[
+        {id:'missao',tipo:'rich',label:'🎯 Missão',valor:mvv.missao||''},
+        {id:'visao',tipo:'rich',label:'👁️ Visão',valor:mvv.visao||''},
+        {id:'valores',tipo:'rich',label:'💎 Valores',valor:mvv.valores||''},
+      ]},
+      {id:'historia',emoji:'📅',nome:'História',campos:[
+        {id:'tl_historia',tipo:'timeline',dados:{items:data.timeline||[]}}
+      ]},
+      {id:'highlights',emoji:'🌱',nome:'Highlights ESG',campos:[
+        {id:'esg-e',tipo:'rich',label:'🌱 E — Ambiental',valor:esg.e||''},
+        {id:'esg-s',tipo:'rich',label:'👥 S — Social',valor:esg.s||''},
+        {id:'esg-g',tipo:'rich',label:'⚖️ G — Governança',valor:esg.g||''},
+      ]},
+    ];
+  }
+
+  function migrarSecoesAnteriores(secoes) {
+    return secoes.map(s => {
+      if (!s.tipo) return s;
+      let campos = [];
+      if (s.tipo==='campos_simples') campos=(s.campos||[]).map(c=>({...c,tipo:c.tipo||'texto'}));
+      else if (s.tipo==='cards_rich') campos=(s.campos||[]).map(c=>({...c,tipo:'rich'}));
+      else if (s.tipo==='timeline')   campos=[{id:'tl_'+s.id,tipo:'timeline',dados:s.dados||{items:[]}}];
+      else if (s.tipo==='tabela')     campos=[{id:'tbl_'+s.id,tipo:'tabela',dados:s.dados||{colunas:[],linhas:[]}}];
+      const {tipo:_t,dados:_d,...rest}=s;
+      return {...rest,campos};
+    });
+  }
 
   async function carregarInfo() {
     try {
-      const res = await fetch('/api/overview', { headers: HEADERS });
-      if (res.status === 401) { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; return; }
+      const res = await fetch('/api/overview', {headers:HEADERS});
+      if (res.status===401){localStorage.removeItem('token');localStorage.removeItem('usuario');window.location.href='/';return;}
       const data = await res.json();
       if (!data) return;
-      const info = data.info || {};
-      const mvv = data.mvv || {};
-      const esg = data.esg || {};
-      if (info.definicao) { document.getElementById('val-definicao').textContent = info.definicao; }
-      if (info.fundacao) { document.getElementById('val-fundacao').textContent = info.fundacao; }
-      if (info.setor) { document.getElementById('val-setor').textContent = info.setor; }
-      if (info.site) { document.getElementById('val-site').textContent = info.site; }
-      if (mvv.missao) { document.getElementById('val-missao').innerHTML = mvv.missao; }
-      if (mvv.visao) { document.getElementById('val-visao').innerHTML = mvv.visao; }
-      if (mvv.valores) { document.getElementById('val-valores').innerHTML = mvv.valores; }
-      if (esg.e) { document.getElementById('val-esg-e').innerHTML = esg.e; }
-      if (esg.s) { document.getElementById('val-esg-s').innerHTML = esg.s; }
-      if (esg.g) { document.getElementById('val-esg-g').innerHTML = esg.g; }
-      if (data.timeline) { timelineData = data.timeline; renderTimeline(); }
-      if (info.customCampos) { customCampos = info.customCampos; renderCustomCampos(); }
-    } catch(err) { console.error(err); }
+      secoesData = (data.secoes && data.secoes.length) ? migrarSecoesAnteriores(data.secoes) : migrarLegacyParaSecoes(data);
+      ensureFvEntry();
+      renderSecoes();
+    } catch(err){console.error(err);}
+  }
+
+  function coletarRichEditors() {
+    secoesData.forEach(s=>{
+      (s.campos||[]).forEach((c,ci)=>{
+        if (c.tipo==='rich') {
+          const el = document.getElementById('rich-'+s.id+'-'+ci);
+          if (el) c.valor = el.innerHTML;
+        }
+      });
+    });
   }
 
   function toggleEdicao() {
+    if (modoEdicao) coletarRichEditors();
     modoEdicao = !modoEdicao;
-    ['definicao','fundacao','setor','site'].forEach(c => {
-      const val = document.getElementById('val-' + c);
-      const inp = document.getElementById('inp-' + c);
-      if (!val || !inp) return;
-      if (modoEdicao) { inp.value = val.textContent === 'Clique em Editar para adicionar.' || val.textContent === '—' ? '' : val.textContent; val.style.display='none'; inp.style.display='block'; }
-      else { val.style.display='block'; inp.style.display='none'; }
-    });
-    ['missao','visao','valores'].forEach(c => {
-      const editor = document.getElementById('val-' + c);
-      const tb = document.getElementById('tb-' + c);
-      if (!editor) return;
-      if (modoEdicao) {
-        if (editor.textContent.trim() === 'Clique em Editar para adicionar.') editor.innerHTML = '';
-        editor.contentEditable = 'true';
-        if (tb) tb.style.display = 'flex';
-      } else {
-        editor.contentEditable = 'false';
-        if (!editor.innerHTML.trim()) editor.innerHTML = 'Clique em Editar para adicionar.';
-        if (tb) tb.style.display = 'none';
-      }
-    });
-    ['esg-e','esg-s','esg-g'].forEach(c => {
-      const editor = document.getElementById('val-' + c);
-      const tb = document.getElementById('tb-' + c);
-      if (!editor) return;
-      if (modoEdicao) {
-        if (editor.textContent.trim() === 'Clique em Editar para adicionar.') editor.innerHTML = '';
-        editor.contentEditable = 'true';
-        if (tb) tb.style.display = 'flex';
-      } else {
-        editor.contentEditable = 'false';
-        if (!editor.innerHTML.trim()) editor.innerHTML = 'Clique em Editar para adicionar.';
-        if (tb) tb.style.display = 'none';
-      }
-    });
-    document.getElementById('btnEditar').style.display = modoEdicao ? 'none' : 'inline-block';
-    document.getElementById('btnSalvar').style.display = modoEdicao ? 'inline-block' : 'none';
-    document.getElementById('btnAddTimeline').style.display = modoEdicao ? 'flex' : 'none';
-    document.getElementById('btnNovaCatWrap').style.display = modoEdicao ? 'block' : 'none';
-    renderCustomCampos();
+    document.getElementById('btnEditar').style.display    = modoEdicao?'none':'inline-block';
+    document.getElementById('btnSalvar').style.display    = modoEdicao?'inline-block':'none';
+    document.getElementById('btnNovaSecao').style.display = modoEdicao?'inline-block':'none';
+    renderSecoes();
   }
 
   async function salvarInfo() {
-    ['definicao','fundacao','setor','site'].forEach(c => {
-      const val = document.getElementById('val-' + c);
-      const inp = document.getElementById('inp-' + c);
-      if (val && inp) val.textContent = inp.value || (c==='fundacao'||c==='setor'||c==='site' ? '—' : 'Clique em Editar para adicionar.');
-    });
-    customCampos = customCampos.map((c, i) => ({ label: c.label, value: document.getElementById('inp-custom-' + i)?.value ?? c.value }));
-    const payload = {
-      info: { definicao: document.getElementById('inp-definicao').value, fundacao: document.getElementById('inp-fundacao').value, setor: document.getElementById('inp-setor').value, site: document.getElementById('inp-site').value, customCampos },
-      mvv: { missao: document.getElementById('val-missao').innerHTML, visao: document.getElementById('val-visao').innerHTML, valores: document.getElementById('val-valores').innerHTML },
-      esg: { e: document.getElementById('val-esg-e').innerHTML, s: document.getElementById('val-esg-s').innerHTML, g: document.getElementById('val-esg-g').innerHTML },
-      timeline: timelineData
-    };
-    try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify(payload) }); } catch(err) { console.error(err); }
+    coletarRichEditors();
+    try { await fetch('/api/overview',{method:'PUT',headers:HEADERS,body:JSON.stringify({secoes:secoesData})}); } catch(err){console.error(err);}
     toggleEdicao();
   }
 
-  function fmtRich(id, cmd) { document.getElementById(id).focus(); document.execCommand(cmd, false, null); }
-  function _ovRichKeydown(e) {
-    if (e.key === 'Tab') { e.preventDefault(); document.execCommand(e.shiftKey ? 'outdent' : 'indent'); }
-  }
-  function inserirLink(id) {
-    const url = prompt('URL do link:');
-    if (!url) return;
-    const texto = prompt('Texto do link:') || url;
-    document.getElementById(id).focus();
-    document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${texto}</a>`);
+  async function _salvarSecoes() {
+    try { await fetch('/api/overview',{method:'PUT',headers:HEADERS,body:JSON.stringify({secoes:secoesData})}); } catch(e){}
   }
 
-  function fmtTimeline(cmd) { fmtRich('timelineDescEditor', cmd); }
-  function inserirLinkTimeline() { inserirLink('timelineDescEditor'); }
+  // ===== RENDER =====
+  const _sBtnBase = 'background:#f0f2f5;border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#4a5568';
+  const _sBtnDel  = 'background:#fff5f5;border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#c53030';
 
-  function abrirModalTimeline() {
-    timelineEditIdx = null;
-    document.getElementById('timelineAno').value = '';
-    document.getElementById('timelineDescEditor').innerHTML = '';
-    document.querySelector('#modalTimeline .modal-titulo').textContent = 'Adicionar Marco Histórico';
-    document.querySelector('#modalTimeline .btn-confirmar').textContent = 'Adicionar';
-    document.getElementById('modalTimeline').classList.add('aberto');
-    setTimeout(() => document.getElementById('timelineAno').focus(), 100);
+  let fvLoaded = false;
+  let _fvWrapNode = null; // cached ref — getElementById fails on detached nodes
+
+  function _getFvWrap() {
+    if (!_fvWrapNode) _fvWrapNode = document.getElementById('fvSecaoWrap');
+    return _fvWrapNode;
   }
 
-  function editarTimeline(idx) {
-    timelineEditIdx = idx;
-    const item = timelineData[idx];
-    document.getElementById('timelineAno').value = item.ano;
-    document.getElementById('timelineDescEditor').innerHTML = item.desc;
-    document.querySelector('#modalTimeline .modal-titulo').textContent = 'Editar Marco Histórico';
-    document.querySelector('#modalTimeline .btn-confirmar').textContent = 'Salvar';
-    document.getElementById('modalTimeline').classList.add('aberto');
-    setTimeout(() => document.getElementById('timelineAno').focus(), 100);
-  }
+  function renderSecoes() {
+    const container = document.getElementById('secoesContainer');
+    if (!container) return;
+    const fvWrap = _getFvWrap();
+    // Detach fvWrap before clearing container so it isn't destroyed
+    if (fvWrap && fvWrap.parentNode) fvWrap.parentNode.removeChild(fvWrap);
 
-  async function adicionarTimeline() {
-    const ano = document.getElementById('timelineAno').value.trim();
-    const desc = document.getElementById('timelineDescEditor').innerHTML.trim();
-    if (!ano || !desc || desc === '<br>') return;
-    if (timelineEditIdx !== null) {
-      timelineData[timelineEditIdx] = { ano, desc };
-    } else {
-      timelineData.push({ ano, desc });
-    }
-    timelineData.sort((a,b) => a.ano - b.ano);
-    timelineEditIdx = null;
-    renderTimeline();
-    fecharModal('modalTimeline');
-    try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ timeline: timelineData }) }); } catch(err) { console.error(err); }
-  }
+    const toShow = secoesData.map((s,i)=>({...s,_ri:i})).filter(s=>modoEdicao || s.visivel!==false);
+    container.innerHTML = '';
 
-  async function removerTimeline(idx) {
-    timelineData.splice(idx, 1);
-    renderTimeline();
-    try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ timeline: timelineData }) }); } catch(err) { console.error(err); }
-  }
+    toShow.forEach((s, vi) => {
+      if (s.tipo === 'fluxo-valor') {
+        _insertFvWrap(s, vi, s._ri, toShow.length, container);
+      } else {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = renderSecao(s, vi, s._ri, toShow.length);
+        while (tmp.firstChild) container.appendChild(tmp.firstChild);
+      }
+    });
 
-  function renderTimeline() {
-    const container = document.getElementById('timeline');
-    if (timelineData.length === 0) { container.innerHTML = '<p style="color:#a0aec0;font-size:13px">Nenhum marco histórico adicionado ainda.</p>'; return; }
-    container.innerHTML = timelineData.map((item, i) => `
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-          <div style="flex:1">
-            <div class="timeline-ano">${item.ano}</div>
-            <div class="timeline-desc">${item.desc}</div>
-          </div>
-          <div style="display:flex;gap:2px;opacity:0;transition:opacity 0.2s" class="timeline-acoes">
-            <button class="timeline-edit" onclick="editarTimeline(${i})" title="Editar" style="opacity:1">✎</button>
-            <button class="timeline-del" onclick="removerTimeline(${i})" title="Remover" style="opacity:1">✕</button>
-          </div>
-        </div>
-      </div>`).join('');
-    container.querySelectorAll('.timeline-item').forEach(item => {
-      item.addEventListener('mouseenter', () => item.querySelector('.timeline-acoes').style.opacity = '1');
-      item.addEventListener('mouseleave', () => item.querySelector('.timeline-acoes').style.opacity = '0');
+    container.querySelectorAll('.timeline-item').forEach(item=>{
+      item.addEventListener('mouseenter',()=>{const a=item.querySelector('.timeline-acoes');if(a)a.style.opacity='1';});
+      item.addEventListener('mouseleave',()=>{const a=item.querySelector('.timeline-acoes');if(a)a.style.opacity='0';});
     });
   }
 
-  // ===== CATEGORIAS CUSTOMIZADAS =====
-  function renderCustomCampos() {
-    const container = document.getElementById('customCamposContainer');
-    if (!container || customCampos.length === 0) { if (container) container.innerHTML = ''; return; }
-    container.innerHTML = '<div class="info-grid" style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f2f5">' +
-      customCampos.map((c, i) => `
-        <div class="info-item">
-          <div class="info-label" style="display:flex;align-items:center;justify-content:space-between">
-            ${c.label}
-            ${modoEdicao ? `<button onclick="removerCategoria(${i})" style="color:#c53030;background:none;border:none;cursor:pointer;font-size:11px;padding:0;margin-left:4px">✕</button>` : ''}
+  function _insertFvWrap(s, vi, ri, total, container) {
+    const fvWrap = _getFvWrap();
+    if (!fvWrap) return;
+    const hidden = s.visivel === false;
+    // In view mode, hidden FV = not rendered at all
+    if (hidden && !modoEdicao) return;
+
+    // Update inner content visibility (use fvWrap.querySelector — node may be detached)
+    const inner = fvWrap.querySelector('#fvSecaoInner');
+    const ocultoMsg = fvWrap.querySelector('#fvOcultoMsg');
+    if (inner) inner.style.display = (hidden && modoEdicao) ? 'none' : '';
+    if (ocultoMsg) ocultoMsg.style.display = (hidden && modoEdicao) ? '' : 'none';
+
+    // Update controls
+    const ctrl = fvWrap.querySelector('#fvCtrl');
+    if (ctrl) {
+      if (modoEdicao) {
+        let h = '<div style="display:flex;gap:4px;align-items:center">';
+        if (vi > 0) h += `<button onclick="moverSecao(${ri},-1)" style="${_sBtnBase}" title="Subir">↑</button>`;
+        if (vi < total-1) h += `<button onclick="moverSecao(${ri},1)" style="${_sBtnBase}" title="Descer">↓</button>`;
+        h += `<button onclick="toggleFvVisivel(${ri})" style="${_sBtnBase}">${hidden?'Mostrar':'Ocultar'}</button>`;
+        h += '</div>';
+        ctrl.innerHTML = h;
+      } else {
+        ctrl.innerHTML = '';
+      }
+    }
+
+    fvWrap.style.display = '';
+    container.appendChild(fvWrap);
+
+    if (!hidden && !fvLoaded) { fvLoaded = true; carregarFluxo(); }
+  }
+
+  function ensureFvEntry() {
+    if (!secoesData.find(s => s.tipo === 'fluxo-valor')) {
+      secoesData.push({id:'fluxo-valor', tipo:'fluxo-valor', emoji:'🗺️', nome:'Fluxo de Valor', visivel:true, campos:[]});
+    }
+  }
+
+  function toggleFvVisivel(ri) {
+    coletarRichEditors();
+    secoesData[ri].visivel = secoesData[ri].visivel !== false ? false : true;
+    _salvarSecoes();
+    renderSecoes();
+  }
+
+  function renderSecao(s, vi, ri, total) {
+    const isE = modoEdicao;
+    const ctrl = isE ? `<div style="display:flex;gap:4px;align-items:center;margin-left:auto;flex-shrink:0">
+      ${vi>0?`<button onclick="moverSecao(${ri},-1)" style="${_sBtnBase}" title="Subir">↑</button>`:''}
+      ${vi<total-1?`<button onclick="moverSecao(${ri},1)" style="${_sBtnBase}" title="Descer">↓</button>`:''}
+      <button onclick="editarSecaoMeta(${ri})" style="${_sBtnBase}" title="Editar nome">✏️</button>
+      <button onclick="removerSecao(${ri})" style="${_sBtnDel}" title="Remover seção">✕</button>
+    </div>` : '';
+    const hdr = `<div class="section-header" style="display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:18px;border-bottom:1.5px solid #f0f2f5">
+      <div class="section-icon">${s.emoji||'📋'}</div>
+      <span class="section-titulo-text">${s.nome}</span>
+      ${ctrl}
+    </div>`;
+    const campos = s.campos||[];
+    const body = campos.length
+      ? _renderCamposAgrupados(s, campos, ri)
+      : (modoEdicao ? '<p style="color:#a0aec0;font-size:12px;margin:0 0 8px">Use "+ Adicionar" abaixo para incluir conteúdo.</p>' : '');
+    const addBar = modoEdicao ? _renderAddBar(ri) : '';
+    return `<div class="section-bloco" data-ri="${ri}">${hdr}${body}${addBar}</div>`;
+  }
+
+  function _renderCamposAgrupados(s, campos, ri) {
+    // agrupa campos consecutivos do mesmo tipo de display para grid layout
+    const groups=[], n=campos.length;
+    let i=0;
+    while(i<n){
+      const c=campos[i], gtype=(c.tipo==='texto'||c.tipo==='textarea')?'simples':c.tipo;
+      if(gtype==='simples'||gtype==='rich'){
+        const items=[{c,ci:i}];
+        while(i+1<n&&((campos[i+1].tipo==='texto'||campos[i+1].tipo==='textarea')?'simples':campos[i+1].tipo)===gtype){i++;items.push({c:campos[i],ci:i});}
+        groups.push({gtype,items});
+      } else {
+        groups.push({gtype,items:[{c,ci:i}]});
+      }
+      i++;
+    }
+    return groups.map(g=>{
+      if(g.gtype==='simples') return _renderGrupoSimples(s,g.items,ri);
+      if(g.gtype==='rich')    return _renderGrupoRich(s,g.items,ri);
+      if(g.gtype==='timeline')return _renderCampoTimeline(s,g.items[0].c,g.items[0].ci,ri);
+      if(g.gtype==='tabela')  return _renderCampoTabela(s,g.items[0].c,g.items[0].ci,ri);
+      return '';
+    }).join('');
+  }
+
+  const _labelInputStyle = 'flex:1;min-width:0;border:none;border-bottom:1.5px solid #d6bcfa;outline:none;font-size:11px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.5px;background:transparent;padding:0 0 1px 0;font-family:inherit';
+
+  function _renderGrupoSimples(s, items, ri) {
+    const html = items.map(({c,ci})=>{
+      const del = modoEdicao ? `<button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};padding:1px 5px;margin-left:4px">✕</button>` : '';
+      const inp = c.tipo==='textarea'
+        ? `<textarea class="info-textarea" oninput="secoesData[${ri}].campos[${ci}].valor=this.value" placeholder="...">${_esc(c.valor)}</textarea>`
+        : `<input type="text" class="info-input" oninput="secoesData[${ri}].campos[${ci}].valor=this.value" value="${_esc(c.valor)}" placeholder="...">`;
+      if (modoEdicao) return `<div class="info-item">
+        <div class="info-label" style="display:flex;align-items:center;justify-content:space-between">
+          <input type="text" value="${_esc(c.label)}" oninput="secoesData[${ri}].campos[${ci}].label=this.value" style="${_labelInputStyle}">${del}
+        </div>${inp}
+      </div>`;
+      return `<div class="info-item"><div class="info-label">${c.label}</div><div class="info-value">${c.valor||'—'}</div></div>`;
+    }).join('');
+    return `<div class="info-grid">${html}</div>`;
+  }
+
+  function _renderGrupoRich(s, items, ri) {
+    const cards = items.map(({c,ci})=>{
+      const eid = 'rich-'+s.id+'-'+ci;
+      const del = modoEdicao ? `<button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};padding:1px 5px;float:right;margin-left:6px">✕</button>` : '';
+      const titleEl = modoEdicao
+        ? `${del}<input type="text" value="${_esc(c.label)}" oninput="secoesData[${ri}].campos[${ci}].label=this.value" style="border:none;border-bottom:1.5px solid #d6bcfa;outline:none;font-size:12px;font-weight:700;color:#1e2a4a;background:transparent;padding:0 0 2px 0;width:calc(100% - 36px);font-family:inherit">`
+        : c.label;
+      const tb = modoEdicao ? `<div style="display:flex;gap:3px;padding:5px;background:#f8fafc;border-radius:6px 6px 0 0;border:1.5px solid #e2e8f0;border-bottom:none;flex-wrap:wrap;margin-top:8px">
+        <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','bold')"><b>B</b></button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','italic')"><i>I</i></button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','insertUnorderedList')">• Lista</button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','insertOrderedList')">1. Lista</button>
+        <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('${eid}')">🔗</button>
+      </div>` : '';
+      const val = c.valor||(modoEdicao?'':`<span style="color:#a0aec0">Clique em Editar para adicionar.</span>`);
+      return `<div class="mvv-card"><div class="mvv-titulo">${titleEl}</div>${tb}<div class="mvv-texto rich-editor" id="${eid}" contenteditable="${modoEdicao}" onkeydown="_ovRichKeydown(event)">${val}</div></div>`;
+    }).join('');
+    return `<div class="mvv-grid">${cards}</div>`;
+  }
+
+  function _renderCampoTimeline(s, c, ci, ri) {
+    const items = (c.dados&&c.dados.items)||[];
+    const addBtn = modoEdicao ? `<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+      <button onclick="abrirModalTimeline(${ri},${ci})" style="font-size:11px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600">+ Marco</button>
+      <button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel}">✕ Remover linha do tempo</button>
+    </div>` : '';
+    if (!items.length) return addBtn+`<p style="color:#a0aec0;font-size:13px">Nenhum marco adicionado ainda.</p>`;
+    const html = items.map((item,i)=>`
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+          <div style="flex:1"><div class="timeline-ano">${item.ano}</div><div class="timeline-desc">${item.desc}</div></div>
+          <div class="timeline-acoes" style="display:flex;gap:2px;opacity:0;transition:opacity 0.2s">
+            <button class="timeline-edit" onclick="editarTimeline(${ri},${ci},${i})">✎</button>
+            <button class="timeline-del" onclick="removerTimelineItem(${ri},${ci},${i})">✕</button>
           </div>
-          <div class="info-value" id="val-custom-${i}" ${modoEdicao ? 'style="display:none"' : ''}>${c.value || '—'}</div>
-          <input type="text" class="info-input" id="inp-custom-${i}" ${modoEdicao ? '' : 'style="display:none"'} value="${c.value || ''}" placeholder="Valor...">
-        </div>`).join('') +
-      '</div>';
+        </div>
+      </div>`).join('');
+    return addBtn+`<div class="timeline">${html}</div>`;
   }
 
-  function abrirModalNovaCategoria() {
-    document.getElementById('novaCatLabel').value = '';
-    document.getElementById('novaCatValue').value = '';
-    document.getElementById('modalNovaCategoria').classList.add('aberto');
-    setTimeout(() => document.getElementById('novaCatLabel').focus(), 100);
+  function _renderCampoTabela(s, c, ci, ri) {
+    const d = c.dados||{colunas:[],linhas:[]};
+    const cols = d.colunas||[], rows = d.linhas||[];
+    const ncols = Math.max(cols.length,1);
+    const colW = (100/ncols).toFixed(1)+'%';
+    const bs = 'border:1px solid #e2e8f0;padding:7px 10px;font-size:12px;word-break:break-word;vertical-align:top';
+    const colgroup = `<colgroup>${cols.map(()=>`<col style="width:${colW}">`).join('')}${modoEdicao?'<col style="width:40px">':''}</colgroup>`;
+    const thead = `<tr>
+      ${cols.map((col,coli)=>`<th style="${bs};font-weight:700;background:${col.bgColor||'#f8fafc'};color:${col.textColor||'#1e2a4a'}">
+        ${modoEdicao?`<div style="display:flex;gap:4px;align-items:center">
+          <input type="text" value="${_esc(col.nome||'')}" oninput="secoesData[${ri}].campos[${ci}].dados.colunas[${coli}].nome=this.value" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-weight:700;font-size:12px;color:inherit;font-family:inherit">
+          <input type="color" title="Cor fundo" value="${col.bgColor||'#f8fafc'}" onchange="_tblColCor(${ri},${ci},${coli},'bgColor',this.value,this.closest('th'))" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;flex-shrink:0">
+          <button onclick="removerColunaTabela(${ri},${ci},${coli})" style="${_sBtnDel};padding:1px 4px">✕</button>
+        </div>`:(col.nome||'—')}
+      </th>`).join('')}
+      ${modoEdicao?`<th style="${bs};background:#f8fafc"><button onclick="adicionarColunaTabela(${ri},${ci})" style="font-size:11px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:4px;padding:3px 8px;cursor:pointer;font-weight:600">+Col</button></th>`:''}
+    </tr>`;
+    const tbody = rows.map((row,r)=>`<tr>
+      ${cols.map((col,coli)=>{
+        const cell=(row&&row[coli])||{valor:'',bgColor:'',textColor:''};
+        return `<td style="${bs};background:${cell.bgColor||'transparent'};color:${cell.textColor||'inherit'}">
+          ${modoEdicao?`<div style="display:flex;gap:3px;align-items:flex-start">
+            <textarea oninput="_tblCellVal(${ri},${ci},${r},${coli},this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-family:inherit;font-size:inherit;color:inherit;resize:none;overflow:hidden;line-height:1.4" rows="1">${_esc(cell.valor||'')}</textarea>
+            <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
+              <input type="color" title="Cor fundo" value="${cell.bgColor||'#ffffff'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'bgColor',this.value,this.closest('td'))" style="width:16px;height:16px;border:none;padding:0;cursor:pointer">
+              <input type="color" title="Cor texto" value="${cell.textColor||'#1e2a4a'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'textColor',this.value,this.closest('td'))" style="width:16px;height:16px;border:none;padding:0;cursor:pointer">
+            </div>
+          </div>`:(cell.valor||'—')}
+        </td>`;
+      }).join('')}
+      ${modoEdicao?`<td style="${bs};background:#fff5f5"><button onclick="removerLinhaTabela(${ri},${ci},${r})" style="${_sBtnDel};padding:1px 4px">✕</button></td>`:''}
+    </tr>`).join('');
+    const delBtn = modoEdicao?`<div style="margin-bottom:8px"><button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel}">✕ Remover tabela</button></div>`:'';
+    const addRow = modoEdicao?`<div style="margin-top:8px"><button onclick="adicionarLinhaTabela(${ri},${ci})" style="font-size:12px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:600">+ Linha</button></div>`:'';
+    return `${delBtn}<div class="secao-tbl-wrap"><div class="secao-tbl"><table style="table-layout:fixed">${colgroup}<thead>${thead}</thead><tbody>${tbody}</tbody></table></div></div>${addRow}`;
   }
 
-  function confirmarNovaCategoria() {
-    const label = document.getElementById('novaCatLabel').value.trim();
-    const value = document.getElementById('novaCatValue').value.trim();
-    if (!label) return;
-    customCampos.push({ label, value });
-    renderCustomCampos();
-    fecharModal('modalNovaCategoria');
+  function _renderAddBar(ri) {
+    const bs2 = 'font-size:11px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:5px;padding:4px 10px;cursor:pointer;font-weight:600';
+    return `<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;color:#718096;font-weight:600;flex-shrink:0">+ Adicionar:</span>
+      <button onclick="addCampo(${ri},'texto')" style="${bs2}">Texto</button>
+      <button onclick="addCampo(${ri},'textarea')" style="${bs2}">Texto longo</button>
+      <button onclick="addCampo(${ri},'rich')" style="${bs2}">Card</button>
+      <button onclick="addCampo(${ri},'timeline')" style="${bs2}">Linha do tempo</button>
+      <button onclick="addCampo(${ri},'tabela')" style="${bs2}">Tabela</button>
+    </div>`;
   }
 
-  function removerCategoria(idx) {
-    customCampos.splice(idx, 1);
-    renderCustomCampos();
+  // table helpers
+  function _tblColCor(ri,ci,coli,campo,val,th){secoesData[ri].campos[ci].dados.colunas[coli][campo]=val;if(th&&campo==='bgColor')th.style.background=val;}
+  function _tblCellVal(ri,ci,r,c,val){const row=secoesData[ri].campos[ci].dados.linhas[r]=secoesData[ri].campos[ci].dados.linhas[r]||[];row[c]=row[c]||{valor:'',bgColor:'',textColor:''};row[c].valor=val;}
+  function _tblCellCor(ri,ci,r,c,campo,val,td){const row=secoesData[ri].campos[ci].dados.linhas[r]=secoesData[ri].campos[ci].dados.linhas[r]||[];row[c]=row[c]||{valor:'',bgColor:'',textColor:''};row[c][campo]=val;if(td){if(campo==='bgColor')td.style.background=val;else if(campo==='textColor')td.style.color=val;}}
+
+  // ===== CRUD SEÇÕES =====
+  function removerSecao(ri){if(!confirm('Remover esta seção?'))return;coletarRichEditors();secoesData[ri].visivel=false;renderSecoes();}
+  function moverSecao(ri,dir){coletarRichEditors();const vis=secoesData.map((s,i)=>({s,i})).filter(x=>x.s.visivel!==false).map(x=>x.i);const pos=vis.indexOf(ri),sp=pos+dir;if(sp<0||sp>=vis.length)return;[secoesData[ri],secoesData[vis[sp]]]=[secoesData[vis[sp]],secoesData[ri]];renderSecoes();}
+  function editarSecaoMeta(ri){const s=secoesData[ri];document.getElementById('editSecaoEmoji').value=s.emoji||'';document.getElementById('editSecaoNome').value=s.nome||'';document.getElementById('editSecaoIdx').value=ri;document.getElementById('modalEditSecao').classList.add('aberto');setTimeout(()=>document.getElementById('editSecaoNome').focus(),100);}
+  function confirmarEditSecao(){const ri=+document.getElementById('editSecaoIdx').value;secoesData[ri].emoji=document.getElementById('editSecaoEmoji').value.trim()||'📋';secoesData[ri].nome=document.getElementById('editSecaoNome').value.trim()||'Seção';fecharModal('modalEditSecao');renderSecoes();}
+  function abrirModalNovaSecao(){document.getElementById('novaSecaoEmoji').value='';document.getElementById('novaSecaoNome').value='';document.getElementById('modalNovaSecao').classList.add('aberto');setTimeout(()=>document.getElementById('novaSecaoNome').focus(),100);}
+  function confirmarNovaSecao(){const emoji=document.getElementById('novaSecaoEmoji').value.trim()||'📋';const nome=document.getElementById('novaSecaoNome').value.trim();if(!nome)return;coletarRichEditors();secoesData.push({id:'secao_'+Date.now(),emoji,nome,visivel:true,campos:[]});fecharModal('modalNovaSecao');renderSecoes();}
+
+  // ===== CRUD CAMPOS =====
+  function addCampo(ri, tipo) {
+    coletarRichEditors();
+    const id = 'campo_'+Date.now();
+    let campo;
+    if      (tipo==='texto')    campo={id,tipo:'texto',label:'Campo',valor:''};
+    else if (tipo==='textarea') campo={id,tipo:'textarea',label:'Campo',valor:''};
+    else if (tipo==='rich')     campo={id,tipo:'rich',label:'Novo Card',valor:''};
+    else if (tipo==='timeline') campo={id,tipo:'timeline',dados:{items:[]}};
+    else if (tipo==='tabela')   campo={id,tipo:'tabela',dados:{colunas:[{nome:'Coluna 1',bgColor:'#f8fafc',textColor:'#1e2a4a'}],linhas:[[{valor:'',bgColor:'',textColor:''}]]}};
+    if (campo) { (secoesData[ri].campos=secoesData[ri].campos||[]).push(campo); renderSecoes(); }
+  }
+
+  function removerCampo(ri, ci) { coletarRichEditors(); secoesData[ri].campos.splice(ci,1); renderSecoes(); }
+
+  // ===== TABELA CRUD =====
+  function adicionarColunaTabela(ri,ci){secoesData[ri].campos[ci].dados.colunas.push({nome:'Nova Coluna',bgColor:'#f8fafc',textColor:'#1e2a4a'});(secoesData[ri].campos[ci].dados.linhas||[]).forEach(row=>row.push({valor:'',bgColor:'',textColor:''}));renderSecoes();}
+  function removerColunaTabela(ri,ci,coli){secoesData[ri].campos[ci].dados.colunas.splice(coli,1);(secoesData[ri].campos[ci].dados.linhas||[]).forEach(row=>row.splice(coli,1));renderSecoes();}
+  function adicionarLinhaTabela(ri,ci){const row=(secoesData[ri].campos[ci].dados.colunas||[]).map(()=>({valor:'',bgColor:'',textColor:''}));(secoesData[ri].campos[ci].dados.linhas=secoesData[ri].campos[ci].dados.linhas||[]).push(row);renderSecoes();}
+  function removerLinhaTabela(ri,ci,r){secoesData[ri].campos[ci].dados.linhas.splice(r,1);renderSecoes();}
+
+  // ===== TIMELINE =====
+  function fmtRich(id,cmd){document.getElementById(id).focus();document.execCommand(cmd,false,null);}
+  function _ovRichKeydown(e){if(e.key==='Tab'){e.preventDefault();document.execCommand(e.shiftKey?'outdent':'indent');}}
+  function inserirLink(id){const url=prompt('URL do link:');if(!url)return;const txt=prompt('Texto do link:')||url;document.getElementById(id).focus();document.execCommand('insertHTML',false,`<a href="${url}" target="_blank">${txt}</a>`);}
+  function fmtTimeline(cmd){fmtRich('timelineDescEditor',cmd);}
+  function inserirLinkTimeline(){inserirLink('timelineDescEditor');}
+
+  function abrirModalTimeline(ri,ci){
+    _tlRi=ri;_tlCi=ci;timelineEditIdx=null;
+    document.getElementById('timelineAno').value='';
+    document.getElementById('timelineDescEditor').innerHTML='';
+    document.querySelector('#modalTimeline .modal-titulo').textContent='Adicionar Marco Histórico';
+    document.querySelector('#modalTimeline .btn-confirmar').textContent='Adicionar';
+    document.getElementById('modalTimeline').classList.add('aberto');
+    setTimeout(()=>document.getElementById('timelineAno').focus(),100);
+  }
+
+  function editarTimeline(ri,ci,idx){
+    _tlRi=ri;_tlCi=ci;timelineEditIdx=idx;
+    const item=secoesData[ri].campos[ci].dados.items[idx];
+    document.getElementById('timelineAno').value=item.ano;
+    document.getElementById('timelineDescEditor').innerHTML=item.desc;
+    document.querySelector('#modalTimeline .modal-titulo').textContent='Editar Marco Histórico';
+    document.querySelector('#modalTimeline .btn-confirmar').textContent='Salvar';
+    document.getElementById('modalTimeline').classList.add('aberto');
+    setTimeout(()=>document.getElementById('timelineAno').focus(),100);
+  }
+
+  async function adicionarTimeline(){
+    if(_tlRi<0||_tlCi<0) return;
+    const ano=document.getElementById('timelineAno').value.trim();
+    const desc=document.getElementById('timelineDescEditor').innerHTML.trim();
+    if(!ano||!desc||desc==='<br>') return;
+    const items=secoesData[_tlRi].campos[_tlCi].dados.items=secoesData[_tlRi].campos[_tlCi].dados.items||[];
+    if(timelineEditIdx!==null){items[timelineEditIdx]={ano,desc};}else{items.push({ano,desc});}
+    items.sort((a,b)=>a.ano-b.ano);
+    timelineEditIdx=null;
+    renderSecoes();
+    fecharModal('modalTimeline');
+    await _salvarSecoes();
+  }
+
+  async function removerTimelineItem(ri,ci,idx){
+    secoesData[ri].campos[ci].dados.items.splice(idx,1);
+    renderSecoes();
+    await _salvarSecoes();
   }
 
   // ===== NOSSO TIME — API =====
@@ -1096,16 +1386,17 @@
     document.getElementById('membroNomeDropdown').style.display = 'none';
     if (id) {
       const m = membros.find(m => m.id == id);
-      if (m) { document.getElementById('membroNome').value=m.nome; document.getElementById('membroCargo').value=m.cargo; document.getElementById('membroDep').value=m.depId||''; document.getElementById('membroEmail').value=m.email||''; }
+      if (m) { document.getElementById('membroNome').value=m.nome; document.getElementById('membroCargo').value=m.cargo; document.getElementById('membroEmail').value=m.email||''; }
     } else {
-      document.getElementById('membroNome').value=''; document.getElementById('membroCargo').value=''; document.getElementById('membroDep').value=''; document.getElementById('membroEmail').value='';
+      document.getElementById('membroNome').value=''; document.getElementById('membroCargo').value=''; document.getElementById('membroEmail').value='';
     }
     document.getElementById('modalMembro').classList.add('aberto');
   }
 
   async function salvarMembro() {
     const id = document.getElementById('membroEditId').value;
-    const membro = { id:id?parseInt(id):Date.now(), nome:document.getElementById('membroNome').value.trim(), cargo:document.getElementById('membroCargo').value.trim(), depId:document.getElementById('membroDep').value, email:document.getElementById('membroEmail').value.trim(), x:Math.random()*400+50, y:Math.random()*200+50 };
+    const _existente = id ? membros.find(m=>m.id==id) : null;
+    const membro = { id:id?parseInt(id):Date.now(), nome:document.getElementById('membroNome').value.trim(), cargo:document.getElementById('membroCargo').value.trim(), depId:_existente?.depId||'', email:document.getElementById('membroEmail').value.trim(), x:Math.random()*400+50, y:Math.random()*200+50 };
     if (!membro.nome) return;
     if (id) { const idx=membros.findIndex(m=>m.id==id); if(idx!==-1){membro.x=membros[idx].x;membro.y=membros[idx].y;membros[idx]=membro;} }
     else membros.push(membro);
@@ -1132,6 +1423,34 @@
       case 'bottom': return { x: l + w/2, y: t + h };
       case 'left':   return { x: l,       y: t + h/2 };
       default:       return { x: l + w/2, y: t + h/2 };
+    }
+  }
+
+  // Canvas-relative bounds using stored m.x/m.y — works even when canvas is hidden
+  function _nodeBounds(memberId) {
+    const m = membros.find(x => x.id == memberId);
+    if (!m) return null;
+    const W = getLarguraCard();
+    const el = document.getElementById('node-' + memberId);
+    const H = el && el.offsetHeight > 0 ? el.offsetHeight : 120;
+    return { l: m.x, t: m.y, w: W, h: H };
+  }
+  function _handleFromBounds(b, side) {
+    switch(side) {
+      case 'top':    return { x: b.l + b.w/2, y: b.t };
+      case 'right':  return { x: b.l + b.w,   y: b.t + b.h/2 };
+      case 'bottom': return { x: b.l + b.w/2, y: b.t + b.h };
+      case 'left':   return { x: b.l,          y: b.t + b.h/2 };
+      default:       return { x: b.l + b.w/2, y: b.t + b.h/2 };
+    }
+  }
+  function _autoEntryFromBounds(b, fromX, fromY) {
+    const cx = b.l + b.w/2, cy = b.t + b.h/2;
+    const dx = cx - fromX, dy = cy - fromY;
+    if (Math.abs(dy) >= Math.abs(dx)) {
+      return dy > 0 ? { x: cx, y: b.t, side: 'top' } : { x: cx, y: b.t + b.h, side: 'bottom' };
+    } else {
+      return dx > 0 ? { x: b.l, y: cy, side: 'left' } : { x: b.l + b.w, y: cy, side: 'right' };
     }
   }
 
@@ -1246,33 +1565,27 @@
     const membrosVisiveis = depAtivo ? membros.filter(m => m.depId == depAtivo) : membros;
     const idsVisiveis = new Set(membrosVisiveis.map(m => m.id));
     const canvas = document.getElementById('orgCanvas');
-    const canvasRect = canvas.getBoundingClientRect();
 
     conexoes.forEach(c => {
       if (!idsVisiveis.has(c.de) || !idsVisiveis.has(c.para)) return;
-      const nodeDE = document.getElementById('node-' + c.de);
-      const nodePARA = document.getElementById('node-' + c.para);
-      if (!nodeDE || !nodePARA) return;
-      const rDE = nodeDE.getBoundingClientRect();
-      const rPARA = nodePARA.getBoundingClientRect();
+      const bDE = _nodeBounds(c.de), bPARA = _nodeBounds(c.para);
+      if (!bDE || !bPARA) return;
       let x1, y1;
       if (c.fromSide) {
-        const pos = getHandlePos(rDE, canvasRect, c.fromSide);
+        const pos = _handleFromBounds(bDE, c.fromSide);
         x1 = pos.x; y1 = pos.y;
       } else {
-        const deL = rDE.left-canvasRect.left, deT = rDE.top-canvasRect.top;
-        const paL = rPARA.left-canvasRect.left, paT = rPARA.top-canvasRect.top;
-        const cx1=deL+rDE.width/2, cy1=deT+rDE.height/2, cx2=paL+rPARA.width/2, cy2=paT+rPARA.height/2;
+        const cx1=bDE.l+bDE.w/2, cy1=bDE.t+bDE.h/2, cx2=bPARA.l+bPARA.w/2, cy2=bPARA.t+bPARA.h/2;
         const dx=cx2-cx1, dy=cy2-cy1;
-        if (Math.abs(dy)>=Math.abs(dx)) { x1=cx1; y1=dy>0?deT+rDE.height:deT; }
-        else { y1=cy1; x1=dx>0?deL+rDE.width:deL; }
+        if (Math.abs(dy)>=Math.abs(dx)) { x1=cx1; y1=dy>0?bDE.t+bDE.h:bDE.t; }
+        else { y1=cy1; x1=dx>0?bDE.l+bDE.w:bDE.l; }
       }
       let entry;
       if (c.toSide) {
-        const pos = getHandlePos(rPARA, canvasRect, c.toSide);
+        const pos = _handleFromBounds(bPARA, c.toSide);
         entry = { x: pos.x, y: pos.y, side: c.toSide };
       } else {
-        entry = getAutoEntryPoint(rPARA, canvasRect, x1, y1);
+        entry = _autoEntryFromBounds(bPARA, x1, y1);
       }
       const { d, mx, my } = buildOrthogonalPath(x1, y1, c.fromSide || null, entry.x, entry.y, entry.side);
       const path = document.createElementNS('http://www.w3.org/2000/svg','path');
@@ -1281,9 +1594,16 @@
       path.setAttribute('stroke-opacity','0.65'); path.setAttribute('marker-end','url(#arrowhead)');
       svg.appendChild(path);
 
+      // Wide invisible hit-area for hover detection
+      const hitPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+      hitPath.setAttribute('d', d); hitPath.setAttribute('fill','none');
+      hitPath.setAttribute('stroke','transparent'); hitPath.setAttribute('stroke-width','20');
+      hitPath.style.pointerEvents = 'stroke'; hitPath.style.cursor = 'pointer';
+      svg.appendChild(hitPath);
+
       const btn = document.createElement('div');
       btn.className = 'conn-del-btn';
-      btn.style.cssText = `position:absolute;left:${mx-9}px;top:${my-9}px;width:18px;height:18px;background:white;border:1.5px solid #e2e8f0;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:#c53030;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,0.12);`;
+      btn.style.cssText = `position:absolute;left:${mx-9}px;top:${my-9}px;width:18px;height:18px;background:white;border:1.5px solid #e2e8f0;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:#c53030;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,0.12);opacity:0;transition:opacity .15s;`;
       btn.title = 'Remover conexão';
       btn.textContent = '×';
       btn.addEventListener('click', async ev => {
@@ -1293,6 +1613,14 @@
         renderOrganograma();
       });
       canvas.appendChild(btn);
+
+      let _orgHt;
+      const showBtn = () => { clearTimeout(_orgHt); btn.style.opacity = '1'; };
+      const hideBtn = () => { _orgHt = setTimeout(() => { btn.style.opacity = '0'; }, 150); };
+      hitPath.addEventListener('mouseenter', showBtn);
+      hitPath.addEventListener('mouseleave', hideBtn);
+      btn.addEventListener('mouseenter', showBtn);
+      btn.addEventListener('mouseleave', hideBtn);
     });
   }
 
@@ -1311,14 +1639,18 @@
       const nomeHtml = `<strong>${primeiro}</strong>${meio ? ' '+meio : ''}<strong>${ultimo ? ' '+ultimo : ''}</strong>`;
       const avatarSize = Math.round(44 * fScale);
       const avatarMb = fScale < 0.8 ? 3 : 6;
-      const fotoHtml = m.foto
-        ? `<img src="${m.foto}" style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:block">`
+      const usuarioSistema = m.email ? usuariosCadastrados.find(u => u.email && u.email.toLowerCase() === m.email.toLowerCase()) : null;
+      const fotoUrl = m.foto || usuarioSistema?.foto || null;
+      const fotoHtml = fotoUrl
+        ? `<img src="${fotoUrl}" style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:block">`
         : `<div style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;background:#edf2f7;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:flex;align-items:center;justify-content:center">
             <svg viewBox="0 0 24 24" width="${Math.round(22*fScale)}" height="${Math.round(22*fScale)}" fill="none">
               <circle cx="12" cy="8" r="4" fill="#a0aec0"/>
               <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" fill="#a0aec0"/>
             </svg>
           </div>`;
+      const nomeFontSize = Math.round(13 * fScale);
+      const cargoFontSize = Math.round(11 * fScale);
 
       const node = document.createElement('div');
       node.className = 'org-node';
@@ -1335,10 +1667,9 @@
           <button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()" title="Remover">🗑️</button>
         </div>
         ${fotoHtml}
-        <div style="font-size:${Math.round(13*fScale)}px;font-weight:600;color:#1e2a4a;margin-bottom:2px;line-height:1.3">${nomeHtml}</div>
-        <div style="font-size:${Math.round(11*fScale)}px;color:${cor};font-weight:600;margin-bottom:2px">${m.cargo}</div>
-        ${dep && fScale >= 0.8 ? `<div style="font-size:${Math.round(10*fScale)}px;color:#718096">${dep.nome}</div>` : ''}
-        ${m.email && fScale >= 1.0 ? `<div style="font-size:${Math.round(10*fScale)}px;color:#a0aec0;margin-top:1px">${m.email}</div>` : ''}
+        <div data-fit data-fit-max="${nomeFontSize}" style="font-size:${nomeFontSize}px;font-weight:600;color:#1e2a4a;margin-bottom:2px;line-height:1.3;white-space:nowrap;overflow:hidden">${nomeHtml}</div>
+        <div data-fit data-fit-max="${cargoFontSize}" style="font-size:${cargoFontSize}px;color:${cor};font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden">${m.cargo}</div>
+        ${m.email && fScale >= 1.0 ? `<div data-fit data-fit-max="${Math.round(10*fScale)}" style="font-size:${Math.round(10*fScale)}px;color:#a0aec0;margin-top:1px;white-space:nowrap;overflow:hidden">${m.email}</div>` : ''}
       `;
 
       node.addEventListener('mouseenter', () => { node.querySelector('.org-node-actions').style.opacity = '1'; });
@@ -1354,7 +1685,20 @@
       });
       canvas.appendChild(node);
     });
-    requestAnimationFrame(() => renderConexoes());
+    requestAnimationFrame(() => { fitOrgNodes(); renderConexoes(); });
+  }
+
+  function fitOrgNodes() {
+    document.querySelectorAll('[data-fit]').forEach(el => {
+      if (!el.offsetWidth) return; // skip elements in hidden tabs (no layout)
+      const maxFs = parseFloat(el.dataset.fitMax) || 13;
+      let fs = maxFs;
+      el.style.fontSize = fs + 'px';
+      while (fs > 7 && el.scrollWidth > el.offsetWidth) {
+        fs = Math.max(7, fs - 0.5);
+        el.style.fontSize = fs + 'px';
+      }
+    });
   }
 
   document.addEventListener('mousemove', e => {
@@ -1587,12 +1931,62 @@
     }
   }
 
+  function _wikiSetupToolbar() {
+    const tb = document.querySelector('.editor-toolbar');
+    if (!tb) return;
+    tb.innerHTML = `
+      <select class="toolbar-select" onmousedown="salvarSelecao()" onchange="fmtFontSize(this.value)" title="Tamanho da fonte">
+        <option value="">Tamanho</option>
+        <option value="10px">10</option>
+        <option value="12px">12</option>
+        <option value="14px">14</option>
+        <option value="16px">16</option>
+        <option value="18px">18</option>
+        <option value="20px">20</option>
+        <option value="24px">24</option>
+        <option value="28px">28</option>
+        <option value="36px">36</option>
+        <option value="48px">48</option>
+      </select>
+      <select class="toolbar-select" onmousedown="salvarSelecao()" onchange="fmtFontFamily(this.value)" title="Fonte">
+        <option value="">Fonte</option>
+        <option value="inherit">Padrão</option>
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="'Times New Roman', serif">Times</option>
+        <option value="'Courier New', monospace">Courier</option>
+        <option value="Georgia, serif">Georgia</option>
+      </select>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('bold')" title="Negrito"><b>B</b></button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('italic')" title="Itálico"><i>I</i></button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('underline')" title="Sublinhado"><u>U</u></button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('strikeThrough')" title="Tachado" style="text-decoration:line-through">S</button>
+      <div class="toolbar-sep"></div>
+      <label title="Cor do texto" style="display:flex;align-items:center;cursor:pointer;padding:2px 4px;border-radius:4px">
+        <span style="font-size:11px;margin-right:3px;color:#4a5568">A</span>
+        <input type="color" id="editorColor" value="#000000" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;background:none" onchange="fmt('foreColor',this.value)" title="Cor do texto">
+      </label>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('insertUnorderedList')" title="Lista com marcadores">• Lista</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('insertOrderedList')" title="Lista numerada">1. Lista</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyLeft')" title="Alinhar à esquerda">⬅</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyCenter')" title="Centralizar">☰</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('justifyRight')" title="Alinhar à direita">➡</button>
+      <div class="toolbar-sep"></div>
+      <button class="toolbar-btn" onmousedown="event.preventDefault();fmtInserirLink()" title="Inserir link">🔗 Link</button>
+    `;
+  }
+
   function novoWiki() {
     wikiEditando = null;
+    _wikiSetupToolbar();
     document.getElementById('editorTitulo').value='';
     document.getElementById('editorTags').value='';
     document.getElementById('editorResponsavel').value='';
-    document.getElementById('editorArea').innerHTML='';
+    const _ea = document.getElementById('editorArea');
+    _ea.innerHTML='';
+    if (!_ea._imgResizeInited) { _wikiImgResizeInit(_ea); _ea._imgResizeInited = true; }
     document.getElementById('versaoHistoria').classList.remove('aberto');
     document.getElementById('versaoHistoriaBody').innerHTML='';
     _atualizarBotoesEditor(null);
@@ -1707,10 +2101,13 @@
     const wiki = wikis.find(w=>w._id===id);
     if (!wiki) return;
     wikiEditando = id;
+    _wikiSetupToolbar();
     document.getElementById('editorTitulo').value=wiki.titulo;
     document.getElementById('editorTags').value=wiki.tags||'';
     document.getElementById('editorResponsavel').value=wiki.responsavel||'';
-    document.getElementById('editorArea').innerHTML=wiki.conteudo||'';
+    const ea = document.getElementById('editorArea');
+    ea.innerHTML=wiki.conteudo||'';
+    if (!ea._imgResizeInited) { _wikiImgResizeInit(ea); ea._imgResizeInited = true; }
     document.getElementById('versaoHistoria').classList.remove('aberto');
     document.getElementById('versaoHistoriaBody').innerHTML='';
     _atualizarBotoesEditor(wiki);
@@ -1937,6 +2334,93 @@
     sel.addRange(_selecaoSalva);
   }
   function fmt(cmd, val) { document.execCommand(cmd, false, val||null); document.getElementById('editorArea').focus(); }
+  function fmtFontSize(size) {
+    if (!size) return;
+    restaurarSelecao();
+    document.execCommand('fontSize', false, 7);
+    document.getElementById('editorArea').querySelectorAll('font[size="7"]').forEach(el => { el.removeAttribute('size'); el.style.fontSize = size; });
+    document.getElementById('editorArea').focus();
+  }
+  function fmtFontFamily(family) {
+    if (!family) return;
+    restaurarSelecao();
+    document.execCommand('fontName', false, family);
+    document.getElementById('editorArea').focus();
+  }
+  function fmtInserirLink() {
+    restaurarSelecao();
+    const url = prompt('URL do link:');
+    if (url) { document.execCommand('createLink', false, url); }
+    document.getElementById('editorArea').focus();
+  }
+  function salvarConteudoWiki() { _agendarAutoSave(); }
+
+  function fmtInserirImagem(input) {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      restaurarSelecao();
+      document.execCommand('insertHTML', false, `<img src="${e.target.result}" style="max-width:100%;height:auto">`);
+      _agendarAutoSave();
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  function _wikiImgResizeInit(area, saveCb) {
+    const _save = saveCb || (typeof salvarConteudoWiki !== 'undefined' ? salvarConteudoWiki : null);
+    const _attachListeners = (wrap, handle, img) => {
+      wrap.addEventListener('mouseenter', () => { handle.style.opacity = '1'; });
+      wrap.addEventListener('mouseleave', () => { if (!handle._dragging) handle.style.opacity = '0'; });
+      handle.addEventListener('mousedown', ev => {
+        ev.preventDefault(); ev.stopPropagation();
+        handle._dragging = true; handle.style.opacity = '1';
+        const startX = ev.clientX, startW = img.offsetWidth;
+        const onMove = ev2 => { img.style.width = Math.max(40, startW + ev2.clientX - startX) + 'px'; img.style.height = 'auto'; };
+        const onUp = () => {
+          handle._dragging = false; handle.style.opacity = '0';
+          document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp);
+          _save && _save();
+        };
+        document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+      });
+    };
+    const _addHandle = img => {
+      if (img._resizeHandle) return;
+      // If already wrapped from saved HTML, re-attach listeners instead of double-wrapping
+      const parent = img.parentElement;
+      if (parent && parent.dataset.imgWrap) {
+        let handle = parent.querySelector('span[data-img-handle]');
+        if (!handle) {
+          handle = document.createElement('span');
+          handle.style.cssText = 'position:absolute;bottom:2px;right:2px;width:14px;height:14px;background:rgba(107,70,193,0.75);cursor:se-resize;border-radius:3px 0 4px 0;user-select:none;opacity:0;transition:opacity .15s;z-index:10';
+          handle.dataset.imgHandle = '1';
+          parent.appendChild(handle);
+        }
+        img._resizeHandle = handle;
+        _attachListeners(parent, handle, img);
+        return;
+      }
+      const wrap = document.createElement('span');
+      wrap.style.cssText = 'position:relative;display:inline-block;line-height:0;vertical-align:bottom';
+      wrap.dataset.imgWrap = '1';
+      img.parentNode.insertBefore(wrap, img); wrap.appendChild(img);
+      const handle = document.createElement('span');
+      handle.style.cssText = 'position:absolute;bottom:2px;right:2px;width:14px;height:14px;background:rgba(107,70,193,0.75);cursor:se-resize;border-radius:3px 0 4px 0;user-select:none;opacity:0;transition:opacity .15s;z-index:10';
+      handle.title = 'Arraste para redimensionar';
+      handle.dataset.imgHandle = '1';
+      wrap.appendChild(handle);
+      img._resizeHandle = handle;
+      _attachListeners(wrap, handle, img);
+    };
+    area.querySelectorAll('img').forEach(_addHandle);
+    const obs = new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => {
+      if (n.tagName === 'IMG') _addHandle(n);
+      else if (n.querySelectorAll) n.querySelectorAll('img').forEach(_addHandle);
+    })));
+    obs.observe(area, { childList: true, subtree: true });
+    area._imgResizeObs = obs;
+  }
   function fmtBlock(tag) {
     restaurarSelecao();
     document.execCommand('formatBlock', false, tag);
@@ -2007,7 +2491,6 @@
 
   // INIT
   carregarInfo();
-  renderTimeline();
   carregarOrg();
   carregarPastas();
 
@@ -2175,6 +2658,834 @@
 
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
+
+  // ===== FLUXO DE VALOR =====
+  const temPermissaoFv = usuario.perfil === 'Admin';
+  let fvBlocos = [], fvTextos = [], fvConexoes = [], fvModo = 'viz';
+  let fvDragging = null, fvOffset = { x: 0, y: 0 };
+
+  async function carregarFluxo() {
+    try {
+      const res = await fetch('/api/fluxo-valor', { headers: HEADERS });
+      const data = await res.json();
+      fvBlocos = data.blocos || [];
+      fvTextos = data.textos || [];
+      fvConexoes = data.conexoes || [];
+      renderFluxo();
+    } catch(err) { console.error(err); }
+    // restore hidden state
+    if (localStorage.getItem('fvSecaoOculta') === '1') {
+      const inner = document.getElementById('fvSecaoInner');
+      const btn = document.getElementById('btnToggleFv');
+      if (inner) inner.style.display = 'none';
+      if (btn) btn.textContent = 'Mostrar';
+    }
+  }
+
+  async function salvarFluxo() {
+    try {
+      await fetch('/api/fluxo-valor', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ blocos: fvBlocos, textos: fvTextos, conexoes: fvConexoes }) });
+    } catch(err) { console.error(err); }
+  }
+
+  function renderFluxo() {
+    const canvas = document.getElementById('fvCanvas');
+    const empty = document.getElementById('fvEmpty');
+    document.querySelectorAll('.fv-block,.fv-text-node,[id^="fvb-"]').forEach(n => n.remove());
+    if (fvBlocos.length === 0 && fvTextos.length === 0) { empty.style.display = 'flex'; renderFvSvg(); return; }
+    empty.style.display = 'none';
+    fvBlocos.forEach(b => renderFvBloco(b));
+    fvTextos.forEach(t => renderFvTexto(t));
+    renderFvSvg();
+  }
+
+  function _renderTabelaEl(b) {
+    const canvas = document.getElementById('fvCanvas');
+    const el = document.createElement('div');
+    el.className = 'fv-block';
+    el.id = 'fvb-' + b.id;
+    el.style.left = b.x + 'px';
+    el.style.top  = b.y + 'px';
+    el.style.minWidth = '180px';
+    el.style.padding = '0';
+
+    const cols = b.colunas || ['Col 1','Col 2'];
+    const rows = b.linhas  || [['','']];
+    const edt  = fvModo === 'edicao';
+    const isPendingT = fvConectando && fvConectando.blocoId === b.id;
+    const portsHtmlT = edt ? `
+      <div class="fv-port fv-port-right${isPendingT?' pending':''}" onclick="clicarPorta('${b.id}','right',event)"  title="Conectar →"></div>
+      <div class="fv-port fv-port-left${isPendingT?' pending':''}"  onclick="clicarPorta('${b.id}','left',event)"   title="← Conectar"></div>
+      <div class="fv-port fv-port-top${isPendingT?' pending':''}"   onclick="clicarPorta('${b.id}','top',event)"    title="↑ Conectar"></div>
+      <div class="fv-port fv-port-bot${isPendingT?' pending':''}"   onclick="clicarPorta('${b.id}','bottom',event)" title="↓ Conectar"></div>` : '';
+
+    const headerCells = cols.map((c,ci) => `<th style="padding:5px 8px;font-size:11px;font-weight:700;color:#1e2a4a;border-bottom:1.5px solid #e2e8f0;border-right:1px solid #f0f2f5;white-space:nowrap;min-width:70px;background:#f8fafc;position:relative">
+      ${edt ? `<span contenteditable="true" onblur="event.stopPropagation();fvTabelaEditColNome(this,'${b.id}',${ci})"
+        style="outline:none;display:block;cursor:text" title="Editar nome da coluna">${_gesc(c)}</span>` : _gesc(c)}
+      ${edt && cols.length > 1 ? `<button onclick="event.stopPropagation();fvTabelaDelCol('${b.id}',${ci})" style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;background:#fff5f5;border:1px solid #feb2b2;color:#c53030;font-size:11px;cursor:pointer;z-index:5;line-height:1;display:none;padding:0" class="fv-tbl-delcol">−</button>` : ''}
+      ${edt ? `<button onclick="event.stopPropagation();fvTabelaAddCol('${b.id}',${ci+1})" style="position:absolute;right:-9px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:#f5f0ff;border:none;color:#2d1b69;font-size:12px;cursor:pointer;z-index:5;line-height:1;display:none;padding:0" class="fv-tbl-addbtn">+</button>` : ''}
+    </th>`).join('');
+
+    const dataRows = rows.map((row, ri) => `<tr>
+      ${row.map((cell, ci) => `<td style="padding:4px 7px;font-size:11px;color:#4a5568;border-bottom:1px solid #f0f2f5;border-right:1px solid #f0f2f5">
+        ${edt ? `<span contenteditable="true" onblur="event.stopPropagation();fvTabelaEditCell(this,'${b.id}',${ri},${ci})"
+          style="outline:none;display:block;min-width:50px;cursor:text">${_gesc(cell)}</span>` : _gesc(cell)}
+      </td>`).join('')}
+      ${edt ? `<td style="width:20px;padding:2px"><button onclick="event.stopPropagation();fvTabelaDelRow('${b.id}',${ri})" style="width:16px;height:16px;border-radius:50%;background:#fff5f5;border:none;color:#c53030;font-size:10px;cursor:pointer;line-height:1;padding:0">−</button></td>` : ''}
+    </tr>`).join('');
+
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1.5px solid #e2e8f0;background:#f5f0ff;border-radius:10px 10px 0 0">
+        <div style="font-size:12px;font-weight:700;color:#2d1b69;display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 40 40" fill="none"><rect x="4" y="6" width="32" height="28" rx="1" stroke="#2d1b69" stroke-width="2.5"/><line x1="4" y1="14" x2="36" y2="14" stroke="#2d1b69" stroke-width="2"/><line x1="4" y1="22" x2="36" y2="22" stroke="#2d1b69" stroke-width="2"/><line x1="18" y1="6" x2="18" y2="34" stroke="#2d1b69" stroke-width="2"/></svg>
+          ${edt ? `<span contenteditable="true" onblur="event.stopPropagation();fvTabelaEditNome(this,'${b.id}')" style="outline:none;cursor:text;border-bottom:1px dashed #9b72ef" title="Clique para editar o título">${_gesc(b.nome||'Tabela')}</span>` : _gesc(b.nome||'Tabela')}
+        </div>
+        ${edt ? `<button class="fv-block-del" onclick="event.stopPropagation();removerBloco('${b.id}')">&#x2715;</button>` : ''}
+      </div>
+      ${portsHtmlT}
+      <div style="overflow-x:auto;position:relative">
+        <table style="border-collapse:collapse;width:100%;font-size:12px" onmouseenter="this.closest('.fv-block').querySelectorAll('.fv-tbl-addbtn,.fv-tbl-delcol').forEach(b=>b.style.display='flex')" onmouseleave="this.closest('.fv-block').querySelectorAll('.fv-tbl-addbtn,.fv-tbl-delcol').forEach(b=>b.style.display='none')">
+          <thead><tr>${headerCells}${edt?'<th style="width:20px"></th>':''}</tr></thead>
+          <tbody>${dataRows}</tbody>
+        </table>
+      </div>
+      ${edt ? `<button onclick="event.stopPropagation();fvTabelaAddRow('${b.id}')" style="width:100%;padding:4px;border:none;background:none;color:#2d1b69;font-size:11px;cursor:pointer;border-top:1px solid #f0f2f5;border-radius:0 0 10px 10px">+ Linha</button>` : ''}
+    `;
+
+    el.addEventListener('mousedown', e => {
+      if (fvModo !== 'edicao' || e.target.tagName === 'BUTTON' || e.target.hasAttribute('contenteditable')) return;
+      fvDragging = { el, bloco: b };
+      const rect = el.getBoundingClientRect();
+      fvOffset.x = e.clientX - rect.left;
+      fvOffset.y = e.clientY - rect.top;
+      e.preventDefault();
+    });
+    canvas.appendChild(el);
+  }
+
+  function renderFvBloco(b) {
+    if (b.tipo === 'tabela') { _renderTabelaEl(b); return; }
+
+    const canvas = document.getElementById('fvCanvas');
+    const el = document.createElement('div');
+    el.className = 'fv-block';
+    el.id = 'fvb-' + b.id;
+    el.style.left = b.x + 'px';
+    el.style.top = b.y + 'px';
+    const isPending = fvConectando && fvConectando.blocoId === b.id;
+    const portsHtml = fvModo === 'edicao' ? `
+      <div class="fv-port fv-port-right${isPending?' pending':''}"  onclick="clicarPorta('${b.id}','right',event)"  title="Conectar →"></div>
+      <div class="fv-port fv-port-left${isPending?' pending':''}"   onclick="clicarPorta('${b.id}','left',event)"   title="← Conectar"></div>
+      <div class="fv-port fv-port-top${isPending?' pending':''}"    onclick="clicarPorta('${b.id}','top',event)"    title="↑ Conectar"></div>
+      <div class="fv-port fv-port-bot${isPending?' pending':''}"    onclick="clicarPorta('${b.id}','bottom',event)" title="↓ Conectar"></div>` : '';
+    const iconSvg = _fvShapeIcon(b.tipo);
+    el.style.padding = '0';
+    el.innerHTML = `
+      ${portsHtml}
+      <div style="background:#f0ebff;padding:16px;display:flex;align-items:center;justify-content:center;position:relative;border-radius:8px 8px 0 0">
+        ${iconSvg}
+        ${fvModo==='edicao' ? `
+          <button class="fv-block-del" onclick="event.stopPropagation();abrirEditarFvBloco('${b.id}')" title="Editar" style="position:absolute;top:6px;left:6px;background:#ede9fe;border-color:#c4b5fd;color:#2d1b69;font-size:11px">✏</button>
+          <button class="fv-block-del" onclick="event.stopPropagation();removerBloco('${b.id}')" style="position:absolute;top:6px;right:6px">&#x2715;</button>` : ''}
+      </div>
+      <div style="padding:9px 13px;border-top:1.5px solid #e2e8f0">
+        <div class="fv-block-nome">${b.nome}</div>
+        ${b.obs ? `<div class="fv-block-obs">${b.obs}</div>` : ''}
+      </div>`;
+    el.addEventListener('dblclick', e => {
+      if (fvModo !== 'edicao' || e.target.classList.contains('fv-port') || e.target.tagName === 'BUTTON') return;
+      abrirEditarFvBloco(b.id);
+    });
+    el.addEventListener('mousedown', e => {
+      if (fvModo !== 'edicao' || e.target.classList.contains('fv-port') || e.target.tagName === 'BUTTON') return;
+      fvDragging = { el, bloco: b };
+      const rect = el.getBoundingClientRect();
+      fvOffset.x = e.clientX - rect.left;
+      fvOffset.y = e.clientY - rect.top;
+      e.preventDefault();
+    });
+    canvas.appendChild(el);
+  }
+
+  function renderFvTexto(t) {
+    const canvas = document.getElementById('fvCanvas');
+    const el = document.createElement('div');
+    el.className = 'fv-text-node';
+    el.id = 'fvt-' + t.id;
+    el.style.left = t.x + 'px';
+    el.style.top = t.y + 'px';
+    el.style.position = 'absolute';
+    el.textContent = t.texto;
+    if (fvModo === 'edicao') {
+      el.title = 'Duplo clique para editar — arraste para mover';
+      const del = document.createElement('button');
+      del.innerHTML = '&#x2715;';
+      del.style.cssText = 'position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:#fff5f5;border:1px solid #feb2b2;color:#c53030;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;line-height:1;z-index:20';
+      del.onclick = e => { e.stopPropagation(); removerTexto(t.id); };
+      el.appendChild(del);
+      el.addEventListener('mouseenter', () => del.style.display = 'flex');
+      el.addEventListener('mouseleave', () => { if (!el.classList.contains('editing')) del.style.display = 'none'; });
+      el.addEventListener('dblclick', e => {
+        e.stopPropagation();
+        el.contentEditable = 'true';
+        el.classList.add('editing');
+        el.focus();
+        const range = document.createRange(); range.selectNodeContents(el);
+        const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      });
+      el.addEventListener('blur', () => {
+        el.contentEditable = 'false';
+        el.classList.remove('editing');
+        t.texto = el.textContent.trim() || t.texto;
+        salvarFluxo();
+      });
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); el.blur(); }
+        if (e.key === 'Escape') { el.textContent = t.texto; el.blur(); }
+      });
+    }
+    el.addEventListener('mousedown', e => {
+      if (fvModo !== 'edicao' || el.classList.contains('editing')) return;
+      fvDragging = { el, texto: t };
+      const rect = el.getBoundingClientRect();
+      fvOffset.x = e.clientX - rect.left;
+      fvOffset.y = e.clientY - rect.top;
+      e.preventDefault();
+    });
+    canvas.appendChild(el);
+  }
+
+  function _fvPortPos(b, porta, elW, elH) {
+    const w = elW || 140, h = elH || 80;
+    switch(porta) {
+      case 'left':   return { x: b.x,       y: b.y + h/2, dx: -1, dy: 0 };
+      case 'top':    return { x: b.x + w/2, y: b.y,       dx: 0,  dy:-1 };
+      case 'bottom': return { x: b.x + w/2, y: b.y + h,   dx: 0,  dy: 1 };
+      default:       return { x: b.x + w,   y: b.y + h/2, dx: 1,  dy: 0 };
+    }
+  }
+
+  function _fvOrthoPath(p1, p2) {
+    const r = 8;
+    const dx = p2.x - p1.x, dy = p2.y - p1.y;
+    if (Math.abs(dx) < 4 && Math.abs(dy) < 4) {
+      return { d: `M${p1.x},${p1.y} L${p2.x},${p2.y}`, mx: (p1.x+p2.x)/2, my: (p1.y+p2.y)/2 };
+    }
+    const fromSide = p1.dx === 1 ? 'right' : p1.dx === -1 ? 'left' : p1.dy === 1 ? 'bottom' : 'top';
+    const toSide   = p2.dx === -1 ? 'left' : p2.dx === 1 ? 'right' : p2.dy === -1 ? 'top' : 'bottom';
+    const isHorizExit  = fromSide === 'left' || fromSide === 'right';
+    const isHorizEntry = toSide === 'left' || toSide === 'right';
+    const isVertEntry  = toSide === 'top'  || toSide === 'bottom';
+    if ((isHorizExit && isVertEntry) || (!isHorizExit && isHorizEntry)) {
+      if (isHorizExit) {
+        if (Math.abs(dy) < 4) return { d: `M${p1.x},${p1.y} H${p2.x}`, mx: (p1.x+p2.x)/2, my: p1.y };
+        const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
+        const cr = Math.min(r, Math.abs(dx)/2, Math.abs(dy)/2);
+        return { d: `M${p1.x},${p1.y} H${p2.x-signX*cr} Q${p2.x},${p1.y} ${p2.x},${p1.y+signY*cr} V${p2.y}`, mx: p2.x, my: (p1.y+p2.y)/2 };
+      } else {
+        if (Math.abs(dx) < 4) return { d: `M${p1.x},${p1.y} V${p2.y}`, mx: p1.x, my: (p1.y+p2.y)/2 };
+        const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
+        const cr = Math.min(r, Math.abs(dy)/2, Math.abs(dx)/2);
+        return { d: `M${p1.x},${p1.y} V${p2.y-signY*cr} Q${p1.x},${p2.y} ${p1.x+signX*cr},${p2.y} H${p2.x}`, mx: (p1.x+p2.x)/2, my: p2.y };
+      }
+    }
+    if (isHorizExit) {
+      if (Math.abs(dy) < 4) return { d: `M${p1.x},${p1.y} H${p2.x}`, mx: (p1.x+p2.x)/2, my: p1.y };
+      const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
+      const mid = fromSide === 'right' ? Math.max((p1.x+p2.x)/2, p1.x+28) :
+                  fromSide === 'left'  ? Math.min((p1.x+p2.x)/2, p1.x-28) : (p1.x+p2.x)/2;
+      const er = Math.min(r, Math.abs(mid-p1.x)/2, Math.abs(dy)/2);
+      return { d: `M${p1.x},${p1.y} H${mid-signX*er} Q${mid},${p1.y} ${mid},${p1.y+signY*er} V${p2.y-signY*er} Q${mid},${p2.y} ${mid+signX*er},${p2.y} H${p2.x}`, mx: mid, my: (p1.y+p2.y)/2 };
+    } else {
+      if (Math.abs(dx) < 4) return { d: `M${p1.x},${p1.y} V${p2.y}`, mx: p1.x, my: (p1.y+p2.y)/2 };
+      const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
+      const mid = fromSide === 'bottom' ? Math.max((p1.y+p2.y)/2, p1.y+28) :
+                  fromSide === 'top'    ? Math.min((p1.y+p2.y)/2, p1.y-28) : (p1.y+p2.y)/2;
+      const er = Math.min(r, Math.abs(mid-p1.y)/2, Math.abs(dx)/2);
+      return { d: `M${p1.x},${p1.y} V${mid-signY*er} Q${p1.x},${mid} ${p1.x+signX*er},${mid} H${p2.x-signX*er} Q${p2.x},${mid} ${p2.x},${mid+signY*er} V${p2.y}`, mx: (p1.x+p2.x)/2, my: mid };
+    }
+  }
+
+  function _fvZigzagPath(p1, p2) {
+    const steps = 8;
+    const amp = 8;
+    const dx = p2.x - p1.x, dy = p2.y - p1.y;
+    const len = Math.sqrt(dx*dx + dy*dy) || 1;
+    const nx = -dy/len, ny = dx/len;
+    let pts = `M${p1.x},${p1.y}`;
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps;
+      const x = p1.x + dx * t;
+      const y = p1.y + dy * t;
+      const side = (i % 2 === 0 ? 1 : -1) * amp;
+      pts += ` L${(x + nx*side).toFixed(1)},${(y + ny*side).toFixed(1)}`;
+    }
+    pts += ` L${p2.x},${p2.y}`;
+    return pts;
+  }
+
+  function renderFvSvg() {
+    const svg = document.getElementById('fvSvg');
+    svg.innerHTML = '';
+    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+    defs.innerHTML = `
+      <marker id="fvArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#1a1a1a"/></marker>
+    `;
+    svg.appendChild(defs);
+
+    fvConexoes.forEach(c => {
+      const deB  = fvBlocos.find(b => b.id === c.de);
+      const parB = fvBlocos.find(b => b.id === c.para);
+      if (!deB || !parB) return;
+      const deEl  = document.getElementById('fvb-' + c.de);
+      const parEl = document.getElementById('fvb-' + c.para);
+      const p1 = _fvPortPos(deB,  c.portaOrigem  || 'right',  deEl  ? deEl.offsetWidth  : 140, deEl  ? deEl.offsetHeight  : 80);
+      const p2 = _fvPortPos(parB, c.portaDestino || 'left',   parEl ? parEl.offsetWidth : 140, parEl ? parEl.offsetHeight : 80);
+      const estilo = c.estilo || 'push';
+      const isSinal = estilo === 'sinal';
+      const isPull  = estilo === 'pull';
+      const color = '#1a1a1a';
+      const ortho = isSinal ? { d: _fvZigzagPath(p1, p2), mx: (p1.x+p2.x)/2, my: (p1.y+p2.y)/2 } : _fvOrthoPath(p1, p2);
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', ortho.d);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', '2');
+      if (isPull) path.setAttribute('stroke-dasharray', '8 5');
+      path.setAttribute('marker-end', 'url(#fvArrow)');
+      svg.appendChild(path);
+
+      if (fvModo === 'edicao') {
+        const mx = ortho.mx, my = ortho.my;
+        const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        hitPath.setAttribute('d', ortho.d);
+        hitPath.setAttribute('fill', 'none');
+        hitPath.setAttribute('stroke', 'transparent');
+        hitPath.setAttribute('stroke-width', '20');
+        hitPath.style.pointerEvents = 'stroke';
+        hitPath.style.cursor = 'pointer';
+        svg.appendChild(hitPath);
+
+        const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+        fo.setAttribute('x', mx - 60); fo.setAttribute('y', my - 15);
+        fo.setAttribute('width', 120); fo.setAttribute('height', 30);
+        fo.style.display = 'none';
+        fo.style.pointerEvents = 'all';
+        const est = c.estilo || 'push';
+        fo.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;gap:2px;align-items:center;justify-content:center;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:3px 5px;box-shadow:0 1px 6px rgba(0,0,0,.14)">
+          <button onclick="fvSetEstilo('${c.id}','push')" title="Push" style="width:22px;height:22px;border-radius:50%;border:${est==='push'?'2px solid #2d1b69':'1px solid #e2e8f0'};background:${est==='push'?'#ede9fe':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="4" x2="10" y2="4" stroke="#2d1b69" stroke-width="1.5"/><polygon points="8,1 14,4 8,7" fill="#2d1b69"/></svg>
+          </button>
+          <button onclick="fvSetEstilo('${c.id}','pull')" title="Pull" style="width:22px;height:22px;border-radius:50%;border:${est==='pull'?'2px solid #2d1b69':'1px solid #e2e8f0'};background:${est==='pull'?'#ede9fe':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="4" x2="10" y2="4" stroke="#2d1b69" stroke-width="1.5" stroke-dasharray="3,2"/><polygon points="8,1 14,4 8,7" fill="#2d1b69"/></svg>
+          </button>
+          <button onclick="fvSetEstilo('${c.id}','sinal')" title="Sinal" style="width:22px;height:22px;border-radius:50%;border:${est==='sinal'?'2px solid #2d1b69':'1px solid #e2e8f0'};background:${est==='sinal'?'#ede9fe':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><polyline points="0,4 3,1 6,7 9,1 11,4" stroke="#2d1b69" stroke-width="1.5" fill="none"/><polygon points="9,1 14,4 9,7" fill="#2d1b69"/></svg>
+          </button>
+          <button onclick="removerConexao('${c.id}')" title="Remover" style="width:22px;height:22px;border-radius:50%;border:1px solid #fed7d7;background:#fff5f5;color:#c53030;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0">&#x2715;</button>
+        </div>`;
+        svg.appendChild(fo);
+
+        let _fvHt;
+        const showFo = () => { clearTimeout(_fvHt); fo.style.display = ''; };
+        const hideFo = () => { _fvHt = setTimeout(() => { fo.style.display = 'none'; }, 150); };
+        hitPath.addEventListener('mouseenter', showFo);
+        hitPath.addEventListener('mouseleave', hideFo);
+        fo.addEventListener('mouseenter', showFo);
+        fo.addEventListener('mouseleave', hideFo);
+      }
+    });
+  }
+
+  document.addEventListener('mousemove', e => {
+    if (!fvDragging) return;
+    const canvasRect = document.getElementById('fvCanvas').getBoundingClientRect();
+    const x = Math.max(0, e.clientX - canvasRect.left - fvOffset.x);
+    const y = Math.max(0, e.clientY - canvasRect.top - fvOffset.y);
+    fvDragging.el.style.left = x + 'px';
+    fvDragging.el.style.top = y + 'px';
+    if (fvDragging.bloco) { fvDragging.bloco.x = x; fvDragging.bloco.y = y; }
+    if (fvDragging.texto) { fvDragging.texto.x = x; fvDragging.texto.y = y; }
+    renderFvSvg();
+  });
+  document.addEventListener('mouseup', () => {
+    if (fvDragging) { fvDragging.el.classList.remove('dragging'); fvDragging = null; salvarFluxo(); }
+  });
+
+  let fvConectando = null;
+
+  function clicarPorta(blocoId, porta, e) {
+    if (e) e.stopPropagation();
+    if (fvModo !== 'edicao') return;
+    if (!fvConectando) {
+      fvConectando = { blocoId, porta };
+      const srcEl = document.getElementById('fvb-' + blocoId);
+      if (srcEl) srcEl.querySelectorAll('.fv-port').forEach(p => p.classList.add('pending'));
+    } else if (fvConectando.blocoId === blocoId) {
+      fvConectando = null;
+      document.querySelectorAll('.fv-port.pending').forEach(p => p.classList.remove('pending'));
+    } else {
+      if (!fvConexoes.find(c => c.de === fvConectando.blocoId && c.para === blocoId && c.portaOrigem === fvConectando.porta && c.portaDestino === porta)) {
+        fvConexoes.push({ id: Date.now().toString(), de: fvConectando.blocoId, portaOrigem: fvConectando.porta, para: blocoId, portaDestino: porta, estilo: fvConStyle });
+        salvarFluxo();
+      }
+      fvConectando = null;
+      document.querySelectorAll('.fv-port.pending').forEach(p => p.classList.remove('pending'));
+      renderFvSvg();
+    }
+  }
+
+  function removerConexao(cId) {
+    fvConexoes = fvConexoes.filter(c => c.id !== cId);
+    renderFvSvg();
+    salvarFluxo();
+  }
+
+  function fvSetEstilo(cId, estilo) {
+    const c = fvConexoes.find(x => x.id === cId);
+    if (c) { c.estilo = estilo; renderFvSvg(); salvarFluxo(); }
+  }
+
+  function toggleModoFv() {
+    if (!temPermissaoFv) { document.getElementById('semPermissaoOverlay').style.display = 'flex'; return; }
+    fvModo = fvModo === 'viz' ? 'edicao' : 'viz';
+    if (fvModo === 'viz') { document.getElementById('fvPickerPanel').classList.remove('open'); salvarFluxo(); }
+    const btn = document.getElementById('btnModoFv');
+    btn.textContent = fvModo === 'edicao' ? '👁️ Modo Visualização' : '✏️ Modo Edição';
+    btn.className   = 'btn-fv' + (fvModo === 'edicao' ? ' primary' : '');
+    document.getElementById('fvToolbarEdicao').style.display = fvModo === 'edicao' ? 'flex' : 'none';
+    fvConectando = null;
+    if (fvModo === 'edicao') setConStyle(fvConStyle);
+    renderFluxo();
+  }
+
+  // HTML escape helper
+  function _gesc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ===== VSM ELEMENT LIBRARY =====
+  const FV_CATEGORIAS = [
+    { id:'classico', label:'Clássicos VSM' },
+    { id:'humano',   label:'Humanos / Organizacional' },
+    { id:'sistema',  label:'Sistemas e Tecnologia' },
+    { id:'automacao',label:'Automação e IA' },
+    { id:'problema', label:'Problemas / Diagnóstico' },
+    { id:'especial', label:'Outros' },
+  ];
+
+  const FV_ELEMENTOS = [
+    { cat:'classico',  tipo:'supplier',        nome:'Supplier / Customer',        desc:'Origem ou destino do fluxo de valor' },
+    { cat:'classico',  tipo:'processo',        nome:'Processo',                   desc:'Etapa de transformação ou agregação de valor' },
+    { cat:'classico',  tipo:'tabela',          nome:'Tabela',                     desc:'Dados estruturados com linhas e colunas', fields:'tabela' },
+    { cat:'classico',  tipo:'manual-info',     nome:'Info Manual',                desc:'Fluxo não automatizado (e-mail manual, ligação)' },
+    { cat:'classico',  tipo:'electronic-info', nome:'Info Eletrônica',            desc:'Fluxo digital entre sistemas ou APIs' },
+    { cat:'classico',  tipo:'inventory',       nome:'Estoque / Fila',             desc:'Acúmulo de trabalho aguardando processamento' },
+    { cat:'classico',  tipo:'fifo',            nome:'FIFO Lane',                  desc:'Fila ordenada por chegada, com limite' },
+    { cat:'classico',  tipo:'supermarket',     nome:'Supermercado',               desc:'Estoque controlado requsitado sob demanda' },
+    { cat:'classico',  tipo:'kaizen',          nome:'Kaizen Burst',               desc:'Ponto de melhoria contínua identificado' },
+    { cat:'humano',    tipo:'papel',           nome:'Papel / Responsável',        desc:'Área, cargo ou função na atividade' },
+    { cat:'humano',    tipo:'handoff',         nome:'Handoff',                    desc:'Troca de área ou responsabilidade' },
+    { cat:'humano',    tipo:'aprovacao',       nome:'Espera por Aprovação',       desc:'Parada aguardando decisão humana' },
+    { cat:'humano',    tipo:'decisao',         nome:'Decisão / Gateway',          desc:'Bifurcação baseada em regras ou condições' },
+    { cat:'sistema',   tipo:'sistema-ti',      nome:'Sistema',                    desc:'Ferramenta ou sistema onde ocorre a atividade' },
+    { cat:'sistema',   tipo:'integracao',      nome:'Integração',                 desc:'Dados trafegando entre sistemas' },
+    { cat:'sistema',   tipo:'documento',       nome:'Documento / Artefato',       desc:'Item que trafega no processo' },
+    { cat:'sistema',   tipo:'trigger',         nome:'Gatilho',                    desc:'Evento que dispara o início do fluxo' },
+    { cat:'automacao', tipo:'rpa',             nome:'Robô RPA',                   desc:'Execução integralmente automatizada' },
+    { cat:'automacao', tipo:'agente-ia',       nome:'Agente de IA',               desc:'Decisão ou geração automática por IA' },
+    { cat:'automacao', tipo:'hibrido',         nome:'Híbrido (Humano + Robô)',    desc:'Parte automatizada + parte humana' },
+    { cat:'problema',  tipo:'retrabalho',      nome:'Retrabalho',                 desc:'Loop de retorno por erro ou inconsistência' },
+    { cat:'problema',  tipo:'falha',           nome:'Falha / Erro Recorrente',    desc:'Ponto conhecido de erros frequentes' },
+    { cat:'problema',  tipo:'sla',             nome:'SLA / Tempo de Espera',      desc:'Tempo em que o item fica parado' },
+    { cat:'problema',  tipo:'paralelo',        nome:'Processo Paralelo',          desc:'Atividades simultâneas no fluxo' },
+    { cat:'problema',  tipo:'arquivo',         nome:'Arquivamento / Fim',         desc:'Encerramento formal do processo' },
+    { cat:'especial',  tipo:'texto',           nome:'Texto / Anotação',           desc:'Rótulo ou comentário livre no canvas', fields:'texto' },
+  ];
+
+  function _fvShapeIcon(tipo) {
+    const icons = {
+      'supplier': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="4" y="18" width="32" height="18" rx="1" stroke="#2d1b69" stroke-width="2"/>
+        <rect x="8" y="10" width="8" height="8" stroke="#2d1b69" stroke-width="2"/>
+        <rect x="24" y="10" width="8" height="8" stroke="#2d1b69" stroke-width="2"/>
+        <rect x="8" y="6" width="4" height="4" fill="#2d1b69"/>
+        <rect x="24" y="6" width="4" height="4" fill="#2d1b69"/>
+        <rect x="16" y="24" width="8" height="12" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="10" y1="24" x2="10" y2="36" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="30" y1="24" x2="30" y2="36" stroke="#2d1b69" stroke-width="1.5"/>
+      </svg>`,
+      'processo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="4" y="10" width="32" height="20" rx="2" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="12" y1="10" x2="12" y2="30" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="28" y1="10" x2="28" y2="30" stroke="#2d1b69" stroke-width="1.5"/>
+      </svg>`,
+      'tabela': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="4" y="6" width="32" height="28" rx="1" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="4" y1="14" x2="36" y2="14" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="4" y1="22" x2="36" y2="22" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="18" y1="6" x2="18" y2="34" stroke="#2d1b69" stroke-width="1.5"/>
+      </svg>`,
+      'manual-info': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="7" y="7" width="26" height="31" rx="2" stroke="#2d1b69" stroke-width="2"/>
+        <rect x="14" y="3" width="12" height="7" rx="2" stroke="#2d1b69" stroke-width="1.8"/>
+        <line x1="12" y1="17" x2="28" y2="17" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="12" y1="23" x2="28" y2="23" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="12" y1="29" x2="22" y2="29" stroke="#2d1b69" stroke-width="1.5"/>
+        <path d="M25 28 L30 33 L28 36 L23 31 Z" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="29" y1="28" x2="32" y2="25" stroke="#2d1b69" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>`,
+      'electronic-info': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="4" y="5" width="32" height="22" rx="2" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="20" y1="27" x2="20" y2="34" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="13" y1="34" x2="27" y2="34" stroke="#2d1b69" stroke-width="2"/>
+        <path d="M10 20 C12 13 28 13 30 20" stroke="#2d1b69" stroke-width="1.8" fill="none"/>
+        <path d="M14 22 C16 17 24 17 26 22" stroke="#2d1b69" stroke-width="1.8" fill="none"/>
+        <circle cx="20" cy="24" r="2" fill="#2d1b69"/>
+      </svg>`,
+      'inventory': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <polygon points="20,3 39,36 1,36" stroke="#2d1b69" stroke-width="2.5"/>
+        <rect x="15" y="24" width="5" height="5" fill="#2d1b69" opacity=".5" rx="1"/>
+        <rect x="21" y="24" width="5" height="5" fill="#2d1b69" opacity=".5" rx="1"/>
+        <rect x="18" y="18" width="5" height="5" fill="#2d1b69" opacity=".5" rx="1"/>
+      </svg>`,
+      'fifo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="2" y="13" width="36" height="14" rx="2" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="12" y1="13" x2="12" y2="27" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="22" y1="13" x2="22" y2="27" stroke="#2d1b69" stroke-width="1.5"/>
+        <text x="6" y="24" font-size="9" fill="#2d1b69">1</text>
+        <text x="16" y="24" font-size="9" fill="#2d1b69">2</text>
+        <text x="26" y="24" font-size="9" fill="#2d1b69">3</text>
+        <polygon points="34,17 38,20 34,23" fill="#2d1b69"/>
+      </svg>`,
+      'supermarket': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="3" y="4" width="34" height="30" rx="1" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="3" y1="15" x2="37" y2="15" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="3" y1="25" x2="37" y2="25" stroke="#2d1b69" stroke-width="1.5"/>
+        <rect x="7"  y="6"  width="5" height="7" rx="1" fill="#2d1b69" opacity=".45"/>
+        <rect x="15" y="6"  width="5" height="7" rx="1" fill="#2d1b69" opacity=".45"/>
+        <rect x="23" y="6"  width="5" height="7" rx="1" fill="#2d1b69" opacity=".45"/>
+        <rect x="31" y="6"  width="4" height="7" rx="1" fill="#2d1b69" opacity=".45"/>
+        <rect x="7"  y="17" width="7" height="6" rx="1" fill="#2d1b69" opacity=".3"/>
+        <rect x="18" y="17" width="7" height="6" rx="1" fill="#2d1b69" opacity=".3"/>
+        <rect x="29" y="17" width="5" height="6" rx="1" fill="#2d1b69" opacity=".3"/>
+        <text x="20" y="34" text-anchor="middle" font-size="9" font-weight="800" fill="#2d1b69">SM</text>
+      </svg>`,
+      'kaizen': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <path d="M20,3 L23,14 L34,9 L27,18 L38,20 L27,22 L34,31 L23,26 L20,37 L17,26 L6,31 L13,22 L2,20 L13,18 L6,9 L17,14 Z"
+          stroke="#2d1b69" stroke-width="1.8" fill="none"/>
+      </svg>`,
+      'papel': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="12" r="8" stroke="#2d1b69" stroke-width="2"/>
+        <path d="M6 36 C6 28 34 28 34 36" stroke="#2d1b69" stroke-width="2" fill="none"/>
+      </svg>`,
+      'handoff': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <path d="M4 14 L24 14" stroke="#2d1b69" stroke-width="2"/>
+        <polygon points="22,10 30,14 22,18" fill="#2d1b69"/>
+        <path d="M36 26 L16 26" stroke="#2d1b69" stroke-width="2"/>
+        <polygon points="18,22 10,26 18,30" fill="#2d1b69"/>
+      </svg>`,
+      'aprovacao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="16" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="20" y1="10" x2="20" y2="20" stroke="#2d1b69" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="20" y1="20" x2="28" y2="24" stroke="#2d1b69" stroke-width="2" stroke-linecap="round"/>
+        <line x1="14" y1="4" x2="14" y2="8" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="26" y1="4" x2="26" y2="8" stroke="#2d1b69" stroke-width="2"/>
+      </svg>`,
+      'decisao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <polygon points="20,4 38,20 20,36 2,20" stroke="#2d1b69" stroke-width="2"/>
+      </svg>`,
+      'sistema-ti': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="4" y="6" width="32" height="22" rx="2" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="14" y1="34" x2="26" y2="34" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="20" y1="28" x2="20" y2="34" stroke="#2d1b69" stroke-width="2"/>
+      </svg>`,
+      'integracao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <circle cx="10" cy="20" r="8" stroke="#2d1b69" stroke-width="2"/>
+        <circle cx="30" cy="20" r="8" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="18" y1="20" x2="22" y2="20" stroke="#2d1b69" stroke-width="2"/>
+        <polygon points="20,17 24,20 20,23" fill="#2d1b69"/>
+      </svg>`,
+      'documento': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <path d="M8 4 L28 4 L36 12 L36 36 L8 36 Z" stroke="#2d1b69" stroke-width="2"/>
+        <path d="M28 4 L28 12 L36 12" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="14" y1="20" x2="30" y2="20" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="14" y1="26" x2="26" y2="26" stroke="#2d1b69" stroke-width="1.5"/>
+      </svg>`,
+      'trigger': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <path d="M22 4 L14 20 L20 20 L18 36 L30 16 L23 16 Z" stroke="#2d1b69" stroke-width="2" fill="none"/>
+      </svg>`,
+      'rpa': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <rect x="10" y="16" width="20" height="18" rx="2" stroke="#2d1b69" stroke-width="2"/>
+        <circle cx="20" cy="9" r="5" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="20" y1="14" x2="20" y2="16" stroke="#2d1b69" stroke-width="2"/>
+        <circle cx="16" cy="24" r="2" fill="#2d1b69"/>
+        <circle cx="24" cy="24" r="2" fill="#2d1b69"/>
+        <line x1="14" y1="30" x2="26" y2="30" stroke="#2d1b69" stroke-width="1.5"/>
+      </svg>`,
+      'agente-ia': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <ellipse cx="20" cy="18" rx="12" ry="12" stroke="#2d1b69" stroke-width="2"/>
+        <path d="M14 18 C14 14 26 14 26 18" stroke="#2d1b69" stroke-width="1.5"/>
+        <path d="M12 22 C10 18 10 14 14 12" stroke="#2d1b69" stroke-width="1.5"/>
+        <path d="M28 22 C30 18 30 14 26 12" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="20" y1="30" x2="20" y2="34" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="14" y1="34" x2="26" y2="34" stroke="#2d1b69" stroke-width="2"/>
+      </svg>`,
+      'hibrido': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <circle cx="13" cy="12" r="6" stroke="#2d1b69" stroke-width="1.8"/>
+        <path d="M4 32 C4 26 22 26 22 32" stroke="#2d1b69" stroke-width="1.8" fill="none"/>
+        <circle cx="30" cy="26" r="7" stroke="#2d1b69" stroke-width="1.8"/>
+        <circle cx="30" cy="26" r="3" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="30" y1="16" x2="30" y2="19" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="30" y1="33" x2="30" y2="36" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="20" y1="26" x2="23" y2="26" stroke="#2d1b69" stroke-width="1.5"/>
+        <line x1="37" y1="26" x2="40" y2="26" stroke="#2d1b69" stroke-width="1.5"/>
+      </svg>`,
+      'retrabalho': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <path d="M32 20 A12 12 0 1 0 20 32" stroke="#2d1b69" stroke-width="2.5" fill="none"/>
+        <polygon points="18,28 26,32 22,40" fill="#2d1b69"/>
+      </svg>`,
+      'falha': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="16" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="12" y1="12" x2="28" y2="28" stroke="#2d1b69" stroke-width="2.5"/>
+        <line x1="28" y1="12" x2="12" y2="28" stroke="#2d1b69" stroke-width="2.5"/>
+      </svg>`,
+      'sla': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="16" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="20" y1="10" x2="20" y2="20" stroke="#2d1b69" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="20" y1="20" x2="28" y2="26" stroke="#2d1b69" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+      'paralelo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <line x1="8" y1="4" x2="8" y2="36" stroke="#2d1b69" stroke-width="3"/>
+        <line x1="20" y1="4" x2="20" y2="36" stroke="#2d1b69" stroke-width="3"/>
+        <line x1="32" y1="4" x2="32" y2="36" stroke="#2d1b69" stroke-width="3"/>
+        <line x1="4" y1="12" x2="36" y2="12" stroke="#2d1b69" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="4" y1="28" x2="36" y2="28" stroke="#2d1b69" stroke-width="1.5" stroke-dasharray="3,3"/>
+      </svg>`,
+      'arquivo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <path d="M4 12 L4 34 L36 34 L36 16 L18 16 L14 12 Z" stroke="#2d1b69" stroke-width="2"/>
+        <line x1="4" y1="20" x2="36" y2="20" stroke="#2d1b69" stroke-width="1.5"/>
+      </svg>`,
+      'texto': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <line x1="8" y1="10" x2="32" y2="10" stroke="#2d1b69" stroke-width="2.5"/>
+        <line x1="20" y1="10" x2="20" y2="34" stroke="#2d1b69" stroke-width="2.5"/>
+        <line x1="12" y1="34" x2="28" y2="34" stroke="#2d1b69" stroke-width="1.5" stroke-dasharray="3,3"/>
+      </svg>`,
+    };
+    return icons[tipo] || `<svg width="36" height="36" viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="28" height="28" rx="3" stroke="#2d1b69" stroke-width="2"/></svg>`;
+  }
+
+  let fvElSelecionado = null;
+  let fvConStyle = 'push';
+
+  function setConStyle(s) {
+    fvConStyle = s;
+    ['push','pull','sinal'].forEach(st => {
+      const btn = document.getElementById('btnCon' + st.charAt(0).toUpperCase() + st.slice(1));
+      if (btn) btn.className = 'btn-fv' + (st === s ? ' primary' : '');
+    });
+  }
+
+  function toggleElementoPicker() {
+    const panel = document.getElementById('fvPickerPanel');
+    if (!panel.classList.contains('open')) {
+      fvElSelecionado = FV_ELEMENTOS[0];
+      _renderFvElementoGrid();
+      document.getElementById('fvElNome').value = '';
+      document.getElementById('fvElObs').value = '';
+      panel.classList.add('open');
+      setTimeout(() => {
+        _atualizarCamposPickerTipo(fvElSelecionado ? fvElSelecionado.tipo : FV_ELEMENTOS[0].tipo);
+        const inp = fvElSelecionado && fvElSelecionado.tipo === 'texto'
+          ? document.getElementById('fvElObs')
+          : document.getElementById('fvElNome');
+        if (inp) inp.focus();
+      }, 320);
+    } else {
+      fecharElementoPicker();
+    }
+  }
+
+  function fecharElementoPicker() {
+    document.getElementById('fvPickerPanel').classList.remove('open');
+  }
+
+  function _renderFvElementoGrid() {
+    const cur = fvElSelecionado ? fvElSelecionado.tipo : FV_ELEMENTOS[0].tipo;
+    let html = '';
+    FV_CATEGORIAS.forEach(cat => {
+      const items = FV_ELEMENTOS.filter(e => e.cat === cat.id);
+      if (!items.length) return;
+      html += `<div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">${cat.label}</div>`;
+      items.forEach(el => {
+        const sel = el.tipo === cur;
+        const ico = _fvShapeIcon(el.tipo);
+        html += `<div onclick="selecionarFvEl(this,'${el.tipo}')" data-tipo="${el.tipo}"
+          style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:2px solid ${sel?'#2d1b69':'#e2e8f0'};cursor:pointer;transition:all .15s;background:${sel?'#f5f0ff':'white'};margin-bottom:3px">
+          <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:#1e2a4a">${el.nome}</div>
+            <div style="font-size:10px;color:#718096;line-height:1.3;margin-top:1px">${el.desc}</div>
+          </div>
+        </div>`;
+      });
+    });
+    document.getElementById('fvElementoGrid').innerHTML = html;
+    _atualizarCamposPickerTipo(cur);
+  }
+
+  function selecionarFvEl(elDiv, tipo) {
+    fvElSelecionado = FV_ELEMENTOS.find(e => e.tipo === tipo);
+    document.querySelectorAll('#fvElementoGrid [data-tipo]').forEach(d => {
+      const sel = d.dataset.tipo === tipo;
+      d.style.borderColor = sel ? '#2d1b69' : '#e2e8f0';
+      d.style.background  = sel ? '#f5f0ff' : 'white';
+    });
+    _atualizarCamposPickerTipo(tipo);
+  }
+
+  function _atualizarCamposPickerTipo(tipo) {
+    const el = FV_ELEMENTOS.find(e => e.tipo === tipo);
+    const fields = el ? (el.fields || 'default') : 'default';
+    const isTexto  = fields === 'texto';
+    const isTabela = tipo === 'tabela';
+    const nomeRow   = document.getElementById('fvPickerNomeRow');
+    const obsRow    = document.getElementById('fvPickerObsRow');
+    const tabelaRow = document.getElementById('fvPickerTabelaRow');
+    const obsLabel  = document.getElementById('fvPickerObsLabel');
+    if (nomeRow)    nomeRow.style.display   = isTexto ? 'none' : 'block';
+    if (obsRow)     obsRow.style.display    = 'block';
+    if (tabelaRow)  tabelaRow.style.display = isTabela ? 'block' : 'none';
+    if (obsLabel)   obsLabel.textContent    = isTexto ? 'Texto *' : 'Observação';
+  }
+
+  function confirmarElemento() {
+    const el = fvElSelecionado || FV_ELEMENTOS[0];
+    const nome = el.tipo === 'texto' ? '' : document.getElementById('fvElNome').value.trim();
+    if (!nome && el.tipo !== 'texto') { document.getElementById('fvElNome').focus(); return; }
+
+    if (el.tipo === 'texto') {
+      const obs = document.getElementById('fvElObs').value.trim();
+      if (!obs) { document.getElementById('fvElObs').focus(); return; }
+      const t = { id: Date.now().toString(), texto: obs, x: 60, y: 60 + fvTextos.length * 40 };
+      fvTextos.push(t);
+      fecharElementoPicker(); renderFluxo(); salvarFluxo();
+      return;
+    }
+
+    const baseX = 40 + (fvBlocos.length % 4) * 220;
+    const baseY = 60 + Math.floor(fvBlocos.length / 4) * 160;
+
+    const b = {
+      id: Date.now().toString(), nome, tipo: el.tipo,
+      obs: document.getElementById('fvElObs').value.trim(),
+      x: baseX, y: baseY,
+      ...(el.tipo === 'tabela' ? (() => {
+        const nc = Math.max(1, Math.min(8, parseInt(document.getElementById('fvTabelaCols').value)||3));
+        const nr = Math.max(1, Math.min(20,parseInt(document.getElementById('fvTabelaRows').value)||3));
+        const cols = Array.from({length:nc},(_,i)=>`Col ${i+1}`);
+        const rows = Array.from({length:nr},()=>new Array(nc).fill(''));
+        return { colunas:cols, linhas:rows };
+      })() : {})
+    };
+    fvBlocos.push(b);
+    fecharElementoPicker(); renderFluxo(); salvarFluxo();
+  }
+
+  function adicionarTexto() {
+    const t = { id: Date.now().toString(), texto: 'Texto livre', x: 100, y: 200 };
+    fvTextos.push(t);
+    renderFluxo();
+    salvarFluxo();
+  }
+
+  function removerBloco(id) {
+    fvBlocos = fvBlocos.filter(b => b.id !== id);
+    fvConexoes = fvConexoes.filter(c => c.de !== id && c.para !== id);
+    renderFluxo();
+    salvarFluxo();
+  }
+
+  let _fvEditId = null;
+  function abrirEditarFvBloco(id) {
+    const b = fvBlocos.find(x => x.id === id);
+    if (!b) return;
+    _fvEditId = id;
+    document.getElementById('fvEditNome').value = b.nome || '';
+    document.getElementById('fvEditObs').value = b.obs || '';
+    document.getElementById('modalFvEditar').classList.add('aberto');
+    setTimeout(() => document.getElementById('fvEditNome').focus(), 100);
+  }
+  function salvarEditarFvBloco() {
+    const b = fvBlocos.find(x => x.id === _fvEditId);
+    if (!b) return;
+    b.nome = document.getElementById('fvEditNome').value.trim() || b.nome;
+    b.obs  = document.getElementById('fvEditObs').value.trim();
+    fecharModal('modalFvEditar');
+    renderFluxo();
+    salvarFluxo();
+  }
+
+  function removerTexto(id) {
+    fvTextos = fvTextos.filter(t => t.id !== id);
+    renderFluxo();
+    salvarFluxo();
+  }
+
+  function _fvGetBloco(id) { return fvBlocos.find(b => b.id === id); }
+
+  function fvTabelaDelCol(blocoId, ci) {
+    const b = _fvGetBloco(blocoId);
+    if (!b || b.colunas.length <= 1) return;
+    b.colunas.splice(ci, 1);
+    b.linhas.forEach(row => row.splice(ci, 1));
+    renderFluxo(); salvarFluxo();
+  }
+
+  function fvTabelaEditNome(span, blocoId) {
+    const b = _fvGetBloco(blocoId);
+    if (!b) return;
+    b.nome = span.textContent.trim() || b.nome;
+    salvarFluxo();
+  }
+
+  function fvTabelaEditColNome(span, blocoId, ci) {
+    const b = _fvGetBloco(blocoId);
+    if (!b || !b.colunas) return;
+    b.colunas[ci] = span.textContent.trim() || b.colunas[ci];
+    salvarFluxo();
+  }
+  function fvTabelaEditCell(span, blocoId, ri, ci) {
+    const b = _fvGetBloco(blocoId);
+    if (!b || !b.linhas) return;
+    b.linhas[ri][ci] = span.textContent;
+    salvarFluxo();
+  }
+  function fvTabelaAddRow(blocoId) {
+    const b = _fvGetBloco(blocoId);
+    if (!b) return;
+    b.linhas.push(new Array(b.colunas.length).fill(''));
+    renderFluxo(); salvarFluxo();
+  }
+  function fvTabelaDelRow(blocoId, ri) {
+    const b = _fvGetBloco(blocoId);
+    if (!b || b.linhas.length <= 1) return;
+    b.linhas.splice(ri, 1);
+    renderFluxo(); salvarFluxo();
+  }
+  function fvTabelaAddCol(blocoId, ci) {
+    const b = _fvGetBloco(blocoId);
+    if (!b) return;
+    b.colunas.splice(ci, 0, 'Nova Col');
+    b.linhas.forEach(row => row.splice(ci, 0, ''));
+    renderFluxo(); salvarFluxo();
+  }
+
+  function limparCanvas() {
+    if (!confirm('Limpar todo o canvas?')) return;
+    fvBlocos = []; fvTextos = []; fvConexoes = [];
+    renderFluxo();
+    salvarFluxo();
+  }
+
 </script>
 <script src="perfil-modal.js"></script>
 </body>

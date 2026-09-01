@@ -10,6 +10,89 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const fs = require('fs');
 
+// ==================== ZIP builder (sem dependência externa) ====================
+// Usado só pra empacotar o pacote do Agent (config.json + agent.py + iniciar.vbs)
+// num único .zip — evita o usuário ter que gerenciar 3 downloads separados
+// (o navegador renomeia arquivos duplicados com "(1)", quebrando o instalador
+// silenciosamente pois ele espera nomes exatos).
+const _CRC32_TABLE = (() => {
+  const table = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = c & 1 ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    table[n] = c >>> 0;
+  }
+  return table;
+})();
+
+function _crc32(buf) {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) crc = _CRC32_TABLE[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+// files: [{ name: 'agent.py', data: Buffer }]. Método STORED (sem compressão) —
+// arquivos são pequenos, prioriza simplicidade/robustez sobre tamanho.
+function buildZip(files) {
+  const localParts = [], centralParts = [];
+  let offset = 0;
+  const dosTime = 0, dosDate = (2026 - 1980) << 9 | (1 << 5) | 1; // data fixa, irrelevante aqui
+
+  for (const { name, data } of files) {
+    const nameBuf = Buffer.from(name, 'utf8');
+    const crc = _crc32(data);
+    const local = Buffer.alloc(30);
+    local.writeUInt32LE(0x04034b50, 0);
+    local.writeUInt16LE(20, 4);
+    local.writeUInt16LE(0, 6);
+    local.writeUInt16LE(0, 8);
+    local.writeUInt16LE(dosTime, 10);
+    local.writeUInt16LE(dosDate, 12);
+    local.writeUInt32LE(crc, 14);
+    local.writeUInt32LE(data.length, 18);
+    local.writeUInt32LE(data.length, 22);
+    local.writeUInt16LE(nameBuf.length, 26);
+    local.writeUInt16LE(0, 28);
+    localParts.push(local, nameBuf, data);
+
+    const central = Buffer.alloc(46);
+    central.writeUInt32LE(0x02014b50, 0);
+    central.writeUInt16LE(20, 4);
+    central.writeUInt16LE(20, 6);
+    central.writeUInt16LE(0, 8);
+    central.writeUInt16LE(0, 10);
+    central.writeUInt16LE(dosTime, 12);
+    central.writeUInt16LE(dosDate, 14);
+    central.writeUInt32LE(crc, 16);
+    central.writeUInt32LE(data.length, 20);
+    central.writeUInt32LE(data.length, 24);
+    central.writeUInt16LE(nameBuf.length, 28);
+    central.writeUInt16LE(0, 30);
+    central.writeUInt16LE(0, 32);
+    central.writeUInt16LE(0, 34);
+    central.writeUInt16LE(0, 36);
+    central.writeUInt32LE(0, 38);
+    central.writeUInt32LE(offset, 42);
+    centralParts.push(central, nameBuf);
+
+    offset += local.length + nameBuf.length + data.length;
+  }
+
+  const centralDir = Buffer.concat(centralParts);
+  const centralOffset = offset;
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(0, 4);
+  end.writeUInt16LE(0, 6);
+  end.writeUInt16LE(files.length, 8);
+  end.writeUInt16LE(files.length, 10);
+  end.writeUInt32LE(centralDir.length, 12);
+  end.writeUInt32LE(centralOffset, 16);
+  end.writeUInt16LE(0, 20);
+
+  return Buffer.concat([...localParts, centralDir, end]);
+}
+
 const app = express();
 
 // Webhook Asaas precisa do body RAW — deve vir ANTES do express.json()
@@ -17,7 +100,16 @@ app.use('/api/webhook/asaas', express.raw({ type: 'application/json' }));
 
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
-app.use(express.static('public'));
+app.use(express.static('public', {
+  setHeaders: (res, filePath) => {
+    // .html sempre fresco (mudanças no app têm que aparecer sem hard-refresh) e os
+    // arquivos do Agent também — cache de navegador nesses já causou gente testar
+    // versão antiga do agent.py/iniciar.vbs mesmo depois de eu corrigir algo.
+    if (filePath.endsWith('.html') || filePath.endsWith('.py') || filePath.endsWith('.vbs') || filePath.endsWith('.bat')) {
+      res.setHeader('Cache-Control', 'no-store');
+    }
+  }
+}));
 
 const uploadsDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
@@ -92,7 +184,7 @@ async function _getSmtpTransporter(empresa) {
   });
 }
 
-async function enviarEmailTarefa(tarefaId, empresa) {
+async function enviarEmailTarefa(tarefaId, empresa, assinaturaHtml) {
   const tarefa = await Tarefa.findById(tarefaId).lean();
   if (!tarefa) throw new Error('Tarefa não encontrada.');
   // Inherit emailTemplateId from model if not set directly on item
@@ -152,9 +244,10 @@ async function enviarEmailTarefa(tarefaId, empresa) {
   }).join('<br>');
   const variavelDoc = anexos.map(d => d.obs||'').filter(Boolean).join('; ');
   const variavelAvulsa = tarefa.observacao || tarefa.variavelAvulsa || '';
+  const assinHtml = assinaturaHtml || '';
   const buildCorpo = (contato) => {
     const primeiroNome = (contato.nome||'').split(' ')[0];
-    return (template.corpo||'')
+    let corpo = (template.corpo||'')
       .replace(/\{nomeCompleto\}/g, contato.nome||'')
       .replace(/\{primeiroNome\}/g, primeiroNome)
       .replace(/\{cpfCnpj\}/g, contato.cpfCnpj||'')
@@ -167,7 +260,12 @@ async function enviarEmailTarefa(tarefaId, empresa) {
       .replace(/\{variavelAvulsa\}/g, variavelAvulsa)
       .replace(/\{cliente\}/g, contato.nome||'')
       .replace(/\{empresa\}/g, contato.empresa_contato||'')
-      .replace(/\{data\}/g, new Date().toLocaleDateString('pt-BR'));
+      .replace(/\{data\}/g, new Date().toLocaleDateString('pt-BR'))
+      .replace(/\{assinatura\}/g, assinHtml);
+    if (assinHtml && !corpo.includes(assinHtml)) {
+      corpo += `<br><br><hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0">${assinHtml}`;
+    }
+    return corpo;
   };
   if (gruposIds.length) {
     // Group task: ONE email with all group contacts, first in TO rest in CC
@@ -289,6 +387,7 @@ const projetoSchema = new mongoose.Schema({
   descricao: { type: String, default: '' }, categoria: { type: String, default: '' }, area: { type: String, default: '' },
   responsavel: { type: String, default: '' }, status: { type: String, default: 'Ativo' }, tags: { type: String, default: '' },
   dataInicio: { type: String, default: '' }, dataFim: { type: String, default: '' },
+  budget: { type: Number, default: 0 }, repositorioId: { type: mongoose.Schema.Types.ObjectId, ref: 'Projeto', default: null },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   tap: { type: Object, default: {} }, estudosCaso: { type: Array, default: [] }, escopo: { type: Object, default: {} },
@@ -312,11 +411,13 @@ const Template = mongoose.model('Template', templateSchema);
 const ideiaSchema = new mongoose.Schema({
   titulo: { type: String, required: true }, tipo: { type: String, default: '' }, responsavel: { type: String, default: '' },
   area: { type: String, default: '' }, data: { type: String, default: '' }, complexidade: { type: String, default: '' },
-  descricao: { type: String, default: '' }, ganho: { type: String, default: '' }, periodo: { type: String, default: '' },
+  descricao: { type: String, default: '' }, ganho: { type: String, default: '' }, outrosGanhos: { type: String, default: '' }, periodo: { type: String, default: '' },
   tags: { type: String, default: '' }, aprovacao: { type: String, default: 'pendente' }, status: { type: String, default: 'Não Iniciada' },
   autor: { type: String, default: '' }, empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now },
+  destacada: { type: Boolean, default: false }, destacadaEm: { type: Date, default: null },
+  anexos: [{ url: String, nome: String, tamanho: Number }]
 });
 const Ideia = mongoose.model('Ideia', ideiaSchema);
 
@@ -359,6 +460,7 @@ const licencaSchema = new mongoose.Schema({
   status: { type: String, default: 'Ativa', enum: ['Ativa', 'Vencendo', 'Vencida', 'Em Renovação'] },
   penalidade: { type: String, default: '' }, alertaDias: { type: Number, default: 30 }, observacoes: { type: String, default: '' },
   documentos: [{ nome: { type: String }, tipo: { type: String }, tamanho: { type: Number }, base64: { type: String } }],
+  renovacoes: [{ inicio: { type: String }, fim: { type: String }, registradoEm: { type: Date, default: Date.now }, registradoPor: { type: String, default: '' } }],
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
@@ -387,6 +489,7 @@ const emailTemplateSchema = new mongoose.Schema({
   nome: { type: String, required: true }, assunto: { type: String, default: '' },
   corpo: { type: String, default: '' }, variaveis: { type: Array, default: [] },
   categoria: { type: String, default: '' },
+  assinaturaId: { type: String, default: '' },
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
 });
@@ -399,6 +502,14 @@ const smtpConfigSchema = new mongoose.Schema({
   remetente: { type: String, default: '' },
 });
 const SmtpConfig = mongoose.model('SmtpConfig', smtpConfigSchema);
+
+const configIASchema = new mongoose.Schema({
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true, unique: true },
+  provedor: { type: String, default: 'claude-sonnet' },
+  credencialNome: { type: String, default: '' },
+  campoCred: { type: String, default: 'api_key' },
+});
+const ConfigIA = mongoose.model('ConfigIA', configIASchema);
 
 const linkTrackingSchema = new mongoose.Schema({
   token: { type: String, required: true, unique: true },
@@ -462,6 +573,8 @@ const processoSchema = new mongoose.Schema({
   categoria: { type: String, default: '' }, responsaveis: { type: Array, default: [] },
   tags: { type: Array, default: [] },
   versao: { type: String, default: 'v1.0' }, ativo: { type: Boolean, default: true },
+  // 'paralelo' = todas as tarefas do fluxo ativam de uma vez; 'sequencial' = uma tarefa só ativa quando a anterior (tarefa/robô/ia/wait/email) estiver concluída/dispensada/etc
+  ativacaoTarefas: { type: String, default: 'paralelo', enum: ['paralelo', 'sequencial'] },
   // Builder canvas: array of {id, tipo, titulo, dados, x, y} + conexoes [{de,para,tipo}]
   elementos: { type: Array, default: [] }, conexoes: { type: Array, default: [] },
   // Documentation tabs
@@ -607,12 +720,14 @@ const maquinaSchema = new mongoose.Schema({
 const Maquina = mongoose.model('Maquina', maquinaSchema);
 
 const credencialSchema = new mongoose.Schema({
-  nome: { type: String, required: true }, tipo: { type: String, default: 'API Key' },
-  proprietario: { type: String, default: '' }, valor: { type: String, default: '' },
-  validade: { type: String, default: '' }, status: { type: String, default: 'Válida', enum: ['Válida', 'Expirando', 'Expirada'] },
-  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
-  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now }
-});
+  nome:         { type: String, required: true },
+  proprietario: { type: String, default: '' },
+  validade:     { type: String, default: '' },
+  campos:       { type: Object, default: {} },
+  empresa:      { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoEm:     { type: Date, default: Date.now },
+  atualizadoEm: { type: Date, default: Date.now }
+}, { strict: false });
 const Credencial = mongoose.model('Credencial', credencialSchema);
 
 const notificacaoSchema = new mongoose.Schema({
@@ -773,26 +888,28 @@ const permOperacoes      = (acao) => criarMiddlewarePermissao('operacoes', acao)
 const permPlanoUsuarios  = (acao) => criarMiddlewarePermissao('planoUsuarios', acao);
 
 // ==================== PÁGINAS ====================
+const _SF_OPTS = { etag: false, lastModified: false };
+const _noCache = (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); };
 
-app.get('/permissionamentos', (req, res) => res.sendFile(path.join(__dirname, 'public', 'permissionamentos.html')));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cadastro.html')));
-app.get('/confirmar-email', (req, res) => res.sendFile(path.join(__dirname, 'public', 'confirmar-email.html')));
-app.get('/recuperar-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'recuperar-senha.html')));
-app.get('/redefinir-senha', (req, res) => res.sendFile(path.join(__dirname, 'public', 'redefinir-senha.html')));
+app.get('/permissionamentos', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'permissionamentos.html'), _SF_OPTS));
+app.get('/', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html'), _SF_OPTS));
+app.get('/cadastro', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'cadastro.html'), _SF_OPTS));
+app.get('/confirmar-email', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'confirmar-email.html'), _SF_OPTS));
+app.get('/recuperar-senha', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'recuperar-senha.html'), _SF_OPTS));
+app.get('/redefinir-senha', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'redefinir-senha.html'), _SF_OPTS));
 app.get('/dashboard', (req, res) => res.redirect('/overview'));
-app.get('/overview', (req, res) => res.sendFile(path.join(__dirname, 'public', 'overview.html')));
-app.get('/gestao-metas', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-metas.html')));
-app.get('/ideias-livres', (req, res) => res.sendFile(path.join(__dirname, 'public', 'ideias-livres.html')));
-app.get('/gestao-projetos', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-projetos.html')));
-app.get('/projeto-tradicional', (req, res) => res.sendFile(path.join(__dirname, 'public', 'projeto-tradicional.html')));
-app.get('/projeto-agil', (req, res) => res.sendFile(path.join(__dirname, 'public', 'projeto-agil.html')));
-app.get('/repositorio-templates', (req, res) => res.sendFile(path.join(__dirname, 'public', 'repositorio-templates.html')));
-app.get('/gestao-licencas', (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-licencas.html')));
-app.get('/operacoes', (req, res) => res.sendFile(path.join(__dirname, 'public', 'operacoes.html')));
-app.get('/robos', (req, res) => res.sendFile(path.join(__dirname, 'public', 'robos.html')));
-app.get('/aceitar-convite', (req, res) => res.sendFile(path.join(__dirname, 'public', 'aceitar-convite.html')));
-app.get('/plano-usuarios', (req, res) => res.sendFile(path.join(__dirname, 'public', 'plano-usuarios.html')));
+app.get('/overview', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'overview.html'), _SF_OPTS));
+app.get('/gestao-metas', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-metas.html'), _SF_OPTS));
+app.get('/ideias-livres', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'ideias-livres.html'), _SF_OPTS));
+app.get('/gestao-projetos', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-projetos.html'), _SF_OPTS));
+app.get('/projeto-tradicional', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'projeto-tradicional.html'), _SF_OPTS));
+app.get('/projeto-agil', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'projeto-agil.html'), _SF_OPTS));
+app.get('/repositorio-templates', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'repositorio-templates.html'), _SF_OPTS));
+app.get('/gestao-licencas', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-licencas.html'), _SF_OPTS));
+app.get('/operacoes', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'operacoes.html'), _SF_OPTS));
+app.get('/robos', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'robos.html'), _SF_OPTS));
+app.get('/aceitar-convite', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'aceitar-convite.html'), _SF_OPTS));
+app.get('/plano-usuarios', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'plano-usuarios.html'), _SF_OPTS));
 
 // ==================== AUTH ====================
 
@@ -1561,8 +1678,17 @@ app.post('/api/projetos', authMiddleware, verificarAssinatura, permGestaoProjeto
     res.status(201).json(projeto);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
-app.put('/api/projetos/:id', authMiddleware, verificarAssinatura, permGestaoProjetos('editar'), async (req, res) => {
+app.put('/api/projetos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
+    const usuario = await Usuario.findById(req.usuario.id).select('permissoes usuarioMestre perfil');
+    if (!usuario) return res.status(401).json({ erro: 'Usuário não encontrado' });
+    const temPermEditar = usuario.usuarioMestre || !!(usuario.permissoes?.gestaoProjetos?.editar);
+    if (!temPermEditar) {
+      const proj = await Projeto.findOne({ _id: req.params.id, empresa: req.usuario.empresa }).select('criadoPor');
+      if (!proj || proj.criadoPor?.toString() !== req.usuario.id) {
+        return res.status(403).json({ erro: 'Sem permissão para editar este projeto' });
+      }
+    }
     const projeto = await Projeto.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
       { $set: { ...req.body, atualizadoEm: new Date() } },
@@ -1796,6 +1922,43 @@ app.put('/api/licencas/:id', authMiddleware, verificarAssinatura, permGestaoLice
     res.json(licenca);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
+app.post('/api/licencas/:id/renovacoes', authMiddleware, verificarAssinatura, permGestaoLicencas('editar'), async (req, res) => {
+  try {
+    const { inicio, fim } = req.body;
+    if (!inicio || !fim) return res.status(400).json({ erro: 'Data de início e fim são obrigatórias.' });
+    const licenca = await Licenca.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { $push: { renovacoes: { inicio, fim, registradoEm: new Date(), registradoPor: req.usuario.nome || '' } }, $set: { atualizadoEm: new Date() } },
+      { new: true }
+    );
+    if (!licenca) return res.status(404).json({ erro: 'Licença não encontrada' });
+    res.json(licenca);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.put('/api/licencas/:id/renovacoes/:renovId', authMiddleware, verificarAssinatura, permGestaoLicencas('editar'), async (req, res) => {
+  try {
+    const { inicio, fim } = req.body;
+    if (!inicio || !fim) return res.status(400).json({ erro: 'Data de início e fim são obrigatórias.' });
+    const licenca = await Licenca.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa, 'renovacoes._id': req.params.renovId },
+      { $set: { 'renovacoes.$.inicio': inicio, 'renovacoes.$.fim': fim, atualizadoEm: new Date() } },
+      { new: true }
+    );
+    if (!licenca) return res.status(404).json({ erro: 'Licença ou renovação não encontrada' });
+    res.json(licenca);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+app.delete('/api/licencas/:id/renovacoes/:renovId', authMiddleware, verificarAssinatura, permGestaoLicencas('editar'), async (req, res) => {
+  try {
+    const licenca = await Licenca.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { $pull: { renovacoes: { _id: req.params.renovId } }, $set: { atualizadoEm: new Date() } },
+      { new: true }
+    );
+    if (!licenca) return res.status(404).json({ erro: 'Licença não encontrada' });
+    res.json(licenca);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
 app.delete('/api/licencas/:id', authMiddleware, verificarAssinatura, permGestaoLicencas('editar'), async (req, res) => {
   try { await Licenca.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ mensagem: 'Licença deletada!' }); }
   catch (err) { res.status(500).json({ erro: err.message }); }
@@ -1889,6 +2052,23 @@ app.put('/api/tarefas/:id', authMiddleware, verificarAssinatura, permOperacoes('
     const tarefa = await Tarefa.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true, strict: false });
     if (!tarefa) return res.status(404).json({ erro: 'Tarefa não encontrada' });
     if (anterior && anterior.status !== 'Concluída' && tarefa.status === 'Concluída') await criarNotificacao(req.usuario.empresa, `Tarefa concluída: ${tarefa.titulo}`, `A tarefa foi concluída.`, 'sucesso', '✅', '/operacoes');
+    // Sincroniza baixa/dispensa com a etapa do processo que gerou esta tarefa (se houver).
+    const _statusEtapaMap = { 'Concluída': 'Concluído', 'Concluída Atrasada': 'Concluído', 'Dispensada': 'Dispensado' };
+    if (req.body.status && _statusEtapaMap[req.body.status] && tarefa.processoExecId && tarefa.processoElementoId) {
+      const exec = await ProExec.findOne({ _id: tarefa.processoExecId, empresa: req.usuario.empresa });
+      if (exec) {
+        const etapas = exec.etapas || [];
+        const etapa = etapas.find(e => e.elementoId === tarefa.processoElementoId);
+        if (etapa && etapa.status !== _statusEtapaMap[req.body.status]) {
+          etapa.status = _statusEtapaMap[req.body.status];
+          etapa.completadoEm = new Date().toISOString();
+          const allDone = etapas.length && etapas.every(e => ['Concluído', 'Dispensado', 'Concluído com Pendência', 'Erro'].includes(e.status));
+          const update = { etapas };
+          if (allDone && !['Concluído com Sucesso', 'Concluído com Pendência'].includes(exec.status)) update.status = 'Concluído com Sucesso';
+          await ProExec.findByIdAndUpdate(exec._id, update, { strict: false });
+        }
+      }
+    }
     res.json(tarefa);
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -1898,7 +2078,7 @@ app.delete('/api/tarefas/:id', authMiddleware, verificarAssinatura, permOperacoe
 });
 app.post('/api/tarefas/:id/enviar-email', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    await enviarEmailTarefa(req.params.id, req.usuario.empresa);
+    await enviarEmailTarefa(req.params.id, req.usuario.empresa, req.body?.assinaturaHtml || '');
     res.json({ mensagem: 'Email enviado!' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1975,6 +2155,25 @@ app.post('/api/smtp-config/testar', authMiddleware, async (req, res) => {
   } catch (err) { res.json({ ok: false, erro: err.message }); }
 });
 
+// ── Config IA ──────────────────────────────────────────────────────────────────
+app.get('/api/config-ia', authMiddleware, async (req, res) => {
+  try {
+    const cfg = await ConfigIA.findOne({ empresa: req.usuario.empresa }).lean() || {};
+    res.json(cfg);
+  } catch(err) { res.status(500).json({ erro: err.message }); }
+});
+app.put('/api/config-ia', authMiddleware, async (req, res) => {
+  try {
+    const { provedor, credencialNome, campoCred } = req.body;
+    const cfg = await ConfigIA.findOneAndUpdate(
+      { empresa: req.usuario.empresa },
+      { provedor, credencialNome, campoCred, empresa: req.usuario.empresa },
+      { new: true, upsert: true }
+    );
+    res.json(cfg);
+  } catch(err) { res.status(500).json({ erro: err.message }); }
+});
+
 // ==================== PROCESSOS ====================
 
 app.get('/api/processos', authMiddleware, verificarAssinatura, async (req, res) => {
@@ -1989,10 +2188,12 @@ app.put('/api/processos/:id', authMiddleware, verificarAssinatura, async (req, r
   try {
     const prev = await Processo.findById(req.params.id).lean();
     const body = { ...req.body, atualizadoEm: new Date() };
-    // versioning: if caller passes versionar:true, snapshot current before saving
+    // versioning: if caller passes versionar:true, snapshot current before saving and lock canvas
     if (req.body.versionar && prev) {
       body.versoes = [...(prev.versoes||[]), { versao: prev.versao, elementos: prev.elementos, conexoes: prev.conexoes, data: new Date(), autor: req.usuario.nome||req.usuario.email||'—' }];
+      body.bloqueado = true;
     }
+    if (req.body.desbloquear) { body.bloqueado = false; delete body.desbloquear; }
     const processo = await Processo.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, body, { new: true, strict: false });
     if (!processo) return res.status(404).json({ erro: 'Processo não encontrado' });
     res.json(processo);
@@ -2001,6 +2202,102 @@ app.put('/api/processos/:id', authMiddleware, verificarAssinatura, async (req, r
 app.delete('/api/processos/:id', authMiddleware, verificarAssinatura, async (req, res) => {
   try { await Processo.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ mensagem: 'Processo deletado!' }); }
   catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.post('/api/processos/ia/executar', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq,
+            formatoSaida, camposJson, varSaida, execId } = req.body;
+    if (!userMessage) return res.status(400).json({ erro: 'Mensagem do usuário não informada' });
+
+    // Resolve provider + credential: agent override OR company default
+    let provedor = provedorReq, credNome = credNomeReq, campo = campoReq;
+    if (!provedor || provedor === 'empresa') {
+      const cfgIA = await ConfigIA.findOne({ empresa: req.usuario.empresa }).lean();
+      provedor = cfgIA?.provedor || 'claude-sonnet';
+      if (!credNome) credNome = cfgIA?.credencialNome;
+      if (!campo)   campo   = cfgIA?.campoCred || 'api_key';
+    }
+    const cred = await Credencial.findOne({ nome: credNome, empresa: req.usuario.empresa }).lean();
+    const apiKey = cred?.campos?.[campo || 'api_key'] || '';
+    if (!apiKey) return res.status(400).json({ erro: 'Credencial de API não encontrada. Configure em Configurações → IA ou informe uma credencial na action.' });
+
+    // Build user message — append JSON schema instruction if structured output
+    let finalUserMsg = userMessage;
+    if (formatoSaida === 'json' && camposJson?.length) {
+      const schema = '{' + camposJson.map(f => `"${f.nome}": <${f.tipo||'string'}>`).join(', ') + '}';
+      finalUserMsg += `\n\nResponda APENAS com um JSON válido, sem texto adicional, no formato exato:\n${schema}`;
+    }
+
+    let resposta = '';
+
+    if (provedor === 'claude-sonnet' || provedor === 'claude-haiku') {
+      const modelId = provedor === 'claude-sonnet' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
+      const body = { model: modelId, max_tokens: 2048, messages: [{ role: 'user', content: finalUserMsg }] };
+      if (systemMessage) body.system = systemMessage;
+      const r = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const d = await r.json();
+      if (!r.ok) return res.status(400).json({ erro: d.error?.message || 'Erro na API Anthropic' });
+      resposta = d.content?.[0]?.text || '';
+
+    } else if (provedor === 'gpt-4o' || provedor === 'gpt-4') {
+      const messages = [];
+      if (systemMessage) messages.push({ role: 'system', content: systemMessage });
+      messages.push({ role: 'user', content: finalUserMsg });
+      const body = { model: provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4', messages };
+      if (formatoSaida === 'json') body.response_format = { type: 'json_object' };
+      const r = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const d = await r.json();
+      if (!r.ok) return res.status(400).json({ erro: d.error?.message || 'Erro na API OpenAI' });
+      resposta = d.choices?.[0]?.message?.content || '';
+
+    } else if (provedor === 'gemini') {
+      const body = { contents: [{ parts: [{ text: finalUserMsg }] }] };
+      if (systemMessage) body.systemInstruction = { parts: [{ text: systemMessage }] };
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+      const d = await r.json();
+      if (!r.ok) return res.status(400).json({ erro: d.error?.message || 'Erro na API Gemini' });
+      resposta = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    } else {
+      return res.status(400).json({ erro: 'Provedor não suportado: ' + (provedor||'?') });
+    }
+
+    // Parse JSON structured output
+    let campos = null;
+    if (formatoSaida === 'json') {
+      try {
+        const match = resposta.match(/\{[\s\S]*\}/);
+        campos = JSON.parse(match ? match[0] : resposta);
+      } catch(e) { campos = null; }
+    }
+
+    // Store results in process variables
+    if (execId) {
+      const exec = await ProExec.findById(execId).lean();
+      if (exec) {
+        const vars = exec.variavelGlobal || {};
+        if (campos) {
+          for (const [k, v] of Object.entries(campos)) vars[k] = String(v);
+        } else if (varSaida) {
+          vars[varSaida] = resposta;
+        }
+        await ProExec.findByIdAndUpdate(execId, { variavelGlobal: vars });
+      }
+    }
+
+    res.json({ ok: true, resposta, campos });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 // Execuções de processo
@@ -2048,7 +2345,7 @@ app.delete('/api/pro-execucoes/:id', authMiddleware, verificarAssinatura, async 
 });
 app.post('/api/pro-execucoes/:id/enviar-email', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    const { emailTemplateId, emailContatoId, emailGrupoId } = req.body;
+    const { emailTemplateId, emailContatoId, emailGrupoId, assinaturaHtml } = req.body;
     if (!emailTemplateId) return res.status(400).json({ erro: 'Template de e-mail não configurado.' });
     const template = await EmailTemplate.findById(emailTemplateId).lean();
     if (!template) return res.status(400).json({ erro: 'Template não encontrado.' });
@@ -2068,13 +2365,18 @@ app.post('/api/pro-execucoes/:id/enviar-email', authMiddleware, verificarAssinat
       auth: { user: smtpCfg.usuario, pass: smtpCfg.senha },
       tls: { rejectUnauthorized: false }
     });
+    const assinHtml = assinaturaHtml || '';
     for (const contato of contatos) {
       if (!contato.email) continue;
       const primeiroNome = (contato.nome||'').split(' ')[0];
-      const corpo = (template.corpo||'')
+      let corpo = (template.corpo||'')
         .replace(/\{nomeCompleto\}/g, contato.nome||'')
         .replace(/\{primeiroNome\}/g, primeiroNome)
-        .replace(/\{data\}/g, new Date().toLocaleDateString('pt-BR'));
+        .replace(/\{data\}/g, new Date().toLocaleDateString('pt-BR'))
+        .replace(/\{assinatura\}/g, assinHtml);
+      if (assinHtml && !corpo.includes(assinHtml)) {
+        corpo += `<br><br><hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0">${assinHtml}`;
+      }
       await transporter.sendMail({
         from: smtpCfg.remetente || smtpCfg.usuario,
         to: contato.email,
@@ -2455,6 +2757,36 @@ app.get('/api/maquinas/:id/agent-config', authMiddleware, verificarAssinatura, a
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Pacote completo do Agent num único .zip (config.json + agent.py + iniciar.vbs) —
+// evita o problema de downloads separados virarem "agent (1).py" etc quando já
+// existe um arquivo com o mesmo nome na pasta de downloads do usuário.
+app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatura, async (req, res) => {
+  try {
+    const maquina = await Maquina.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!maquina) return res.status(404).json({ erro: 'Máquina não encontrada' });
+    const config = {
+      server: process.env.BASE_URL || 'http://localhost:3000',
+      workspace: req.usuario.empresa.toString(),
+      machineKey: maquina.machineKey,
+      machineId: maquina.machineId
+    };
+    const files = [
+      { name: 'config.json', data: Buffer.from(JSON.stringify(config, null, 2), 'utf8') },
+      { name: 'agent.py', data: fs.readFileSync(path.join(__dirname, 'public', 'agent.py')) },
+      { name: 'iniciar.vbs', data: fs.readFileSync(path.join(__dirname, 'public', 'iniciar.vbs')) },
+    ];
+    const zipBuf = buildZip(files);
+    const nomeSeguro = (maquina.nome || maquina.machineId || 'agent').replace(/[^a-zA-Z0-9_-]/g, '_');
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="hoc-agent-${nomeSeguro}.zip"`);
+    // Sem isso o navegador pode servir um .zip antigo do cache mesmo depois do
+    // agent.py ser atualizado no servidor — sempre gerar fresco.
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.send(zipBuf);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 // Heartbeat — chamado pelo agent.py a cada 20s (autenticado por machineKey no body)
 app.post('/api/maquinas/heartbeat', async (req, res) => {
   try {
@@ -2471,32 +2803,37 @@ app.post('/api/maquinas/heartbeat', async (req, res) => {
       robosAtivos: ativos, robosAtivosList: robosAtivosList || [],
       ultimoHeartbeat: new Date(), status
     });
-    // Retorna comandos pendentes (execuções criadas para esta máquina ainda não iniciadas)
-    const pendentes = await ExecucaoRobo.find({
-      maquina: maquina.machineId,
-      status: 'em_execucao',
-      comandoEnviado: { $ne: true }
-    }).limit(3);
+    // Retorna comandos pendentes — mark atômico (findOneAndUpdate) evita double-dispatch
+    // mesmo com múltiplos agentes ou heartbeats concorrentes
+    const pendentes = [];
+    for (let i = 0; i < 3; i++) {
+      const exec = await ExecucaoRobo.findOneAndUpdate(
+        { maquina: maquina.machineId, status: 'em_execucao', comandoEnviado: { $ne: true } },
+        { $set: { comandoEnviado: true } },
+        { new: true }
+      );
+      if (!exec) break;
+      pendentes.push(exec);
+    }
     const roboIds = [...new Set(pendentes.map(e => e.roboId?.toString()).filter(Boolean))];
     const robosEncontrados = roboIds.length ? await Robot.find({ _id: { $in: roboIds } }) : [];
     const roboMap = Object.fromEntries(robosEncontrados.map(r => [r._id.toString(), r]));
-    // Marca como enviados só depois de ter os dados do robô
-    if (pendentes.length) {
-      await ExecucaoRobo.updateMany(
-        { _id: { $in: pendentes.map(e => e._id) } },
-        { comandoEnviado: true }
-      );
-    }
     const INTERP = { py:'python', js:'node', ts:'npx ts-node', rb:'ruby', sh:'bash', php:'php', r:'Rscript' };
     const commands = pendentes.map(e => {
       const robo = roboMap[e.roboId?.toString()] || {};
       let command = robo.comandoExecucao || '';
       if (!command && robo.arquivoPrincipal) {
         const arq = robo.arquivoPrincipal;
-        const ext = (arq.split('.').pop()||'').toLowerCase();
-        if (INTERP[ext]) command = `${INTERP[ext]} ${arq}`;
-        else if (['exe','bat','cmd'].includes(ext)) command = arq;
-        else command = `python ${arq}`;
+        if (/\s/.test(arq.trim())) {
+          // Já parece um comando completo (tem espaço) — usa como está, evita
+          // duplicar o interpretador (ex: virar "python python main.py").
+          command = arq.trim();
+        } else {
+          const ext = (arq.split('.').pop()||'').toLowerCase();
+          if (INTERP[ext]) command = `${INTERP[ext]} ${arq}`;
+          else if (['exe','bat','cmd'].includes(ext)) command = arq;
+          else command = `python ${arq}`;
+        }
       }
       return {
         execId:           e._id,
@@ -2511,7 +2848,8 @@ app.post('/api/maquinas/heartbeat', async (req, res) => {
         gitBranch:        robo.gitBranch || 'main',
         pacotesPip:       robo.pacotesPip || '',
         preComando:       robo.preComando || '',
-        timeout:          robo.timeout || 30
+        timeout:          robo.timeout || 30,
+        apiKey:           robo.apiKey || ''
       };
     });
     res.json({ ok: true, status, commands });
@@ -2557,14 +2895,44 @@ app.get('/api/robos/execucoes/:id/status', async (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// Credencial por nome — consumida pelo robô em execução
+// Logs externos — postados por scripts com x-robot-key (sem agente em execução)
+app.post('/api/robos/execucoes/:id/logs/externo', async (req, res) => {
+  try {
+    const apiKey = req.headers['x-robot-key'];
+    if (!apiKey) return res.status(400).json({ erro: 'x-robot-key header obrigatório' });
+    const robo = await Robot.findOne({ apiKey }).lean();
+    if (!robo) return res.status(401).json({ erro: 'Chave inválida' });
+    const exec = await ExecucaoRobo.findById(req.params.id);
+    if (!exec) return res.status(404).json({ erro: 'Execução não encontrada' });
+    if (exec.empresa?.toString() !== robo.empresa?.toString()) return res.status(403).json({ erro: 'Acesso negado' });
+    const logEntry = {
+      time: req.body.time || new Date(),
+      status: req.body.status || req.body.nivel || 'info',
+      message: req.body.message || req.body.mensagem || '',
+    };
+    await ExecucaoRobo.findByIdAndUpdate(req.params.id, { $push: { logs: logEntry } });
+    res.json({ ok: true });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Credencial por nome — consumida pelo agente (x-machine-key) ou por scripts externos (x-robot-key)
 app.get('/api/credenciais/:nome/valor', async (req, res) => {
   try {
+    let empresaId;
     const machineKey = req.headers['x-machine-key'];
-    if (!machineKey) return res.status(400).json({ erro: 'x-machine-key header obrigatório' });
-    const maquina = await Maquina.findOne({ machineKey, ativo: true });
-    if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
-    const cred = await Credencial.findOne({ nome: req.params.nome, empresa: maquina.empresa });
+    const apiKey     = req.headers['x-robot-key'];
+    if (machineKey) {
+      const maquina = await Maquina.findOne({ machineKey, ativo: true });
+      if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
+      empresaId = maquina.empresa;
+    } else if (apiKey) {
+      const robo = await Robot.findOne({ apiKey }).lean();
+      if (!robo) return res.status(401).json({ erro: 'Chave inválida' });
+      empresaId = robo.empresa;
+    } else {
+      return res.status(400).json({ erro: 'x-machine-key ou x-robot-key obrigatório' });
+    }
+    const cred = await Credencial.findOne({ nome: req.params.nome, empresa: empresaId });
     if (!cred) return res.status(404).json({ erro: 'Credencial não encontrada' });
     res.json({ nome: cred.nome, campos: cred.campos || { valor: cred.valor } });
   } catch (err) { res.status(500).json({ erro: err.message }); }
@@ -2671,7 +3039,12 @@ app.post('/api/robos/:id/package', authMiddleware, verificarAssinatura, uploadRo
     if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado' });
     await Robot.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
-      { zipNome: req.file.originalname, vinculoTipo: 'zip', atualizadoEm: new Date() }
+      {
+        zipNome: req.file.originalname,
+        vinculoTipo: 'zip',
+        atualizadoEm: new Date(),
+        $push: { zipHistorico: { nome: req.file.originalname, aplicadoEm: new Date() } }
+      }
     );
     res.json({ ok: true, zipNome: req.file.originalname });
   } catch (err) { res.status(500).json({ erro: err.message }); }
@@ -2695,16 +3068,33 @@ app.get('/api/robos/:id/package', async (req, res) => {
 // ==================== CREDENCIAIS ====================
 
 app.get('/api/credenciais', authMiddleware, verificarAssinatura, async (req, res) => {
-  try { const creds = await Credencial.find({ empresa: req.usuario.empresa }).select('-valor').sort({ criadoEm: -1 }); res.json(creds); }
+  try { const creds = await Credencial.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 }); res.json(creds); }
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 app.post('/api/credenciais', authMiddleware, verificarAssinatura, async (req, res) => {
-  try { const cred = await Credencial.create({ ...req.body, empresa: req.usuario.empresa }); res.status(201).json(cred); }
+  try { const { nome, proprietario, validade, campos } = req.body; const cred = await Credencial.create({ nome, proprietario, validade, campos: campos || {}, empresa: req.usuario.empresa }); res.status(201).json(cred); }
   catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.put('/api/credenciais/:id', authMiddleware, verificarAssinatura, async (req, res) => {
-  try { const cred = await Credencial.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, { ...req.body, atualizadoEm: new Date() }, { new: true }); if (!cred) return res.status(404).json({ erro: 'Credencial não encontrada' }); res.json(cred); }
-  catch (err) { res.status(400).json({ erro: err.message }); }
+  try {
+    const { nome, proprietario, validade, campos: novosCampos } = req.body;
+    const cred = await Credencial.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!cred) return res.status(404).json({ erro: 'Credencial não encontrada' });
+    // merge campos: keep old value when new value is empty string (campo mantido mas sem alteração)
+    let campos = {};
+    if (novosCampos) {
+      const antigos = cred.campos || {};
+      for (const [k, v] of Object.entries(novosCampos)) {
+        campos[k] = v !== '' ? v : (antigos[k] || '');
+      }
+    }
+    const updated = await Credencial.findOneAndUpdate(
+      { _id: req.params.id, empresa: req.usuario.empresa },
+      { nome, proprietario, validade, campos, atualizadoEm: new Date() },
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 app.delete('/api/credenciais/:id', authMiddleware, verificarAssinatura, async (req, res) => {
   try { await Credencial.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ mensagem: 'Credencial deletada!' }); }

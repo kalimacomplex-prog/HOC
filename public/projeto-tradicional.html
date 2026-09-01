@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
@@ -311,6 +311,7 @@
     /* Editor toolbar buttons */
     .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #4a5568; }
     .toolbar-btn:hover { background: #e2e8f0; }
+    .toolbar-select { font-size: 11px; padding: 3px 5px; border: 1px solid #e2e8f0; border-radius: 4px; outline: none; color: #4a5568; background: white; cursor: pointer; }
     /* Card "Novo Documento" estilo item */
     .ec-novo-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; background: white; border: 1.5px dashed #c4b5fd; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; color: #6b46c1; }
     .ec-novo-item:hover { border-color: #2d1b69; background: #f5f0ff; }
@@ -452,19 +453,26 @@
 
   <!-- Tabs principais -->
   <div class="proj-tabs">
-    <button class="proj-tab active" onclick="mudarTab('estudo',this)">Estudo de Caso</button>
+    <button class="proj-tab active" onclick="mudarTab('dashboard',this)">📊 Dashboard</button>
+    <button class="proj-tab" onclick="mudarTab('estudo',this)">Estudo de Caso</button>
     <button class="proj-tab" onclick="mudarTab('tap',this)">Iniciação</button>
     <button class="proj-tab" onclick="mudarTab('planejamento',this)">Planejamento</button>
     <button class="proj-tab" onclick="mudarTab('change',this)">Change Request</button>
     <button class="proj-tab" onclick="mudarTab('execucao',this)">Execução</button>
     <button class="proj-tab" onclick="mudarTab('encerramento',this)">Encerramento</button>
+    <button class="proj-tab" onclick="mudarTab('equipe-clientes',this)">👥 Equipe e Clientes</button>
     <button class="proj-tab" onclick="mudarTab('agente',this)">🤖 Agente de IA</button>
   </div>
 
   <div class="proj-content">
 
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard" style="display:block">
+      <div id="dashboardContent"></div>
+    </div>
+
     <!-- ESTUDO DE CASO -->
-    <div id="tab-estudo">
+    <div id="tab-estudo" style="display:none">
       <div style="margin-bottom:14px">
         <div style="font-size:12px;color:#718096">Selecione um material para te apoiar no estudo deste projeto</div>
       </div>
@@ -525,14 +533,14 @@
       <div class="tap-section" data-sec-key="tap-2">
         <div class="tap-section-title"><div class="tap-section-num">2</div> Justificativa<button class="sec-del-btn" onclick="_ocultarSecao('tap','tap-2')" title="Ocultar seção">✕</button></div>
         <div class="tap-value" id="tap-justificativa-v">—</div>
-        <textarea class="tap-textarea" id="tap-justificativa" style="display:none" rows="4" placeholder="Descreva por que este projeto é necessário..."></textarea>
+        <textarea class="tap-textarea" id="tap-justificativa" style="display:none" rows="4" placeholder="Descreva por que este projeto é necessário..." onkeydown="_tapTaKeydown(event)"></textarea>
       </div>
 
       <!-- 3. Objetivos -->
       <div class="tap-section" data-sec-key="tap-3">
         <div class="tap-section-title"><div class="tap-section-num">3</div> Objetivos<button class="sec-del-btn" onclick="_ocultarSecao('tap','tap-3')" title="Ocultar seção">✕</button></div>
         <div class="tap-value" id="tap-objetivos-v">—</div>
-        <textarea class="tap-textarea" id="tap-objetivos" style="display:none" rows="3" placeholder="Liste os objetivos do projeto..."></textarea>
+        <textarea class="tap-textarea" id="tap-objetivos" style="display:none" rows="3" placeholder="Liste os objetivos do projeto..." onkeydown="_tapTaKeydown(event)"></textarea>
       </div>
 
       <!-- 4. Escopo -->
@@ -543,14 +551,14 @@
             <div class="tap-label" style="margin-bottom:8px">Incluso no Escopo</div>
             <div id="tap-escopo-in-v"><div style="color:#a0aec0;font-size:12px">Nenhum item</div></div>
             <div id="tap-escopo-in-edit" style="display:none">
-              <textarea class="tap-textarea" id="tap-escopo-in" rows="4" placeholder="Um item por linha..."></textarea>
+              <textarea class="tap-textarea" id="tap-escopo-in" rows="4" placeholder="Um item por linha..." onkeydown="_tapTaKeydown(event)"></textarea>
             </div>
           </div>
           <div>
             <div class="tap-label" style="margin-bottom:8px">Fora do Escopo</div>
             <div id="tap-escopo-out-v"><div style="color:#a0aec0;font-size:12px">Nenhum item</div></div>
             <div id="tap-escopo-out-edit" style="display:none">
-              <textarea class="tap-textarea" id="tap-escopo-out" rows="4" placeholder="Um item por linha..."></textarea>
+              <textarea class="tap-textarea" id="tap-escopo-out" rows="4" placeholder="Um item por linha..." onkeydown="_tapTaKeydown(event)"></textarea>
             </div>
           </div>
         </div>
@@ -573,14 +581,14 @@
       <div class="tap-section" data-sec-key="tap-6">
         <div class="tap-section-title"><div class="tap-section-num">6</div> Premissas<button class="sec-del-btn" onclick="_ocultarSecao('tap','tap-6')" title="Ocultar seção">✕</button></div>
         <div class="tap-value" id="tap-premissas-v">—</div>
-        <textarea class="tap-textarea" id="tap-premissas" style="display:none" rows="3" placeholder="Liste as premissas do projeto..."></textarea>
+        <textarea class="tap-textarea" id="tap-premissas" style="display:none" rows="3" placeholder="Liste as premissas do projeto..." onkeydown="_tapTaKeydown(event)"></textarea>
       </div>
 
       <!-- 7. Restrições -->
       <div class="tap-section" data-sec-key="tap-7">
         <div class="tap-section-title"><div class="tap-section-num">7</div> Restrições<button class="sec-del-btn" onclick="_ocultarSecao('tap','tap-7')" title="Ocultar seção">✕</button></div>
         <div class="tap-value" id="tap-restricoes-v">—</div>
-        <textarea class="tap-textarea" id="tap-restricoes" style="display:none" rows="3" placeholder="Liste as restrições do projeto..."></textarea>
+        <textarea class="tap-textarea" id="tap-restricoes" style="display:none" rows="3" placeholder="Liste as restrições do projeto..." onkeydown="_tapTaKeydown(event)"></textarea>
       </div>
 
       <!-- 8. Critérios de Sucesso -->
@@ -690,6 +698,9 @@
           <button id="eapBtnAprovar" onclick="eapAprovar()" style="display:none;font-size:12px;padding:5px 12px;background:#276749;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">✅ Aprovar</button>
           <button id="eapBtnHistorico" onclick="toggleEscopoHistorico()" style="font-size:12px;padding:5px 12px;background:#f7fafc;color:#4a5568;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;font-weight:600">🕒 Histórico</button>
         </div>
+        <!-- datalist for EAP responsável autocomplete -->
+        <datalist id="eapUsersList"></datalist>
+
         <!-- Canvas + History panel wrapper -->
         <div style="display:flex;flex:1;min-height:0;overflow:hidden;align-items:flex-start">
           <div id="eapCanvas" style="flex:1;position:relative;overflow:auto;background:#f0f2f5;min-height:0;height:100%">
@@ -787,22 +798,20 @@
       <!-- Recursos -->
       <div id="subtab-recursos" style="display:none">
 
-        <!-- ── TOOLBAR ─────────────────────────────────────────────── -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-          <button class="rec-add-btn" onclick="recAddDisp()">+ Recurso Disponível</button>
-          <button class="rec-add-btn" onclick="recAddAcq()">+ Recurso a Adquirir</button>
-        </div>
-
         <!-- ── RESUMO TOTAL + POR CATEGORIA ─────────────────────────── -->
         <div class="tap-section" style="margin-bottom:14px">
           <div class="rec-section-hdr" style="margin-bottom:12px">
             <div class="rec-section-title">📊 Resumo</div>
+            <button id="btnRecCatToggle" onclick="_recToggleCat()" style="font-size:11px;padding:4px 10px;background:#f5f0ff;color:#7c3aed;border:1.5px solid #c4b5fd;border-radius:6px;cursor:pointer;font-weight:600">Exibir Resumo por Categoria</button>
           </div>
           <!-- KPIs totais -->
           <div id="recKpiGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px"></div>
-          <!-- Por categoria (automático) -->
+          <!-- Por categoria (toggle) -->
           <div id="recCatWrap" style="display:none">
-            <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Por Categoria</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px">Por Categoria</div>
+              <button onclick="recAdicionarCategoria()" class="rec-add-btn" style="font-size:11px;padding:3px 9px">+ Categoria</button>
+            </div>
             <div style="overflow-x:auto;width:100%">
               <table class="rec-tbl" id="recCatTable">
                 <thead>
@@ -811,6 +820,7 @@
                     <th style="width:120px;text-align:right">Budget <span style="font-weight:400;color:#a0aec0">(edite aqui)</span></th>
                     <th style="width:110px;text-align:right">Usado</th>
                     <th style="width:110px;text-align:right">Saldo</th>
+                    <th style="width:30px"></th>
                   </tr>
                 </thead>
                 <tbody id="recCatTbody"></tbody>
@@ -860,6 +870,7 @@
                   <th style="width:100px">Efetivação</th>
                   <th style="width:95px">Status</th>
                   <th style="width:70px;text-align:center">Atraso</th>
+                  <th style="min-width:130px">Tarefa</th>
                   <th style="width:110px">Fornecedor</th>
                   <th style="min-width:120px">Observação</th>
                   <th style="width:60px;text-align:center">📎</th>
@@ -871,8 +882,39 @@
           </div>
         </div>
 
+        <!-- ── PESSOAL ─────────────────────────────────────────────── -->
+        <div class="tap-section" style="margin-top:14px">
+          <div class="rec-section-hdr" style="margin-bottom:0">
+            <div class="rec-section-title">👥 Pessoal (Custos com Pessoas)</div>
+            <button class="rec-add-btn" onclick="pessoalAdd()">+ Pessoa</button>
+          </div>
+          <div id="pessoalEmpty" style="text-align:center;padding:20px;color:#a0aec0;font-size:12px;display:none">Nenhum custo de pessoal cadastrado.</div>
+          <div style="overflow-x:auto;width:100%">
+            <table class="rec-tbl" id="pessoalTable">
+              <thead><tr>
+                <th style="min-width:150px">Nome</th>
+                <th style="width:120px">Papel</th>
+                <th style="width:105px;text-align:right">Custo/Mês (R$)</th>
+                <th style="width:95px">Início</th>
+                <th style="width:95px">Fim</th>
+                <th style="min-width:130px">Tarefa</th>
+                <th style="width:105px;text-align:right">Total Estimado</th>
+                <th style="width:28px"></th>
+              </tr></thead>
+              <tbody id="pessoalTbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Custo por Tarefa -->
+        <div class="tap-section" id="custoPorTarefaWrap" style="margin-top:10px;display:none">
+          <div class="rec-section-title" style="margin-bottom:8px">📌 Custo por Tarefa</div>
+          <div id="custoPorTarefaBody"></div>
+        </div>
+
         <!-- hidden file input for uploads -->
         <input type="file" id="recFileInput" style="display:none" multiple onchange="recFileSelected(event)">
+        <input type="file" id="qualFileInput" style="display:none" multiple onchange="qualFileSelected(event)">
 
       </div>
 
@@ -898,7 +940,7 @@
         <!-- Sub-tabs bar -->
         <div style="display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid #e2e8f0">
           <button class="qual-subtab active" id="qualTabUso" onclick="qualMudarSubTab('uso')">📋 Uso</button>
-          <button class="qual-subtab" id="qualTabTemplates" onclick="qualMudarSubTab('templates')">🔧 Templates</button>
+          <button class="qual-subtab" id="qualTabTemplates" onclick="qualMudarSubTab('templates')">🔧 Modelos</button>
         </div>
         <!-- USO -->
         <div id="qual-sub-uso">
@@ -944,6 +986,24 @@
         <div style="background:white;border-radius:8px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex:1;text-align:center"><div style="font-size:22px;font-weight:700;color:#276749" id="crAprovado">0</div><div style="font-size:11px;color:#718096">Aprovadas</div></div>
         <div style="background:white;border-radius:8px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex:1;text-align:center"><div style="font-size:22px;font-weight:700;color:#c53030" id="crReprovado">0</div><div style="font-size:11px;color:#718096">Reprovadas</div></div>
         <div style="background:white;border-radius:8px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.06);flex:1;text-align:center"><div style="font-size:22px;font-weight:700;color:#2b6cb0" id="crDocAprovado">0</div><div style="font-size:11px;color:#718096">Aguardando</div></div>
+      </div>
+      <!-- Filtros CR -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <input type="text" id="crFiltroTitulo" placeholder="Buscar por título..." oninput="renderCRs()" style="flex:1;padding:7px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box">
+        <button id="crBtnMaisFiltros" onclick="_crToggleFiltros()" style="padding:7px 14px;background:white;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:#4a5568;white-space:nowrap">⚙️ Mais Filtros</button>
+        <button onclick="limparFiltrosCR()" style="padding:7px 12px;background:#f0f2f5;border:none;border-radius:6px;font-size:12px;cursor:pointer;color:#4a5568;font-weight:600;white-space:nowrap">Limpar</button>
+      </div>
+      <div id="crFiltrosPanel" style="display:none;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:12px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+          <div style="min-width:130px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">Categoria</label><select id="crFiltroCategoria" onchange="renderCRs()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;background:white"><option value="">Todas</option><option>Escopo</option><option>Correção</option><option>Repriorização</option><option>Prazo</option><option>Custo / Orçamento</option><option>Requisitos / Regras de negócio</option><option>Qualidade</option><option>Compliance / Legal</option><option>Recursos / Capacidade</option><option>Integrações / Dependências</option><option>Estratégia / Direcionamento</option><option>Outros</option></select></div>
+          <div style="min-width:130px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">Status</label><select id="crFiltroStatus" onchange="renderCRs()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;background:white"><option value="">Todos</option><option value="rascunho">Rascunho</option><option value="em_aprovacao">Aguardando</option><option value="aprovado">Aprovado</option><option value="reprovado">Reprovado</option><option value="dispensado">Dispensado</option></select></div>
+          <div style="min-width:130px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">Solicitante</label><input type="text" id="crFiltroSolicitante" placeholder="Nome..." oninput="renderCRs()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box"></div>
+          <div style="min-width:110px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">Data De</label><input type="date" id="crFiltroDataDe" onchange="renderCRs()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box"></div>
+          <div style="min-width:110px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">Data Até</label><input type="date" id="crFiltroDataAte" onchange="renderCRs()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box"></div>
+          <div style="flex:1;min-width:140px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">Motivo</label><input type="text" id="crFiltroMotivo" placeholder="Buscar no motivo..." oninput="renderCRs()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box"></div>
+          <div style="flex:1;min-width:140px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">Descrição</label><input type="text" id="crFiltroDesc" placeholder="Buscar na descrição..." oninput="renderCRs()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box"></div>
+          <div style="flex:1;min-width:140px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">Impacto</label><input type="text" id="crFiltroImpacto" placeholder="Buscar no impacto..." oninput="renderCRs()" style="width:100%;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box"></div>
+        </div>
       </div>
       <div id="crLista"><div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma solicitação de mudança.</div></div>
     </div>
@@ -1030,7 +1090,7 @@
         <div class="tap-section" data-sec-key="tenc-2">
           <div class="tap-section-title"><div class="tap-section-num">2</div> Objetivo do Projeto<button class="sec-del-btn" onclick="_ocultarSecao('tenc','tenc-2')" title="Ocultar seção">✕</button></div>
           <div class="tap-value" id="tenc-objetivo-v" style="white-space:pre-wrap">—</div>
-          <textarea class="tap-textarea" id="tenc-objetivo" style="display:none" rows="4" placeholder="Descreva o objetivo conforme o TAP e confirme se foi atingido..."></textarea>
+          <textarea class="tap-textarea" id="tenc-objetivo" style="display:none" rows="4" placeholder="Descreva o objetivo conforme o TAP e confirme se foi atingido..." onkeydown="_tapTaKeydown(event)"></textarea>
         </div>
 
         <!-- 3. Escopo Final Entregue -->
@@ -1059,13 +1119,13 @@
             <div class="tap-field"><div class="tap-label">Prazo Planejado</div><div class="tap-value" id="tenc-prazoPlan-v">—</div><input class="tap-input" id="tenc-prazoPlan" type="date" style="display:none"></div>
             <div class="tap-field"><div class="tap-label">Prazo Realizado</div><div class="tap-value" id="tenc-prazoReal-v">—</div><input class="tap-input" id="tenc-prazoReal" type="date" style="display:none"></div>
           </div>
-          <div class="tap-field" style="margin-top:8px"><div class="tap-label">Detalhamento</div><div class="tap-value" id="tenc-detPrazo-v" style="white-space:pre-wrap">—</div><textarea class="tap-textarea" id="tenc-detPrazo" style="display:none" rows="2" placeholder="Variações de prazo..."></textarea></div>
+          <div class="tap-field" style="margin-top:8px"><div class="tap-label">Detalhamento</div><div class="tap-value" id="tenc-detPrazo-v" style="white-space:pre-wrap">—</div><textarea class="tap-textarea" id="tenc-detPrazo" style="display:none" rows="2" placeholder="Variações de prazo..." onkeydown="_tapTaKeydown(event)"></textarea></div>
           <div style="font-size:12px;font-weight:700;color:#4a5568;margin:12px 0 8px">4.2 Custos</div>
           <div class="tap-grid">
             <div class="tap-field"><div class="tap-label">Orçamento Aprovado</div><div class="tap-value" id="tenc-orcAprov-v">—</div><input class="tap-input" id="tenc-orcAprov" style="display:none" placeholder="R$ 0,00"></div>
             <div class="tap-field"><div class="tap-label">Custo Final Realizado</div><div class="tap-value" id="tenc-custoFinal-v">—</div><input class="tap-input" id="tenc-custoFinal" style="display:none" placeholder="R$ 0,00"></div>
           </div>
-          <div class="tap-field" style="margin-top:8px"><div class="tap-label">Detalhamento</div><div class="tap-value" id="tenc-detCusto-v" style="white-space:pre-wrap">—</div><textarea class="tap-textarea" id="tenc-detCusto" style="display:none" rows="2" placeholder="Variações de custo..."></textarea></div>
+          <div class="tap-field" style="margin-top:8px"><div class="tap-label">Detalhamento</div><div class="tap-value" id="tenc-detCusto-v" style="white-space:pre-wrap">—</div><textarea class="tap-textarea" id="tenc-detCusto" style="display:none" rows="2" placeholder="Variações de custo..." onkeydown="_tapTaKeydown(event)"></textarea></div>
         </div>
 
         <!-- 5. Riscos e Pendências Finais -->
@@ -1103,7 +1163,7 @@
             <div class="tap-field"><div class="tap-label">Contratos encerrados</div><div class="tap-value" id="tenc-contratos-v">—</div><select class="tap-input" id="tenc-contratos" style="display:none"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
             <div class="tap-field"><div class="tap-label">Licenças/acessos revogados</div><div class="tap-value" id="tenc-licencas-v">—</div><select class="tap-input" id="tenc-licencas" style="display:none"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
           </div>
-          <div class="tap-field" style="margin-top:10px"><div class="tap-label">Observações</div><div class="tap-value" id="tenc-obsRec-v" style="white-space:pre-wrap">—</div><textarea class="tap-textarea" id="tenc-obsRec" style="display:none" rows="2" placeholder="Observações..."></textarea></div>
+          <div class="tap-field" style="margin-top:10px"><div class="tap-label">Observações</div><div class="tap-value" id="tenc-obsRec-v" style="white-space:pre-wrap">—</div><textarea class="tap-textarea" id="tenc-obsRec" style="display:none" rows="2" placeholder="Observações..." onkeydown="_tapTaKeydown(event)"></textarea></div>
         </div>
 
         <!-- 8. Declaração de Encerramento -->
@@ -1183,6 +1243,95 @@
       </div>
     </div>
 
+    <!-- EQUIPE E CLIENTES -->
+    <div id="tab-equipe-clientes" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div><div style="font-size:15px;font-weight:700;color:#1e2a4a">👥 Equipe e Clientes</div><div style="font-size:12px;color:#718096">Gerencie membros, acompanhe pesquisas de satisfação e turnover</div></div>
+        <button class="btn-primary" onclick="ecAbrirModal()" style="font-size:12px;padding:7px 14px">+ Adicionar Pessoa</button>
+      </div>
+      <!-- KPIs rápidos -->
+      <div id="ecKpis" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px"></div>
+      <!-- Filtros -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+        <input id="ecFiltroNome" type="text" placeholder="🔍 Nome..." oninput="renderEquipeClientes()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;min-width:140px;flex:1">
+        <input id="ecFiltroPapel" type="text" placeholder="Papel..." oninput="renderEquipeClientes()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;min-width:120px;flex:1">
+        <select id="ecFiltroTipo" onchange="renderEquipeClientes()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;background:white">
+          <option value="">Tipo: Todos</option>
+          <option value="Interno">Interno</option>
+          <option value="Externo">Externo</option>
+        </select>
+        <select id="ecFiltroStatus" onchange="renderEquipeClientes()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;background:white">
+          <option value="">Status: Todos</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
+        <button onclick="document.getElementById('ecFiltroNome').value='';document.getElementById('ecFiltroPapel').value='';document.getElementById('ecFiltroTipo').value='';document.getElementById('ecFiltroStatus').value='';renderEquipeClientes()" style="padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;cursor:pointer;background:white;color:#718096">✕ Limpar</button>
+      </div>
+      <!-- Lista -->
+      <div id="ecEmpty" style="display:none;text-align:center;padding:40px;color:#a0aec0;font-size:13px;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">Nenhuma pessoa encontrada.</div>
+      <div id="ecLista" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Equipe e Clientes -->
+<div class="modal-overlay" id="modalEC">
+  <div class="modal" style="max-width:560px;max-height:92vh;overflow-y:auto">
+    <div class="modal-header">
+      <span class="modal-titulo" id="ecModalTitulo">Nova Pessoa</span>
+      <button class="btn-fechar" onclick="fecharModal('modalEC')">×</button>
+    </div>
+    <input type="hidden" id="ecEditId">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px">
+      <div class="form-group" style="grid-column:1/-1"><label>Nome *</label><input type="text" id="ecNome" placeholder="Nome completo..."></div>
+      <div class="form-group"><label>Tipo de Membro *</label>
+        <select id="ecTipo" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;background:white">
+          <option value="Interno">👤 Interno (equipe)</option>
+          <option value="Externo">🌐 Externo (cliente / stakeholder)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Papel / Função</label>
+        <input type="text" id="ecPapel" placeholder="Ex: Gerente, Dev, Cliente..." list="ecPapelList">
+        <datalist id="ecPapelList"><option value="Gerente de Projeto"><option value="Desenvolvedor"><option value="Designer"><option value="Analista"><option value="Patrocinador"><option value="Stakeholder"><option value="Scrum Master"><option value="Product Owner"></datalist>
+      </div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="ecEmail" placeholder="email@exemplo.com"></div>
+      <div class="form-group"><label>Telefone</label><input type="text" id="ecTelefone" placeholder="(00) 00000-0000"></div>
+      <div class="form-group"><label>Ativo no projeto?</label>
+        <select id="ecAtivo"><option value="true">✅ Sim</option><option value="false">❌ Não (inativo)</option></select>
+      </div>
+      <div class="form-group"><label>Data de Inativação</label><input type="date" id="ecDataInativacao"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Observação</label><textarea id="ecObs" rows="2" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalEC')">Cancelar</button>
+      <button class="btn-confirmar" onclick="ecSalvar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pesquisa de Satisfação -->
+<div class="modal-overlay" id="modalPesquisa">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <span class="modal-titulo">📊 Registrar Avaliação</span>
+      <button class="btn-fechar" onclick="fecharModal('modalPesquisa')">×</button>
+    </div>
+    <input type="hidden" id="pesqPessoaId">
+    <div style="padding:4px 0">
+      <div class="form-group"><label>Pessoa</label><div id="pesqNomePessoa" style="font-weight:600;color:#1e2a4a;padding:4px 0;font-size:14px"></div></div>
+      <div class="form-group"><label>Data da Pesquisa</label><input type="date" id="pesqData"></div>
+      <div class="form-group"><label>Descrição / Contexto</label><input type="text" id="pesqDescricao" placeholder="Ex: Revisão Sprint 3, Pós-entrega do marco 2..."></div>
+      <div class="form-group">
+        <label>Nota (1 a 5)</label>
+        <div id="pesqEstrelas" style="display:flex;gap:8px;margin-top:6px"></div>
+        <input type="hidden" id="pesqNota" value="3">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalPesquisa')">Cancelar</button>
+      <button class="btn-confirmar" onclick="pesqSalvar()">Registrar</button>
+    </div>
   </div>
 </div>
 
@@ -1211,14 +1360,32 @@
   </div>
 </div>
 
+<!-- Modal Selecionar Pasta EC (templates e outros) -->
+<div class="modal-overlay" id="modalECPastaSelect">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header"><span class="modal-titulo" id="modalECPastaSelectTitulo">Selecionar Pasta</span><button class="btn-fechar" onclick="fecharModal('modalECPastaSelect')">×</button></div>
+    <div style="font-size:12px;color:#718096;margin-bottom:14px" id="modalECPastaSelectDesc">Escolha a pasta onde o arquivo será salvo.</div>
+    <div class="form-group"><label>Salvar em *</label>
+      <div class="ec-folder-picker" id="ecPastaSelectWrap"></div>
+      <input type="hidden" id="ecPastaSelectVal">
+      <div id="ecPastaSelectErro" style="color:#e53e3e;font-size:11px;margin-top:4px;display:none">← Pasta obrigatória</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalECPastaSelect')">Cancelar</button>
+      <button class="btn-confirmar" onclick="_confirmarPastaEC()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Nova Nota EC -->
 <div class="modal-overlay" id="modalNovaNotaEC">
   <div class="modal" style="max-width:400px">
     <div class="modal-header"><span class="modal-titulo">📝 Novo Documento</span><button class="btn-fechar" onclick="fecharModal('modalNovaNotaEC')">×</button></div>
     <div class="form-group"><label>Título *</label><input type="text" id="novaNotaECTitulo" placeholder="Título do documento..."></div>
-    <div class="form-group"><label>Salvar em</label>
+    <div class="form-group"><label>Salvar em *</label>
       <div class="ec-folder-picker" id="novaNotaECPastaWrap"></div>
       <input type="hidden" id="novaNotaECPasta">
+      <div id="novaNotaECPastaErro" style="color:#e53e3e;font-size:11px;margin-top:4px;display:none">← Pasta obrigatória</div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalNovaNotaEC')">Cancelar</button>
@@ -1238,9 +1405,10 @@
         <div style="font-size:11px;color:#a0aec0" id="uploadECFilesize">—</div>
       </div>
     </div>
-    <div class="form-group"><label>Salvar em</label>
+    <div class="form-group"><label>Salvar em *</label>
       <div class="ec-folder-picker" id="uploadECPastaWrap"></div>
       <input type="hidden" id="uploadECPasta">
+      <div id="uploadECPastaErro" style="color:#e53e3e;font-size:11px;margin-top:4px;display:none">← Pasta obrigatória</div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="cancelarUploadEC()">Cancelar</button>
@@ -1367,9 +1535,10 @@
       <div class="form-group">
         <label>Categoria</label>
         <select id="crCategoria" onchange="_crCategoriaChange(this)">
-          <option>Escopo</option><option>Cronograma</option><option>Prazo</option><option>Orçamento</option>
-          <option>Qualidade</option><option>Recursos</option><option>Legal</option><option>Estratégico</option>
-          <option>Dependências</option><option>Outros</option>
+          <option>Escopo</option><option>Correção</option><option>Repriorização</option><option>Prazo</option>
+          <option>Custo / Orçamento</option><option>Requisitos / Regras de negócio</option><option>Qualidade</option>
+          <option>Compliance / Legal</option><option>Recursos / Capacidade</option>
+          <option>Integrações / Dependências</option><option>Estratégia / Direcionamento</option><option>Outros</option>
         </select>
       </div>
       <div class="form-group" id="crCategoriaOutroWrap" style="display:none">
@@ -1480,198 +1649,75 @@
       <div class="form-group">
         <label>Probabilidade</label>
         <select id="riscoProb">
-      case 'kaizen': return { titulo:'',area:'',responsavel:'',data:'',
-        problema:tb('Descrição','Impacto'), categoriaProblem:'', categoriaOutroTexto:'',
-        equipe:tb('Nome','Departamento','Contato','Função'),
-        stakeholders:tb('Stakeholder / Segmento','Papel / Interesse','Influência'),
-        vozCliente:'',
-        metas:tb('Métrica','Estado Atual','Objetivo'),
-        objetivoQualitativo:'',
-        entregaveis:tb('Entregável','Descrição','Critério de Aceite'),
-        solucao:tb('Plano de Ação','Responsável','Prazo','Status'),
-        recursos:tb('Recurso','Categoria','Disponibilidade (OK/NOK)','Observação'),
-        milestones:tb('Marco'),
-        assinaturas:[],
-        comentarios:'' };
-        reflexoes:tbL('Reflexão','Lição Aprendida') };
-      case '5w2h': return { projeto:'',responsavel:'',
-        tabela:tb('O Quê (WHAT)','Quem (WHO)','Quando (WHEN)','Onde (WHERE)','Por Quê (WHY)','Como (HOW)','Quanto (HOW MUCH)') };
-      case 'pdca': return { plan:tb('Problema','Meta','Ação Planejada'),
-        do:tb('Ação Executada','Responsável','Data'),
-        check:tb('Resultado Esperado','Resultado Obtido','Meta Atingida?'),
-        act:tb('Padronização','Próximos Passos') };
-      case 'ishikawa': return { problema:'',
-        causas:tb('Método','Máquina','Mão de Obra','Material','Meio Ambiente','Medição') };
-      case 'dmaic': return { projectCharter:'',escopo:'',
-        metrics:tb('Métrica','Baseline','Meta','Método'),
-        analyze:tbL('Causa Raiz','Evidência','Impacto'),
-        improve:tb('Solução','Ação','Responsável','Resultado'),
-        control:tb('O Quê Controlar','Como','Responsável','Frequência') };
-      case 'masp': return { tabela:tb('1. Identificação','2. Observação','3. Análise de Causa','4. Plano de Ação','5. Ação','6. Verificação','7. Padronização','8. Conclusão') };
-      case 'swot': return { forcas:'',fraquezas:'',oportunidades:'',ameacas:'' };
-      default: return {};
-    }
-  }
-
-  // ===== Dynamic table HTML =====
-  function _ecDtbl(m, key) {
-    const tbl = m.dados && m.dados[key];
-    if (!tbl) return '';
-    const mid = m.id; const {cols,rows} = tbl;
-    const thead = '<thead><tr>' + cols.map((c,j) =>
-      `<th><div class="ec-dtbl-colname" contenteditable="true" oninput="_ecTblCol(${mid},'${key}',${j},this.textContent)">${c}</div><span class="ec-dtbl-delcol" onclick="_ecTblDelCol(${mid},'${key}',${j})" title="Remover">✕</span></th>`
-    ).join('') + `<th class="ec-dtbl-addcol" onclick="_ecTblAddCol(${mid},'${key}')" title="Nova coluna">+</th><th style="width:22px;border:none;background:none"></th></tr></thead>`;
-    const tbody = '<tbody>' + rows.map((row,i) =>
-      '<tr>' + cols.map((_,j) =>
-        `<td contenteditable="true" oninput="_ecTblCell(${mid},'${key}',${i},${j},this.innerHTML)">${row[j]||''}</td>`
-      ).join('') + `<td></td><td class="ec-dtbl-del" onclick="_ecTblDelRow(${mid},'${key}',${i})" title="Remover linha">✕</td></tr>`
-    ).join('') + '</tbody>';
-    return `<div class="ec-dtbl-wrap"><table class="ec-dtbl">${thead}${tbody}</table></div><button class="ec-dtbl-addrow" onclick="_ecTblAddRow(${mid},'${key}')">+ Linha</button>`;
-  }
-
-  function _ecTblCell(mid,key,row,col,val){const m=ecMateriais.find(m=>m.id==mid);if(m?.dados?.[key]?.rows?.[row])m.dados[key].rows[row][col]=val;ecAgendarAutoSave();}
-  function _ecTblCol(mid,key,col,name){const m=ecMateriais.find(m=>m.id==mid);if(m?.dados?.[key]?.cols)m.dados[key].cols[col]=name.trim()||('Col '+(col+1));ecAgendarAutoSave();}
-  function _ecTblAddRow(mid,key){const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key])return;m.dados[key].rows.push(m.dados[key].cols.map(()=>''));salvarDadosEC();renderECEditor();}
-  function _ecTblDelRow(mid,key,row){const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key]||m.dados[key].rows.length<=1)return;m.dados[key].rows.splice(row,1);salvarDadosEC();renderECEditor();}
-  function _ecTblAddCol(mid,key){const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key])return;m.dados[key].cols.push('Nova Coluna');m.dados[key].rows.forEach(r=>r.push(''));salvarDadosEC();renderECEditor();}
-  function _ecTblDelCol(mid,key,col){const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key]||m.dados[key].cols.length<=1)return;m.dados[key].cols.splice(col,1);m.dados[key].rows.forEach(r=>r.splice(col,1));salvarDadosEC();renderECEditor();}
-  function _ecDadosField(mid,key,val){const m=ecMateriais.find(m=>m.id==mid);if(m?.dados)m.dados[key]=val;ecAgendarAutoSave();}
-
-  // Image support for A3/DMAIC blocks
-  function _ecAddImg(mid,key,inputEl){const file=inputEl.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const m=ecMateriais.find(m=>m.id==mid);if(!m?.dados?.[key])return;if(!m.dados[key].imagens)m.dados[key].imagens=[];m.dados[key].imagens.push({nome:file.name,base64:e.target.result});inputEl.value='';salvarDadosEC();renderECEditor();};reader.readAsDataURL(file);}
-  function _ecDelImg(mid,key,idx){const m=ecMateriais.find(m=>m.id==mid);if(m?.dados?.[key]?.imagens){m.dados[key].imagens.splice(idx,1);salvarDadosEC();renderECEditor();}}
-
-  // A3-style block (table + image strip)
-  // A3-style block (table + image strip + links)
-  function _ecBlock(m,key,label,spanFull) {
-    const mid=m.id;
-    const blkDados=m.dados?.[key]||{};
-    const imgs=blkDados.imagens||[];
-    const links=blkDados.links||[];
-    const semTabela=!!blkDados.semTabela;
-    const imgGrid = imgs.length
-      ? '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">' + imgs.map((img,i) =>
-          `<div style="position:relative;flex:1;min-width:140px"><img src="${img.base64}" style="width:100%;height:auto;max-height:220px;object-fit:contain;border-radius:6px;border:1px solid #e2e8f0;cursor:zoom-in;display:block" title="${img.nome}" onclick="_ecExpandImg(this.src,'${img.nome}')"><button onclick="_ecDelImg(${mid},'${key}',${i})" style="position:absolute;top:3px;right:3px;background:rgba(197,48,48,0.85);color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;line-height:1.6;font-weight:700">✕</button></div>`
-        ).join('') + '</div>' : '';
-    const linkChips = links.map((l,i) =>
-      `<span style="display:inline-flex;align-items:center;gap:4px;background:#f5f0ff;color:#2d1b69;border:1px solid #e9d8fd;border-radius:20px;padding:2px 9px;font-size:11px;cursor:pointer" onclick="abrirMaterialEC(${l.id})">${l.icon} ${l.titulo||'Material'}<button onclick="event.stopPropagation();_ecDelLink(${mid},'${key}',${i})" style="background:none;border:none;color:#9f7aea;cursor:pointer;font-size:10px;margin-left:2px;line-height:1">✕</button></span>`
-    ).join('');
-    const linkStrip = linkChips ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px">${linkChips}</div>` : '';
-    const tblToggleBtn=`<button onclick="_ecToggleTabela(${mid},'${key}')" style="font-size:9px;color:${semTabela?'#276749':'#c05621'};cursor:pointer;background:${semTabela?'#f0fff4':'#fff5f5'};padding:2px 6px;border-radius:4px;font-weight:600;border:none;line-height:1.4" title="${semTabela?'Mostrar tabela':'Ocultar tabela'}">${semTabela?'📋 Tabela':'✕ Tabela'}</button>`;
-    return `<div class="ec-a3-cell${spanFull?' ec-a3-span':''}">
-      <div class="ec-a3-hd"><span>${label}</span>
-        <div style="display:flex;gap:3px;align-items:center">
-          ${tblToggleBtn}
-          <label style="font-size:9px;color:#6b46c1;cursor:pointer;background:#ede9fe;padding:2px 6px;border-radius:4px;font-weight:600;line-height:1.4">📷<input type="file" accept="image/*" style="display:none" onchange="_ecAddImg(${mid},'${key}',this)"></label>
-          <button style="font-size:9px;color:#276749;cursor:pointer;background:#f0fff4;padding:2px 6px;border-radius:4px;font-weight:600;border:none;line-height:1.4" onclick="_ecOpenLinkPicker(${mid},'${key}')">🔗</button>
+          <option value="Muito Alto">Muito Alto</option>
+          <option value="Alto">Alto</option>
+          <option value="Médio">Médio</option>
+          <option value="Baixo">Baixo</option>
+          <option value="Muito Baixo">Muito Baixo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Impacto</label>
+        <select id="riscoImpacto">
+          <option value="Muito Alto">Muito Alto</option>
+          <option value="Alto">Alto</option>
+          <option value="Médio">Médio</option>
+          <option value="Baixo">Baixo</option>
+          <option value="Muito Baixo">Muito Baixo</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Há Plano de Resposta?</label>
+        <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:8px 12px;background:#f5f0ff;border:1.5px solid #c4b5fd;border-radius:6px;font-size:13px;color:#4a5568">
+          <input type="checkbox" id="riscoPlanResposta" style="width:14px;height:14px;cursor:pointer">
+          Sim, há um plano de resposta definido
+        </label>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Estratégia de Resposta</label>
+        <textarea id="riscoResposta" rows="2" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit" placeholder="Como será respondido este risco?"></textarea>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Responsável pela Gestão</label>
+        <input type="text" id="riscoResponsavel" placeholder="Nome do responsável...">
+      </div>
+      <input type="hidden" id="riscoStatus" value="Não Ocorreu">
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Comentários</label>
+        <div style="border:1.5px solid #e2e8f0;border-radius:6px;overflow:hidden">
+          <div style="display:flex;gap:2px;padding:4px 6px;background:#f8fafc;border-bottom:1px solid #e2e8f0;flex-wrap:wrap">
+            <button class="toolbar-btn" onmousedown="event.preventDefault();document.execCommand('bold')" style="padding:3px 6px;font-size:12px"><b>B</b></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();document.execCommand('italic')" style="padding:3px 6px;font-size:12px"><i>I</i></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();document.execCommand('underline')" style="padding:3px 6px;font-size:12px"><u>U</u></button>
+            <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch"></div>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();document.execCommand('insertUnorderedList')" style="padding:3px 6px;font-size:12px">• Lista</button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();document.execCommand('insertOrderedList')" style="padding:3px 6px;font-size:12px">1. Lista</button>
+            <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch"></div>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();_riscoFmtLink()" style="padding:3px 6px;font-size:12px">🔗 Link</button>
+          </div>
+          <div id="riscoComentariosEditor" contenteditable="true" style="min-height:80px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit;line-height:1.6"></div>
         </div>
       </div>
-      <div class="ec-a3-bd">${semTabela?'':_ecDtbl(m,key)}${imgGrid}${linkStrip}</div>
-    </div>`;
-  }
-  function _ecToggleTabela(mid,key){
-    const m=ecMateriais.find(x=>x.id==mid); if(!m?.dados) return;
-    if(!m.dados[key]) m.dados[key]={};
-    m.dados[key].semTabela=!m.dados[key].semTabela;
-    ecAgendarAutoSave(); renderECEditor();
-  }
-  function _ecExpandImg(src,nome){
-    const ov=document.createElement('div');
-    ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;flex-direction:column;gap:12px';
-    ov.onclick=()=>ov.remove();
-    const img=document.createElement('img');
-    img.src=src; img.style.cssText='max-width:92vw;max-height:88vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5)';
-    const lbl=document.createElement('span');
-    lbl.textContent=nome||''; lbl.style.cssText='color:rgba(255,255,255,0.7);font-size:12px';
-    ov.appendChild(img); ov.appendChild(lbl);
-    document.body.appendChild(ov);
-  }
-
-  // ===== Per-template body renderers =====
-  function _renderTplBody(m) {
-    if (!m.dados) m.dados = _ecInitDados(m.templateId);
-    const mid=m.id; const d=m.dados;
-    const sec=(lbl,html)=>`<div class="ec-tpl-sec"><div class="ec-tpl-sec-lbl">${lbl}</div>${html}</div>`;
-    const fld=(key,lbl,multi)=>`<div style="margin-bottom:8px"><label style="font-size:11px;font-weight:600;color:#718096;display:block;margin-bottom:3px">${lbl}</label>${multi
-      ?`<textarea class="ec-tpl-field" rows="3" oninput="_ecDadosField(${mid},'${key}',this.value)">${d[key]||''}</textarea>`
-      :`<input class="ec-tpl-field" value="${String(d[key]||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}" oninput="_ecDadosField(${mid},'${key}',this.value)">`
-    }</div>`;
-    switch(m.templateId) {
-      case 'kaizen': return `
-        ${sec('Identificação',`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${fld('titulo','Título')}${fld('area','Área / Processo')}${fld('responsavel','Responsável')}${fld('data','Data')}</div>`)}
-        ${sec('Problema',_ecDtbl(m,'problema'))}
-        ${sec('Meta Geral',fld('metaGeral','Meta geral da ação Kaizen',true))}
-        ${sec('Solução',_ecDtbl(m,'solucao'))}`;
-      case 'a3': return `
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">${fld('titulo','Título')}${fld('dono','Dono do Processo')}${fld('data','Data')}</div>
-        <div class="ec-a3-grid">
-          ${_ecBlock(m,'problema','🔴 Problema')}${_ecBlock(m,'contexto','📋 Contexto')}
-          ${_ecBlock(m,'estadoAtual','📊 Estado Atual')}${_ecBlock(m,'metas','🎯 Metas')}
-          ${_ecBlock(m,'analises','🔍 Análises')}${_ecBlock(m,'planoAcoes','✅ Plano / Ações')}
-          ${_ecBlock(m,'reflexoes','💡 Reflexões',true)}
-        </div>`;
-      case '5w2h': return `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">${fld('projeto','Projeto / Iniciativa')}${fld('responsavel','Responsável Geral')}</div>
-        ${_ecDtbl(m,'tabela')}`;
-      case 'pdca': return `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          ${sec('🔵 PLAN — Planejar',_ecDtbl(m,'plan'))}
-          ${sec('🟡 DO — Executar',_ecDtbl(m,'do'))}
-          ${sec('🟢 CHECK — Verificar',_ecDtbl(m,'check'))}
-          ${sec('🔴 ACT — Agir',_ecDtbl(m,'act'))}
-        </div>`;
-      case 'ishikawa': return `
-        ${sec('Problema (Efeito)',fld('problema','Descreva o problema que está sendo analisado',true))}
-        ${sec('6M — Causas por Categoria',_ecDtbl(m,'causas'))}`;
-      case 'dmaic': return `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">${fld('projectCharter','Project Charter',true)}${fld('escopo','Escopo (Dentro / Fora)',true)}</div>
-        ${sec('📏 MEASURE — Métricas',_ecDtbl(m,'metrics'))}
-        <div class="ec-tpl-sec"><div class="ec-tpl-sec-lbl">🔍 ANALYZE — Análise de Causas</div>${_ecBlock(m,'analyze','Análise de Causa Raiz')}</div>
-        ${sec('⚡ IMPROVE — Melhorias',_ecDtbl(m,'improve'))}
-        ${sec('🔒 CONTROL — Controles',_ecDtbl(m,'control'))}`;
-      case 'masp': return `
-        <p style="font-size:11px;color:#718096;margin-bottom:10px">Cada coluna = um passo do MASP. Adicione linhas para registrar evidências e ações em cada etapa.</p>
-        ${_ecDtbl(m,'tabela')}`;
-      case 'swot':
-        const swotHdr=`<div style="display:grid;grid-template-columns:1fr 1fr"><div style="padding:5px 14px;background:#276749;color:white;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-right:1.5px solid #2d1b69">Ambiente Interno</div><div style="padding:5px 14px;background:#c05621;color:white;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Ambiente Externo</div></div>`;
-        return `<div class="ec-swot-outer">${swotHdr}<div class="ec-swot-grid">
-          <div class="ec-swot-cell"><div class="ec-swot-lbl">💪 Forças (Strengths)</div><div class="ec-swot-area" contenteditable="true" oninput="_ecDadosField(${mid},'forcas',this.innerHTML)">${d.forcas||''}</div></div>
-          <div class="ec-swot-cell"><div class="ec-swot-lbl">⚠ Fraquezas (Weaknesses)</div><div class="ec-swot-area" contenteditable="true" oninput="_ecDadosField(${mid},'fraquezas',this.innerHTML)">${d.fraquezas||''}</div></div>
-          <div class="ec-swot-cell"><div class="ec-swot-lbl">🚀 Oportunidades (Opportunities)</div><div class="ec-swot-area" contenteditable="true" oninput="_ecDadosField(${mid},'oportunidades',this.innerHTML)">${d.oportunidades||''}</div></div>
-          <div class="ec-swot-cell"><div class="ec-swot-lbl">⚡ Ameaças (Threats)</div><div class="ec-swot-area" contenteditable="true" oninput="_ecDadosField(${mid},'ameacas',this.innerHTML)">${d.ameacas||''}</div></div>
-        </div></div>`;
-      default: return '<p style="color:#a0aec0">Template não encontrado.</p>';
-    }
-  }
-
-  function renderTemplateView(m) {
-    const area=document.getElementById('ecAreaPrincipal'); if(!area) return;
-    const tpl=EC_TEMPLATES.find(t=>t.id===m.templateId)||{};
-    if(!m.dados) m.dados=_ecInitDados(m.templateId);
-    area.innerHTML=`<div class="ec-tpl-view">
-      <div class="ec-tpl-view-top">
-        <span style="font-size:22px">${tpl.icon||'📋'}</span>
-        <input class="ec-editor-titulo" id="ecTplTitulo" value="${m.titulo.replace(/"/g,'&quot;')}" placeholder="Título..." oninput="ecAgendarAutoSave()" style="flex:1;border:none;outline:none;font-size:14px;font-weight:700;color:#1e2a4a;font-family:inherit">
-        <select id="ecEditorPasta" onchange="ecAgendarAutoSave()" style="font-size:11px;padding:4px 8px;border:1.5px solid #e2e8f0;border-radius:6px;outline:none">${_ecPastaOpts(m.pasta||'')}</select>
-        <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
-        <button class="btn-secondary" onclick="fecharEditorEC()" style="font-size:12px;padding:6px 12px">← Voltar</button>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Arquivos</label>
+        <div id="riscoArquivosLista" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:#f5f0ff;color:#6b46c1;border:1.5px dashed #c4b5fd;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600">
+          📎 Anexar arquivo
+          <input type="file" id="riscoFileInput" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt" style="display:none" onchange="_riscoAnexarArquivos(this)">
+        </label>
       </div>
-      case 'kaizen': return `
-        ${sec('Identificação',`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${fld('titulo','Título')}${fld('area','Área / Processo')}${fld('responsavel','Responsável')}${fld('data','Data')}</div>`)}
-        ${sec('Equipe',_ecDtbl(m,'equipe'))}
-        ${sec('Problema',_ecDtbl(m,'problema'))}
-        ${sec('Tipo / Categoria do Problema',_ecKaizenCategoria(m))}
-        ${sec('Principais Stakeholders',_ecDtbl(m,'stakeholders'))}
-        ${sec('Voz do Cliente',fld('vozCliente','O que o cliente espera / necessita?',true))}
-        ${sec('Metas',`${fld('objetivoQualitativo','Objetivo Qualitativo',true)}${_ecDtbl(m,'metas')}`)}
-        ${sec('Entregáveis',_ecDtbl(m,'entregaveis'))}
-        ${sec('Solução / Plano de Ação',_ecDtbl(m,'solucao'))}
-        ${sec('Recursos',_ecDtbl(m,'recursos'))}
-        ${sec('Milestones',_ecMilestonesTbl(m,'milestones'))}
-        ${sec('Assinaturas',_ecAssinaturasTbl(m))}
-        ${sec('Comentários Livres',fld('comentarios','',true))}`;
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalRisco')">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarRisco()">Salvar</button>
+    </div>
+  </div>
+</div>
 
-
+<!-- Overlay Bloqueio por Inadimplência -->
+<div id="bloqueioOverlay" style="display:none;position:fixed;inset:0;background:rgba(45,27,105,0.97);z-index:99999;align-items:center;justify-content:center">
+  <div style="background:white;border-radius:16px;padding:40px 48px;max-width:440px;width:94%;text-align:center;box-shadow:0 8px 48px rgba(0,0,0,0.3)">
+    <div style="font-size:48px;margin-bottom:16px">🔒</div>
     <div class="bloqueio-titulo">Acesso suspenso</div>
     <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
     <div class="bloqueio-dias" id="bloqueioDias"></div>
@@ -1679,6 +1725,7 @@
     <div class="bloqueio-link"><a href="/plano-usuarios">Ver detalhes da assinatura →</a></div>
   </div>
 </div>
+
 <script>
   const token = localStorage.getItem('token');
   const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
@@ -1822,6 +1869,12 @@
     // Riscos detalhados
     riscosDetalhados = (projeto.riscos || []);
     renderRiscosDetalhados();
+    // Pessoal e Equipe e Clientes
+    if (!projeto.pessoal) projeto.pessoal = [];
+    if (!projeto.equipeClientes) projeto.equipeClientes = [];
+    renderPessoal();
+    renderEquipeClientes();
+    renderDashboard();
     // Qualidade
     qualidade = (projeto.qualidade || {}).checklists || []; // legacy compat
     carregarQual();
@@ -1860,6 +1913,8 @@
     document.getElementById('tab-' + id).style.display = 'block';
     btn.classList.add('active');
     // Quando Planejamento fica visível, re-render EAP (parent estava display:none → offsetWidth/Height eram 0)
+    if (id === 'dashboard') renderDashboard();
+    if (id === 'equipe-clientes') renderEquipeClientes();
     if (id === 'planejamento') {
       const activeSub = document.querySelector('#tab-planejamento .sub-tab.active');
       const activeId = activeSub ? (activeSub.getAttribute('onclick')||'').match(/mudarSubTab\('(\w+)'/)?.[1] : 'escopo';
@@ -1879,6 +1934,73 @@
   }
 
   // ===== TAP =====
+  function _tapTaKeydown(e) {
+    const ta = e.target;
+    const start = ta.selectionStart;
+    const val = ta.value;
+    const lineStart = val.lastIndexOf('\n', start - 1) + 1;
+    const lineText = val.slice(lineStart);
+    const lineEnd = lineText.indexOf('\n');
+    const lineContent = lineEnd >= 0 ? lineText.slice(0, lineEnd) : lineText;
+
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const prefixes = ['• ', '→ ', '✓ '];
+      // Check numbered list: match "N. " at start
+      const numMatch = lineContent.match(/^(\d+)\. /);
+      if (numMatch) {
+        // Increment number
+        const n = parseInt(numMatch[1]) + 1;
+        const oldPfx = numMatch[0];
+        const newPfx = n + '. ';
+        ta.value = val.slice(0, lineStart) + newPfx + lineContent.slice(oldPfx.length) + (lineEnd >= 0 ? val.slice(lineStart + lineEnd) : '');
+        ta.selectionStart = ta.selectionEnd = start + newPfx.length - oldPfx.length;
+      } else {
+        let curPfx = '', curIdx = -1;
+        for (let i = 0; i < prefixes.length; i++) {
+          if (lineContent.startsWith(prefixes[i])) { curPfx = prefixes[i]; curIdx = i; break; }
+        }
+        if (curIdx >= 0) {
+          const isLast = curIdx === prefixes.length - 1;
+          if (isLast) {
+            // Cycle to numbered: 1.
+            const newPfx = '1. ';
+            ta.value = val.slice(0, lineStart) + newPfx + lineContent.slice(curPfx.length) + (lineEnd >= 0 ? val.slice(lineStart + lineEnd) : '');
+            ta.selectionStart = ta.selectionEnd = start + newPfx.length - curPfx.length;
+          } else {
+            const nextPfx = prefixes[curIdx + 1];
+            ta.value = val.slice(0, lineStart) + nextPfx + lineContent.slice(curPfx.length) + (lineEnd >= 0 ? val.slice(lineStart + lineEnd) : '');
+            ta.selectionStart = ta.selectionEnd = start + nextPfx.length - curPfx.length;
+          }
+        } else {
+          ta.value = val.slice(0, lineStart) + '• ' + val.slice(lineStart);
+          ta.selectionStart = ta.selectionEnd = start + 2;
+        }
+      }
+      ta.dispatchEvent(new Event('input'));
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      // Auto-continue list marker on new line
+      const numMatch2 = lineContent.match(/^(\d+)\. /);
+      const bulletMatch = lineContent.match(/^(• |→ |✓ )/);
+      let pfx = '';
+      if (numMatch2 && lineContent.length > numMatch2[0].length) {
+        pfx = (parseInt(numMatch2[1]) + 1) + '. ';
+      } else if (bulletMatch && lineContent.length > bulletMatch[0].length) {
+        pfx = bulletMatch[1];
+      }
+      if (pfx) {
+        e.preventDefault();
+        const ins = '\n' + pfx;
+        ta.value = val.slice(0, start) + ins + val.slice(ta.selectionEnd);
+        ta.selectionStart = ta.selectionEnd = start + ins.length;
+        ta.dispatchEvent(new Event('input'));
+      }
+    }
+  }
+
   function toggleTAP() {
     // Não pode editar se aprovado
     const tap = projeto.tap || {};
@@ -2397,12 +2519,13 @@
   let _execCanvasDrawing = false;
   let _execCanvasColor = '#1e2a4a';
   let _execCanvasSize = 3;
-  let _execCanvasTool = 'pen'; // 'pen' | 'eraser' | 'line' | 'arrow' | 'rect' | 'circle'
+  let _execCanvasTool = 'pen'; // 'pen' | 'eraser' | 'line' | 'arrow' | 'rect' | 'circle' | 'text'
   let _execShapeFill = false;
-  let _execCanvasSnapshot = null; // ImageData for shape preview
+  let _execCanvasSnapshot = null;
   let _execCanvasStartX = 0;
   let _execCanvasStartY = 0;
-  let _execUndoStack = []; // array of ImageData for undo
+  let _execUndoStack = [];
+  let _execTextBoxes = []; // [{id,x,y,w,h,text,fontSize,color}] — canvas-pixel coords
 
   function renderEstudos() { renderECContent(); } // compatibilidade
 
@@ -2417,8 +2540,8 @@
     renderECContent();
   }
 
-  // Folder tree picker
-  function _renderEcFolderPicker(wrapperId, hiddenId, selectedId, rootLabel) {
+  // Folder tree picker (required=true → omits "Sem pasta" root option)
+  function _renderEcFolderPicker(wrapperId, hiddenId, selectedId, rootLabel, required) {
     const wrap = document.getElementById(wrapperId);
     if (!wrap) return;
     const hidden = document.getElementById(hiddenId);
@@ -2442,10 +2565,12 @@
 
     const esc = s => s.replace(/'/g, "\\'");
     const rootSel = sel === '' ? ' selected' : '';
-    wrap.innerHTML =
+    const rootBtn = required ? '' :
       `<button type="button" class="ec-fpick-item${rootSel}" onclick="_ecFpickSelect('${esc(wrapperId)}','${esc(hiddenId)}','',this)">
         <span style="color:#718096">📁</span><span style="margin-left:4px">${rootLabel || 'Sem pasta'}</span>
-      </button>` + buildRows(null, 0);
+      </button>`;
+    const body = buildRows(null, 0);
+    wrap.innerHTML = rootBtn + (body || (required ? '<div style="padding:10px 12px;font-size:12px;color:#a0aec0">Nenhuma pasta criada. Crie uma pasta primeiro.</div>' : ''));
 
     if (hidden) hidden.value = sel;
   }
@@ -3125,7 +3250,8 @@
         <button class="btn-secondary" onclick="fecharEditorEC()" style="font-size:12px;padding:6px 12px;white-space:nowrap">← Voltar</button>
         <span style="font-size:20px">${tpl.icon||'📋'}</span>
         <input class="ec-editor-titulo" id="ecTplTitulo" value="${m.titulo.replace(/"/g,'&quot;')}" placeholder="Título..." oninput="ecAgendarAutoSave()" style="flex:1;border:none;outline:none;font-size:14px;font-weight:700;color:#1e2a4a;font-family:inherit">
-        <select id="ecEditorPasta" onchange="ecAgendarAutoSave()" style="font-size:11px;padding:4px 8px;border:1.5px solid #e2e8f0;border-radius:6px;outline:none">${_ecPastaOpts(m.pasta||'')}</select>
+        <select id="ecEditorPasta" onchange="ecAgendarAutoSave();_ecCheckPasta()" style="font-size:11px;padding:4px 8px;border:1.5px solid ${m.pasta?'#e2e8f0':'#fc8181'};border-radius:6px;outline:none">${_ecPastaOpts(m.pasta||'')}</select>
+        ${!m.pasta?'<span style="color:#e53e3e;font-size:11px;font-weight:600;white-space:nowrap" id="ecPastaWarn">← Pasta obrigatória</span>':'<span id="ecPastaWarn" style="display:none"></span>'}
         ${(()=>{const _pf={'kaizen':'_ecExportKaizenPDF','a3':'_ecExportA3PDF','5w2h':'_ecExport5w2hPDF','pdca':'_ecExportPDCAPDF','ishikawa':'_ecExportIshikawaPDF','dmaic':'_ecExportDMAICPDF','swot':'_ecExportSWOTPDF','masp':'_ecExportMASPPDF'};const _fn=_pf[m.templateId];return _fn?`<button onclick="${_fn}(${m.id})" style="font-size:11px;padding:5px 11px;background:#f0fff4;color:#276749;border:1.5px solid #c6f6d5;border-radius:6px;cursor:pointer;font-weight:600;white-space:nowrap">📄 PDF</button>`:''})()}
         <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
       </div>
@@ -3134,12 +3260,39 @@
     </div>`;
   }
 
+  let _ecPastaSelectCb = null;
+  function _pedirPastaEC(titulo, desc, cb) {
+    _ecPastaSelectCb = cb;
+    document.getElementById('modalECPastaSelectTitulo').textContent = titulo;
+    document.getElementById('modalECPastaSelectDesc').textContent = desc;
+    _renderEcFolderPicker('ecPastaSelectWrap', 'ecPastaSelectVal',
+      ecPastaAtual !== 'templates' ? ecPastaAtual : '', undefined, true);
+    document.getElementById('ecPastaSelectErro').style.display = 'none';
+    document.getElementById('ecPastaSelectWrap').style.borderColor = '';
+    document.getElementById('modalECPastaSelect').classList.add('aberto');
+  }
+  function _confirmarPastaEC() {
+    const pasta = document.getElementById('ecPastaSelectVal')?.value || null;
+    const erroEl = document.getElementById('ecPastaSelectErro');
+    const wrap = document.getElementById('ecPastaSelectWrap');
+    if (!pasta) {
+      if (erroEl) erroEl.style.display = '';
+      if (wrap) wrap.style.borderColor = '#fc8181';
+      return;
+    }
+    fecharModal('modalECPastaSelect');
+    if (_ecPastaSelectCb) { _ecPastaSelectCb(pasta); _ecPastaSelectCb = null; }
+  }
+
   function abrirTemplateEC(id) {
     const tpl=EC_TEMPLATES.find(t=>t.id===id); if(!tpl) return;
-    const material={id:Date.now(),tipo:'template',templateId:id,titulo:tpl.nome,
-      pasta:ecPastaAtual!=='templates'?ecPastaAtual:null,
-      dados:_ecInitDados(id),criado:new Date().toISOString().split('T')[0]};
-    ecMateriais.unshift(material); salvarDadosEC(); editarMaterialEC(material.id);
+    const criar = pasta => {
+      const material={id:Date.now(),tipo:'template',templateId:id,titulo:tpl.nome,
+        pasta, dados:_ecInitDados(id),criado:new Date().toISOString().split('T')[0]};
+      ecMateriais.unshift(material); salvarDadosEC(); editarMaterialEC(material.id);
+    };
+    if (ecPastaAtual !== 'templates') { criar(ecPastaAtual); }
+    else { _pedirPastaEC('Usar Template', `Escolha a pasta onde "${tpl.nome}" será salvo.`, criar); }
   }
   function salvarMaterialTemplate(){} // deprecated
 
@@ -3155,7 +3308,7 @@
       input.value = '';
       document.getElementById('uploadECFilenome').textContent = file.name;
       document.getElementById('uploadECFilesize').textContent = ecUploadPendente.tamanho + ' KB';
-      _renderEcFolderPicker('uploadECPastaWrap', 'uploadECPasta', ecPastaAtual !== 'templates' ? ecPastaAtual : '');
+      _renderEcFolderPicker('uploadECPastaWrap', 'uploadECPasta', ecPastaAtual !== 'templates' ? ecPastaAtual : '', undefined, true);
       document.getElementById('modalUploadEC').classList.add('aberto');
     };
     reader.readAsDataURL(file);
@@ -3163,7 +3316,15 @@
   function confirmarUploadEC() {
     if (!ecUploadPendente) return;
     const pasta = document.getElementById('uploadECPasta')?.value || null;
-    const material = { id: Date.now(), tipo:'arquivo', titulo: ecUploadPendente.nome, pasta: pasta||null, tamanho: ecUploadPendente.tamanho, base64: ecUploadPendente.base64, criado: new Date().toISOString().split('T')[0] };
+    const erroEl = document.getElementById('uploadECPastaErro');
+    if (!pasta) {
+      if (erroEl) erroEl.style.display = '';
+      const wrap = document.getElementById('uploadECPastaWrap');
+      if (wrap) wrap.style.borderColor = '#fc8181';
+      return;
+    }
+    if (erroEl) erroEl.style.display = 'none';
+    const material = { id: Date.now(), tipo:'arquivo', titulo: ecUploadPendente.nome, pasta: pasta, tamanho: ecUploadPendente.tamanho, base64: ecUploadPendente.base64, criado: new Date().toISOString().split('T')[0] };
     ecMateriais.unshift(material);
     ecUploadPendente = null;
     salvarDadosEC();
@@ -3188,15 +3349,23 @@
   // ===== Editor de notas =====
   function pedirTituloNota() {
     document.getElementById('novaNotaECTitulo').value = '';
-    _renderEcFolderPicker('novaNotaECPastaWrap', 'novaNotaECPasta', ecPastaAtual !== 'templates' ? ecPastaAtual : '');
+    _renderEcFolderPicker('novaNotaECPastaWrap', 'novaNotaECPasta', ecPastaAtual !== 'templates' ? ecPastaAtual : '', undefined, true);
     document.getElementById('modalNovaNotaEC').classList.add('aberto');
     setTimeout(() => document.getElementById('novaNotaECTitulo').focus(), 80);
   }
   function confirmarNovaNotaEC() {
     const titulo = document.getElementById('novaNotaECTitulo').value.trim() || 'Nova Nota';
     const pasta = document.getElementById('novaNotaECPasta')?.value || null;
+    const erroEl = document.getElementById('novaNotaECPastaErro');
+    if (!pasta) {
+      if (erroEl) erroEl.style.display = '';
+      const wrap = document.getElementById('novaNotaECPastaWrap');
+      if (wrap) wrap.style.borderColor = '#fc8181';
+      return;
+    }
+    if (erroEl) erroEl.style.display = 'none';
     fecharModal('modalNovaNotaEC');
-    const material = { id: Date.now(), tipo:'nota', titulo, conteudo:'', pasta: pasta||null, criado: new Date().toISOString().split('T')[0] };
+    const material = { id: Date.now(), tipo:'nota', titulo, conteudo:'', pasta: pasta, criado: new Date().toISOString().split('T')[0] };
     ecMateriais.unshift(material);
     salvarDadosEC();
     editarMaterialEC(material.id);
@@ -3216,31 +3385,129 @@
       <div class="ec-editor-wrap">
         <div class="ec-editor-header">
           <input class="ec-editor-titulo" id="ecEditorTitulo" value="${m.titulo}" placeholder="Título do documento..." oninput="ecAgendarAutoSave()">
-          <select id="ecEditorPasta" style="font-size:12px;padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:6px;outline:none" onchange="ecAgendarAutoSave()">
+          <select id="ecEditorPasta" style="font-size:12px;padding:5px 8px;border:1.5px solid ${m.pasta?'#e2e8f0':'#fc8181'};border-radius:6px;outline:none" onchange="ecAgendarAutoSave();_ecCheckPasta()">
             ${_ecPastaOpts(m.pasta||'')}
           </select>
+          ${!m.pasta?'<span style="color:#e53e3e;font-size:11px;font-weight:600;white-space:nowrap" id="ecPastaWarn">← Pasta obrigatória</span>':'<span id="ecPastaWarn" style="display:none"></span>'}
           <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
+          <button class="btn-secondary" onclick="_exportECPDF()" style="font-size:12px;padding:6px 12px">⬇ PDF</button>
           <button class="btn-secondary" onclick="fecharEditorEC()" style="font-size:12px;padding:6px 12px">← Voltar</button>
         </div>
-        <div class="ec-editor-toolbar">
-          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('bold')" title="Negrito"><b>B</b></button>
-          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('italic')" title="Itálico"><i>I</i></button>
-          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('underline')" title="Sublinhado"><u>U</u></button>
-          <div style="width:1px;background:#e2e8f0;margin:0 4px;align-self:stretch"></div>
-          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('insertUnorderedList')" title="Lista">• Lista</button>
-          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('insertOrderedList')" title="Numerada">1. Lista</button>
-          <div style="width:1px;background:#e2e8f0;margin:0 4px;align-self:stretch"></div>
+        <div class="ec-editor-toolbar" style="flex-wrap:nowrap;overflow-x:auto;gap:2px">
+          <select class="toolbar-select" onmousedown="_ecSaveSel()" onchange="_ecRestoreSel();fmtEC('fontName',this.value);this.value=''" title="Fonte">
+            <option value="">Fonte</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Times New Roman', serif">Times New Roman</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="'Courier New', monospace">Courier New</option>
+            <option value="Verdana, sans-serif">Verdana</option>
+          </select>
+          <select class="toolbar-select" onmousedown="_ecSaveSel()" onchange="_fmtECFontSize(this.value);this.value=''" title="Tamanho">
+            <option value="">Tam.</option>
+            <option value="10px">10</option><option value="12px">12</option><option value="14px">14</option>
+            <option value="16px">16</option><option value="18px">18</option><option value="20px">20</option>
+            <option value="24px">24</option><option value="28px">28</option><option value="36px">36</option>
+          </select>
+          <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch;flex-shrink:0"></div>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('bold')"><b>B</b></button>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('italic')"><i>I</i></button>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('underline')"><u>U</u></button>
+          <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('strikeThrough')" style="text-decoration:line-through">S</button>
+          <label title="Cor" style="display:flex;align-items:center;cursor:pointer;padding:2px 4px;border-radius:4px;flex-shrink:0">
+            <span style="font-size:11px;color:#4a5568;margin-right:2px">A</span>
+            <input type="color" value="#000000" style="width:16px;height:16px;border:none;padding:0;cursor:pointer;background:none" onmousedown="_ecSaveSel()" onchange="_ecRestoreSel();fmtEC('foreColor',this.value)">
+          </label>
+          <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch;flex-shrink:0"></div>
+          <button class="toolbar-btn" style="white-space:nowrap" onmousedown="event.preventDefault();fmtEC('insertUnorderedList')">• Lista</button>
+          <button class="toolbar-btn" style="white-space:nowrap" onmousedown="event.preventDefault();fmtEC('insertOrderedList')">1. Lista</button>
+          <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch;flex-shrink:0"></div>
           <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('justifyLeft')">⬅</button>
           <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('justifyCenter')">☰</button>
           <button class="toolbar-btn" onmousedown="event.preventDefault();fmtEC('justifyRight')">➡</button>
+          <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch;flex-shrink:0"></div>
+          <button class="toolbar-btn" style="white-space:nowrap" onmousedown="event.preventDefault();_fmtECLink()">🔗 Link</button>
         </div>
         <div class="ec-editor-body">
-          <div class="ec-editor-area" id="ecEditorArea" contenteditable="true" oninput="ecAgendarAutoSave()">${m.conteudo||''}</div>
+          <div class="ec-editor-area" id="ecEditorArea" contenteditable="true" oninput="ecAgendarAutoSave()" onmouseup="_ecSaveSel()" onkeyup="_ecSaveSel()">${m.conteudo||''}</div>
         </div>
       </div>`;
+    setTimeout(()=>{const ea=document.getElementById('ecEditorArea');if(ea&&!ea._imgResizeInited){_wikiImgResizeInit(ea,()=>ecAgendarAutoSave());ea._imgResizeInited=true;}},0);
+  }
+
+  function _wikiImgResizeInit(area, saveCb) {
+    area.addEventListener('click', e => {
+      if (e.target.tagName !== 'IMG') return;
+      const img = e.target;
+      if (img._resizeHandle) return;
+      const wrap = document.createElement('span');
+      wrap.style.cssText = 'position:relative;display:inline-block;line-height:0';
+      img.parentNode.insertBefore(wrap, img); wrap.appendChild(img);
+      const handle = document.createElement('span');
+      handle.style.cssText = 'position:absolute;bottom:0;right:0;width:14px;height:14px;background:rgba(107,70,193,0.6);cursor:se-resize;border-radius:3px 0 4px 0;user-select:none';
+      wrap.appendChild(handle); img._resizeHandle = handle;
+      handle.addEventListener('mousedown', ev => {
+        ev.preventDefault(); ev.stopPropagation();
+        const startX = ev.clientX, startW = img.offsetWidth;
+        const onMove = ev2 => { img.style.width = Math.max(40, startW + ev2.clientX - startX) + 'px'; img.style.height = 'auto'; };
+        const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); saveCb && saveCb(); };
+        document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onUp);
+      });
+    });
+  }
+
+  let _ecSavedSel = null;
+  function _ecSaveSel() {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) _ecSavedSel = sel.getRangeAt(0).cloneRange();
+  }
+  function _ecRestoreSel() {
+    if (!_ecSavedSel) return;
+    document.getElementById('ecEditorArea')?.focus();
+    const sel = window.getSelection();
+    if (sel) { sel.removeAllRanges(); sel.addRange(_ecSavedSel); }
   }
 
   function fmtEC(cmd, val) { document.execCommand(cmd, false, val||null); document.getElementById('ecEditorArea')?.focus(); }
+
+  function _fmtECFontSize(size) {
+    if (!size) return;
+    _ecRestoreSel();
+    document.execCommand('fontSize', false, 7);
+    document.getElementById('ecEditorArea')?.querySelectorAll('font[size="7"]').forEach(el => { el.removeAttribute('size'); el.style.fontSize = size; });
+    document.getElementById('ecEditorArea')?.focus();
+  }
+
+  function _fmtECLink() {
+    _ecRestoreSel();
+    const url = prompt('URL do link:');
+    if (url) document.execCommand('createLink', false, url);
+    document.getElementById('ecEditorArea')?.focus();
+  }
+
+  function _fmtECImg(input) {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => { document.execCommand('insertHTML', false, `<img src="${e.target.result}" style="max-width:100%;height:auto">`); ecAgendarAutoSave(); };
+    reader.readAsDataURL(file); input.value = '';
+  }
+
+  function _exportECPDF() {
+    const m = ecMateriais.find(m=>m.id==ecEditandoId); if (!m) return;
+    const win = window.open('','_blank');
+    win.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${m.titulo||'Documento'}</title><style>body{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;padding:0 24px;font-size:14px;line-height:1.6}img{max-width:100%}pre{background:#f8f9fa;padding:12px;border-radius:4px;overflow-x:auto}h1,h2,h3{color:#2d3748}</style></head><body><h1>${m.titulo||'Documento'}</h1><hr>${m.conteudo||''}</body></html>`);
+    win.document.close(); win.onload = () => { win.print(); };
+  }
+
+  function _ecCheckPasta() {
+    const sel = document.getElementById('ecEditorPasta');
+    const warn = document.getElementById('ecPastaWarn');
+    if (!sel) return;
+    const ok = !!sel.value;
+    sel.style.borderColor = ok ? '#e2e8f0' : '#fc8181';
+    if (warn) { warn.style.display = ok ? 'none' : ''; warn.textContent = ok ? '' : '← Pasta obrigatória'; }
+    const ind = document.getElementById('ecAutoSaveIndicator');
+    if (!ok && ind) { ind.textContent = '⚠ Escolha uma pasta'; ind.style.color = '#e53e3e'; }
+  }
 
   function ecAgendarAutoSave() {
     const ind = document.getElementById('ecAutoSaveIndicator');
@@ -3499,37 +3766,87 @@
             <button style="${pdfBtnStyle}" onclick="_execExportNotaPDF(${mid})">📄 PDF</button>
             <button class="btn-secondary" onclick="fecharEditorExec()" style="font-size:12px;padding:6px 12px">← Voltar</button>
           </div>
-          <div class="ec-editor-toolbar">
-            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('bold')" title="Negrito"><b>B</b></button>
-            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('italic')" title="Itálico"><i>I</i></button>
-            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('underline')" title="Sublinhado"><u>U</u></button>
-            <div style="width:1px;background:#e2e8f0;margin:0 4px;align-self:stretch"></div>
-            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('insertUnorderedList')">• Lista</button>
-            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('insertOrderedList')">1. Lista</button>
-            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('indent')" title="Aumentar recuo">⇥</button>
-            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('outdent')" title="Diminuir recuo">⇤</button>
-            <div style="width:1px;background:#e2e8f0;margin:0 4px;align-self:stretch"></div>
+          <div class="ec-editor-toolbar" style="flex-wrap:nowrap;overflow-x:auto;gap:2px">
+            <select class="toolbar-select" onmousedown="_execSaveSel()" onchange="_execRestoreSel();fmtExec('fontName',this.value);this.value=''" title="Fonte">
+              <option value="">Fonte</option>
+              <option value="Arial, sans-serif">Arial</option>
+              <option value="'Times New Roman', serif">Times New Roman</option>
+              <option value="Georgia, serif">Georgia</option>
+              <option value="'Courier New', monospace">Courier New</option>
+              <option value="Verdana, sans-serif">Verdana</option>
+            </select>
+            <select class="toolbar-select" onmousedown="_execSaveSel()" onchange="_fmtExecFontSize(this.value);this.value=''" title="Tamanho">
+              <option value="">Tam.</option>
+              <option value="10px">10</option><option value="12px">12</option><option value="14px">14</option>
+              <option value="16px">16</option><option value="18px">18</option><option value="20px">20</option>
+              <option value="24px">24</option><option value="28px">28</option><option value="36px">36</option>
+            </select>
+            <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch;flex-shrink:0"></div>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('bold')"><b>B</b></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('italic')"><i>I</i></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('underline')"><u>U</u></button>
+            <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('strikeThrough')" style="text-decoration:line-through">S</button>
+            <label title="Cor" style="display:flex;align-items:center;cursor:pointer;padding:2px 4px;border-radius:4px;flex-shrink:0">
+              <span style="font-size:11px;color:#4a5568;margin-right:2px">A</span>
+              <input type="color" value="#000000" style="width:16px;height:16px;border:none;padding:0;cursor:pointer;background:none" onmousedown="_execSaveSel()" onchange="_execRestoreSel();fmtExec('foreColor',this.value)">
+            </label>
+            <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch;flex-shrink:0"></div>
+            <button class="toolbar-btn" style="white-space:nowrap" onmousedown="event.preventDefault();fmtExec('insertUnorderedList')">• Lista</button>
+            <button class="toolbar-btn" style="white-space:nowrap" onmousedown="event.preventDefault();fmtExec('insertOrderedList')">1. Lista</button>
+            <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch;flex-shrink:0"></div>
             <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('justifyLeft')">⬅</button>
             <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('justifyCenter')">☰</button>
             <button class="toolbar-btn" onmousedown="event.preventDefault();fmtExec('justifyRight')">➡</button>
+            <div style="width:1px;background:#e2e8f0;margin:0 3px;align-self:stretch;flex-shrink:0"></div>
+            <button class="toolbar-btn" style="white-space:nowrap" onmousedown="event.preventDefault();_fmtExecLink()">🔗 Link</button>
           </div>
           <div class="ec-editor-body">
-            <div class="ec-editor-area" id="execEditorArea" contenteditable="true" oninput="execAgendarAutoSave()">${m.conteudo||''}</div>
+            <div class="ec-editor-area" id="execEditorArea" contenteditable="true" oninput="execAgendarAutoSave()" onmouseup="_execSaveSel()" onkeyup="_execSaveSel()">${m.conteudo||''}</div>
           </div>
         </div>`;
+      setTimeout(()=>{const ea=document.getElementById('execEditorArea');if(ea&&!ea._imgResizeInited){_wikiImgResizeInit(ea,()=>execAgendarAutoSave());ea._imgResizeInited=true;}},0);
     } else if (m.tipo === 'tabela') {
       area.innerHTML = `
-        <div class="ec-editor-wrap">
-          <div class="ec-editor-header">
-            <input class="ec-editor-titulo" id="execEditorTitulo" value="${m.titulo}" placeholder="Título da tabela..." oninput="execAgendarAutoSave()">
+        <div class="ec-editor-wrap" style="display:flex;flex-direction:column;height:calc(100vh - 155px);overflow:hidden">
+          <div class="ec-editor-header" style="flex-shrink:0">
+            <input class="ec-editor-titulo" id="execEditorTitulo" value="${m.titulo}" placeholder="Título da planilha..." oninput="execAgendarAutoSave()">
             <span class="ec-autosave" id="execAutoSaveIndicator"></span>
             <button style="${pdfBtnStyle}" onclick="_execExportTabelaPDF(${mid})">📄 PDF</button>
             <button class="btn-secondary" onclick="fecharEditorExec()" style="font-size:12px;padding:6px 12px">← Voltar</button>
           </div>
-          <div style="padding:20px">
-            <div id="execTabelaWrap">${_execDtbl(m)}</div>
+          <div class="st-toolbar" onmousedown="event.preventDefault()">
+            <span style="font-size:10px;color:#a0aec0;white-space:nowrap">Tamanho</span>
+            <select class="st-tb-sel" onchange="_stFmt('fontSize',+this.value);this.value=''" title="Tamanho da fonte">
+              <option value="">—</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="16">16</option><option value="18">18</option><option value="20">20</option><option value="24">24</option>
+            </select>
+            <div class="st-tb-sep"></div>
+            <button class="st-tb-btn" onclick="_stFmt('bold')" title="Negrito (Ctrl+B)" style="font-weight:700;min-width:26px">N</button>
+            <button class="st-tb-btn" onclick="_stFmt('italic')" title="Itálico (Ctrl+I)" style="font-style:italic;min-width:26px">I</button>
+            <button class="st-tb-btn" onclick="_stFmt('underline')" title="Sublinhado" style="text-decoration:underline;min-width:26px">S</button>
+            <div class="st-tb-sep"></div>
+            <label class="st-clabel" title="Cor do texto (A)" onmousedown="event.stopPropagation()">
+              <span class="st-cicon" style="color:#2d3748;border-bottom:3px solid currentColor">A</span>
+              <span class="st-ctxt">Cor texto</span>
+              <input type="color" id="stColorTxt" value="#000000" class="st-cinp" oninput="_stFmt('color',this.value)" onchange="_stFmt('color',this.value)">
+            </label>
+            <label class="st-clabel" title="Cor de fundo da célula" onmousedown="event.stopPropagation()">
+              <span class="st-cicon" style="background:#fef08a;padding:1px 3px;border-radius:2px">▦</span>
+              <span class="st-ctxt">Cor fundo</span>
+              <input type="color" id="stColorBg" value="#ffffff" class="st-cinp" oninput="_stFmt('bg',this.value==='#ffffff'?'':this.value)" onchange="_stFmt('bg',this.value==='#ffffff'?'':this.value)">
+            </label>
+            <div class="st-tb-sep"></div>
+            <button class="st-tb-btn" onclick="_stFmt('align','left')" title="Alinhar à esquerda" style="font-size:11px">⬅ Esq</button>
+            <button class="st-tb-btn" onclick="_stFmt('align','center')" title="Alinhar ao centro" style="font-size:11px">☰ Centro</button>
+            <button class="st-tb-btn" onclick="_stFmt('align','right')" title="Alinhar à direita" style="font-size:11px">➡ Dir</button>
           </div>
+          <div class="st-fxbar">
+            <input class="st-fxref" id="stCellRef" value="A1" onkeydown="_stRefNav(event)" title="Referência da célula">
+            <span style="font-size:13px;color:#a0aec0;font-style:italic;padding:0 4px">fx</span>
+            <input class="st-fxinp" id="stFxInput" placeholder="Valor ou fórmula (ex: =SOMA(A1:B3))..." onkeydown="_stFxNav(event)" oninput="_stFxInput(this.value)" title="Fórmula ou valor da célula selecionada">
+          </div>
+          <div id="stWrap" style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0;min-width:0"></div>
         </div>`;
+      setTimeout(() => { _stInit(mid); _stRender(); _stFocus(); }, 0);
     } else if (m.tipo === 'desenho') {
       const toolBtn = (id, tool, icon, label) =>
         `<button id="${id}" onclick="_execSetTool('${tool}')" class="exec-shape-btn ${_execCanvasTool===tool?'active':''}">${icon} ${label}</button>`;
@@ -3553,6 +3870,9 @@
               ${toolBtn('execToolRect','rect','▭','Retângulo')}
               ${toolBtn('execToolCircle','circle','○','Círculo')}
               <div style="width:1px;background:#e2e8f0;align-self:stretch;margin:0 2px"></div>
+              <span style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap">Texto</span>
+              ${toolBtn('execToolText','text','T','Caixa de texto')}
+              <div style="width:1px;background:#e2e8f0;align-self:stretch;margin:0 2px"></div>
               <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:#718096">
                 Cor <input type="color" id="execCanvasColor" value="${_execCanvasColor}" oninput="_execCanvasColor=this.value" style="width:26px;height:22px;border:none;border-radius:4px;cursor:pointer;padding:1px">
               </label>
@@ -3572,29 +3892,458 @@
     }
   }
 
-  function _execDtbl(m) {
-    const mid = m.id;
-    const tbl = m.dados?.tabela;
-    if (!tbl) return '';
-    const { cols, rows } = tbl;
-    const thead = '<thead><tr>' + cols.map((c,j) =>
-      `<th><div class="ec-dtbl-colname" contenteditable="true" oninput="_execTblCol(${mid},${j},this.textContent)">${c}</div><span class="ec-dtbl-delcol" onclick="_execTblDelCol(${mid},${j})" title="Remover">✕</span></th>`
-    ).join('') + `<th class="ec-dtbl-addcol" onclick="_execTblAddCol(${mid})" title="Nova coluna">+</th><th style="width:22px;border:none;background:none"></th></tr></thead>`;
-    const tbody = '<tbody>' + rows.map((row,i) =>
-      '<tr>' + cols.map((_,j) =>
-        `<td contenteditable="true" oninput="_execTblCell(${mid},${i},${j},this.innerHTML)">${row[j]||''}</td>`
-      ).join('') + `<td></td><td class="ec-dtbl-del" onclick="_execTblDelRow(${mid},${i})" title="Remover linha">✕</td></tr>`
-    ).join('') + '</tbody>';
-    return `<div class="ec-dtbl-wrap"><table class="ec-dtbl">${thead}${tbody}</table></div><button class="ec-dtbl-addrow" onclick="_execTblAddRow(${mid})">+ Linha</button>`;
+  function _execFindM(mid) { return execMateriais.find(x => x.id == mid); }
+
+  // ===================== SPREADSHEET ENGINE =====================
+  let _stD=null,_stMid=null,_stSel=[1,1],_stSel2=null,_stEditing=false,_stCopied=null,_stDragging=false;
+  const _stRC=100,_stCC=26,_stDCW=90,_stDRH=24;
+
+  function _stLtr(c){if(c<=26)return String.fromCharCode(64+c);return String.fromCharCode(64+Math.floor((c-1)/26))+String.fromCharCode(65+(c-1)%26);}
+  function _stKey(r,c){return _stLtr(c)+r;}
+  function _stSh(){return _stD.sheets[_stD.act];}
+  function _stGC(r,c){return _stSh().cells[_stKey(r,c)]||{};}
+  function _stSC(r,c,p){const k=_stKey(r,c),sh=_stSh();if(!sh.cells[k])sh.cells[k]={};Object.assign(sh.cells[k],p);const cell=sh.cells[k];if(!cell.v&&!cell.f&&!cell.bold&&!cell.italic&&!cell.underline&&!cell.color&&!cell.bg&&!cell.align&&!cell.fontSize)delete sh.cells[k];}
+
+  // Formula evaluator
+  function _stCV(key,si){const sh=_stD.sheets[si??_stD.act],cell=sh?.cells?.[key];if(!cell)return 0;if(cell.f?.startsWith('=')){try{return _stEval(cell.f.slice(1),si??_stD.act);}catch{return'#ERRO';}}const v=cell.v??'';return v===''?0:(isNaN(+v)||v.trim()===''?v:+v);}
+  function _stRV(r1,c1,r2,c2,si){const vals=[];for(let r=Math.min(r1,r2);r<=Math.max(r1,r2);r++)for(let c=Math.min(c1,c2);c<=Math.max(c1,c2);c++)vals.push(_stCV(_stLtr(c)+r,si));return vals;}
+  function _stParseRef(ref){const m=/^([A-Za-z]+)(\d+)$/.exec(ref);if(!m)return null;let c=0;for(const ch of m[1].toUpperCase())c=c*26+ch.charCodeAt(0)-64;return[+m[2],c];}
+  function _stSplitArgs(s){const a=[];let d=0,cur='';for(const ch of s){if('(['.includes(ch))d++;else if(')]'.includes(ch))d--;else if(ch===';'&&d===0){a.push(cur.trim());cur='';continue;}else if(ch===','&&d===0){a.push(cur.trim());cur='';continue;}cur+=ch;}if(cur.trim())a.push(cur.trim());return a;}
+  function _stFnRange(arg,si){
+    arg=arg.trim();
+    if(/^".*"$/.test(arg))return[arg.slice(1,-1)]; // quoted string literal
+    if(arg.includes(':')){const[r1k,r2k]=arg.split(':'),a=_stParseRef(r1k),b=_stParseRef(r2k);return a&&b?_stRV(a[0],a[1],b[0],b[1],si):[]}
+    const rc=_stParseRef(arg);if(rc)return[_stCV(arg,si)];
+    const n=+arg;return isNaN(n)?[]:[n];
+  }
+  function _stFn(fn,args,si){
+    const vals=args.flatMap(a=>_stFnRange(a,si)).filter(v=>typeof v==='number'&&!isNaN(v));
+    const all=args.flatMap(a=>_stFnRange(a,si));
+    switch(fn){
+      case'SOMA':case'SUM':return vals.reduce((a,b)=>a+b,0);
+      case'MÉDIA':case'MEDIA':case'AVERAGE':return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+      case'CONT.NÚM':case'CONT':case'COUNT':return vals.length;
+      case'CONT.VALORES':case'COUNTA':return all.filter(v=>v!==''&&v!==0&&v!==null&&v!==undefined).length;
+      case'MÍNIMO':case'MINIMO':case'MIN':return vals.length?Math.min(...vals):0;
+      case'MÁXIMO':case'MAXIMO':case'MAX':return vals.length?Math.max(...vals):0;
+      case'ARRED':case'ROUND':return vals.length>=2?Math.round(vals[0]*10**vals[1])/10**vals[1]:Math.round(vals[0]||0);
+      case'ABS':return Math.abs(vals[0]||0);
+      case'RAIZ':case'SQRT':return Math.sqrt(vals[0]||0);
+      case'POTÊNCIA':case'POWER':return vals.length>=2?Math.pow(vals[0],vals[1]):0;
+      case'MOD':return vals.length>=2?vals[0]%vals[1]:0;
+      case'INT':case'TRUNCAR':return Math.floor(vals[0]||0);
+      case'CONCATENAR':case'CONCAT':return all.map(String).join('');
+      default:return '#NOME?';
+    }
+  }
+  function _stEvalSafe(expr,si){if(/^".*"$/.test(expr.trim()))return expr.trim().slice(1,-1);try{return _stEval(expr,si);}catch{return expr;}}
+  function _stEval(expr,si){
+    si=si??_stD.act;
+    // SE/IF(cond;t;f)
+    const ifRx=/\b(SE|IF)\s*\((.+)\)\s*$/i;
+    let ifM=ifRx.exec(expr);
+    if(ifM){const parts=_stSplitArgs(ifM[2]);if(parts.length>=2){const cond=_stEvalSafe(parts[0],si);const res=cond?parts[1]:(parts[2]||'');return _stEvalSafe(res,si);}return'#ERRO';}
+    // Functions — loop to handle nested calls like ARRED(MEDIA(A1:A3);2)
+    {let prev;do{prev=expr;expr=expr.replace(/\b([A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ\.]+)\s*\(([^()]*)\)/gi,(_,fn,args)=>{const r=_stFn(fn.toUpperCase(),_stSplitArgs(args),si);return typeof r==='number'?String(r):'"'+String(r).replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"';});}while(expr!==prev);}
+    // Cell refs (case-insensitive: a1 == A1)
+    expr=expr.replace(/\b([A-Za-z]+\d+)\b/g,(_,ref)=>{const v=_stCV(ref.toUpperCase(),si);return typeof v==='number'?String(v):`"${String(v).replace(/\\/g,'\\\\').replace(/"/g,'\\"')}"`;});
+    try{const r=Function('"use strict";return('+expr+')')();return r===undefined?'':r;}catch{return'#ERRO';}
+  }
+  function _stDisp(r,c){const cell=_stGC(r,c);if(!cell.v&&!cell.f)return'';if(cell.f?.startsWith('=')){try{const v=_stEval(cell.f.slice(1));if(typeof v==='number')return Number.isInteger(v)?String(v):v.toFixed(10).replace(/\.?0+$/,'');return v===undefined?'':String(v);}catch{return'#ERRO';}}return String(cell.v??'');}
+  function _stEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  // Save / Load
+  function _stSave(){const m=_execFindM(_stMid);if(!m)return;m.dados=m.dados||{};m.dados.planilha=JSON.parse(JSON.stringify(_stD));execAgendarAutoSave();}
+  function _stInit(mid){
+    _stMid=mid;const m=_execFindM(mid);if(!m)return;
+    m.dados=m.dados||{};
+    if(!m.dados.planilha){
+      const sh={name:'Plan1',cells:{},colWidths:{},rowHeights:{}};
+      if(m.dados?.tabela){const{cols,rows}=m.dados.tabela;cols.forEach((c,ci)=>{sh.cells[_stLtr(ci+1)+'1']={v:c,bold:true};});rows.forEach((row,ri)=>row.forEach((v,ci)=>{if(v)sh.cells[_stLtr(ci+1)+(ri+2)]={v};}));}
+      m.dados.planilha={sheets:[sh],act:0};
+    }
+    _stD=JSON.parse(JSON.stringify(m.dados.planilha));
+    if(!_stD.sheets?.length)_stD.sheets=[{name:'Plan1',cells:{},colWidths:{},rowHeights:{}}];
+    if(_stD.act===undefined||_stD.act===null)_stD.act=0;
+    if(typeof _stD.act!=='number')_stD.act=+_stD.act||0;
+    _stSel=[1,1];_stSel2=null;_stEditing=false;_stCopied=null;
   }
 
-  function _execFindM(mid) { return execMateriais.find(x => x.id == mid); }
-  function _execTblCell(mid,row,col,val){ const m=_execFindM(mid); if(m?.dados?.tabela?.rows?.[row]) m.dados.tabela.rows[row][col]=val; execAgendarAutoSave(); }
-  function _execTblCol(mid,col,name){ const m=_execFindM(mid); if(m?.dados?.tabela?.cols) m.dados.tabela.cols[col]=name.trim()||('Col '+(col+1)); execAgendarAutoSave(); }
-  function _execTblAddRow(mid){ const m=_execFindM(mid); if(!m?.dados?.tabela) return; m.dados.tabela.rows.push(m.dados.tabela.cols.map(()=>'')); salvarDadosExec(); renderExecEditor(); }
-  function _execTblDelRow(mid,row){ const m=_execFindM(mid); if(!m?.dados?.tabela||m.dados.tabela.rows.length<=1) return; m.dados.tabela.rows.splice(row,1); salvarDadosExec(); renderExecEditor(); }
-  function _execTblAddCol(mid){ const m=_execFindM(mid); if(!m?.dados?.tabela) return; m.dados.tabela.cols.push('Nova Coluna'); m.dados.tabela.rows.forEach(r=>r.push('')); salvarDadosExec(); renderExecEditor(); }
-  function _execTblDelCol(mid,col){ const m=_execFindM(mid); if(!m?.dados?.tabela||m.dados.tabela.cols.length<=1) return; m.dados.tabela.cols.splice(col,1); m.dados.tabela.rows.forEach(r=>r.splice(col,1)); salvarDadosExec(); renderExecEditor(); }
+  // CSS
+  function _stCSS(){return`
+#execAreaPrincipal{min-width:0;overflow:hidden}
+.st-tbl{border-collapse:collapse;font-size:12px;font-family:inherit;table-layout:fixed}
+.st-tbl th,.st-tbl td{border:1px solid #e2e8f0;padding:0;box-sizing:border-box;overflow:hidden;white-space:nowrap}
+.st-corner{background:#f8fafc;position:sticky;top:0;left:0;z-index:4;min-width:40px;width:40px;border-color:#cbd5e0}
+.st-ch{background:#f8fafc;position:sticky;top:0;z-index:2;text-align:center;font-weight:600;font-size:11px;color:#718096;user-select:none;cursor:default;border-color:#cbd5e0}
+.st-ch-sel{background:#6b46c1!important;color:white!important;border-bottom:3px solid #4c1d95!important}
+.st-ch-inner{position:relative;display:flex;align-items:center;justify-content:center;height:22px}
+.st-col-resize{position:absolute;right:0;top:0;width:5px;height:100%;cursor:col-resize;z-index:5}
+.st-col-resize:hover,.st-col-resize:active{background:#6b46c1}
+.st-rh{background:#f8fafc;position:sticky;left:0;z-index:1;text-align:right;padding:0 5px 0 2px;font-weight:600;font-size:11px;color:#718096;user-select:none;cursor:pointer;min-width:40px;width:40px;border-color:#cbd5e0;position:relative}
+.st-rh-sel{background:#6b46c1!important;color:white!important;border-right:3px solid #4c1d95!important}
+.st-row-resize{position:absolute;bottom:0;left:0;width:100%;height:4px;cursor:row-resize;z-index:5}
+.st-row-resize:hover,.st-row-resize:active{background:#6b46c1}
+.st-cell{padding:1px 4px;text-align:left;cursor:cell;overflow:hidden;white-space:nowrap;position:relative}
+.st-cell:hover{background:#f7f8ff}
+.st-cell-sel{outline:2px solid #6b46c1!important;outline-offset:-2px;background:#ede9fe!important;z-index:1}
+.st-cell-range{background:#f3f0ff}
+.st-tabbar{display:flex;align-items:flex-end;border-top:2px solid #e2e8f0;background:#f8fafc;padding:0 8px;gap:2px;flex-shrink:0;min-height:30px}
+.st-tab{padding:5px 14px;font-size:11px;cursor:pointer;border:1px solid transparent;border-bottom:none;border-radius:4px 4px 0 0;color:#718096;user-select:none;transition:all .15s}
+.st-tab:hover{background:#e2e8f0}
+.st-tab.active{background:white;border-color:#e2e8f0;color:#2d1b69;font-weight:700;margin-bottom:-1px}
+.st-tab-add{color:#a0aec0;padding:5px 10px;font-size:16px}
+.st-toolbar{display:flex;align-items:center;gap:3px;padding:4px 8px;background:#f8fafc;border-bottom:1px solid #e2e8f0;flex-shrink:0;flex-wrap:wrap}
+.st-tb-sep{width:1px;background:#e2e8f0;align-self:stretch;margin:0 4px;flex-shrink:0}
+.st-fxbar{display:flex;align-items:center;gap:4px;padding:2px 8px;border-bottom:1px solid #e2e8f0;background:white;flex-shrink:0}
+.st-fxref{width:56px;border:1px solid #e2e8f0;border-radius:3px;padding:2px 4px;font-size:11px;text-align:center;font-family:monospace;flex-shrink:0}
+.st-fxinp{flex:1;border:1px solid #e2e8f0;border-radius:3px;padding:2px 6px;font-size:12px;font-family:monospace;min-width:0}
+.st-tb-btn{padding:3px 8px;border:1px solid #e2e8f0;background:white;border-radius:3px;cursor:pointer;font-size:12px;color:#4a5568;white-space:nowrap}
+.st-tb-btn:hover{background:#edf2f7;border-color:#cbd5e0}
+.st-tb-sel{padding:2px 4px;border:1px solid #e2e8f0;border-radius:3px;font-size:11px;cursor:pointer;background:white;color:#4a5568}
+.st-clabel{display:flex;align-items:center;gap:3px;cursor:pointer;padding:2px 7px;border-radius:3px;border:1px solid #e2e8f0;background:white;user-select:none}
+.st-clabel:hover{background:#edf2f7}
+.st-cicon{font-size:12px;font-weight:700;color:#2d3748}
+.st-ctxt{font-size:10px;color:#718096;white-space:nowrap}
+.st-cinp{width:18px;height:18px;border:none;padding:0;cursor:pointer;border-radius:2px;flex-shrink:0}
+.st-rh{background:#f8fafc;position:sticky;left:0;z-index:1;text-align:right;padding:0 5px 0 2px;font-weight:600;font-size:11px;color:#718096;user-select:none;cursor:pointer;min-width:40px;width:40px;border-color:#cbd5e0;position:relative}
+.st-rh:hover{background:#edf2f7}
+.st-ctx{position:fixed;z-index:9999;background:white;border:1px solid #e2e8f0;border-radius:7px;padding:4px 0;box-shadow:0 6px 20px rgba(0,0,0,.15);min-width:180px;font-size:12px}
+.st-ctx-item{padding:7px 16px;cursor:pointer;color:#2d3748;display:flex;align-items:center;gap:8px}
+.st-ctx-item:hover{background:#f0f4f8}
+.st-ctx-sep{height:1px;background:#e2e8f0;margin:3px 0}
+`;}
+
+  // Render
+  function _stRender(){
+    const wrap=document.getElementById('stWrap');if(!wrap)return;
+    if(!document.getElementById('stCss')){const s=document.createElement('style');s.id='stCss';s.textContent=_stCSS();document.head.appendChild(s);}
+    // Preserve scroll position
+    const prevGrid=document.getElementById('stGridWrap');
+    const sv={t:prevGrid?.scrollTop||0,l:prevGrid?.scrollLeft||0};
+    const sh=_stSh();
+    const usedRows=Object.keys(sh.cells).map(k=>{const m=/(\d+)$/.exec(k);return m?+m[1]:0;});
+    const rows=Math.max(_stRC,usedRows.length?Math.max(...usedRows)+5:_stRC);
+    const cols=_stCC;
+    const cw=c=>sh.colWidths?.[c]||_stDCW;
+    const rh=r=>sh.rowHeights?.[r]||_stDRH;
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const rMin=Math.min(sr,se[0]),rMax=Math.max(sr,se[0]),cMin=Math.min(sc,se[1]),cMax=Math.max(sc,se[1]);
+    let html='<div id="stGridWrap" style="overflow:auto;flex:1;min-height:0;width:100%;min-width:0"><table class="st-tbl" id="stTable" tabindex="0" onkeydown="_stKeyDown(event)" onmousedown="_stTableMD(event)" onmouseover="_stTableMO(event)" ondblclick="_stTableDblClick(event)">';
+    html+='<colgroup><col style="width:40px;min-width:40px">';
+    for(let c=1;c<=cols;c++)html+=`<col style="width:${cw(c)}px;min-width:${cw(c)}px">`;
+    html+='</colgroup>';
+    html+='<thead><tr><th class="st-corner" onclick="_stSelAll()"></th>';
+    for(let c=1;c<=cols;c++){
+      const sel=c>=cMin&&c<=cMax;
+      html+=`<th class="st-ch${sel?' st-ch-sel':''}" data-stc="${c}" onclick="_stSelCol(${c},event)" oncontextmenu="_stCtxCol(event,${c})"><div class="st-ch-inner">${_stLtr(c)}<div class="st-col-resize" onmousedown="_stStartColRes(event,${c})"></div></div></th>`;
+    }
+    html+='</tr></thead><tbody>';
+    for(let r=1;r<=rows;r++){
+      const rsel=r>=rMin&&r<=rMax;
+      html+=`<tr><td class="st-rh${rsel?' st-rh-sel':''}" data-str="${r}" style="height:${rh(r)}px" onclick="_stSelRow(${r},event)" oncontextmenu="_stCtxRow(event,${r})">${r}<div class="st-row-resize" onmousedown="_stStartRowRes(event,${r})"></div></td>`;
+      for(let c=1;c<=cols;c++){
+        const cell=_stGC(r,c);
+        const isSel=r===sr&&c===sc;
+        const inRange=r>=rMin&&r<=rMax&&c>=cMin&&c<=cMax;
+        const disp=_stDisp(r,c);
+        const st=_stCellStyle(cell);
+        html+=`<td class="st-cell${isSel?' st-cell-sel':''}${inRange&&!isSel?' st-cell-range':''}" data-str="${r}" data-stc="${c}" style="${st}height:${rh(r)}px">${_stEsc(disp)}</td>`;
+      }
+      html+='</tr>';
+    }
+    html+='</tbody></table></div>';
+    html+='<div class="st-tabbar" id="stTabBar">';
+    _stD.sheets.forEach((s,i)=>{html+=`<div class="st-tab${i===_stD.act?' active':''}" ondblclick="_stRenameSheet(${i})" onclick="_stSwitch(${i})" title="Duplo clique para renomear">${_stEsc(s.name)}</div>`;});
+    html+='<div class="st-tab st-tab-add" onclick="_stAddSheet()" title="Nova aba">+</div></div>';
+    wrap.innerHTML=html;
+    // Restore scroll (prevents page jump on cell click)
+    const ng=document.getElementById('stGridWrap');
+    if(ng){ng.scrollTop=sv.t;ng.scrollLeft=sv.l;}
+    _stUpdateFormulaBar();
+  }
+
+  function _stCellStyle(cell){
+    let s='';
+    if(cell.bold)s+='font-weight:700;';
+    if(cell.italic)s+='font-style:italic;';
+    if(cell.underline)s+='text-decoration:underline;';
+    if(cell.color)s+=`color:${cell.color};`;
+    if(cell.bg)s+=`background:${cell.bg};`;
+    if(cell.align)s+=`text-align:${cell.align};`;
+    if(cell.fontSize)s+=`font-size:${cell.fontSize}px;`;
+    return s;
+  }
+
+  function _stUpdateFormulaBar(){
+    const refEl=document.getElementById('stCellRef'),fxEl=document.getElementById('stFxInput');
+    if(!refEl||!fxEl)return;
+    refEl.value=_stLtr(_stSel[1])+_stSel[0];
+    const cell=_stGC(_stSel[0],_stSel[1]);
+    fxEl.value=cell.f||(cell.v??'');
+  }
+
+  // Interaction
+  function _stFocus(){document.getElementById('stTable')?.focus({preventScroll:true});}
+  function _stTableMD(e){
+    const td=e.target.closest('[data-str][data-stc]');if(!td)return;
+    e.preventDefault();
+    if(_stEditing){
+      const inp=document.getElementById('stEditInp');
+      if(inp&&inp.value.startsWith('=')){
+        // Insert cell reference at cursor position
+        const r2=+td.dataset.str,c2=+td.dataset.stc,ref=_stLtr(c2)+r2;
+        const pos=inp.selectionStart,end=inp.selectionEnd;
+        inp.value=inp.value.slice(0,pos)+ref+inp.value.slice(end);
+        inp.setSelectionRange(pos+ref.length,pos+ref.length);
+        inp.focus({preventScroll:true});
+        const fx=document.getElementById('stFxInput');if(fx)fx.value=inp.value;
+        return;
+      }
+      _stCommit();
+    }
+    const r=+td.dataset.str,c=+td.dataset.stc;
+    if(e.shiftKey){_stSel2=[r,c];_stUpdateSelClasses();return;}
+    _stSel=[r,c];_stSel2=null;_stDragging=true;
+    _stUpdateSelClasses();
+    _stFocus();
+    document.addEventListener('mouseup',_stTableMU,{once:true});
+  }
+  function _stTableMO(e){
+    if(!_stDragging)return;
+    const td=e.target.closest('[data-str][data-stc]');if(!td)return;
+    const r=+td.dataset.str,c=+td.dataset.stc;
+    const cur=_stSel2||_stSel;
+    if(r===cur[0]&&c===cur[1])return;
+    _stSel2=[r,c];
+    _stUpdateSelClasses();
+  }
+  function _stTableMU(){_stDragging=false;}
+  function _stTableDblClick(e){
+    const td=e.target.closest('[data-str][data-stc]');if(!td)return;
+    _stSel=[+td.dataset.str,+td.dataset.stc];_stSel2=null;
+    _stStartEdit();
+  }
+  // Lightweight selection highlight update — no full re-render
+  function _stUpdateSelClasses(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const rMin=Math.min(sr,se[0]),rMax=Math.max(sr,se[0]);
+    const cMin=Math.min(sc,se[1]),cMax=Math.max(sc,se[1]);
+    document.querySelectorAll('.st-cell').forEach(td=>{
+      const r=+td.dataset.str,c=+td.dataset.stc;
+      const isSel=r===sr&&c===sc,inRange=r>=rMin&&r<=rMax&&c>=cMin&&c<=cMax;
+      td.classList.toggle('st-cell-sel',isSel);
+      td.classList.toggle('st-cell-range',inRange&&!isSel);
+    });
+    document.querySelectorAll('.st-ch[data-stc]').forEach(th=>{
+      th.classList.toggle('st-ch-sel',+th.dataset.stc>=cMin&&+th.dataset.stc<=cMax);
+    });
+    document.querySelectorAll('.st-rh[data-str]').forEach(td=>{
+      td.classList.toggle('st-rh-sel',+td.dataset.str>=rMin&&+td.dataset.str<=rMax);
+    });
+    _stUpdateFormulaBar();
+  }
+  function _stKeyDown(e){
+    if(_stEditing){
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();_stCommit(1,0);}
+      else if(e.key==='Tab'){e.preventDefault();_stCommit(0,e.shiftKey?-1:1);}
+      else if(e.key==='Escape')_stCancelEdit();
+      return;
+    }
+    const[r,c]=_stSel;
+    if(e.ctrlKey){
+      switch(e.key){
+        case'c':_stCopy();break;
+        case'v':_stPaste();break;
+        case'b':e.preventDefault();_stFmt('bold');break;
+        case'i':e.preventDefault();_stFmt('italic');break;
+        case'z':e.preventDefault();break;
+      }return;
+    }
+    switch(e.key){
+      case'ArrowUp':e.preventDefault();_stMoveSel(-1,0,e.shiftKey);break;
+      case'ArrowDown':e.preventDefault();_stMoveSel(1,0,e.shiftKey);break;
+      case'ArrowLeft':e.preventDefault();_stMoveSel(0,-1,e.shiftKey);break;
+      case'ArrowRight':e.preventDefault();_stMoveSel(0,1,e.shiftKey);break;
+      case'Tab':e.preventDefault();_stMoveSel(0,e.shiftKey?-1:1,false);break;
+      case'Enter':e.preventDefault();_stMoveSel(1,0,false);break;
+      case'Delete':case'Backspace':_stClearSel();break;
+      case'F2':e.preventDefault();_stStartEdit();break;
+      default:if(!e.altKey&&e.key.length===1){_stStartEdit(e.key);e.preventDefault();}
+    }
+  }
+  function _stMoveSel(dr,dc,extend){
+    const[r,c]=_stSel,nr=Math.max(1,Math.min(500,r+dr)),nc=Math.max(1,Math.min(_stCC,c+dc));
+    if(extend){_stSel2=[nr,nc];}else{_stSel=[nr,nc];_stSel2=null;}
+    _stRender();_stFocus();
+  }
+  function _stStartEdit(initChar){
+    if(_stEditing){const inp=document.getElementById('stEditInp');if(inp)inp.focus();return;}
+    _stEditing=true;_stSel2=null;
+    const[r,c]=_stSel;
+    const cell=_stGC(r,c);
+    const td=document.querySelector(`td[data-str="${r}"][data-stc="${c}"]`);if(!td)return;
+    const wrap=document.getElementById('stGridWrap');if(!wrap)return;
+    const tdR=td.getBoundingClientRect(),wR=wrap.getBoundingClientRect();
+    const inp=document.createElement('input');
+    inp.id='stEditInp';
+    const initVal=initChar!=null?initChar:(cell.f||cell.v||'');
+    inp.value=initVal;
+    inp.style.cssText=`position:absolute;left:${td.offsetLeft}px;top:${td.offsetTop}px;width:${Math.max(td.offsetWidth,120)}px;height:${td.offsetHeight}px;border:2px solid #6b46c1;outline:none;padding:0 4px;font-size:${cell.fontSize||12}px;font-family:inherit;z-index:30;box-sizing:border-box;${_stCellStyle(cell)}`;
+    wrap.appendChild(inp);inp.focus({preventScroll:true});
+    if(initChar)inp.setSelectionRange(inp.value.length,inp.value.length);else inp.select();
+    inp.addEventListener('input',()=>{const fx=document.getElementById('stFxInput');if(fx)fx.value=inp.value;});
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();_stCommit(1,0);}
+      else if(e.key==='Tab'){e.preventDefault();_stCommit(0,e.shiftKey?-1:1);}
+      else if(e.key==='Escape'){e.preventDefault();_stCancelEdit();}
+    });
+    inp.addEventListener('blur',()=>{setTimeout(()=>{if(_stEditing)_stCommit();},30);});
+  }
+  function _stCommit(dr=0,dc=0){
+    const inp=document.getElementById('stEditInp');if(!inp)return;
+    const val=inp.value;const[r,c]=_stSel;
+    inp.removeEventListener('blur',_stCommit);
+    _stEditing=false;inp.remove();
+    if(val.startsWith('=')){_stSC(r,c,{f:val,v:undefined});}else{_stSC(r,c,{v:val,f:undefined});}
+    _stSave();
+    if(dr||dc){const nr=Math.max(1,Math.min(500,r+dr)),nc=Math.max(1,Math.min(_stCC,c+dc));_stSel=[nr,nc];_stSel2=null;}
+    _stRender();_stFocus();
+  }
+  function _stCancelEdit(){const inp=document.getElementById('stEditInp');if(inp){_stEditing=false;inp.remove();}_stRender();_stFocus();}
+  function _stClearSel(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    for(let r=Math.min(sr,se[0]);r<=Math.max(sr,se[0]);r++)for(let c=Math.min(sc,se[1]);c<=Math.max(sc,se[1]);c++){const k=_stKey(r,c),sh=_stSh();if(sh.cells[k]){delete sh.cells[k].v;delete sh.cells[k].f;if(Object.keys(sh.cells[k]).length===0)delete sh.cells[k];}}
+    _stSave();_stRender();_stFocus();
+  }
+
+  // Context menus
+  function _stCtxClose(){document.querySelectorAll('.st-ctx').forEach(m=>m.remove());}
+  function _stCtxShow(e,html){
+    e.preventDefault();e.stopPropagation();_stCtxClose();
+    const m=document.createElement('div');m.className='st-ctx';
+    m.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+    m.style.top=Math.min(e.clientY,window.innerHeight-120)+'px';
+    m.innerHTML=html;document.body.appendChild(m);
+    setTimeout(()=>document.addEventListener('mousedown',_stCtxClose,{once:true}),0);
+  }
+  function _stCtxRow(e,r){
+    // Ensure the row is selected
+    if(r<Math.min(_stSel[0],(_stSel2||_stSel)[0])||r>Math.max(_stSel[0],(_stSel2||_stSel)[0])){_stSel=[r,1];_stSel2=[r,_stCC];_stUpdateSelClasses();}
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const r1=Math.min(sr,se[0]),r2=Math.max(sr,se[0]);
+    const lbl=r2>r1?`linhas ${r1}–${r2}`:`linha ${r1}`;
+    _stCtxShow(e,`<div class="st-ctx-item" onmousedown="event.stopPropagation();_stCtxClose();_stDelRows()">🗑️ Excluir ${lbl}</div>
+      <div class="st-ctx-sep"></div>
+      <div class="st-ctx-item" onmousedown="event.stopPropagation();_stCtxClose();_stClearSel()">✕ Limpar conteúdo</div>`);
+  }
+  function _stCtxCol(e,c){
+    if(c<Math.min(_stSel[1],(_stSel2||_stSel)[1])||c>Math.max(_stSel[1],(_stSel2||_stSel)[1])){_stSel=[1,c];_stSel2=[_stRC,c];_stUpdateSelClasses();}
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const c1=Math.min(sc,se[1]),c2=Math.max(sc,se[1]);
+    const lbl=c2>c1?`colunas ${_stLtr(c1)}–${_stLtr(c2)}`:`coluna ${_stLtr(c1)}`;
+    _stCtxShow(e,`<div class="st-ctx-item" onmousedown="event.stopPropagation();_stCtxClose();_stDelCols()">🗑️ Excluir ${lbl}</div>
+      <div class="st-ctx-sep"></div>
+      <div class="st-ctx-item" onmousedown="event.stopPropagation();_stCtxClose();_stClearSel()">✕ Limpar conteúdo</div>`);
+  }
+
+  // Row / column / all selection
+  function _stSelRow(r,e){
+    e.stopPropagation();
+    if(e.shiftKey&&_stSel){_stSel=[_stSel[0],1];_stSel2=[r,_stCC];}
+    else{_stSel=[r,1];_stSel2=[r,_stCC];}
+    _stUpdateSelClasses();_stFocus();
+  }
+  function _stSelCol(c,e){
+    e.stopPropagation();
+    if(e.shiftKey&&_stSel){_stSel=[1,_stSel[1]];_stSel2=[_stRC,c];}
+    else{_stSel=[1,c];_stSel2=[_stRC,c];}
+    _stUpdateSelClasses();_stFocus();
+  }
+  function _stSelAll(){_stSel=[1,1];_stSel2=[_stRC,_stCC];_stUpdateSelClasses();_stFocus();}
+
+  // Delete rows / columns
+  function _stDelRows(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const r1=Math.min(sr,se[0]),r2=Math.max(sr,se[0]);
+    if(!confirm(r2>r1?`Excluir linhas ${r1}–${r2}?`:`Excluir a linha ${r1}?`))return;
+    const sh=_stSh();
+    const newCells={};
+    Object.entries(sh.cells).forEach(([key,val])=>{
+      const m=/^([A-Z]+)(\d+)$/.exec(key);if(!m)return;
+      const r=+m[2];if(r>=r1&&r<=r2)return;
+      newCells[m[1]+(r>r2?r-(r2-r1+1):r)]=val;
+    });
+    sh.cells=newCells;
+    if(sh.rowHeights){const rh={};Object.entries(sh.rowHeights).forEach(([r,h])=>{const ri=+r;if(ri>=r1&&ri<=r2)return;rh[ri>r2?ri-(r2-r1+1):ri]=h;});sh.rowHeights=rh;}
+    _stSel=[Math.max(1,r1),Math.min(sc,_stCC)];_stSel2=null;
+    _stSave();_stRender();
+  }
+  function _stDelCols(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const c1=Math.min(sc,se[1]),c2=Math.max(sc,se[1]);
+    if(!confirm(c2>c1?`Excluir colunas ${_stLtr(c1)}–${_stLtr(c2)}?`:`Excluir a coluna ${_stLtr(c1)}?`))return;
+    const sh=_stSh();
+    const newCells={};
+    Object.entries(sh.cells).forEach(([key,val])=>{
+      const m=/^([A-Z]+)(\d+)$/.exec(key);if(!m)return;
+      let col=0;for(const ch of m[1])col=col*26+ch.charCodeAt(0)-64;
+      if(col>=c1&&col<=c2)return;
+      newCells[_stLtr(col>c2?col-(c2-c1+1):col)+m[2]]=val;
+    });
+    sh.cells=newCells;
+    if(sh.colWidths){const cw={};Object.entries(sh.colWidths).forEach(([c,w])=>{const ci=+c;if(ci>=c1&&ci<=c2)return;cw[ci>c2?ci-(c2-c1+1):ci]=w;});sh.colWidths=cw;}
+    _stSel=[Math.max(1,sr),Math.max(1,c1)];_stSel2=null;
+    _stSave();_stRender();
+  }
+
+  // Formatting
+  function _stFmt(prop,val){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    for(let r=Math.min(sr,se[0]);r<=Math.max(sr,se[0]);r++)for(let c=Math.min(sc,se[1]);c<=Math.max(sc,se[1]);c++){const cur=_stGC(r,c)[prop];_stSC(r,c,{[prop]:val!==undefined?val:!cur});}
+    _stSave();_stRender();_stFocus();
+  }
+
+  // Resize
+  let _stResType=null,_stResIdx=null,_stResStart=0,_stResCurSize=0;
+  function _stStartColRes(e,c){e.stopPropagation();e.preventDefault();_stResType='col';_stResIdx=c;_stResStart=e.clientX;_stResCurSize=_stSh().colWidths?.[c]||_stDCW;document.addEventListener('mousemove',_stOnRes,{passive:false});document.addEventListener('mouseup',_stEndRes);}
+  function _stStartRowRes(e,r){e.stopPropagation();e.preventDefault();_stResType='row';_stResIdx=r;_stResStart=e.clientY;_stResCurSize=_stSh().rowHeights?.[r]||_stDRH;document.addEventListener('mousemove',_stOnRes,{passive:false});document.addEventListener('mouseup',_stEndRes);}
+  function _stOnRes(e){
+    const sh=_stSh();
+    if(_stResType==='col'){
+      const nw=Math.max(20,_stResCurSize+(e.clientX-_stResStart));
+      if(!sh.colWidths)sh.colWidths={};sh.colWidths[_stResIdx]=nw;
+      const col=document.querySelector(`col:nth-child(${_stResIdx+1})`);if(col){col.style.width=nw+'px';col.style.minWidth=nw+'px';}
+    } else {
+      const nh=Math.max(16,_stResCurSize+(e.clientY-_stResStart));
+      if(!sh.rowHeights)sh.rowHeights={};sh.rowHeights[_stResIdx]=nh;
+      const tds=document.querySelectorAll(`[data-str="${_stResIdx}"]`);tds.forEach(td=>td.style.height=nh+'px');
+    }
+  }
+  function _stEndRes(){document.removeEventListener('mousemove',_stOnRes);document.removeEventListener('mouseup',_stEndRes);_stResType=null;_stSave();}
+
+  // Sheets
+  function _stSwitch(idx){if(_stEditing)_stCancelEdit();_stD.act=idx;_stSel=[1,1];_stSel2=null;_stSave();_stRender();_stFocus();}
+  function _stAddSheet(){const n=_stD.sheets.length+1;_stD.sheets.push({name:'Plan'+n,cells:{},colWidths:{},rowHeights:{}});_stD.act=_stD.sheets.length-1;_stSave();_stRender();_stFocus();}
+  function _stRenameSheet(idx){const name=prompt('Nome da aba:',_stD.sheets[idx].name);if(name?.trim()){_stD.sheets[idx].name=name.trim();_stSave();_stRender();}}
+
+  // Copy / Paste
+  function _stCopy(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    _stCopied={r1:Math.min(sr,se[0]),c1:Math.min(sc,se[1]),r2:Math.max(sr,se[0]),c2:Math.max(sc,se[1]),data:{}};
+    for(let r=_stCopied.r1;r<=_stCopied.r2;r++)for(let c=_stCopied.c1;c<=_stCopied.c2;c++)_stCopied.data[_stKey(r-_stCopied.r1+1,c-_stCopied.c1+1)]=JSON.parse(JSON.stringify(_stGC(r,c)));
+  }
+  function _stPaste(){
+    if(!_stCopied)return;
+    const[tr,tc]=_stSel,dr=_stCopied.r2-_stCopied.r1,dc=_stCopied.c2-_stCopied.c1;
+    for(let r=0;r<=dr;r++)for(let c=0;c<=dc;c++){const src=_stCopied.data[_stKey(r+1,c+1)];if(src)_stSC(tr+r,tc+c,JSON.parse(JSON.stringify(src)));}
+    _stSave();_stRender();
+  }
+
+  // Formula bar
+  function _stFxNav(e){if(e.key==='Enter'){e.preventDefault();const val=document.getElementById('stFxInput')?.value;if(val!=null){const[r,c]=_stSel;if(val.startsWith('=')){_stSC(r,c,{f:val,v:undefined});}else{_stSC(r,c,{v:val,f:undefined});}_stSave();_stRender();}_stFocus();}}
+  function _stFxInput(val){if(!_stEditing)return;const inp=document.getElementById('stEditInp');if(inp)inp.value=val;}
+  function _stRefNav(e){if(e.key!=='Enter')return;const ref=document.getElementById('stCellRef')?.value?.trim()?.toUpperCase();if(!ref)return;const m=/^([A-Z]+)(\d+)$/.exec(ref);if(!m)return;let col=0;for(const ch of m[1])col=col*26+ch.charCodeAt(0)-64;_stSel=[+m[2],col];_stSel2=null;_stRender();_stFocus();}
 
   function _execInitCanvas(m) {
     const canvas = document.getElementById('execCanvas');
@@ -3603,11 +4352,18 @@
     canvas.height = Math.max(500, Math.round(canvas.width * 0.6));
     const ctx = canvas.getContext('2d');
     _execUndoStack = [];
+    _execTextBoxes = m.textBoxes ? JSON.parse(JSON.stringify(m.textBoxes)) : [];
 
-    if (m.canvasData) {
+    const bgSrc = m.canvasBase || m.canvasData;
+    if (bgSrc) {
       const img = new Image();
-      img.onload = () => { ctx.drawImage(img, 0, 0); };
-      img.src = m.canvasData;
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        _execRenderAllTextBoxes(canvas.parentElement, canvas);
+      };
+      img.src = bgSrc;
+    } else {
+      setTimeout(() => _execRenderAllTextBoxes(canvas.parentElement, canvas), 0);
     }
 
     function getPos(e) {
@@ -3644,6 +4400,11 @@
 
     function startDraw(e) {
       e.preventDefault();
+      if (_execCanvasTool === 'text') {
+        const [x,y] = getPos(e);
+        _execPlaceTextInput(canvas, ctx, x, y);
+        return;
+      }
       _execCanvasDrawing = true;
       const [x,y] = getPos(e);
       _execCanvasStartX = x; _execCanvasStartY = y;
@@ -3678,8 +4439,7 @@
         // Commit shape: already drawn in last mousemove
         _execCanvasSnapshot = null;
       }
-      const dm = _execFindM(execEditandoId);
-      if (dm) { dm.canvasData = canvas.toDataURL('image/png'); execAgendarAutoSave(); }
+      _execSaveCanvas(canvas);
     }
 
     canvas.addEventListener('mousedown', startDraw);
@@ -3705,13 +4465,222 @@
 
   function _execSetTool(tool) {
     _execCanvasTool = tool;
+    const existing = document.getElementById('execTextInput');
+    if (existing) existing.blur();
     document.querySelectorAll('.exec-shape-btn').forEach(b => b.classList.remove('active'));
-    const ids = {pen:'execToolPen',eraser:'execToolEraser',line:'execToolLine',arrow:'execToolArrow',rect:'execToolRect',circle:'execToolCircle'};
+    const ids = {pen:'execToolPen',eraser:'execToolEraser',line:'execToolLine',arrow:'execToolArrow',rect:'execToolRect',circle:'execToolCircle',text:'execToolText'};
     const el = document.getElementById(ids[tool]);
     if (el) el.classList.add('active');
-    // Update canvas cursor
     const canvas = document.getElementById('execCanvas');
-    if (canvas) canvas.style.cursor = tool === 'eraser' ? 'cell' : 'crosshair';
+    if (canvas) canvas.style.cursor = tool === 'eraser' ? 'cell' : tool === 'text' ? 'text' : 'crosshair';
+  }
+
+  function _execPlaceTextInput(canvas, ctx, cx, cy) {
+    if (document.getElementById('execTextBox')) return;
+    const container = canvas.parentElement;
+    container.style.position = 'relative';
+    const canvasR = canvas.getBoundingClientRect();
+    const containerR = container.getBoundingClientRect();
+    const scaleX = canvasR.width / canvas.width;
+    const scaleY = canvasR.height / canvas.height;
+    const canvL = canvasR.left - containerR.left;
+    const canvT = canvasR.top  - containerR.top;
+    const BOX_W = 180, BOX_H = 80;
+    let left = Math.max(canvL, Math.min(canvL + cx * scaleX, canvL + canvasR.width  - BOX_W));
+    let top  = Math.max(canvT, Math.min(canvT + cy * scaleY, canvT + canvasR.height - BOX_H));
+    const fontSize = Math.max(12, _execCanvasSize * 2 + 8);
+
+    // Outer box (draggable + resizable)
+    const box = document.createElement('div');
+    box.id = 'execTextBox';
+    box.style.cssText = `position:absolute;left:${left}px;top:${top}px;width:${BOX_W}px;height:${BOX_H}px;min-width:100px;min-height:60px;border:1.5px solid #6b46c1;border-radius:5px;background:rgba(255,255,255,0.96);z-index:20;box-shadow:0 3px 12px rgba(0,0,0,0.18);display:flex;flex-direction:column;resize:both;overflow:hidden`;
+
+    // Drag handle (header)
+    const handle = document.createElement('div');
+    handle.style.cssText = `background:#6b46c1;padding:3px 8px;cursor:move;user-select:none;display:flex;align-items:center;justify-content:space-between;flex-shrink:0`;
+    handle.innerHTML = `<span style="font-size:10px;color:rgba(255,255,255,0.9);font-weight:600;letter-spacing:.3px">T CAIXA DE TEXTO</span><button id="_etbCancel" style="background:none;border:none;color:white;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;font-weight:700;opacity:.8" title="Cancelar (Esc)">×</button>`;
+
+    // Textarea
+    const inp = document.createElement('textarea');
+    inp.id = 'execTextInput';
+    inp.placeholder = 'Digite o texto...';
+    inp.style.cssText = `flex:1;border:none;outline:none;padding:5px 8px;font-size:${fontSize}px;color:${_execCanvasColor};font-family:sans-serif;line-height:1.4;resize:none;background:transparent;width:100%;box-sizing:border-box`;
+
+    // Confirm button bar
+    const bar = document.createElement('div');
+    bar.style.cssText = `display:flex;justify-content:flex-end;padding:2px 4px;background:#f8f5ff;flex-shrink:0;border-top:1px solid #e9d8fd`;
+    bar.innerHTML = `<button id="_etbOk" style="font-size:10px;padding:2px 8px;background:#6b46c1;color:white;border:none;border-radius:3px;cursor:pointer;font-weight:600">✓ Inserir</button>`;
+
+    box.appendChild(handle); box.appendChild(inp); box.appendChild(bar);
+    container.appendChild(box);
+    inp.focus();
+
+    // Drag logic (handle prevents textarea blur via preventDefault)
+    let drag = false, dsx = 0, dsy = 0, bsl = 0, bst = 0;
+    handle.addEventListener('mousedown', e => {
+      if (e.target.id === '_etbCancel') return;
+      drag = true; dsx = e.clientX; dsy = e.clientY;
+      bsl = parseFloat(box.style.left); bst = parseFloat(box.style.top);
+      e.preventDefault();
+    });
+    function onMove(e) {
+      if (!drag) return;
+      let nl = bsl + e.clientX - dsx, nt = bst + e.clientY - dsy;
+      nl = Math.max(canvL, Math.min(nl, canvL + canvasR.width  - box.offsetWidth));
+      nt = Math.max(canvT, Math.min(nt, canvT + canvasR.height - box.offsetHeight));
+      box.style.left = nl + 'px'; box.style.top = nt + 'px';
+    }
+    function onUp() { drag = false; }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+
+    function destroy() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      box.remove();
+    }
+    document.getElementById('_etbOk').addEventListener('mousedown', e => e.preventDefault());
+    document.getElementById('_etbOk').addEventListener('click', commit);
+    document.getElementById('_etbCancel').addEventListener('mousedown', e => e.preventDefault());
+    document.getElementById('_etbCancel').addEventListener('click', destroy);
+    bar.addEventListener('mousedown', e => e.preventDefault());
+    inp.addEventListener('keydown', e => { if (e.key === 'Escape') { destroy(); e.stopPropagation(); } });
+
+    function commit() {
+      const text = inp.value;
+      const boxL = parseFloat(box.style.left) - canvL;
+      const boxT = parseFloat(box.style.top)  - canvT;
+      const handleH = handle.offsetHeight;
+      const barH = bar.offsetHeight;
+      const boxW = box.offsetWidth;
+      const boxH = box.offsetHeight;
+      destroy();
+      if (text.trim()) {
+        const tb = {
+          id: Date.now(),
+          x: (boxL + 8) / scaleX,
+          y: (boxT + handleH + 5) / scaleY,
+          w: (boxW - 16) / scaleX,
+          h: (boxH - handleH - barH - 10) / scaleY,
+          text,
+          fontSize: Math.round(fontSize / scaleX),
+          color: _execCanvasColor
+        };
+        _execTextBoxes.push(tb);
+        _execRenderAllTextBoxes(container, canvas);
+        _execSaveCanvas(canvas);
+      }
+    }
+  }
+
+  function _execSaveCanvas(canvas) {
+    const m = _execFindM(execEditandoId);
+    if (!m) return;
+    m.canvasBase = canvas.toDataURL('image/png');
+    m.textBoxes = JSON.parse(JSON.stringify(_execTextBoxes));
+    // Build composite image for PDF / view
+    const tmp = document.createElement('canvas');
+    tmp.width = canvas.width; tmp.height = canvas.height;
+    const tCtx = tmp.getContext('2d');
+    tCtx.drawImage(canvas, 0, 0);
+    _execTextBoxes.forEach(tb => {
+      tCtx.font = `${tb.fontSize}px sans-serif`;
+      tCtx.fillStyle = tb.color;
+      const lh = tb.fontSize * 1.4;
+      tb.text.split('\n').forEach((line, i) => {
+        if (line) tCtx.fillText(line, tb.x, tb.y + tb.fontSize * (i + 1) + lh * i);
+      });
+    });
+    m.canvasData = tmp.toDataURL('image/png');
+    execAgendarAutoSave();
+  }
+
+  function _execRenderAllTextBoxes(container, canvas) {
+    container.querySelectorAll('[data-exec-tb]').forEach(el => el.remove());
+    if (!_execTextBoxes.length) return;
+    const canvasR = canvas.getBoundingClientRect();
+    const containerR = container.getBoundingClientRect();
+    const scaleX = canvasR.width / canvas.width;
+    const scaleY = canvasR.height / canvas.height;
+    const canvL = canvasR.left - containerR.left;
+    const canvT = canvasR.top  - containerR.top;
+    _execTextBoxes.forEach(tb => _execRenderTextBox(tb, container, canvas, scaleX, scaleY, canvL, canvT));
+  }
+
+  function _execRenderTextBox(tb, container, canvas, scaleX, scaleY, canvL, canvT) {
+    const el = document.createElement('div');
+    el.dataset.execTb = tb.id;
+    const cssX = canvL + tb.x * scaleX;
+    const cssY = canvT + tb.y * scaleY;
+    const cssW = Math.max(80, tb.w * scaleX);
+    const cssH = Math.max(40, tb.h * scaleY);
+    const fsCss = Math.round(tb.fontSize * scaleX);
+    el.style.cssText = `position:absolute;left:${cssX}px;top:${cssY}px;width:${cssW}px;min-width:80px;min-height:40px;border:1.5px solid #6b46c1;border-radius:5px;background:rgba(255,255,255,0.96);z-index:20;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.12);resize:both`;
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = `background:#6b46c1;padding:2px 8px;cursor:move;user-select:none;display:flex;align-items:center;justify-content:space-between;flex-shrink:0`;
+    hdr.innerHTML = `<span style="font-size:9px;color:rgba(255,255,255,0.85);font-weight:600;letter-spacing:.3px">✦ TEXTO</span><button data-del style="background:none;border:none;color:white;cursor:pointer;font-size:13px;line-height:1;padding:0 2px;font-weight:700" title="Remover">×</button>`;
+
+    const display = document.createElement('div');
+    display.style.cssText = `flex:1;padding:5px 8px;font-size:${fsCss}px;color:${tb.color};font-family:sans-serif;line-height:1.4;white-space:pre-wrap;word-break:break-word;overflow:auto;cursor:text;min-height:24px`;
+    display.textContent = tb.text;
+    display.title = 'Duplo clique para editar';
+
+    el.appendChild(hdr); el.appendChild(display);
+    container.appendChild(el);
+
+    // Drag via pointer capture on header
+    let drag = false, dsx = 0, dsy = 0, bsl = 0, bst = 0;
+    hdr.addEventListener('pointerdown', e => {
+      if (e.target.dataset.del !== undefined) return;
+      drag = true; dsx = e.clientX; dsy = e.clientY;
+      bsl = parseFloat(el.style.left); bst = parseFloat(el.style.top);
+      hdr.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    hdr.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const cr = canvas.getBoundingClientRect(), cor = container.getBoundingClientRect();
+      const cl = cr.left - cor.left, ct = cr.top - cor.top;
+      let nl = Math.max(cl, Math.min(bsl + e.clientX - dsx, cl + cr.width  - el.offsetWidth));
+      let nt = Math.max(ct, Math.min(bst + e.clientY - dsy, ct + cr.height - el.offsetHeight));
+      el.style.left = nl + 'px'; el.style.top = nt + 'px';
+    });
+    hdr.addEventListener('pointerup', e => {
+      if (!drag) return; drag = false;
+      const cr = canvas.getBoundingClientRect(), cor = container.getBoundingClientRect();
+      const cl = cr.left - cor.left, ct = cr.top - cor.top;
+      const sx = cr.width / canvas.width, sy = cr.height / canvas.height;
+      tb.x = (parseFloat(el.style.left) - cl) / sx;
+      tb.y = (parseFloat(el.style.top)  - ct) / sy;
+      _execSaveCanvas(canvas);
+    });
+
+    // Delete
+    hdr.querySelector('[data-del]').addEventListener('click', () => {
+      _execTextBoxes = _execTextBoxes.filter(t => t.id !== tb.id);
+      el.remove();
+      _execSaveCanvas(canvas);
+    });
+
+    // Double-click to edit text inline
+    display.addEventListener('dblclick', () => {
+      display.style.display = 'none';
+      const ta = document.createElement('textarea');
+      ta.value = tb.text;
+      ta.style.cssText = `flex:1;border:none;outline:none;padding:5px 8px;font-size:${fsCss}px;color:${tb.color};font-family:sans-serif;line-height:1.4;resize:none;background:transparent;width:100%;box-sizing:border-box;min-height:24px`;
+      el.insertBefore(ta, display);
+      ta.focus();
+      ta.addEventListener('mousedown', e => e.stopPropagation());
+      ta.addEventListener('blur', () => {
+        tb.text = ta.value;
+        display.textContent = tb.text;
+        display.style.display = '';
+        ta.remove();
+        _execSaveCanvas(canvas);
+      });
+      ta.addEventListener('keydown', e => { if (e.key === 'Escape') ta.blur(); });
+    });
   }
 
   function _execUndoCanvas() {
@@ -3720,8 +4689,7 @@
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.putImageData(_execUndoStack.pop(), 0, 0);
-    const dm = _execFindM(execEditandoId);
-    if (dm) { dm.canvasData = canvas.toDataURL('image/png'); execAgendarAutoSave(); }
+    _execSaveCanvas(canvas);
   }
 
   function _execClearCanvas() {
@@ -3731,11 +4699,46 @@
     const ctx = canvas.getContext('2d');
     _execUndoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const m = _execFindM(execEditandoId);
-    if (m) { m.canvasData = null; execAgendarAutoSave(); }
+    _execTextBoxes = [];
+    canvas.parentElement.querySelectorAll('[data-exec-tb]').forEach(el => el.remove());
+    _execSaveCanvas(canvas);
   }
 
-  function fmtExec(cmd) { document.execCommand(cmd, false, null); document.getElementById('execEditorArea')?.focus(); }
+  let _execSavedSel = null;
+  function _execSaveSel() {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) _execSavedSel = sel.getRangeAt(0).cloneRange();
+  }
+  function _execRestoreSel() {
+    if (!_execSavedSel) return;
+    document.getElementById('execEditorArea')?.focus();
+    const sel = window.getSelection();
+    if (sel) { sel.removeAllRanges(); sel.addRange(_execSavedSel); }
+  }
+
+  function fmtExec(cmd, val) { document.execCommand(cmd, false, val||null); document.getElementById('execEditorArea')?.focus(); }
+
+  function _fmtExecFontSize(size) {
+    if (!size) return;
+    _execRestoreSel();
+    document.execCommand('fontSize', false, 7);
+    document.getElementById('execEditorArea')?.querySelectorAll('font[size="7"]').forEach(el => { el.removeAttribute('size'); el.style.fontSize = size; });
+    document.getElementById('execEditorArea')?.focus();
+  }
+
+  function _fmtExecLink() {
+    _execRestoreSel();
+    const url = prompt('URL do link:');
+    if (url) document.execCommand('createLink', false, url);
+    document.getElementById('execEditorArea')?.focus();
+  }
+
+  function _fmtExecImg(input) {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => { document.execCommand('insertHTML', false, `<img src="${e.target.result}" style="max-width:100%;height:auto">`); execAgendarAutoSave(); };
+    reader.readAsDataURL(file); input.value = '';
+  }
 
   function execAgendarAutoSave() {
     const ind = document.getElementById('execAutoSaveIndicator');
@@ -3964,10 +4967,23 @@
   }
   function _eapEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+  let _eapUsersLoaded = false;
+  async function _eapLoadUsers() {
+    if (_eapUsersLoaded) return;
+    _eapUsersLoaded = true;
+    try {
+      const r = await fetch('/api/usuarios', { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+      const j = await r.json();
+      const users = (j.usuarios || j || []).map(u => u.nome || u.email || '').filter(Boolean);
+      const dl = document.getElementById('eapUsersList');
+      if (dl) dl.innerHTML = users.map(n => `<option value="${n.replace(/"/g,'&quot;')}">`).join('');
+    } catch(e) {}
+  }
+
   function _eapCardHtml(b, readOnly) {
     const id = b.id, x = b.x||80, y = b.y||80;
     if (readOnly) return `<div class="eap-card" id="eap-c-${id}" style="left:${x}px;top:${y}px">
-      <div class="eap-card-handle" style="cursor:default"><span style="font-size:10px;color:#a0aec0">EAP</span></div>
+      <div class="eap-card-handle" style="cursor:default;min-height:14px"></div>
       <div class="eap-card-body">
         <div style="font-size:13px;font-weight:600;color:#1e2a4a;white-space:pre-wrap;min-height:22px">${_eapEsc(b.titulo||'')}</div>
         ${b.responsavel&&b.showResp?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid #f0f2f5;font-size:11px;color:#718096">👤 ${_eapEsc(b.responsavel)}</div>`:''}
@@ -3982,7 +4998,7 @@
         <textarea class="eap-card-titulo" rows="2" onmousedown="event.stopPropagation()" oninput="_eapCardTitulo(${id},this.value)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault()}" placeholder="Tarefa / Entrega...">${_eapEsc(b.titulo||'')}</textarea>
         <div id="eap-r-${id}" class="eap-card-resp-row" style="display:${b.showResp?'flex':'none'}">
           <span style="font-size:11px;color:#a0aec0;flex-shrink:0">👤</span>
-          <input class="eap-card-resp-input" value="${_eapEsc(b.responsavel||'')}" onmousedown="event.stopPropagation()" oninput="_eapCardResp(${id},this.value)" placeholder="Responsável...">
+          <input class="eap-card-resp-input" list="eapUsersList" value="${_eapEsc(b.responsavel||'')}" onmousedown="event.stopPropagation()" oninput="_eapCardResp(${id},this.value)" placeholder="Responsável...">
           <button onmousedown="event.stopPropagation()" onclick="event.stopPropagation();_eapToggleResp(${id})" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:10px;padding:0;flex-shrink:0" title="Remover campo">✕</button>
         </div>
       </div>
@@ -3997,6 +5013,7 @@
   }
 
   function eapRenderCanvas() {
+    _eapLoadUsers();
     const v = escopoGetVersao();
     const inner = document.getElementById('eapCanvasInner');
     const empty = document.getElementById('eapEmpty');
@@ -5005,12 +6022,25 @@
   function _recSave(){ agendarSalvarProjeto(); }
   function _recCatOpts(selected){
     const d=_recEnsure();
-    // derive unique categories from adquirir items
-    const cats=[...new Set(d.adquirir.map(r=>r.categoria).filter(Boolean))].sort();
+    const fromBudget=Object.keys(d.categoriasBudget||{});
+    const fromItems=d.adquirir.map(r=>r.categoria).filter(Boolean);
+    const fromDisp=d.disponiveis.map(r=>r.categoria).filter(Boolean);
+    const cats=[...new Set([...fromBudget,...fromItems,...fromDisp])].sort();
     return `<option value="">— Sem categoria —</option>`+cats.map(c=>`<option value="${_gesc(c)}" ${c===selected?'selected':''}>${_gesc(c)}</option>`).join('');
   }
 
+  function _recSaveCatBudgetsFromDOM(){
+    document.querySelectorAll('.rec-cat-budget-input').forEach(el=>{
+      const cat=el.dataset.cat;
+      if(cat===undefined) return;
+      if(!recursos.categoriasBudget) recursos.categoriasBudget={};
+      const v=parseFloat(el.value);
+      recursos.categoriasBudget[cat]= isNaN(v)?0:v;
+    });
+  }
+
   function recRender(){
+    _recSaveCatBudgetsFromDOM();
     const d=_recEnsure();
     _recRenderKpis(d);
     _recRenderCat(d);
@@ -5020,47 +6050,126 @@
 
   function _recRenderKpis(d){
     const grid=document.getElementById('recKpiGrid'); if(!grid)return;
-    const budgetTotal=Object.values(d.categoriasBudget||{}).reduce((s,v)=>s+(parseFloat(v)||0),0);
-    const usado=d.adquirir.filter(r=>r.dataEfetivacao).reduce((s,r)=>s+(parseFloat(r.custo)||0),0);
+    const projBudget=parseFloat(projeto.budget)||0;
+    const catSum=Object.values(d.categoriasBudget||{}).reduce((s,v)=>s+(parseFloat(v)||0),0);
+    const usandoCatSum=projBudget===0 && catSum>0;
+    let budgetTotal=usandoCatSum?catSum:projBudget;
+    const usadoAcq=d.adquirir.filter(r=>r.dataEfetivacao||r.statusCompra==='adquirido').reduce((s,r)=>s+(parseFloat(r.custo)||0),0);
+    const _hoje=new Date(); _hoje.setHours(0,0,0,0);
+    const usadoPes=(projeto.pessoal||[]).reduce((s,p)=>{
+      if(!p.inicio||!p.custo)return s;
+      const meses=Math.max(1,Math.ceil((_hoje-new Date(p.inicio))/(1000*60*60*24*30.44)));
+      return s+(+(p.custo||0))*meses;
+    },0);
+    const usado=usadoAcq+usadoPes;
     const saldo=budgetTotal-usado;
     const saldoPos=saldo>=0;
+    const conflito=projBudget>0 && catSum>0 && Math.abs(projBudget-catSum)>0.01
+      && !(_recDismissedConflict && Math.abs(_recDismissedConflict.cat-catSum)<0.01 && Math.abs(_recDismissedConflict.proj-projBudget)<0.01);
+    const alertaHTML=conflito?`
+      <div style="margin-top:8px;padding:10px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#78350f">
+        <div style="font-weight:700;margin-bottom:4px">Divergência de budget detectada</div>
+        <div style="color:#92400e;margin-bottom:8px">Categoria: <b>${_brl(catSum)}</b> · Projeto: <b>${_brl(projBudget)}</b></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="_recDismissedConflict={cat:${catSum},proj:${projBudget}};agendarSalvarProjeto();_recRenderKpis(_recEnsure())" style="padding:4px 10px;background:#fef3c7;border:1px solid #fde68a;border-radius:5px;font-size:11px;cursor:pointer;color:#78350f;font-weight:600">
+            Manter budget do projeto (${_brl(projBudget)})
+          </button>
+          <button onclick="_recDismissedConflict=null;projeto.budget=${catSum};agendarSalvarProjeto();recRender()" style="padding:4px 10px;background:#2d1b69;border:none;border-radius:5px;font-size:11px;cursor:pointer;color:white;font-weight:600">
+            Usar soma das categorias (${_brl(catSum)})
+          </button>
+        </div>
+      </div>`:'';
     grid.innerHTML=
-      `<div class="rec-kpi"><div class="rec-kpi-lbl">Budget Total</div><div class="rec-kpi-val">${_brl(budgetTotal)}</div><div class="rec-kpi-hint">Soma dos budgets por categoria</div></div>`+
+      `<div class="rec-kpi" style="cursor:default">
+        <div class="rec-kpi-lbl">Budget do Projeto</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="number" id="recBudgetInput" value="${budgetTotal||''}" placeholder="0"
+            style="font-size:16px;font-weight:800;color:#1e2a4a;border:none;border-bottom:1.5px solid #c4b5fd;outline:none;background:transparent;width:100%;font-family:inherit"
+            oninput="_recDismissedConflict=null;projeto.budget=+this.value;_recRenderKpis(_recEnsure())"
+            onchange="agendarSalvarProjeto()"
+            title="Editar budget total">
+        </div>
+        <div class="rec-kpi-hint">${usandoCatSum?'Usando soma das categorias':'Budget global do projeto'}</div>
+        ${alertaHTML}
+      </div>`+
       `<div class="rec-kpi"><div class="rec-kpi-lbl">Usado</div><div class="rec-kpi-val">${_brl(usado)}</div><div class="rec-kpi-hint">Compras efetivadas</div></div>`+
       `<div class="rec-kpi ${!saldoPos?'rec-kpi-alert':''}"><div class="rec-kpi-lbl">Saldo</div><div class="rec-kpi-val ${saldoPos?'rec-kpi-green':'rec-kpi-red'}">${_brl(saldo)}</div><div class="rec-kpi-hint">${saldoPos?'Dentro do previsto':'⚠️ Acima do budget'}</div></div>`;
   }
 
+  let _recCatVisible = false;
+  let _recDismissedConflict = null;
+  function _recToggleCat() {
+    _recCatVisible = !_recCatVisible;
+    const wrap = document.getElementById('recCatWrap');
+    const btn = document.getElementById('btnRecCatToggle');
+    if (wrap) wrap.style.display = _recCatVisible ? 'block' : 'none';
+    if (btn) btn.textContent = _recCatVisible ? 'Ocultar Resumo por Categoria' : 'Exibir Resumo por Categoria';
+    if (_recCatVisible) _recRenderCat(_recEnsure());
+  }
+
   function _recRenderCat(d){
+    _recSaveCatBudgetsFromDOM();
     const tbody=document.getElementById('recCatTbody');
-    const wrap=document.getElementById('recCatWrap');
     if(!tbody)return;
-    // derive categories from adquirir items
-    const cats=[...new Set(d.adquirir.map(r=>r.categoria).filter(Boolean))].sort();
-    if(!cats.length){ if(wrap)wrap.style.display='none'; tbody.innerHTML=''; return; }
-    if(wrap)wrap.style.display='block';
-    tbody.innerHTML=cats.map(cat=>{
-      const usado=d.adquirir.filter(r=>r.categoria===cat&&r.dataEfetivacao).reduce((s,r)=>s+(parseFloat(r.custo)||0),0);
+    // union of: categories from adquirir items + manually added categories in categoriasBudget
+    const fromItems=d.adquirir.map(r=>r.categoria).filter(Boolean);
+    const fromBudget=Object.keys(d.categoriasBudget||{}).filter(k=>k!=='Pessoas');
+    const cats=[...new Set([...fromBudget,...fromItems])].sort();
+
+    // Pessoas row: usado = pessoal custo × meses até hoje (always pinned)
+    const hoje=new Date(); hoje.setHours(0,0,0,0);
+    const usadoPessoas=(projeto.pessoal||[]).reduce((s,p)=>{
+      if(!p.inicio||!p.custo)return s;
+      const meses=Math.max(1,Math.ceil((hoje-new Date(p.inicio))/(1000*60*60*24*30.44)));
+      return s+(+(p.custo||0))*meses;
+    },0);
+    const budgPessoas=parseFloat((d.categoriasBudget||{})['Pessoas'])||0;
+    const saldoPessoas=budgPessoas-usadoPessoas;
+
+    const pessoasRow=`<tr style="background:#faf5ff">
+      <td style="padding:5px 7px;font-size:11px;font-weight:700;color:#6b46c1">👥 Pessoas</td>
+      <td style="text-align:right"><input class="rec-cell rec-cell-num rec-cat-budget-input" type="number" data-cat="Pessoas" value="${budgPessoas||''}" placeholder="0"
+        title="Budget para Pessoas"
+        oninput="if(!recursos.categoriasBudget)recursos.categoriasBudget={};recursos.categoriasBudget['Pessoas']=+this.value"
+        onchange="_recRenderKpis(_recEnsure());_recSave()"
+        style="text-align:right;width:100%"></td>
+      <td style="text-align:right;padding:5px 7px;font-size:11px;font-weight:600;color:#1e2a4a">${_brl(usadoPessoas)}</td>
+      <td style="text-align:right;padding:5px 7px;font-size:11px;font-weight:700;color:${saldoPessoas>=0?'#276749':'#c53030'}">${budgPessoas>0?_brl(saldoPessoas):'—'}</td>
+      <td style="padding:2px 4px;color:#a0aec0;font-size:10px;text-align:center" title="Linha automática — calculada a partir da tabela de Pessoal">🔒</td>
+    </tr>`;
+
+    const catRows=cats.map(cat=>{
+      const usado=d.adquirir.filter(r=>r.categoria===cat&&(r.dataEfetivacao||r.statusCompra==='adquirido')).reduce((s,r)=>s+(parseFloat(r.custo)||0),0);
       const budget=parseFloat((d.categoriasBudget||{})[cat])||0;
       const saldo=budget-usado;
       const saldoPos=saldo>=0;
       return `<tr>
         <td style="padding:5px 7px;font-size:11px;font-weight:600;color:#1e2a4a">${_gesc(cat)}</td>
-        <td style="text-align:right"><input class="rec-cell rec-cell-num" type="number" value="${budget||''}" placeholder="0"
+        <td style="text-align:right"><input class="rec-cell rec-cell-num rec-cat-budget-input" type="number" data-cat="${_gesc(cat)}" value="${budget||''}" placeholder="0"
           title="Budget para '${_gesc(cat)}'"
-          onchange="if(!recursos.categoriasBudget)recursos.categoriasBudget={};recursos.categoriasBudget[${JSON.stringify(cat)}]=+this.value;recRender();_recSave()"
+          oninput="if(!recursos.categoriasBudget)recursos.categoriasBudget={};recursos.categoriasBudget[this.dataset.cat]=+this.value"
+          onchange="_recRenderKpis(_recEnsure());_recSave()"
           style="text-align:right;width:100%"></td>
         <td style="text-align:right;padding:5px 7px;font-size:11px;font-weight:600;color:#1e2a4a">${_brl(usado)}</td>
         <td style="text-align:right;padding:5px 7px;font-size:11px;font-weight:700;color:${saldoPos?'#276749':'#c53030'}">${budget>0?_brl(saldo):'—'}</td>
+        <td style="padding:2px 4px"><button onclick="recRemoverCategoria(${JSON.stringify(cat)})" style="background:none;border:none;cursor:pointer;color:#c53030;font-size:11px;padding:2px 4px" title="Remover categoria">✕</button></td>
       </tr>`;
     }).join('');
+
+    tbody.innerHTML = pessoasRow + (cats.length ? catRows : '<tr><td colspan="5" style="text-align:center;color:#a0aec0;padding:10px;font-size:12px">Nenhuma outra categoria. Clique em + Categoria para adicionar.</td></tr>');
+  }
+  function recRemoverCategoria(cat){
+    const d=_recEnsure();
+    delete d.categoriasBudget[cat];
+    _recSave(); _recRenderCat(d);
   }
 
   function _recRenderDisp(d){
     const tbody=document.getElementById('recDispTbody');
     const empty=document.getElementById('recDispEmpty');
     if(!tbody)return;
-    if(!d.disponiveis.length){ if(empty)empty.style.display='block'; tbody.innerHTML=''; return; }
     if(empty)empty.style.display='none';
+    if(!d.disponiveis.length){ tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:#a0aec0;padding:16px;font-size:12px">Nenhum recurso disponível cadastrado.</td></tr>'; return; }
     tbody.innerHTML=d.disponiveis.map((r,i)=>`<tr id="recD-${r.id}">
       <td><input class="rec-cell" value="${_gesc(r.nome)}" placeholder="Nome do recurso" onchange="recursos.disponiveis[${i}].nome=this.value;_recSave()"></td>
       <td><select class="rec-sel" onchange="recursos.disponiveis[${i}].categoria=this.value;_recSave()">${_recCatOpts(r.categoria)}</select></td>
@@ -5074,8 +6183,8 @@
     const tbody=document.getElementById('recAcqTbody');
     const empty=document.getElementById('recAcqEmpty');
     if(!tbody)return;
-    if(!d.adquirir.length){ if(empty)empty.style.display='block'; tbody.innerHTML=''; return; }
     if(empty)empty.style.display='none';
+    if(!d.adquirir.length){ tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:#a0aec0;padding:16px;font-size:12px">Nenhum recurso a adquirir cadastrado.</td></tr>'; return; }
     const today=new Date(); today.setHours(0,0,0,0);
     const statusOpts=st=>`<option value="pendente" ${st==='pendente'?'selected':''}>Pendente</option>
       <option value="solicitado" ${st==='solicitado'?'selected':''}>Solicitado</option>
@@ -5102,9 +6211,10 @@
         <td><select class="rec-sel" onchange="recursos.adquirir[${i}].categoria=this.value;recRender();_recSave()">${_recCatOpts(r.categoria)}</select></td>
         <td><input class="rec-cell rec-cell-num" type="number" value="${r.custo||''}" placeholder="0,00" style="text-align:right" onchange="recursos.adquirir[${i}].custo=+this.value;recRender();_recSave()"></td>
         <td><input class="rec-cell" type="date" value="${r.prazoCompra||''}" onchange="recursos.adquirir[${i}].prazoCompra=this.value;recRender();_recSave()"></td>
-        <td><input class="rec-cell" type="date" value="${r.dataEfetivacao||''}" onchange="recursos.adquirir[${i}].dataEfetivacao=this.value;recRender();_recSave()"></td>
-        <td><select class="rec-sel" onchange="recursos.adquirir[${i}].statusCompra=this.value;_recSave()">${statusOpts(r.statusCompra||'pendente')}</select></td>
+        <td><input class="rec-cell" type="date" value="${r.dataEfetivacao||''}" onchange="if(this.value)recursos.adquirir[${i}].statusCompra='adquirido';recursos.adquirir[${i}].dataEfetivacao=this.value;recRender();_recSave()"></td>
+        <td><select class="rec-sel" onchange="recursos.adquirir[${i}].statusCompra=this.value;recRender();_recSave()">${statusOpts(r.statusCompra||'pendente')}</select></td>
         <td style="text-align:center;padding:4px 2px">${avisoBadge}</td>
+        <td><select class="rec-sel" onchange="recursos.adquirir[${i}].tarefaId=this.value;renderCustoPorTarefa();_recSave()" style="font-size:11px;max-width:160px">${_tarefaOpts(r.tarefaId)}</select></td>
         <td><input class="rec-cell" value="${_gesc(r.fornecedor||'')}" placeholder="Fornecedor..." onchange="recursos.adquirir[${i}].fornecedor=this.value;_recSave()"></td>
         <td><input class="rec-cell" value="${_gesc(r.obs||'')}" placeholder="Observações..." onchange="recursos.adquirir[${i}].obs=this.value;_recSave()"></td>
         <td style="text-align:center"><button class="rec-attach-btn" onclick="recOpenFiles('acq',${i})">📎 ${(r.arquivos||[]).length||''}</button></td>
@@ -5115,7 +6225,16 @@
 
   // ── CRUD ───────────────────────────────────────────────────
   // categories are auto-derived from adquirir items — no add/delete needed
-  function recAddDisp(){ const d=_recEnsure(); d.disponiveis.push({id:Date.now(),nome:'',categoria:'',obs:'',arquivos:[]}); recRender(); _recSave(); setTimeout(()=>{ const tds=document.querySelectorAll('#recDispTbody tr:last-child td input'); if(tds.length)tds[0].focus(); },50); }
+  function recAdicionarCategoria(){
+    _recSaveCatBudgetsFromDOM();
+    const nome=(prompt('Nome da nova categoria:')||'').trim();
+    if(!nome) return;
+    const d=_recEnsure();
+    if(!d.categoriasBudget) d.categoriasBudget={};
+    if(!(nome in d.categoriasBudget)) d.categoriasBudget[nome]=0;
+    _recSave(); _recRenderCat(d);
+  }
+  function recAddDisp(){const d=_recEnsure(); d.disponiveis.push({id:Date.now(),nome:'',categoria:'',obs:'',arquivos:[]}); recRender(); _recSave(); setTimeout(()=>{ const tds=document.querySelectorAll('#recDispTbody tr:last-child td input'); if(tds.length)tds[0].focus(); },50); }
   function recDelDisp(i){ _recEnsure().disponiveis.splice(i,1); recRender(); _recSave(); }
   function recAddAcq(){ const d=_recEnsure(); d.adquirir.push({id:Date.now(),nome:'',categoria:'',custo:'',prazoCompra:'',dataEfetivacao:'',statusCompra:'pendente',fornecedor:'',pendencia:'',obs:'',arquivos:[]}); recRender(); _recSave(); setTimeout(()=>{ const tds=document.querySelectorAll('#recAcqTbody tr:last-child td input'); if(tds.length)tds[0].focus(); },50); }
   function recDelAcq(i){ _recEnsure().adquirir.splice(i,1); recRender(); _recSave(); }
@@ -5178,6 +6297,40 @@
     document.getElementById('recFilePop')?.remove();
   }
 
+  // ── QUALIDADE FILE UPLOAD ──────────────────────────────────
+  let _qualFileCtx = null;
+  function qualPickFile(pastaId) {
+    _qualFileCtx = pastaId;
+    const inp = document.getElementById('qualFileInput');
+    if (inp) { inp.value=''; inp.click(); }
+  }
+  function qualFileSelected(e) {
+    if (!_qualFileCtx) return;
+    const files = Array.from(e.target.files); if (!files.length) return;
+    const pastaId = _qualFileCtx;
+    const pasta = qualPastas.find(p => p.id === pastaId); if (!pasta) return;
+    pasta.arquivos = pasta.arquivos || [];
+    let done = 0;
+    files.forEach(file => {
+      const fd = new FormData(); fd.append('arquivo', file);
+      fetch('/api/uploads', { method:'POST', headers:{'Authorization':'Bearer '+localStorage.getItem('token')}, body:fd })
+        .then(r => r.json()).then(res => {
+          pasta.arquivos.push({ nome: res.nomeOriginal || file.name, url: res.url, adicionadoEm: new Date().toISOString().split('T')[0] });
+          done++; if (done === files.length) { salvarQual(); renderQualAreaPrincipal(); }
+        }).catch(() => {
+          pasta.arquivos.push({ nome: file.name, url: '#', adicionadoEm: new Date().toISOString().split('T')[0] });
+          done++; if (done === files.length) { salvarQual(); renderQualAreaPrincipal(); }
+        });
+    });
+  }
+  function qualRemoveFile(pastaId, fi) {
+    if (!confirm('Remover este arquivo?')) return;
+    const pasta = qualPastas.find(p => p.id === pastaId); if (!pasta) return;
+    pasta.arquivos = pasta.arquivos || [];
+    pasta.arquivos.splice(fi, 1);
+    salvarQual(); renderQualAreaPrincipal();
+  }
+
   // legacy compat
   function adicionarRecurso(){ recAddAcq(); }
   function renderRecursos(){ recRender(); }
@@ -5200,6 +6353,9 @@
       document.getElementById('riscoResposta').value = r.resposta || '';
       document.getElementById('riscoResponsavel').value = r.responsavel || '';
       document.getElementById('riscoStatus').value = r.status || 'Não Ocorreu';
+      document.getElementById('riscoPlanResposta').checked = r.planResposta || false;
+      const cEd = document.getElementById('riscoComentariosEditor');
+      if (cEd) cEd.innerHTML = r.comentarios || '';
       _riscoArquivosPendentes = JSON.parse(JSON.stringify(r.arquivos || []));
     } else {
       document.getElementById('riscoModalTitulo').textContent = 'Novo Risco';
@@ -5212,6 +6368,9 @@
       document.getElementById('riscoResposta').value = '';
       document.getElementById('riscoResponsavel').value = '';
       document.getElementById('riscoStatus').value = 'Não Ocorreu';
+      document.getElementById('riscoPlanResposta').checked = false;
+      const cEd = document.getElementById('riscoComentariosEditor');
+      if (cEd) cEd.innerHTML = '';
       _riscoArquivosPendentes = [];
     }
     document.getElementById('riscoFileInput').value = '';
@@ -5249,6 +6408,12 @@
     _riscoRenderArquivos();
   }
 
+  function _riscoFmtLink() {
+    const url = prompt('URL do link:');
+    if (url) document.execCommand('createLink', false, url);
+    document.getElementById('riscoComentariosEditor')?.focus();
+  }
+
   function salvarRisco() {
     const nome = document.getElementById('riscoNome').value.trim();
     if (!nome) { alert('Informe o nome do risco.'); return; }
@@ -5261,8 +6426,10 @@
       impacto:     document.getElementById('riscoImpacto').value,
       resposta:    document.getElementById('riscoResposta').value.trim(),
       responsavel: document.getElementById('riscoResponsavel').value.trim(),
-      status:      document.getElementById('riscoStatus').value,
-      arquivos:    _riscoArquivosPendentes,
+      status:       document.getElementById('riscoStatus').value,
+      planResposta: document.getElementById('riscoPlanResposta')?.checked || false,
+      comentarios:  document.getElementById('riscoComentariosEditor')?.innerHTML || '',
+      arquivos:     _riscoArquivosPendentes,
     };
     if (editId) {
       const idx = riscosDetalhados.findIndex(x => x.id == editId);
@@ -5300,7 +6467,13 @@
         <td><span style="${coresPi[r.prob]||coresPi['Médio']};padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">${r.prob||'Médio'}</span></td>
         <td><span style="${coresPi[r.impacto]||coresPi['Médio']};padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">${r.impacto||'Médio'}</span></td>
         <td style="font-size:11px">${r.responsavel||''}</td>
-        <td><span style="${coresStatus[status]||coresStatus['Não Ocorreu']};padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;white-space:nowrap">${status}</span></td>
+        <td><select onchange="_riscoStatusUpdate(${r.id},this.value)" style="font-size:11px;padding:3px 6px;border:1.5px solid #e2e8f0;border-radius:6px;outline:none;background:white;color:#4a5568;cursor:pointer">
+          <option value="Não Ocorreu" ${status==='Não Ocorreu'?'selected':''}>Não Ocorreu</option>
+          <option value="Em Monitoramento" ${status==='Em Monitoramento'?'selected':''}>Em Monitoramento</option>
+          <option value="Ocorreu" ${status==='Ocorreu'?'selected':''}>Ocorreu</option>
+          <option value="Mitigado" ${status==='Mitigado'?'selected':''}>Mitigado</option>
+          <option value="Dispensado" ${status==='Dispensado'?'selected':''}>Dispensado</option>
+        </select></td>
         <td style="white-space:nowrap">
           <button onclick="abrirModalRisco(${r.id})" style="background:#f5f0ff;border:none;border-radius:4px;cursor:pointer;padding:3px 8px;color:#6b46c1;font-size:11px;margin-right:4px">✏️</button>
           <button onclick="_riscoExcluir(${r.id})" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button>
@@ -5309,6 +6482,10 @@
     }).join('');
   }
 
+  function _riscoStatusUpdate(id, status) {
+    const r = riscosDetalhados.find(x => x.id == id);
+    if (r) { r.status = status; agendarSalvarProjeto(); }
+  }
   function _riscoExcluir(id) {
     if (!confirm('Remover este risco?')) return;
     riscosDetalhados = riscosDetalhados.filter(x => x.id != id);
@@ -5468,6 +6645,28 @@
         </div>`;
       }).join('');
     }
+    // ── Documents section ──
+    const pasta = qualPastas.find(p => p.id === qualPastaAtual);
+    const arquivos = pasta?.arquivos || [];
+    html += `<div style="margin-top:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:#2d1b69">📎 Documentos</div>
+        <button onclick="qualPickFile('${qualPastaAtual}')" style="font-size:12px;padding:6px 13px;background:#f5f0ff;color:#7c3aed;border:1.5px solid #c4b5fd;border-radius:6px;cursor:pointer;font-weight:600">+ Adicionar arquivo</button>
+      </div>`;
+    if (!arquivos.length) {
+      html += `<div style="text-align:center;padding:20px;color:#a0aec0;font-size:12px;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">Nenhum documento nesta pasta.</div>`;
+    } else {
+      html += `<div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden">`;
+      html += arquivos.map((f, fi) => `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f2f5">
+        <span style="font-size:16px">${(f.nome||'').match(/\.pdf$/i)?'📄':(f.nome||'').match(/\.(png|jpg|jpeg|gif|svg)$/i)?'🖼️':(f.nome||'').match(/\.(zip|rar|7z)$/i)?'🗜️':'📄'}</span>
+        <a href="${_gesc(f.url||'#')}" target="_blank" style="flex:1;font-size:12px;color:#2d1b69;font-weight:500;text-overflow:ellipsis;overflow:hidden;white-space:nowrap">${_gesc(f.nome||f.url)}</a>
+        <span style="font-size:11px;color:#a0aec0;flex-shrink:0">${f.adicionadoEm||''}</span>
+        <button onclick="qualRemoveFile('${qualPastaAtual}',${fi})" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:13px;padding:0 4px;flex-shrink:0" title="Remover">✕</button>
+      </div>`).join('');
+      html += `</div>`;
+    }
+    html += `</div>`;
+
     area.innerHTML = html;
   }
 
@@ -5910,7 +7109,7 @@
         document.getElementById('crMotivo').value = cr.motivo || '';
         document.getElementById('crImpacto').value = cr.impacto || '';
         document.getElementById('crData').value = cr.data || '';
-        const _crKnownCats = ['Escopo','Cronograma','Prazo','Orçamento','Qualidade','Recursos','Legal','Estratégico','Dependências','Outros'];
+        const _crKnownCats = ['Escopo','Correção','Repriorização','Prazo','Custo / Orçamento','Requisitos / Regras de negócio','Qualidade','Compliance / Legal','Recursos / Capacidade','Integrações / Dependências','Estratégia / Direcionamento','Outros'];
         const _crCatStored = cr.categoria || 'Escopo';
         if (_crKnownCats.includes(_crCatStored)) {
           document.getElementById('crCategoria').value = _crCatStored;
@@ -5967,11 +7166,32 @@
     const crDocAprovadoEl = document.getElementById('crDocAprovado');
     if (crDocAprovadoEl) crDocAprovadoEl.textContent = changeRequests.filter(c => c.docStatus === 'em_aprovacao').length;
     const lista = document.getElementById('crLista');
-    if (!changeRequests.length) { lista.innerHTML = '<div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma solicitação de mudança.</div>'; return; }
+    const fTit     = (document.getElementById('crFiltroTitulo')?.value || '').toLowerCase();
+    const fCat     = document.getElementById('crFiltroCategoria')?.value || '';
+    const fSt      = document.getElementById('crFiltroStatus')?.value || '';
+    const fSol     = (document.getElementById('crFiltroSolicitante')?.value || '').toLowerCase();
+    const fDataDe  = document.getElementById('crFiltroDataDe')?.value || '';
+    const fDataAte = document.getElementById('crFiltroDataAte')?.value || '';
+    const fMotivo  = (document.getElementById('crFiltroMotivo')?.value || '').toLowerCase();
+    const fDesc    = (document.getElementById('crFiltroDesc')?.value || '').toLowerCase();
+    const fImpacto = (document.getElementById('crFiltroImpacto')?.value || '').toLowerCase();
+    const crFiltrados = changeRequests.filter(c => {
+      if (fTit && !(c.titulo||'').toLowerCase().includes(fTit)) return false;
+      if (fCat && (c.categoria||'') !== fCat) return false;
+      if (fSt  && (c.docStatus||'rascunho') !== fSt) return false;
+      if (fSol && !(c.solicitante||'').toLowerCase().includes(fSol)) return false;
+      if (fDataDe  && (c.data||'') < fDataDe)  return false;
+      if (fDataAte && (c.data||'') > fDataAte)  return false;
+      if (fMotivo  && !(c.motivo||'').toLowerCase().includes(fMotivo))   return false;
+      if (fDesc    && !(c.descricao||'').toLowerCase().includes(fDesc))  return false;
+      if (fImpacto && !(c.impacto||'').toLowerCase().includes(fImpacto)) return false;
+      return true;
+    });
+    if (!crFiltrados.length) { lista.innerHTML = '<div style="text-align:center;padding:40px;color:#a0aec0;font-size:13px">Nenhuma solicitação encontrada.</div>'; return; }
     // Unified single status: docStatus drives everything
     const dsCor  = { rascunho:'background:#edf2f7;color:#4a5568', em_aprovacao:'background:#ebf4ff;color:#2b6cb0', aprovado:'background:#c6f6d5;color:#276749', reprovado:'background:#fff5f5;color:#c53030', dispensado:'background:#fffaf0;color:#744210' };
     const dsLabel = { rascunho:'📝 Rascunho', em_aprovacao:'⏳ Aguardando Aprovação', aprovado:'✅ Aprovado', reprovado:'✗ Reprovado', dispensado:'🚫 Dispensado' };
-    lista.innerHTML = changeRequests.map(cr => {
+    lista.innerHTML = crFiltrados.map(cr => {
       const ds = cr.docStatus || 'rascunho';
       const isAprovado = ds === 'aprovado';
       const isDispensado = ds === 'dispensado';
@@ -6017,6 +7237,18 @@
         ${histHtml}
       </div>`;
     }).join('');
+  }
+  function _crToggleFiltros() {
+    const panel = document.getElementById('crFiltrosPanel');
+    const btn = document.getElementById('crBtnMaisFiltros');
+    if (!panel) return;
+    const open = panel.style.display === 'none';
+    panel.style.display = open ? '' : 'none';
+    if (btn) { btn.style.borderColor = open ? '#2d1b69' : ''; btn.style.color = open ? '#2d1b69' : ''; }
+  }
+  function limparFiltrosCR() {
+    ['crFiltroTitulo','crFiltroCategoria','crFiltroStatus','crFiltroSolicitante','crFiltroDataDe','crFiltroDataAte','crFiltroMotivo','crFiltroDesc','crFiltroImpacto'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    renderCRs();
   }
   function enviarCRAprovacao(id) { _abrirUserPickerAprov('cr', id); }
   function aprovarCRDoc(id) {
@@ -6156,7 +7388,7 @@
     const secWrap=document.getElementById('btnAddSecaoTermoEncWrap');
     if(secWrap) secWrap.style.display=termoEncEditando?'':'none';
     const btn=document.getElementById('btnEditarTermoEnc');
-    if(btn) btn.textContent=termoEncEditando?'💾 Salvar':'✏️ Editar';
+    if(btn) btn.textContent=termoEncEditando?'✓ Concluir':'✏️ Editar';
     // Show/hide sec-del-btn on fixed sections
     document.querySelectorAll('#termoEncDocumento .tap-section[data-sec-key]').forEach(el => el.classList.toggle('editando', termoEncEditando));
     if(!termoEncEditando){ _salvarTermoEnc(); _renderSecaoRestaurarBar('tenc'); }
@@ -6321,6 +7553,9 @@
       projeto.cronogramaVersoes = _cronVersoes;
       projeto.recursos = recursos;
       projeto.riscos = riscosDetalhados;
+      // New data
+      projeto.pessoal = projeto.pessoal || [];
+      projeto.equipeClientes = projeto.equipeClientes || [];
       projeto.qualidade = { checklists: qualidade };
       projeto.ecPastas = ecPastas;
       projeto.ecMateriais = ecMateriais;
@@ -6347,6 +7582,483 @@
   function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
   document.querySelectorAll('.modal-overlay').forEach(m => { m.addEventListener('click', e => { if (e.target===m) m.classList.remove('aberto'); }); });
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href='/'; }
+
+  // ===== DASHBOARD =====
+  function renderDashboard() {
+    const el = document.getElementById('dashboardContent');
+    if (!el) return;
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const fmtR = v => 'R$ ' + (+(v||0)).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+    const pct = (a,b) => b > 0 ? Math.round(a/b*100) : 0;
+
+    // ── 1. PRAZO ──
+    const tasks = cronograma || [];
+    const total = tasks.length;
+    const doneAll = tasks.filter(t => +(t.pct||0) === 100);
+    // Performance: concluídas no prazo / total concluídas
+    const onTime = doneAll.filter(t => t.fimReal && t.fim && new Date(t.fimReal) <= new Date(t.fim));
+    const perfPrazo = doneAll.length ? Math.round(onTime.length / doneAll.length * 100) : null;
+    // Real x Planejado
+    const realTodayPct = total ? pct(tasks.filter(t=>t.fimReal && new Date(t.fimReal)<today).length, total) : null;
+    const planTodayPct = total ? pct(tasks.filter(t=>t.fim && new Date(t.fim)<today).length, total) : null;
+    // Desvio: avg delay only for tasks where fimReal > fim (actually late)
+    const atrasadas = tasks.filter(t=>t.fimReal && t.fim && new Date(t.fimReal)>new Date(t.fim));
+    const avgDesvio = atrasadas.length
+      ? Math.round(atrasadas.reduce((s,t)=>s+(new Date(t.fimReal)-new Date(t.fim))/86400000,0)/atrasadas.length)
+      : null;
+
+    // ── 2. CUSTO ──
+    // Budget: use same fallback logic as the recursos screen
+    const projBudget = parseFloat(projeto.budget)||0;
+    const catSum = Object.values((recursos&&recursos.categoriasBudget)||{}).reduce((s,v)=>s+(parseFloat(v)||0),0);
+    const budget = (projBudget===0 && catSum>0) ? catSum : projBudget;
+
+    const pessoalList = projeto.pessoal || [];
+    const acqList = (recursos&&recursos.adquirir)||[];
+
+    // COMPROMETIDO: todos os valores cadastrados (sem filtro de status)
+    // pessoal: custo × meses(inicio→fim), fim ausente usa hoje
+    const compAcq = acqList.reduce((s,r)=>s+(+(r.custo||0)),0);
+    const compPessoal = pessoalList.reduce((s,p) => {
+      if (!p.inicio || !p.custo) return s;
+      const ini = new Date(p.inicio);
+      const fim = p.fim ? new Date(p.fim) : today;
+      const meses = Math.max(1, Math.ceil((fim - ini) / (1000*60*60*24*30.44)));
+      return s + +(p.custo||0) * meses;
+    }, 0);
+    const comprometido = compAcq + compPessoal;
+    const compPct = budget ? pct(comprometido, budget) : null;
+
+    // AC: aquisições (adquirido OU dataEfetivacao preenchida) + pessoal mensal até hoje
+    const acAcq = acqList.filter(r=>r.statusCompra==='adquirido'||r.dataEfetivacao)
+      .reduce((s,r)=>s+(+(r.custo||0)),0);
+    const acPessoal = pessoalList.reduce((s,p) => {
+      if (!p.inicio || !p.custo) return s;
+      const ini = new Date(p.inicio);
+      const meses = Math.max(1, Math.ceil((today - ini) / (1000*60*60*24*30.44)));
+      return s + +(p.custo||0) * meses;
+    }, 0);
+    const ac = acAcq + acPessoal;
+    const acPct = budget ? pct(ac, budget) : null;
+
+    // Real x Planejado custo:
+    // Real = mesmo AC (adquirido/efetivado + pessoal × meses até hoje)
+    const realHojePct = acPct;
+    // Planned = aquisições com prazoCompra < hoje + pessoal com inicio < hoje (× meses até hoje)
+    const plannedAcqHoje = acqList.filter(r=>r.prazoCompra && new Date(r.prazoCompra)<today)
+      .reduce((s,r)=>s+(+(r.custo||0)),0);
+    const plannedPessoalHoje = pessoalList.reduce((s,p) => {
+      if (!p.inicio || !p.custo || new Date(p.inicio)>=today) return s;
+      const meses = Math.max(1, Math.ceil((today - new Date(p.inicio)) / (1000*60*60*24*30.44)));
+      return s + +(p.custo||0) * meses;
+    }, 0);
+    const plannedHojePct = budget ? pct(plannedAcqHoje + plannedPessoalHoje, budget) : null;
+
+    // ── 3. ESCOPO ──
+    const crs = changeRequests || [];
+    const crsSol = crs.length;
+    const crsEscopoAprov = crs.filter(c=>c.categoria==='Escopo'&&c.docStatus==='aprovado').length;
+    const escopoPct = total ? pct(doneAll.length, total) : null;
+
+    // ── 4. RISCO ──
+    const riscos = riscosDetalhados || [];
+    const ativosR = riscos.filter(r=>r.status!=='Ocorreu'&&r.status!=='Dispensado');
+    const riscosAtivos = ativosR.length;
+    const riscosCriticos = ativosR.filter(r=>r.tipo!=='Positivo'&&['Alto','Muito Alto'].includes(r.prob)&&['Alto','Médio','Muito Alto'].includes(r.impacto)).length;
+    const comPlano = riscos.filter(r=>r.planResposta).length;
+    const taxaMit = riscos.length ? pct(comPlano, riscos.length) : null;
+
+    // ── 5. SATISFAÇÃO ──
+    const equipeC = projeto.equipeClientes || [];
+    const internos = equipeC.filter(p=>p.tipo==='Interno');
+    const externos = equipeC.filter(p=>p.tipo==='Externo');
+    // Turnover: all inactive internals (ativo===false), not date-filtered
+    const inatInternos = internos.filter(p=>p.ativo===false||p.ativo==='false').length;
+    const turnover = internos.length ? Math.round(inatInternos/internos.length*100) : null;
+    const notasInt = internos.flatMap(p=>(p.pesquisas||[]).map(s=>+s.nota));
+    const notasExt = externos.flatMap(p=>(p.pesquisas||[]).map(s=>+s.nota));
+    const satInt = notasInt.length ? (notasInt.reduce((a,b)=>a+b,0)/notasInt.length).toFixed(1) : null;
+    const satExt = notasExt.length ? (notasExt.reduce((a,b)=>a+b,0)/notasExt.length).toFixed(1) : null;
+
+    // ── HELPERS ──
+    const clr = (v,ok,warn) => v==null?'#a0aec0':v>=ok?'#38a169':v>=warn?'#d69e2e':'#e53e3e';
+    const clrInv = (v,bad,warn) => v==null?'#a0aec0':v<=bad?'#38a169':v<=warn?'#d69e2e':'#e53e3e';
+    const star = v => v==null?'—':'★'.repeat(Math.round(+v))+'☆'.repeat(5-Math.round(+v))+` ${v}`;
+
+    // KPI card with hover tooltip (no title attr — uses CSS hover)
+    const kpi = (label, val, formula, color) => `
+      <div style="position:relative;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:16px 18px 14px;border-left:4px solid ${color}">
+        <div class="dash-info-wrap" style="position:absolute;top:8px;right:8px">
+          <div class="dash-info-icon" style="width:18px;height:18px;border-radius:50%;background:#edf2f7;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#a0aec0;cursor:default;line-height:1;user-select:none">i</div>
+          <div class="dash-info-tip" style="display:none;position:absolute;right:0;top:24px;background:#1e2a4a;color:white;border-radius:8px;padding:10px 12px;font-size:11px;width:230px;z-index:200;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,.25)">${formula}</div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-right:26px">${label}</div>
+        <div style="font-size:26px;font-weight:800;color:${color};line-height:1">${val}</div>
+      </div>`;
+
+    const sec = (icon, title, cards) => `
+      <div style="margin-bottom:24px">
+        <div style="font-size:13px;font-weight:700;color:#1e2a4a;margin-bottom:10px;display:flex;align-items:center;gap:6px;border-bottom:2px solid #e2e8f0;padding-bottom:6px">${icon} ${title}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${cards}</div>
+      </div>`;
+
+    el.innerHTML = `
+      <style>
+        .dash-info-wrap:hover .dash-info-icon{background:#6b46c1;color:white}
+        .dash-info-wrap:hover .dash-info-tip{display:block !important}
+      </style>
+      <div style="padding:4px 0">
+        <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:15px;font-weight:700;color:#1e2a4a">📊 Dashboard do Projeto</div>
+          <div style="font-size:11px;color:#a0aec0">Atualizado em ${today.toLocaleDateString('pt-BR')}</div>
+        </div>
+        ${total===0?'<div style="text-align:center;padding:40px;color:#a0aec0;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)">Adicione tarefas ao cronograma para ver os indicadores.</div>':''}
+        ${sec('⏱️','Prazo',
+          kpi('Tarefas Concluídas no Prazo',perfPrazo!=null?perfPrazo+'%':'—','Tarefas concluídas no prazo ÷ Total de tarefas concluídas × 100. Uma tarefa está no prazo quando a Data Fim Real ≤ Data Fim Planejada.',clr(perfPrazo,80,50)) +
+          kpi('Real x Planejado',realTodayPct!=null?`${realTodayPct}% / ${planTodayPct}%`:'—','% de tarefas com Data Fim Real antes de hoje | % de tarefas com Data Fim Planejada antes de hoje.',clr(realTodayPct,planTodayPct-5,planTodayPct-20)) +
+          kpi('Atraso Médio',avgDesvio!=null?`+${avgDesvio} dias`:'0 dias','Média de dias de atraso das tarefas concluídas fora do prazo: Σ(Data Fim Real − Data Fim Planejada) ÷ nº de tarefas com atraso. Considera apenas tarefas onde Fim Real > Fim Planejado.',clrInv(avgDesvio??0,0,3))
+        )}
+        ${sec('💰','Custo',
+          kpi('Volume do Orçamento já Comprometido',compPct!=null?compPct+'%':'—','Σ todos os valores da tabela de Aquisições + Σ Pessoal (custo × meses entre Início e Fim; sem Fim usa hoje). Representa tudo comprometido independente de status.',compPct!=null?clrInv(compPct,80,100):'#a0aec0') +
+          kpi('Real x Planejado (%)',realHojePct!=null?`${realHojePct}% / ${plannedHojePct??'—'}%`:'—','Real: AC ÷ orçamento (aquisições adquiridas/efetivadas + pessoal × meses até hoje). Planejado: (aquisições com Prazo < hoje + pessoal com Início < hoje × meses até hoje) ÷ orçamento.',realHojePct!=null?clr(realHojePct,(plannedHojePct??0)-5,(plannedHojePct??0)-20):'#a0aec0') +
+          kpi('Real x Planejado (R$)',budget?`${fmtR(ac)} / ${fmtR(plannedAcqHoje+plannedPessoalHoje)}`:'—','Real: Σ aquisições adquiridas/efetivadas + pessoal × meses até hoje. Planejado: Σ aquisições com Prazo < hoje + pessoal com Início < hoje × meses até hoje.',budget?clrInv(acPct??0,80,100):'#a0aec0')
+        )}
+        ${sec('🎯','Escopo',
+          kpi('Tarefas Concluídas',escopoPct!=null?escopoPct+'%':'—','Tarefas concluídas (100%) ÷ Total de tarefas × 100.',clr(escopoPct,80,50)) +
+          kpi('Mudanças de Escopo Solicitadas',crs.filter(c=>c.categoria==='Escopo').length,'Total de change requests com categoria "Escopo", independente de status.',clrInv(crs.filter(c=>c.categoria==='Escopo').length,3,6)) +
+          kpi('Mudanças de Escopo Aprovadas',crsEscopoAprov,'Change requests com Categoria = "Escopo" E status = aprovado.',clrInv(crsEscopoAprov,2,4))
+        )}
+        ${sec('⚠️','Risco',
+          kpi('Riscos Ativos',riscosAtivos,'Riscos com status diferente de "Ocorreu" e "Dispensado".',clrInv(riscosAtivos,2,5)) +
+          kpi('Riscos Críticos Ativos',riscosCriticos,'Riscos ativos, do tipo Negativo, com Probabilidade Alta ou Muito Alta, e Impacto Médio, Alto ou Muito Alto.',clrInv(riscosCriticos,0,2)) +
+          kpi('Taxa de Mitigação',taxaMit!=null?taxaMit+'%':'—','Riscos com "Há Plano de Resposta?" marcado ÷ Total de riscos × 100.',taxaMit!=null?clr(taxaMit,70,40):'#a0aec0')
+        )}
+        ${sec('👥','Satisfação e Engajamento',
+          kpi('Turnover no Projeto',turnover!=null?turnover+'%':'—','Membros internos inativos (campo Ativo = Não) ÷ Total de membros internos × 100.',turnover!=null?clrInv(turnover,5,15):'#a0aec0') +
+          kpi('Satisfação da Equipe',satInt!=null?star(satInt):'—','Média das notas das pesquisas de satisfação registradas para membros do tipo Interno.',satInt!=null?clr(+satInt,4,3):'#a0aec0') +
+          kpi('Satisfação Externa',satExt!=null?star(satExt):'—','Média das notas das pesquisas de satisfação registradas para membros do tipo Externo.',satExt!=null?clr(+satExt,4,3):'#a0aec0')
+        )}
+      </div>`;
+  }
+
+  // ===== PESSOAL (Recursos) =====
+  function _tarefaOpts(selId) {
+    const tasks = cronograma || [];
+    const opts = tasks.filter(t=>t.nome).map(t=>`<option value="${t.id}" ${t.id==selId?'selected':''}>${_gesc?_gesc(t.nome):t.nome}</option>`).join('');
+    return `<option value="">— nenhuma —</option>${opts}`;
+  }
+  function renderPessoal() {
+    const list = projeto.pessoal || [];
+    const tbody = document.getElementById('pessoalTbody');
+    const empty = document.getElementById('pessoalEmpty');
+    if (!tbody) return;
+    empty.style.display = list.length ? 'none' : 'block';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const fmt = v => 'R$ '+(+(v||0)).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+    tbody.innerHTML = list.map((p,i) => {
+      const ini = p.inicio ? new Date(p.inicio) : today;
+      const fim = p.fim ? new Date(p.fim) : today;
+      const meses = Math.max(1, Math.ceil((fim - ini) / (1000*60*60*24*30.44)));
+      const total = +(p.custo||0) * meses;
+      return `<tr>
+        <td><input value="${p.nome||''}" onchange="pessoalUpd(${i},'nome',this.value)" style="border:none;outline:none;width:100%;font-size:12px;background:transparent"></td>
+        <td><input value="${p.papel||''}" onchange="pessoalUpd(${i},'papel',this.value)" style="border:none;outline:none;width:100%;font-size:12px;background:transparent"></td>
+        <td style="text-align:right"><input type="number" value="${p.custo||0}" onchange="pessoalUpd(${i},'custo',+this.value)" style="border:none;outline:none;width:80px;text-align:right;font-size:12px;background:transparent"></td>
+        <td><input type="date" value="${p.inicio||''}" onchange="pessoalUpd(${i},'inicio',this.value)" style="border:none;outline:none;font-size:11px;background:transparent"></td>
+        <td><input type="date" value="${p.fim||''}" onchange="pessoalUpd(${i},'fim',this.value)" style="border:none;outline:none;font-size:11px;background:transparent"></td>
+        <td><select onchange="pessoalUpd(${i},'tarefaId',this.value)" style="border:none;outline:none;font-size:11px;background:transparent;width:100%;max-width:160px">${_tarefaOpts(p.tarefaId)}</select></td>
+        <td style="text-align:right;font-size:12px;color:#6b46c1;font-weight:600">${fmt(total)}</td>
+        <td><button onclick="pessoalDel(${i})" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:3px 7px;color:#c53030;font-size:11px">✕</button></td>
+      </tr>`;
+    }).join('');
+    renderCustoPorTarefa();
+  }
+  function renderCustoPorTarefa() {
+    const wrap = document.getElementById('custoPorTarefaWrap');
+    const body = document.getElementById('custoPorTarefaBody');
+    if (!wrap || !body) return;
+    const pessoal = projeto.pessoal || [];
+    const acq = (recursos && recursos.adquirir) || [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    const fmt = v => v ? 'R$ '+(+(v||0)).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : '—';
+
+    const hasTarefa = pessoal.some(p=>p.tarefaId) || acq.some(r=>r.tarefaId);
+    if (!hasTarefa) { wrap.style.display='none'; return; }
+    wrap.style.display='block';
+
+    const tasks = cronograma || [];
+    const taskMap = Object.fromEntries(tasks.map(t=>[String(t.id), t.nome||'(sem nome)']));
+
+    // All groups: one per tarefaId + "(Sem tarefa)" for unassigned
+    const ids = [...new Set([
+      ...pessoal.filter(p=>p.tarefaId).map(p=>String(p.tarefaId)),
+      ...acq.filter(r=>r.tarefaId).map(r=>String(r.tarefaId))
+    ])];
+
+    const calcRow = (pesItems, acqItems) => {
+      // Pessoas Planj: inicio < today, custo × meses(ini→today)
+      const pesPlan = pesItems.reduce((s,p)=>{
+        if(!p.inicio||!p.custo||new Date(p.inicio)>=today) return s;
+        return s+(+(p.custo))*Math.max(1,Math.ceil((today-new Date(p.inicio))/(1000*60*60*24*30.44)));
+      },0);
+      // Pessoas Real: custo × meses(ini→today) regardless of ini date
+      const pesReal = pesItems.reduce((s,p)=>{
+        if(!p.inicio||!p.custo) return s;
+        return s+(+(p.custo))*Math.max(1,Math.ceil((today-new Date(p.inicio))/(1000*60*60*24*30.44)));
+      },0);
+      // Recursos Planj: prazoCompra < today
+      const acqPlan = acqItems.filter(r=>r.prazoCompra&&new Date(r.prazoCompra)<today)
+        .reduce((s,r)=>s+(+(r.custo||0)),0);
+      // Recursos Real: adquirido OR dataEfetivacao (same as AC)
+      const acqReal = acqItems.filter(r=>r.statusCompra==='adquirido'||r.dataEfetivacao)
+        .reduce((s,r)=>s+(+(r.custo||0)),0);
+      return { pesPlan, pesReal, acqPlan, acqReal };
+    };
+
+    let totPesPlan=0, totPesReal=0, totAcqPlan=0, totAcqReal=0;
+
+    const rows = [
+      ...ids.map(tid => {
+        const pesItems = pessoal.filter(p=>String(p.tarefaId)===tid);
+        const acqItems = acq.filter(r=>String(r.tarefaId)===tid);
+        const c = calcRow(pesItems, acqItems);
+        totPesPlan+=c.pesPlan; totPesReal+=c.pesReal; totAcqPlan+=c.acqPlan; totAcqReal+=c.acqReal;
+        const nome = taskMap[tid]||'Tarefa #'+tid;
+        return `<tr>
+          <td style="font-size:12px;font-weight:600;color:#1e2a4a">${nome}</td>
+          <td style="text-align:right;font-size:11px;color:#718096">${fmt(c.pesPlan)}</td>
+          <td style="text-align:right;font-size:11px;color:#2d3748">${fmt(c.pesReal)}</td>
+          <td style="text-align:right;font-size:11px;color:#718096">${fmt(c.acqPlan)}</td>
+          <td style="text-align:right;font-size:11px;color:#2d3748">${fmt(c.acqReal)}</td>
+          <td style="text-align:right;font-size:12px;font-weight:700;color:#6b46c1">${fmt(c.pesPlan+c.acqPlan)}</td>
+          <td style="text-align:right;font-size:12px;font-weight:700;color:#276749">${fmt(c.pesReal+c.acqReal)}</td>
+        </tr>`;
+      }),
+      // Sem tarefa row
+      (()=>{
+        const pesItems = pessoal.filter(p=>!p.tarefaId);
+        const acqItems = acq.filter(r=>!r.tarefaId);
+        if(!pesItems.length&&!acqItems.length) return '';
+        const c = calcRow(pesItems, acqItems);
+        totPesPlan+=c.pesPlan; totPesReal+=c.pesReal; totAcqPlan+=c.acqPlan; totAcqReal+=c.acqReal;
+        return `<tr style="background:#f8fafc">
+          <td style="font-size:12px;color:#a0aec0;font-style:italic">— Sem tarefa</td>
+          <td style="text-align:right;font-size:11px;color:#718096">${fmt(c.pesPlan)}</td>
+          <td style="text-align:right;font-size:11px;color:#2d3748">${fmt(c.pesReal)}</td>
+          <td style="text-align:right;font-size:11px;color:#718096">${fmt(c.acqPlan)}</td>
+          <td style="text-align:right;font-size:11px;color:#2d3748">${fmt(c.acqReal)}</td>
+          <td style="text-align:right;font-size:12px;font-weight:700;color:#6b46c1">${fmt(c.pesPlan+c.acqPlan)}</td>
+          <td style="text-align:right;font-size:12px;font-weight:700;color:#276749">${fmt(c.pesReal+c.acqReal)}</td>
+        </tr>`;
+      })()
+    ].join('');
+
+    body.innerHTML = `<table class="rec-tbl" style="width:100%">
+      <thead>
+        <tr style="background:#f7fafc">
+          <th rowspan="2" style="vertical-align:bottom">Tarefa</th>
+          <th colspan="2" style="text-align:center;border-bottom:1px solid #e2e8f0;font-size:10px;padding-bottom:3px">👥 Pessoas</th>
+          <th colspan="2" style="text-align:center;border-bottom:1px solid #e2e8f0;font-size:10px;padding-bottom:3px">📦 Recursos</th>
+          <th rowspan="2" style="text-align:right;vertical-align:bottom;width:110px">Total Planj.</th>
+          <th rowspan="2" style="text-align:right;vertical-align:bottom;width:110px">Total Real</th>
+        </tr>
+        <tr style="background:#f7fafc">
+          <th style="text-align:right;width:100px;font-weight:500;color:#718096">Planj.</th>
+          <th style="text-align:right;width:100px;font-weight:500;color:#2d3748">Real</th>
+          <th style="text-align:right;width:100px;font-weight:500;color:#718096">Planj.</th>
+          <th style="text-align:right;width:100px;font-weight:500;color:#2d3748">Real</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+      <tfoot>
+        <tr style="background:#edf2f7;font-weight:700">
+          <td style="font-size:12px;color:#1e2a4a">Total</td>
+          <td style="text-align:right;font-size:11px;color:#718096">${fmt(totPesPlan)}</td>
+          <td style="text-align:right;font-size:11px;color:#2d3748">${fmt(totPesReal)}</td>
+          <td style="text-align:right;font-size:11px;color:#718096">${fmt(totAcqPlan)}</td>
+          <td style="text-align:right;font-size:11px;color:#2d3748">${fmt(totAcqReal)}</td>
+          <td style="text-align:right;font-size:12px;color:#6b46c1">${fmt(totPesPlan+totAcqPlan)}</td>
+          <td style="text-align:right;font-size:12px;color:#276749">${fmt(totPesReal+totAcqReal)}</td>
+        </tr>
+      </tfoot>
+    </table>`;
+  }
+  function pessoalAdd() {
+    if (!projeto.pessoal) projeto.pessoal = [];
+    projeto.pessoal.push({ nome:'', papel:'', custo:0, inicio:'', fim:'', tarefaId:'' });
+    renderPessoal(); agendarSalvarProjeto();
+  }
+  function pessoalUpd(i, field, val) {
+    if (projeto.pessoal[i]) { projeto.pessoal[i][field] = val; renderPessoal(); agendarSalvarProjeto(); }
+  }
+  function pessoalDel(i) {
+    projeto.pessoal.splice(i,1); renderPessoal(); agendarSalvarProjeto();
+  }
+
+  // ===== EQUIPE E CLIENTES =====
+  function renderEquipeClientes() {
+    const list = projeto.equipeClientes || [];
+    const kpisEl = document.getElementById('ecKpis');
+    const listaEl = document.getElementById('ecLista');
+    const emptyEl = document.getElementById('ecEmpty');
+    if (!listaEl) return;
+
+    const internos = list.filter(p=>p.tipo==='Interno');
+    const externos = list.filter(p=>p.tipo==='Externo');
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const thisM = hoje.getFullYear()*100+hoje.getMonth();
+    const inatMes = internos.filter(p=>{
+      if(!p.dataInativacao)return false;
+      const d=new Date(p.dataInativacao);
+      return d.getFullYear()*100+d.getMonth()===thisM;
+    }).length;
+    const notasInt = internos.flatMap(p=>(p.pesquisas||[]).map(s=>+s.nota));
+    const notasExt = externos.flatMap(p=>(p.pesquisas||[]).map(s=>+s.nota));
+    const satInt = notasInt.length ? (notasInt.reduce((a,b)=>a+b,0)/notasInt.length).toFixed(1) : '—';
+    const satExt = notasExt.length ? (notasExt.reduce((a,b)=>a+b,0)/notasExt.length).toFixed(1) : '—';
+
+    if (kpisEl) kpisEl.innerHTML = [
+      ['👤 Membros Internos', internos.length, '#6b46c1'],
+      ['🌐 Membros Externos', externos.length, '#3182ce'],
+    ].map(([l,v,c])=>`<div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:14px 16px;border-left:4px solid ${c}">
+      <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">${l}</div>
+      <div style="font-size:22px;font-weight:800;color:${c}">${v}</div>
+    </div>`).join('');
+
+    // Apply filters
+    const fNome   = (document.getElementById('ecFiltroNome')?.value||'').trim().toLowerCase();
+    const fPapel  = (document.getElementById('ecFiltroPapel')?.value||'').trim().toLowerCase();
+    const fTipo   = document.getElementById('ecFiltroTipo')?.value||'';
+    const fStatus = document.getElementById('ecFiltroStatus')?.value||'';
+    const filtered = list.filter(p => {
+      if (fNome   && !(p.nome||'').toLowerCase().includes(fNome))   return false;
+      if (fPapel  && !(p.papel||'').toLowerCase().includes(fPapel)) return false;
+      if (fTipo   && p.tipo !== fTipo)                               return false;
+      const ativo = p.ativo !== false && p.ativo !== 'false';
+      if (fStatus === 'ativo'   && !ativo)  return false;
+      if (fStatus === 'inativo' &&  ativo)  return false;
+      return true;
+    });
+
+    emptyEl.style.display = filtered.length ? 'none' : 'block';
+    listaEl.innerHTML = filtered.map((p,i) => {
+      const i_orig = list.indexOf(p);
+      const ativo = p.ativo!==false && p.ativo!=='false';
+      const pesquisas = p.pesquisas || [];
+      const notasP = pesquisas.map(s=>+s.nota);
+      const avgP = notasP.length ? (notasP.reduce((a,b)=>a+b,0)/notasP.length).toFixed(1) : null;
+      const stars = n => n==null?'' : '★'.repeat(Math.round(+n))+'☆'.repeat(5-Math.round(+n))+` (${n})`;
+      const tipoClr = p.tipo==='Externo' ? ['#ebf8ff','#2b6cb0'] : ['#f5f0ff','#6b46c1'];
+      return `<div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:14px 18px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+              <span style="font-weight:700;font-size:14px;color:#1e2a4a">${p.nome||'(sem nome)'}</span>
+              ${p.tipo?`<span style="background:${tipoClr[0]};color:${tipoClr[1]};font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">${p.tipo}</span>`:''}
+              ${p.papel?`<span style="background:#f7fafc;color:#4a5568;font-size:10px;padding:2px 8px;border-radius:4px;border:1px solid #e2e8f0">${p.papel}</span>`:''}
+              ${!ativo?'<span style="background:#fff5f5;color:#c53030;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px">INATIVO</span>':''}
+            </div>
+            <div style="font-size:12px;color:#718096;display:flex;gap:16px;flex-wrap:wrap">
+              ${p.email?`<span>✉️ ${p.email}</span>`:''}
+              ${p.telefone?`<span>📞 ${p.telefone}</span>`:''}
+              ${!ativo&&p.dataInativacao?`<span>Inativado em ${new Date(p.dataInativacao).toLocaleDateString('pt-BR')}</span>`:''}
+            </div>
+            ${avgP!=null?`<div style="font-size:12px;color:#d69e2e;margin-top:4px">⭐ ${stars(avgP)} — ${notasP.length} avaliação(ões)</div>`:''}
+            ${pesquisas.length?`<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${pesquisas.slice(-3).reverse().map(s=>`<span style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:3px 8px;font-size:11px;color:#4a5568">⭐ ${'★'.repeat(+s.nota)} ${s.descricao||''} <span style="color:#a0aec0">${s.data?new Date(s.data).toLocaleDateString('pt-BR'):''}</span> <button onclick="pesqDel(${i_orig},${s.id})" style="background:none;border:none;cursor:pointer;color:#e53e3e;font-size:10px;padding:0 2px">✕</button></span>`).join('')}</div>`:''}
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button onclick="pesqAbrirModal(${i_orig})" style="background:#fffbeb;border:1.5px solid #f6e05e;border-radius:6px;cursor:pointer;padding:5px 10px;color:#b7791f;font-size:11px;font-weight:600">⭐ Avaliar</button>
+            <button onclick="ecAbrirModal(${i_orig})" style="background:#f5f0ff;border:none;border-radius:6px;cursor:pointer;padding:5px 10px;color:#6b46c1;font-size:11px">✏️</button>
+            <button onclick="ecDel(${i_orig})" style="background:#fff5f5;border:none;border-radius:6px;cursor:pointer;padding:5px 9px;color:#c53030;font-size:11px">✕</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  function ecAbrirModal(idx) {
+    const p = idx!=null ? (projeto.equipeClientes||[])[idx] : null;
+    document.getElementById('ecModalTitulo').textContent = p ? 'Editar Pessoa' : 'Nova Pessoa';
+    document.getElementById('ecEditId').value = idx!=null ? idx : '';
+    document.getElementById('ecNome').value = p?.nome||'';
+    document.getElementById('ecTipo').value = p?.tipo||'Interno';
+    document.getElementById('ecPapel').value = p?.papel||'';
+    document.getElementById('ecEmail').value = p?.email||'';
+    document.getElementById('ecTelefone').value = p?.telefone||'';
+    document.getElementById('ecAtivo').value = String(p?.ativo!==false&&p?.ativo!=='false'?true:false);
+    document.getElementById('ecDataInativacao').value = p?.dataInativacao||'';
+    document.getElementById('ecObs').value = p?.obs||'';
+    document.getElementById('modalEC').classList.add('aberto');
+    setTimeout(()=>document.getElementById('ecNome').focus(),60);
+  }
+  function ecSalvar() {
+    if (!projeto.equipeClientes) projeto.equipeClientes = [];
+    const idx = document.getElementById('ecEditId').value;
+    const dados = {
+      nome: document.getElementById('ecNome').value.trim(),
+      tipo: document.getElementById('ecTipo').value,
+      papel: document.getElementById('ecPapel').value.trim(),
+      email: document.getElementById('ecEmail').value.trim(),
+      telefone: document.getElementById('ecTelefone').value.trim(),
+      ativo: document.getElementById('ecAtivo').value === 'true',
+      dataInativacao: document.getElementById('ecDataInativacao').value,
+      obs: document.getElementById('ecObs').value.trim(),
+    };
+    if (!dados.nome) { alert('Informe o nome.'); return; }
+    if (idx !== '') {
+      Object.assign(projeto.equipeClientes[+idx], dados);
+    } else {
+      projeto.equipeClientes.push({ id: Date.now(), pesquisas: [], ...dados });
+    }
+    fecharModal('modalEC');
+    renderEquipeClientes(); renderDashboard(); agendarSalvarProjeto();
+  }
+  function ecDel(i) {
+    if (!confirm('Remover esta pessoa?')) return;
+    projeto.equipeClientes.splice(i,1);
+    renderEquipeClientes(); renderDashboard(); agendarSalvarProjeto();
+  }
+
+  // ===== PESQUISAS DE SATISFAÇÃO =====
+  let _pesqIdx = null;
+  function pesqAbrirModal(personIdx) {
+    _pesqIdx = personIdx;
+    const p = (projeto.equipeClientes||[])[personIdx];
+    document.getElementById('pesqNomePessoa').textContent = p?.nome || '—';
+    document.getElementById('pesqData').value = new Date().toISOString().split('T')[0];
+    document.getElementById('pesqDescricao').value = '';
+    document.getElementById('pesqNota').value = '3';
+    pesqRenderEstrelas(3);
+    document.getElementById('modalPesquisa').classList.add('aberto');
+  }
+  function pesqRenderEstrelas(sel) {
+    const el = document.getElementById('pesqEstrelas');
+    if (!el) return;
+    el.innerHTML = [1,2,3,4,5].map(n=>`
+      <button type="button" onclick="pesqRenderEstrelas(${n})" style="font-size:28px;background:none;border:none;cursor:pointer;color:${n<=sel?'#d69e2e':'#e2e8f0'};padding:2px 4px;line-height:1">★</button>
+    `).join('');
+    document.getElementById('pesqNota').value = sel;
+  }
+  function pesqSalvar() {
+    if (_pesqIdx == null) return;
+    const p = (projeto.equipeClientes||[])[_pesqIdx];
+    if (!p) return;
+    if (!p.pesquisas) p.pesquisas = [];
+    p.pesquisas.push({
+      id: Date.now(),
+      data: document.getElementById('pesqData').value,
+      descricao: document.getElementById('pesqDescricao').value.trim(),
+      nota: +document.getElementById('pesqNota').value || 3,
+    });
+    fecharModal('modalPesquisa');
+    renderEquipeClientes(); renderDashboard(); agendarSalvarProjeto();
+  }
+  function pesqDel(personIdx, pesqId) {
+    const p = (projeto.equipeClientes||[])[personIdx];
+    if (!p) return;
+    p.pesquisas = (p.pesquisas||[]).filter(s=>s.id !== pesqId);
+    renderEquipeClientes(); renderDashboard(); agendarSalvarProjeto();
+  }
 
   carregarProjeto();
   function fecharBanner() {

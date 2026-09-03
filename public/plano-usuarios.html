@@ -59,6 +59,7 @@
     .btn-editar:hover { background: #ede9fe; }
     .btn-deletar { background: #fff5f5; color: #c53030; }
     .btn-deletar:hover { background: #fed7d7; }
+    .badge.dono { background: #edf2f7; color: #4a5568; margin-left: 6px; }
     .badge.ativo { background: #f0fff4; color: #276749; }
     .badge.pendente { background: #fffaf0; color: #c05621; }
     .badge.inativo { background: #fff5f5; color: #c53030; }
@@ -260,7 +261,6 @@
     <div id="permissoesConvite">
       <div class="perm-titulo">Permissões por Módulo</div>
       <div id="permModulosConvite"></div>
-      <div id="permFuturasConvite"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalConvite')">Cancelar</button>
@@ -284,7 +284,6 @@
     <div id="permissoesEditar">
       <div class="perm-titulo">Permissões por Módulo</div>
       <div id="editarPermModulos"></div>
-      <div id="editarPermFuturas"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalEditar')">Cancelar</button>
@@ -492,9 +491,29 @@
     }
   }
 
-  if (usuario.perfil !== 'Admin') {
-    document.getElementById('conteudo').innerHTML = `<div class="acesso-negado"><h2>🔒 Acesso Restrito</h2><p>Apenas administradores podem acessar esta página.</p></div>`;
-  }
+  // Checa a permissão de verdade no servidor (não só o `perfil` em cache no localStorage) —
+  // quem tem editarUsuarios/convidarUsuarios sem ser Admin também deve conseguir entrar aqui.
+  let _podeEditarUsuarios = false, _podeConvidarUsuarios = false;
+  (async () => {
+    let temAcesso = usuario.perfil === 'Admin';
+    try {
+      const r = await fetch('/api/usuarios/minhas-permissoes', { headers: HEADERS });
+      if (r.ok) {
+        const p = await r.json();
+        temAcesso = p.isAdmin || !!(p.permissoes?.planoUsuarios?.acessar);
+        _podeEditarUsuarios = p.isAdmin || !!(p.permissoes?.planoUsuarios?.editarUsuarios);
+        _podeConvidarUsuarios = p.isAdmin || !!(p.permissoes?.planoUsuarios?.convidarUsuarios);
+      }
+    } catch(e) {}
+    if (!temAcesso) {
+      document.getElementById('conteudo').innerHTML = `<div class="acesso-negado"><h2>🔒 Acesso Restrito</h2><p>Você não tem permissão para acessar esta página.</p></div>`;
+      return;
+    }
+    const btnConvidar = document.querySelector('button[onclick="abrirModalConvite()"]');
+    if (btnConvidar) btnConvidar.style.display = _podeConvidarUsuarios ? '' : 'none';
+    carregarUsuarios();
+    aplicarTabURL();
+  })();
 
   // ===== TABS =====
   function mudarTab(id, btn) {
@@ -508,15 +527,15 @@
   // ===== DEFINIÇÃO DOS MÓDULOS =====
   const MODULOS = [
     { id: 'overview',       nome: '🏠 Nivelamento de Conhecimento', acoes: ['acessar', 'editar', 'aprovar'] },
-    { id: 'ideiasLivres',   nome: '💡 Ideias Livres',               acoes: ['acessar', 'criar', 'aprovar'] },
     { id: 'gestaoMetas',    nome: '🎯 Gestão de Metas e Resultados', acoes: ['acessar', 'editar'] },
-    { id: 'gestaoProjetos', nome: '📁 Gestão de Projetos',           acoes: ['acessar', 'criar', 'editar'] },
-    { id: 'gestaoLicencas', nome: '📋 Gestão de Licenças',           acoes: ['acessar', 'criar', 'editar'] },
-    { id: 'operacoes',      nome: '⚙️ Operações',                    acoes: ['acessar', 'criar', 'editar'] },
-    { id: 'planoUsuarios',  nome: '👥 Usuários e Permissões',        acoes: ['acessar', 'gerenciar'] },
+    { id: 'operacoes',      nome: '⚙️ Operações',                    acoes: ['acessar'] },
+    { id: 'ideiasLivres',   nome: '💡 Ideias Livres',               acoes: ['acessar', 'aprovar'] },
+    { id: 'gestaoProjetos', nome: '📁 Gestão de Projetos',           acoes: ['acessar', 'aprovarCriacao', 'aprovarExecucao'] },
+    { id: 'gestaoLicencas', nome: '📋 Gestão de Licenças',           acoes: ['acessar', 'editar'] },
+    { id: 'planoUsuarios',  nome: '👥 Usuários e Permissões',        acoes: ['acessar', 'editarUsuarios', 'convidarUsuarios'] },
   ];
 
-  const LABELS_ACAO = { acessar: 'Acessar', editar: 'Editar', criar: 'Criar', aprovar: 'Aprovar Wikis', gerenciar: 'Adicionar/Remover Usuários' };
+  const LABELS_ACAO = { acessar: 'Acessar', editar: 'Editar', aprovar: 'Aprovar', editarUsuarios: 'Editar/Remover Usuários', convidarUsuarios: 'Convidar Usuários', aprovarCriacao: 'Aprovar Criação de Projetos (inclui publicar o próprio projeto direto, sem fila)', aprovarExecucao: 'Aprovar Execução (TAP, Cronograma, Escopo, Mudanças, Encerramento)' };
   // Override label por módulo+ação
   const LABEL_OVERRIDE = { 'ideiasLivres_aprovar': 'Aprovar Ideias', 'overview_aprovar': 'Aprovar Wikis' };
 
@@ -545,23 +564,6 @@
         </div>
       </div>`;
     }).join('');
-  }
-
-  function renderPermFuturas(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    const futuras = [
-      { nome: '📁 Gestão de Projetos — Aprovações', descricao: 'TAP, Orçamento, Prazo, Mudanças Solicitadas, Encerramento e dispensa de mudanças' },
-      { nome: '⚙️ Edição do Fluxo de Valor', descricao: 'Permissão para criar e editar o Fluxo de Valor em Operações' },
-      { nome: '🚀 Funcionalidades Avançadas de Projetos', descricao: 'Ativar módulos e configurações avançadas de Gestão de Projetos' },
-    ];
-    container.innerHTML = `<div style="margin-top:12px;border-top:1px dashed #e2e8f0;padding-top:10px">
-      <div style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">🔒 Permissões Futuras <span style="background:#f0f2f5;color:#718096;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;vertical-align:middle">Em breve</span></div>
-      ${futuras.map(f => `<div class="perm-modulo" style="opacity:0.5">
-        <div class="perm-modulo-header" style="display:flex;align-items:center;justify-content:space-between">${f.nome}<span style="font-size:10px;background:#e2e8f0;color:#718096;padding:1px 6px;border-radius:8px">Em breve</span></div>
-        <div class="perm-modulo-body"><div style="font-size:11px;color:#718096">${f.descricao}</div></div>
-      </div>`).join('')}
-    </div>`;
   }
 
   // Se marcar uma ação, garantir que "acessar" também fica marcado
@@ -608,13 +610,13 @@
 
   // ===== PERMISSÕES PADRÃO PARA NOVO USUÁRIO =====
   const permissoesPadrao = {
-    overview:       { acessar: true,  editar: false },
-    ideiasLivres:   { acessar: true,  criar: true,  aprovar: false },
+    overview:       { acessar: true,  editar: false, aprovar: false },
+    ideiasLivres:   { acessar: true,  aprovar: false },
     gestaoMetas:    { acessar: true,  editar: false },
-    gestaoProjetos: { acessar: true,  criar: false,  editar: false },
-    gestaoLicencas: { acessar: true,  criar: false,  editar: false },
-    operacoes:      { acessar: true,  criar: false,  editar: false },
-    planoUsuarios:  { acessar: false, gerenciar: false },
+    gestaoProjetos: { acessar: true,  aprovarCriacao: false, aprovarExecucao: false },
+    gestaoLicencas: { acessar: true,  editar: false },
+    operacoes:      { acessar: true },
+    planoUsuarios:  { acessar: false, editarUsuarios: false, convidarUsuarios: false },
   };
 
   // ===== USUÁRIOS =====
@@ -631,13 +633,15 @@
       tbody.innerHTML = usuarios.map(u => {
         const permStr = encodeURIComponent(JSON.stringify(u.permissoes || {}));
         return `<tr>
-          <td><strong>${u.nome}</strong></td>
+          <td><strong>${u.nome}</strong>${u.usuarioMestre ? ' <span class="badge dono" title="Dono original da empresa: não pode ser alterado ou removido">🔒 Dono</span>' : ''}</td>
           <td>${u.email}</td>
           <td>${u.perfil}</td>
           <td><span class="badge ${u.status.toLowerCase()}">${u.status}</span></td>
           <td>
-            <button class="btn-acao btn-editar" onclick="abrirModalEditar('${u._id}','${u.nome}','${u.perfil}','${u.status}',${u.usuarioMestre},'${permStr}')">✏️ Editar</button>
+            ${u.usuarioMestre || !_podeEditarUsuarios ? '' : `
+            <button class="btn-acao btn-editar" onclick="abrirModalEditar('${u._id}','${u.nome}','${u.perfil}','${u.status}','${permStr}')">✏️ Editar</button>
             <button class="btn-acao btn-deletar" onclick="deletarUsuario('${u._id}','${u.nome}')">Remover</button>
+            `}
           </td>
         </tr>`;
       }).join('');
@@ -662,11 +666,10 @@
     document.getElementById('permissoesConvite').style.opacity = '1';
     document.getElementById('permissoesConvite').style.pointerEvents = 'auto';
     renderPermModulos('permModulosConvite', permissoesPadrao, 'conv');
-    renderPermFuturas('permFuturasConvite');
     document.getElementById('modalConvite').classList.add('aberto');
   }
 
-  function abrirModalEditar(id, nome, perfil, status, usuarioMestre, permEnc) {
+  function abrirModalEditar(id, nome, perfil, status, permEnc) {
     let permissoes = {};
     try { permissoes = JSON.parse(decodeURIComponent(permEnc)); } catch(e) {}
     document.getElementById('editarId').value = id;
@@ -675,9 +678,7 @@
     document.getElementById('editarErro').style.display = 'none';
     document.getElementById('editarSucesso').style.display = 'none';
     renderPermModulos('editarPermModulos', permissoes, 'edit');
-    renderPermFuturas('editarPermFuturas');
-    const isAdmin = perfil === 'Admin' || usuarioMestre === true || usuarioMestre === 'true';
-    setPermissoesEditar(isAdmin);
+    setPermissoesEditar(perfil === 'Admin');
     document.getElementById('modalEditar').classList.add('aberto');
   }
 
@@ -701,7 +702,6 @@
     const email = document.getElementById('conviteEmail').value.trim();
     const nome = document.getElementById('conviteNome').value.trim();
     const perfil = document.getElementById('convitePerfil').value;
-    const usuarioMestre = perfil === 'Admin';
     const btn = document.getElementById('btnEnviar');
     const erro = document.getElementById('conviteErro');
     const sucesso = document.getElementById('conviteSucesso');
@@ -712,7 +712,7 @@
     try {
       const res = await fetch('/api/convites', {
         method: 'POST', headers: HEADERS,
-        body: JSON.stringify({ nome, email, perfil, usuarioMestre, permissoes })
+        body: JSON.stringify({ nome, email, perfil, permissoes })
       });
       const data = await res.json();
       if (!res.ok) { erro.textContent = data.erro || 'Erro ao enviar convite.'; erro.style.display = 'block'; return; }
@@ -727,7 +727,6 @@
     const id = document.getElementById('editarId').value;
     const perfil = document.getElementById('editarPerfil').value;
     const status = document.getElementById('editarStatus').value;
-    const usuarioMestre = perfil === 'Admin';
     const permissoes = lerPermModulos('edit');
     const btn = document.getElementById('btnSalvar');
     const erro = document.getElementById('editarErro');
@@ -737,7 +736,7 @@
     try {
       const res = await fetch(`/api/usuarios/${id}`, {
         method: 'PUT', headers: HEADERS,
-        body: JSON.stringify({ perfil, status, usuarioMestre, permissoes })
+        body: JSON.stringify({ perfil, status, permissoes })
       });
       const data = await res.json();
       if (!res.ok) { erro.textContent = data.erro || 'Erro ao salvar.'; erro.style.display = 'block'; return; }
@@ -1347,12 +1346,11 @@
   function copiarPixBloqueio(codigo) { copiarPix(codigo); }
 
   // INIT
-  carregarUsuarios();
-  aplicarTabURL();
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
   <script src="/global.js"></script>
 <script src="perfil-modal.js"></script>
+<script src="/sidebar-permissoes.js"></script>
 </body>
 </html>

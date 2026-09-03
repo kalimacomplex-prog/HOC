@@ -281,7 +281,7 @@
       <span class="modal-titulo">📨 Enviar para Aprovação</span>
       <button class="btn-fechar" onclick="fecharModal('modalNotifProjeto')">×</button>
     </div>
-    <p style="font-size:13px;color:#4a5568;margin:0 0 12px">Selecione o membro que deve receber e aprovar este projeto:</p>
+    <p style="font-size:13px;color:#4a5568;margin:0 0 12px">Selecione quem deve ser notificado — a lista mostra só quem tem permissão de aprovar criação de projetos:</p>
     <input type="text" id="notifProjSearch" placeholder="Buscar membro..." oninput="filtrarUsuariosNotifProj()" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box;margin-bottom:6px">
     <div class="notif-user-list" id="notifProjUserList">
       <div style="padding:20px;text-align:center;color:#a0aec0;font-size:12px">Carregando...</div>
@@ -289,6 +289,20 @@
     <div class="modal-footer" style="margin-top:14px">
       <button class="btn-cancelar" onclick="fecharModal('modalNotifProjeto')">Cancelar</button>
       <button class="btn-confirmar" onclick="confirmarEnvioProjeto()">📨 Enviar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhes do Cadastro -->
+<div class="modal-overlay" id="modalDetalhesProjeto">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-titulo">ℹ️ Dados do Cadastro</span>
+      <button class="btn-fechar" onclick="fecharModal('modalDetalhesProjeto')">×</button>
+    </div>
+    <div id="detalhesProjetoBody" style="display:grid;gap:10px;font-size:13px"></div>
+    <div class="modal-footer" style="margin-top:14px">
+      <button class="btn-cancelar" onclick="fecharModal('modalDetalhesProjeto')">Fechar</button>
     </div>
   </div>
 </div>
@@ -392,7 +406,8 @@
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
 
   let projetos = [];
-  let _podeCriarProjeto = false;
+  let _podePublicarImediato = false;
+  let _podeAprovarCriacao = false;
   let _usuariosNotifProj = [];
   let _notifProjUserSelecionado = null;
 
@@ -451,8 +466,9 @@
           <td>
             <div style="display:flex;gap:4px;flex-wrap:wrap">
               <button class="btn-acao btn-abrir" onclick="event.stopPropagation();abrirProjeto('${p._id}','${p.tipo}')">Abrir</button>
-              ${p.status === 'Aguardando Aprovação' ? `<button onclick="event.stopPropagation();aprovarProjeto('${p._id}')" style="padding:3px 8px;background:#f0fff4;color:#276749;border:1.5px solid #c6f6d5;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap" title="Aprovar projeto">✓ Aprovar</button>` : ''}
-              ${p.status === 'Aguardando Aprovação' ? `<button onclick="event.stopPropagation();reprovarProjeto('${p._id}')" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:1.5px solid #fed7d7;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap" title="Reprovar projeto">✕ Reprovar</button>` : ''}
+              <button class="btn-acao" onclick="event.stopPropagation();verDetalhesProjeto('${p._id}')" title="Ver dados do cadastro">ℹ️ Detalhes</button>
+              ${p.status === 'Aguardando Aprovação' && _podeAprovarCriacao ? `<button onclick="event.stopPropagation();aprovarProjeto('${p._id}')" style="padding:3px 8px;background:#f0fff4;color:#276749;border:1.5px solid #c6f6d5;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap" title="Aprovar projeto">✓ Aprovar</button>` : ''}
+              ${p.status === 'Aguardando Aprovação' && _podeAprovarCriacao ? `<button onclick="event.stopPropagation();reprovarProjeto('${p._id}')" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:1.5px solid #fed7d7;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap" title="Reprovar projeto">✕ Reprovar</button>` : ''}
               ${podeAcoes && p.status !== 'Pausado' && p.status !== 'Aguardando Aprovação' ? `<button class="btn-pause" onclick="event.stopPropagation();pausarProjeto('${p._id}')" title="Pausar">⏸</button>` : ''}
               ${podeAcoes && p.status === 'Pausado' ? `<button class="btn-pause" onclick="event.stopPropagation();reativarProjeto('${p._id}')" title="Reativar" style="background:#f0fff4;color:#276749;border-color:#c6f6d5">▶</button>` : ''}
               ${podeAcoes && !['Concluído','Cancelado','Reprovado','Aguardando Aprovação'].includes(p.status) ? `<button onclick="event.stopPropagation();concluirProjeto('${p._id}')" style="padding:3px 8px;background:#ebf8ff;color:#2b6cb0;border:1.5px solid #bee3f8;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap" title="Marcar como concluído">✔ Concluir</button>` : ''}
@@ -529,7 +545,7 @@
     document.getElementById('projTags').value = '';
     document.getElementById('novoProjErro').style.display = 'none';
     // Show/hide buttons based on permission
-    document.getElementById('btnCriarProjeto').style.display = _podeCriarProjeto ? '' : 'none';
+    document.getElementById('btnCriarProjeto').style.display = _podePublicarImediato ? '' : 'none';
     document.getElementById('modalNovoProjeto').classList.add('aberto');
   }
 
@@ -548,6 +564,25 @@
       tags: document.getElementById('projTags').value.trim(),
       status: statusOverride || 'Ativo'
     };
+  }
+
+  function verDetalhesProjeto(id) {
+    const p = projetos.find(x => x._id === id);
+    if (!p) return;
+    const linha = (label, valor) => `<div><div style="font-size:11px;color:#a0aec0;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px">${label}</div><div style="color:#1e2a4a">${valor || '—'}</div></div>`;
+    document.getElementById('detalhesProjetoBody').innerHTML = [
+      linha('Nome', p.nome),
+      linha('Tipo', p.tipo === 'tradicional' ? 'Tradicional' : 'Ágil'),
+      linha('Descrição', p.descricao),
+      linha('Categoria', p.categoria),
+      linha('Responsável', p.responsavel),
+      linha('Orçamento', p.budget ? 'R$ ' + parseFloat(p.budget).toLocaleString('pt-BR', {minimumFractionDigits:2}) : ''),
+      linha('Data de Início', p.dataInicio ? formatarData(p.dataInicio) : ''),
+      linha('Data de Fim', p.dataFim ? formatarData(p.dataFim) : ''),
+      linha('Tags', p.tags),
+      linha('Status', p.status),
+    ].join('');
+    document.getElementById('modalDetalhesProjeto').classList.add('aberto');
   }
 
   async function criarProjeto() {
@@ -576,7 +611,7 @@
     lista.innerHTML = '<div style="padding:20px;text-align:center;color:#a0aec0;font-size:12px">Carregando...</div>';
     document.getElementById('modalNotifProjeto').classList.add('aberto');
     if (_usuariosNotifProj.length === 0) {
-      fetch('/api/usuarios', { headers: HEADERS }).then(r => r.json()).then(data => {
+      fetch('/api/usuarios/com-permissao/gestaoProjetos/aprovarCriacao', { headers: HEADERS }).then(r => r.json()).then(data => {
         const us = data.usuarios || data || [];
         _usuariosNotifProj = us.filter(u => u._id !== usuario.id);
         renderUsuariosNotifProj(_usuariosNotifProj);
@@ -586,7 +621,7 @@
 
   function renderUsuariosNotifProj(lista) {
     const el = document.getElementById('notifProjUserList');
-    if (!lista.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:#a0aec0;font-size:12px">Nenhum membro encontrado.</div>'; return; }
+    if (!lista.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:#a0aec0;font-size:12px">Nenhum usuário com permissão para aprovar criação de projetos, além de você.</div>'; return; }
     el.innerHTML = lista.map(u => `
       <div class="notif-user-item${_notifProjUserSelecionado === u._id ? ' selecionado' : ''}" onclick="selecionarUserNotifProj('${u._id}')">
         <div class="notif-user-avatar">${(u.nome||'?')[0].toUpperCase()}</div>
@@ -645,11 +680,13 @@
     await carregarProjetos();
   }
   async function aprovarProjeto(id) {
+    if (!_podeAprovarCriacao) return;
     if (!confirm('Aprovar este projeto? Ele será marcado como Ativo.')) return;
     await fetch(`/api/projetos/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ status: 'Ativo' }) });
     await carregarProjetos();
   }
   async function reprovarProjeto(id) {
+    if (!_podeAprovarCriacao) return;
     const motivo = prompt('Motivo da reprovação (opcional):');
     if (motivo === null) return;
     await fetch(`/api/projetos/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ status: 'Reprovado', observacaoReprovacao: motivo }) });
@@ -662,7 +699,9 @@
       const r = await fetch('/api/usuarios/minhas-permissoes', { headers: HEADERS });
       if (r.ok) {
         const p = await r.json();
-        _podeCriarProjeto = p.isAdmin || !!(p.permissoes?.gestaoProjetos?.criar);
+        _podePublicarImediato = p.isAdmin || !!(p.permissoes?.gestaoProjetos?.aprovarCriacao);
+        _podeAprovarCriacao = p.isAdmin || !!(p.permissoes?.gestaoProjetos?.aprovarCriacao);
+        renderProjetos();
       }
     } catch(e) {}
   })();
@@ -844,5 +883,6 @@ function copiarPixBloqueio(codigo) {
   setInterval(carregarNotificacoes, 60000);
 </script>
 <script src="perfil-modal.js"></script>
+<script src="/sidebar-permissoes.js"></script>
 </body>
 </html>

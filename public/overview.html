@@ -514,6 +514,7 @@
             <button class="btn-secondary" id="btnNovaVersao" onclick="novaVersaoWiki()" style="font-size:12px;display:none">+ Nova Versão</button>
             <button class="btn-secondary" onclick="exportarPDF()" style="font-size:12px">📄 PDF</button>
             <span id="autoSaveIndicator" style="font-size:11px;color:#a0aec0;min-width:60px;text-align:right"></span>
+            <button class="btn-secondary" id="btnSolicitarAprovWiki" onclick="abrirModalSolicitarAprovWiki()" style="font-size:12px;display:none">📨 Solicitar Aprovação</button>
             <button class="btn-primary" id="btnAprovarWiki" onclick="aprovarWiki()" style="background:#38a169;font-size:12px;display:none">✓ Aprovar</button>
           </div>
         </div>
@@ -610,6 +611,15 @@
 </div>
 
 <!-- Modal Timeline -->
+<div class="modal-overlay" id="modalSolicitarAprovWiki">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header"><span class="modal-titulo">📨 Solicitar Aprovação</span><button class="btn-fechar" onclick="fecharModal('modalSolicitarAprovWiki')">×</button></div>
+    <p style="font-size:13px;color:#4a5568;margin:0 0 12px">Selecione quem deve ser notificado — a lista mostra só quem tem permissão de aprovar wikis:</p>
+    <div id="solicitarAprovWikiUserList" style="max-height:320px;overflow-y:auto"></div>
+    <div class="modal-footer" style="margin-top:12px"><button class="btn-cancelar" onclick="fecharModal('modalSolicitarAprovWiki')">Cancelar</button><button class="btn-confirmar" onclick="_enviarSolicitacaoAprovWiki()">📨 Enviar</button></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalTimeline">
   <div class="modal" style="max-width:520px">
     <div class="modal-header"><span class="modal-titulo">Adicionar Marco Histórico</span><button class="btn-fechar" onclick="fecharModal('modalTimeline')">×</button></div>
@@ -687,6 +697,7 @@
     </div>
     <div class="form-group"><label>Cargo / Função *</label><input type="text" id="membroCargo" placeholder="Ex: Desenvolvedor Sênior"></div>
     <div class="form-group"><label>Email</label><input type="email" id="membroEmail" placeholder="email@empresa.com"></div>
+    <div class="form-group"><label>Time</label><select id="membroDep"></select></div>
     <input type="hidden" id="membroEditId">
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalMembro')">Cancelar</button><button class="btn-confirmar" onclick="salvarMembro()">Salvar</button></div>
   </div>
@@ -895,6 +906,7 @@
   }
 
   function toggleEdicao() {
+    if (!modoEdicao && !_podeEditarWiki) return;
     if (modoEdicao) coletarRichEditors();
     modoEdicao = !modoEdicao;
     document.getElementById('btnEditar').style.display    = modoEdicao?'none':'inline-block';
@@ -1312,7 +1324,7 @@
   }
 
   // ===== DEPARTAMENTOS =====
-  function abrirModalDep() { document.getElementById('depNome').value=''; document.getElementById('modalDep').classList.add('aberto'); setTimeout(()=>document.getElementById('depNome').focus(),100); }
+  function abrirModalDep() { if (!_podeEditarWiki) return; document.getElementById('depNome').value=''; document.getElementById('modalDep').classList.add('aberto'); setTimeout(()=>document.getElementById('depNome').focus(),100); }
 
   async function adicionarDep() {
     const nome = document.getElementById('depNome').value.trim();
@@ -1381,24 +1393,34 @@
 
   // ===== MEMBROS =====
   function abrirModalMembro(id) {
+    if (!_podeEditarWiki) return;
     document.getElementById('modalMembroTitulo').textContent = id ? 'Editar Membro' : 'Novo Membro';
     document.getElementById('membroEditId').value = id || '';
     document.getElementById('membroNomeDropdown').style.display = 'none';
+    const depSel = document.getElementById('membroDep');
+    depSel.innerHTML = '<option value="">— Sem time —</option>' + departamentos.map(dep => `<option value="${dep.id}">${dep.nome}</option>`).join('');
     if (id) {
       const m = membros.find(m => m.id == id);
-      if (m) { document.getElementById('membroNome').value=m.nome; document.getElementById('membroCargo').value=m.cargo; document.getElementById('membroEmail').value=m.email||''; }
+      if (m) { document.getElementById('membroNome').value=m.nome; document.getElementById('membroCargo').value=m.cargo; document.getElementById('membroEmail').value=m.email||''; depSel.value = m.depId||''; }
     } else {
       document.getElementById('membroNome').value=''; document.getElementById('membroCargo').value=''; document.getElementById('membroEmail').value='';
+      // Se um time já está selecionado na barra lateral, o novo membro nasce vinculado a ele.
+      depSel.value = depAtivo || '';
     }
     document.getElementById('modalMembro').classList.add('aberto');
   }
 
   async function salvarMembro() {
     const id = document.getElementById('membroEditId').value;
-    const _existente = id ? membros.find(m=>m.id==id) : null;
-    const membro = { id:id?parseInt(id):Date.now(), nome:document.getElementById('membroNome').value.trim(), cargo:document.getElementById('membroCargo').value.trim(), depId:_existente?.depId||'', email:document.getElementById('membroEmail').value.trim(), x:Math.random()*400+50, y:Math.random()*200+50 };
+    const nome = document.getElementById('membroNome').value.trim();
+    // Reaproveita o membro existente de mesmo nome em vez de duplicar — evita perder o time já
+    // atribuído quando alguém tenta "recriar" uma pessoa que já está cadastrada.
+    const _porNome = !id && nome ? membros.find(m => m.nome.trim().toLowerCase() === nome.toLowerCase()) : null;
+    const idEfetivo = id || _porNome?.id;
+    const _existente = idEfetivo ? membros.find(m=>m.id==idEfetivo) : null;
+    const membro = { id:idEfetivo?parseInt(idEfetivo):Date.now(), nome, cargo:document.getElementById('membroCargo').value.trim(), depId:document.getElementById('membroDep').value||'', email:document.getElementById('membroEmail').value.trim(), x:Math.random()*400+50, y:Math.random()*200+50 };
     if (!membro.nome) return;
-    if (id) { const idx=membros.findIndex(m=>m.id==id); if(idx!==-1){membro.x=membros[idx].x;membro.y=membros[idx].y;membros[idx]=membro;} }
+    if (idEfetivo) { const idx=membros.findIndex(m=>m.id==idEfetivo); if(idx!==-1){membro.x=membros[idx].x;membro.y=membros[idx].y;membros[idx]=membro;} }
     else membros.push(membro);
     await salvarOrg();
     renderOrganograma();
@@ -1406,6 +1428,7 @@
   }
 
   async function deletarMembro(id) {
+    if (!_podeEditarWiki) return;
     if (!confirm('Remover este membro?')) return;
     membros = membros.filter(m=>m.id!=id);
     conexoes = conexoes.filter(c=>c.de!=id&&c.para!=id);
@@ -1516,6 +1539,7 @@
 
   function iniciarConexaoHandle(memberId, side, e) {
     e.stopPropagation();
+    if (!_podeEditarWiki) return;
     if (conectandoDe) {
       if (conectandoDe.memberId === memberId) {
         // Cancel: clicked same source handle again
@@ -1608,6 +1632,7 @@
       btn.textContent = '×';
       btn.addEventListener('click', async ev => {
         ev.stopPropagation();
+        if (!_podeEditarWiki) return;
         conexoes = conexoes.filter(x => !(x.de == c.de && x.para == c.para));
         await salvarOrg();
         renderOrganograma();
@@ -1675,7 +1700,7 @@
       node.addEventListener('mouseenter', () => { node.querySelector('.org-node-actions').style.opacity = '1'; });
       node.addEventListener('mouseleave', () => { node.querySelector('.org-node-actions').style.opacity = '0'; });
       node.addEventListener('mousedown', e => {
-        if (e.target.classList.contains('conn-handle') || e.target.tagName === 'BUTTON' || conectandoDe) return;
+        if (!_podeEditarWiki || e.target.classList.contains('conn-handle') || e.target.tagName === 'BUTTON' || conectandoDe) return;
         dragging = { node, membro: m };
         const rect = node.getBoundingClientRect();
         dragOffset.x = e.clientX - rect.left;
@@ -1769,6 +1794,7 @@
   }
 
   function criarPasta() {
+    if (!_podeEditarWiki) return;
     document.getElementById('novaPastaNome').value = '';
     _popularSelectPastas('novaPastaParent', null);
     document.getElementById('novaPastaParent').value = pastaAtiva || '';
@@ -1795,6 +1821,7 @@
 
   function abrirEditPasta(id, e) {
     e.stopPropagation();
+    if (!_podeEditarWiki) return;
     const p = pastas.find(p => p.id === id);
     if (!p) return;
     document.getElementById('editPastaId').value = id;
@@ -1892,6 +1919,7 @@
 
   async function removerPasta(id, e) {
     e.stopPropagation();
+    if (!_podeEditarWiki) return;
     if (!confirm('Remover esta pasta? Os documentos dentro dela não serão deletados.')) return;
     try {
       await fetch(`/api/pastas/${id}`, { method: 'DELETE', headers: HEADERS });
@@ -1906,6 +1934,31 @@
 
   // ===== WIKIS — API =====
   let wikis = [], wikiEditando = null;
+  let _podeAprovarWiki = false;
+  let _podeEditarWiki = false;
+  (async () => {
+    try {
+      const r = await fetch('/api/usuarios/minhas-permissoes', { headers: HEADERS });
+      if (r.ok) {
+        const p = await r.json();
+        _podeAprovarWiki = p.isAdmin || !!(p.permissoes?.overview?.aprovar);
+        _podeEditarWiki = p.isAdmin || !!(p.permissoes?.overview?.editar);
+        temPermissaoFv = _podeEditarWiki;
+        const btnNovo = document.querySelector('button[onclick="novoWiki()"]');
+        if (btnNovo) btnNovo.style.display = _podeEditarWiki ? '' : 'none';
+        const btnEditarOverview = document.getElementById('btnEditar');
+        if (btnEditarOverview && !_podeEditarWiki) btnEditarOverview.style.display = 'none';
+        if (!_podeEditarWiki) {
+          ['abrirModalMembro()', 'abrirModalDep()', 'criarPasta()', 'novoDocExterno()']
+            .forEach(fn => document.querySelectorAll(`button[onclick="${fn}"]`).forEach(b => b.style.display = 'none'));
+        }
+        _atualizarBotoesEditor(wikiEditando ? wikis.find(w => w._id === wikiEditando) : null);
+        // A tabela/lista de documentos já pode ter renderizado antes desta permissão chegar —
+        // atualiza de novo agora que _podeEditarWiki é conhecido (ex.: dropdown de mover pasta).
+        if (wikis.length) filtrarWikis();
+      }
+    } catch(e) {}
+  })();
 
   async function carregarWikis() {
     try {
@@ -1919,14 +1972,22 @@
     const aprovado = wiki?.status === 'Aprovado';
     const area = document.getElementById('editorArea');
     const btnAprovar = document.getElementById('btnAprovarWiki');
+    const btnSolicitar = document.getElementById('btnSolicitarAprovWiki');
     const btnNovaVersao = document.getElementById('btnNovaVersao');
+    const _cabecalho = ['editorTitulo', 'editorTags', 'editorResponsavel'];
     if (aprovado) {
       area.contentEditable = 'false';
+      _cabecalho.forEach(id => document.getElementById(id)?.setAttribute('disabled',''));
       if (btnAprovar) btnAprovar.style.display = 'none';
+      if (btnSolicitar) btnSolicitar.style.display = 'none';
       if (btnNovaVersao) btnNovaVersao.style.display = '';
     } else {
-      area.contentEditable = 'true';
-      if (btnAprovar) btnAprovar.style.display = wiki ? '' : 'none';
+      const souAutor = wiki && wiki.criadoPor === (usuario.id || usuario._id);
+      const podeEditarEste = _podeEditarWiki || souAutor;
+      area.contentEditable = podeEditarEste ? 'true' : 'false';
+      _cabecalho.forEach(id => { const el = document.getElementById(id); if (el) { if (podeEditarEste) el.removeAttribute('disabled'); else el.setAttribute('disabled',''); } });
+      if (btnAprovar) btnAprovar.style.display = (wiki && _podeAprovarWiki) ? '' : 'none';
+      if (btnSolicitar) btnSolicitar.style.display = (wiki && podeEditarEste) ? '' : 'none';
       if (btnNovaVersao) btnNovaVersao.style.display = 'none';
     }
   }
@@ -1979,6 +2040,7 @@
   }
 
   function novoWiki() {
+    if (!_podeEditarWiki) return;
     wikiEditando = null;
     _wikiSetupToolbar();
     document.getElementById('editorTitulo').value='';
@@ -2067,12 +2129,43 @@
   }
 
   async function aprovarWiki() {
+    if (!_podeAprovarWiki) return;
     if (!wikiEditando) { alert('Salve primeiro.'); return; }
     if (!confirm('Aprovar este wiki? Após aprovado ele ficará imutável.')) return;
     await fetch(`/api/wikis/${wikiEditando}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({status:'Aprovado'}) });
     await carregarWikis();
     const wiki = wikis.find(w=>w._id===wikiEditando);
     _atualizarBotoesEditor(wiki || null);
+  }
+
+  let _usuariosAprovWiki = [];
+  function abrirModalSolicitarAprovWiki() {
+    if (!wikiEditando) { alert('Salve primeiro.'); return; }
+    const lista = document.getElementById('solicitarAprovWikiUserList');
+    lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Carregando...</div>';
+    document.getElementById('modalSolicitarAprovWiki').classList.add('aberto');
+    fetch('/api/usuarios/com-permissao/overview/aprovar', { headers: HEADERS }).then(r=>r.json()).then(users=>{
+      _usuariosAprovWiki = (users||[]).filter(u => u._id !== (usuario.id || usuario._id));
+      if (!_usuariosAprovWiki.length) { lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Nenhum usuário com permissão para aprovar wikis, além de você.</div>'; return; }
+      lista.innerHTML = _usuariosAprovWiki.map(u=>`
+        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:6px">
+          <input type="radio" name="wikiAprovUser" value="${u._id}" style="accent-color:#2d1b69">
+          <span style="font-size:13px;font-weight:600;color:#1e2a4a">${u.nome}</span>
+          <span style="font-size:11px;color:#718096;margin-left:auto">${u.email||''}</span>
+        </label>`).join('');
+    }).catch(()=>{ lista.innerHTML = '<div style="padding:12px;color:#c53030;font-size:12px">Erro ao carregar usuários.</div>'; });
+  }
+  async function _enviarSolicitacaoAprovWiki() {
+    const sel = document.querySelector('input[name="wikiAprovUser"]:checked');
+    if (!sel) { alert('Selecione um usuário.'); return; }
+    const wiki = wikis.find(w=>w._id===wikiEditando);
+    await fetch('/api/notificacoes', { method:'POST', headers: HEADERS, body: JSON.stringify({
+      titulo: `📄 Aprovação de wiki solicitada`,
+      mensagem: `O wiki "${wiki?.titulo||''}" aguarda sua aprovação.`,
+      tipo: 'aviso', icone: '📄', link: '/overview', destinatario: sel.value
+    })});
+    fecharModal('modalSolicitarAprovWiki');
+    alert('Solicitação de aprovação enviada!');
   }
 
   async function novaVersaoWiki(id) {
@@ -2182,6 +2275,7 @@
   }
 
   async function deletarWiki(id) {
+    if (!_podeEditarWiki) return;
     if (!confirm('Deletar este documento?')) return;
     await fetch(`/api/wikis/${id}`, { method:'DELETE', headers:HEADERS });
     await carregarWikis();
@@ -2222,7 +2316,7 @@
       return `<tr>
         <td><span style="margin-right:4px">${icone}</span><strong>${w.titulo}</strong>${linkDoc}</td>
         <td>
-          <select onchange="moverWikiPasta('${w._id}',this.value)" style="font-size:11px;padding:2px 4px;border:1px solid #e2e8f0;border-radius:4px;color:#718096;background:white;cursor:pointer">
+          <select onchange="moverWikiPasta('${w._id}',this.value)" ${_podeEditarWiki?'':'disabled'} style="font-size:11px;padding:2px 4px;border:1px solid #e2e8f0;border-radius:4px;color:#718096;background:white;cursor:pointer">
             <option value="">Sem pasta</option>
             ${pastaOpts}
           </select>
@@ -2241,6 +2335,7 @@
   }
 
   async function moverWikiPasta(id, pastaIdStr) {
+    if (!_podeEditarWiki) return;
     const pastaId = pastaIdStr ? parseInt(pastaIdStr) : null;
     const wiki = wikis.find(w => w._id === id);
     if (!wiki) return;
@@ -2269,6 +2364,7 @@
   }
 
   function novoDocExterno() {
+    if (!_podeEditarWiki) return;
     document.getElementById('docExternoTitulo').value = '';
     document.getElementById('docExternoArquivo').value = '';
     document.getElementById('docUploadLabel').innerHTML = 'Clique para selecionar ou arraste o arquivo aqui<br><span style="font-size:11px;margin-top:4px;display:block">PDF, DOCX, XLSX, PNG, JPG — até 30 MB</span>';
@@ -2660,7 +2756,7 @@
   setInterval(carregarNotificacoes, 60000);
 
   // ===== FLUXO DE VALOR =====
-  const temPermissaoFv = usuario.perfil === 'Admin';
+  let temPermissaoFv = usuario.perfil === 'Admin';
   let fvBlocos = [], fvTextos = [], fvConexoes = [], fvModo = 'viz';
   let fvDragging = null, fvOffset = { x: 0, y: 0 };
 
@@ -3488,5 +3584,6 @@
 
 </script>
 <script src="perfil-modal.js"></script>
+<script src="/sidebar-permissoes.js"></script>
 </body>
 </html>

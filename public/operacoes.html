@@ -484,111 +484,99 @@
         <div class="page-title">Dashboard</div>
         <div class="breadcrumb" style="margin-bottom:14px">Operações > Dashboard — visão geral do sistema</div>
 
-        <!-- Bloco 1: KPIs principais -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
-          <div style="background:white;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #2d1b69;position:relative;overflow:hidden">
-            <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Total de Robôs</div>
-            <div id="kpiTotal" style="font-size:32px;font-weight:800;color:#1e2a4a;line-height:1">—</div>
-            <div style="font-size:11px;color:#718096;margin-top:4px">cadastrados</div>
-            <div style="position:absolute;right:16px;top:16px;font-size:28px;opacity:.08">🤖</div>
-          </div>
-          <div style="background:white;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #38a169;position:relative;overflow:hidden">
-            <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Taxa de Sucesso</div>
-            <div id="kpiTaxa" style="font-size:32px;font-weight:800;color:#276749;line-height:1">—</div>
-            <div style="font-size:11px;color:#718096;margin-top:4px">das execuções</div>
-            <div style="position:absolute;right:16px;top:16px;font-size:28px;opacity:.08">✅</div>
-          </div>
-          <div style="background:white;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #38a169;position:relative;overflow:hidden">
-            <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Horas Economizadas</div>
-            <div id="fteSaved" style="font-size:32px;font-weight:800;color:#276749;line-height:1">—</div>
-            <div style="font-size:11px;color:#718096;margin-top:4px">FTE saved total</div>
-            <div style="position:absolute;right:16px;top:16px;font-size:28px;opacity:.08">⏱️</div>
-          </div>
-          <div style="background:white;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #e53e3e;position:relative;overflow:hidden">
-            <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Com Erro</div>
-            <div id="kpiErros" style="font-size:32px;font-weight:800;color:#c53030;line-height:1">—</div>
-            <div style="font-size:11px;color:#718096;margin-top:4px">atenção necessária</div>
-            <div style="position:absolute;right:16px;top:16px;font-size:28px;opacity:.08">❌</div>
-          </div>
+        <div class="com-tabs">
+          <button class="com-tab active" id="dashTab-eficiencia" onclick="mudarDashTab('eficiencia',this)">📈 Eficiência e Produtividade</button>
+          <button class="com-tab" id="dashTab-automacao" onclick="mudarDashTab('automacao',this)">🤖 Automação</button>
         </div>
 
-        <!-- Bloco 2: Eficiência Operacional -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <div style="width:3px;height:16px;background:#2d1b69;border-radius:2px"></div>
-          <span style="font-size:11px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:.5px">Eficiência Operacional</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px">
-          <div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px">
-            <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:4px">🔴 Top Robôs com Erros</div>
-            <div style="font-size:11px;color:#718096;margin-bottom:12px">Automações instáveis que precisam de manutenção</div>
-            <div id="topErros"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem erros registrados 🎉</div></div>
-          </div>
-          <div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px">
-            <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:4px">⏱️ Tempo Médio de Execução</div>
-            <div style="font-size:11px;color:#718096;margin-bottom:12px">Monitore robôs ficando mais lentos ao longo do tempo</div>
-            <div id="tempoMedioRobos"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem dados de tempo</div></div>
-          </div>
-        </div>
-
-        <!-- Bloco 3: Capacidade e Infraestrutura -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <div style="width:3px;height:16px;background:#3b5bdb;border-radius:2px"></div>
-          <span style="font-size:11px;font-weight:700;color:#3b5bdb;text-transform:uppercase;letter-spacing:.5px">Capacidade e Infraestrutura</span>
-        </div>
-        <div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px;margin-bottom:24px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div>
-              <div style="font-size:12px;font-weight:700;color:#1e2a4a">🏗️ Fila de Espera e Disponibilidade</div>
-              <div style="font-size:11px;color:#718096;margin-top:2px">Robôs aguardando máquina disponível e status dos agentes</div>
-            </div>
-            <div style="display:flex;gap:16px">
-              <div style="text-align:center">
-                <div id="kpiExecutando" style="font-size:22px;font-weight:800;color:#276749">—</div>
-                <div style="font-size:10px;color:#718096;font-weight:600">Executando</div>
-              </div>
-              <div style="width:1px;background:#e2e8f0"></div>
-              <div style="text-align:center">
-                <div id="kpiFila" style="font-size:22px;font-weight:800;color:#b7791f">—</div>
-                <div style="font-size:10px;color:#718096;font-weight:600">Na Fila</div>
-              </div>
+        <!-- ===== EFICIÊNCIA E PRODUTIVIDADE ===== -->
+        <div id="dash-eficiencia">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+            <span style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.5px">Visão:</span>
+            <div class="com-tabs" style="margin-bottom:0" id="dashEscopoTabs">
+              <button class="com-tab active" onclick="dashSetEscopo('global',this)">Global</button>
+              <button class="com-tab" onclick="dashSetEscopo('time',this)">Por Time</button>
             </div>
           </div>
-          <div id="dashGrid" style="display:flex;flex-wrap:wrap;gap:8px"></div>
-        </div>
 
-        <!-- Bloco 4: Negócio e ROI -->
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-          <div style="width:3px;height:16px;background:#d69e2e;border-radius:2px"></div>
-          <span style="font-size:11px;font-weight:700;color:#b7791f;text-transform:uppercase;letter-spacing:.5px">Negócio e ROI</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px">
-          <div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px">
-            <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:4px">🏆 Volumetria por Departamento</div>
-            <div style="font-size:11px;color:#718096;margin-bottom:12px">Ranking gamificado de uso por área</div>
-            <div id="volumetria"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem dados</div></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <div style="width:3px;height:16px;background:#2d1b69;border-radius:2px"></div>
+            <span style="font-size:11px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:.5px">⏰ Cumprimento de Prazo</span>
+            <span id="dashQuebraCtrl-prazo" data-bloco="prazo" style="display:none;align-items:center;gap:12px;margin-left:6px"></span>
           </div>
-          <div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px">
-            <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:4px">💡 ROI e Economia</div>
-            <div style="font-size:11px;color:#718096;margin-bottom:16px">Valor gerado pela automação vs trabalho manual</div>
-            <div style="display:flex;gap:16px;margin-bottom:16px">
-              <div style="flex:1;background:#f0fff4;border-radius:8px;padding:14px;text-align:center;border:1px solid #9ae6b4">
-                <div style="font-size:10px;font-weight:700;color:#276749;margin-bottom:4px">ROI FINANCEIRO</div>
-                <div id="roiFinanceiro" style="font-size:24px;font-weight:800;color:#276749">—</div>
-                <div style="font-size:10px;color:#718096;margin-top:2px">estimado</div>
-              </div>
-              <div style="flex:1;background:#f5f0ff;border-radius:8px;padding:14px;text-align:center;border:1px solid #c4b5fd">
-                <div style="font-size:10px;font-weight:700;color:#4f46e5;margin-bottom:4px">TAXA DE SUCESSO</div>
-                <div id="taxaSucesso" style="font-size:24px;font-weight:800;color:#4f46e5">—</div>
-                <div style="font-size:10px;color:#718096;margin-top:2px">das execuções</div>
-              </div>
+          <div id="dashPrazoArea" style="margin-bottom:24px"></div>
+
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <div style="width:3px;height:16px;background:#3b5bdb;border-radius:2px"></div>
+            <span style="font-size:11px;font-weight:700;color:#3b5bdb;text-transform:uppercase;letter-spacing:.5px">📦 Volume: Previsto x Concluído</span>
+            <div class="com-tabs" style="margin:0 0 0 10px" id="dashGranTabs">
+              <button class="com-tab" onclick="dashSetGran('dia',this)" style="padding:5px 12px">Diário</button>
+              <button class="com-tab" onclick="dashSetGran('semana',this)" style="padding:5px 12px">Semanal</button>
+              <button class="com-tab active" onclick="dashSetGran('mes',this)" style="padding:5px 12px">Mensal</button>
             </div>
-            <div style="font-size:11px;color:#718096;font-style:italic">* ROI estimado com R$35/hora de trabalho manual economizado</div>
+            <span id="dashQuebraCtrl-volume" data-bloco="volume" style="display:none;align-items:center;gap:12px;margin-left:6px"></span>
+          </div>
+          <div id="dashVolFiltroRange" style="display:flex;align-items:flex-end;gap:10px;margin-bottom:10px">
+            <div><label style="font-size:10px;font-weight:700;color:#718096;display:block;margin-bottom:3px">DE</label><input type="date" id="dashVolDeInp" onchange="dashSetVolRange()" style="padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px"></div>
+            <div><label style="font-size:10px;font-weight:700;color:#718096;display:block;margin-bottom:3px">ATÉ</label><input type="date" id="dashVolAteInp" onchange="dashSetVolRange()" style="padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px"></div>
+            <button onclick="dashLimparVolRange()" style="padding:6px 12px;background:#f8fafc;color:#718096;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Limpar (usar período padrão)</button>
+          </div>
+          <div id="dashVolumeArea" style="margin-bottom:24px"></div>
+
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <div style="width:3px;height:16px;background:#d69e2e;border-radius:2px"></div>
+            <span style="font-size:11px;font-weight:700;color:#b7791f;text-transform:uppercase;letter-spacing:.5px">🗂️ Backlog — Pendências Acumuladas</span>
+            <span id="dashQuebraCtrl-backlog" data-bloco="backlog" style="display:none;align-items:center;gap:12px;margin-left:6px"></span>
+          </div>
+          <div id="dashBacklogArea" style="margin-bottom:24px"></div>
+
+          <div id="dashLeadTimeBloco">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+              <div style="width:3px;height:16px;background:#38a169;border-radius:2px"></div>
+              <span style="font-size:11px;font-weight:700;color:#276749;text-transform:uppercase;letter-spacing:.5px">⏳ Lead Time por Processo</span>
+            </div>
+            <div id="dashLeadTimeArea" style="margin-bottom:24px"></div>
           </div>
         </div>
 
-        <!-- Placeholder tarefas/processos -->
-        <div style="background:white;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);text-align:center;color:#a0aec0;font-size:13px">
-          Em breve: dados de tarefas e processos
+        <!-- ===== AUTOMAÇÃO ===== -->
+        <div id="dash-automacao" style="display:none">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+            <div style="background:white;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #2d1b69;position:relative;overflow:hidden">
+              <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Total de Robôs</div>
+              <div id="dashAutoTotal" style="font-size:32px;font-weight:800;color:#1e2a4a;line-height:1">—</div>
+              <div style="font-size:11px;color:#718096;margin-top:4px">cadastrados</div>
+              <div style="position:absolute;right:16px;top:16px;font-size:28px;opacity:.08">🤖</div>
+            </div>
+            <div style="background:white;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #38a169;position:relative;overflow:hidden">
+              <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Horas Economizadas x Tempo Humano</div>
+              <div id="dashAutoEconomizado" style="font-size:32px;font-weight:800;color:#276749;line-height:1">—</div>
+              <div id="dashAutoEconomizadoSub" style="font-size:11px;color:#718096;margin-top:4px">—</div>
+            </div>
+            <div style="background:white;border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid #e53e3e;position:relative;overflow:hidden">
+              <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">% de Falhas x Execuções</div>
+              <div id="dashAutoFalhas" style="font-size:32px;font-weight:800;color:#c53030;line-height:1">—</div>
+              <div id="dashAutoFalhasSub" style="font-size:11px;color:#718096;margin-top:4px">—</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px">
+              <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:4px">🔴 Top 3 Robôs com Mais Erros</div>
+              <div style="font-size:11px;color:#718096;margin-bottom:12px">Automações instáveis que precisam de manutenção</div>
+              <div id="dashAutoTopErros"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem erros registrados 🎉</div></div>
+            </div>
+            <div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px">
+              <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:4px">⏱️ Top 3 Execuções Mais Longas</div>
+              <div style="font-size:11px;color:#718096;margin-bottom:12px">Tempo médio de execução por robô</div>
+              <div id="dashAutoTopLongas"><div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem dados de execução</div></div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;margin:20px 0 12px">
+            <div style="width:3px;height:16px;background:#3b5bdb;border-radius:2px"></div>
+            <span style="font-size:11px;font-weight:700;color:#3b5bdb;text-transform:uppercase;letter-spacing:.5px">⏳ Lead Time por Robô — Meta x Real</span>
+          </div>
+          <div id="dashAutoLeadTimeArea"></div>
         </div>
       </div>
 
@@ -694,14 +682,13 @@
         <div class="page-title">Gestão de Tarefas</div>
         <div class="breadcrumb" style="margin-bottom:14px">Operações > Tarefas</div>
 
-        <!-- ── NAV: Lista | Modelos ── + Carga de Trabalho (direita) -->
+        <!-- ── NAV: Lista | Modelos ── -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div style="display:flex;gap:4px">
             <button id="tskTab-hoje" class="tsk-subtab" onclick="tskNavTo('hoje')">Hoje</button>
             <button id="tskTab-lista" class="tsk-subtab active" onclick="tskNavTo('lista')">Lista de Tarefas</button>
             <button id="tskTab-modelos" class="tsk-subtab" onclick="tskNavTo('modelos')">Modelos de Tarefas</button>
           </div>
-          <button id="tskTab-carga" class="tsk-subtab" onclick="tskNavTo('carga')" style="margin-left:auto">📊 Carga de Trabalho</button>
         </div>
 
         <!-- Lista + Modelos -->
@@ -719,7 +706,7 @@
               <table class="tsk-table">
                 <thead><tr>
                   <th style="width:32px"></th>
-                  <th>Tarefa / Modelo</th><th>Contato / Grupo</th><th>Responsáveis</th><th>Prazo</th><th>Competência</th>
+                  <th>Tarefa / Modelo</th><th>Contato / Grupo</th><th>Responsáveis</th><th>Time</th><th>Prazo</th><th>Competência</th>
                   <th>Prioridade</th><th>Status</th><th>Processo</th><th style="width:80px">Ações</th>
                 </tr></thead>
                 <tbody id="tskHojeBody"></tbody>
@@ -730,7 +717,7 @@
               <table class="tsk-table">
                 <thead><tr>
                   <th style="width:32px"></th>
-                  <th>Tarefa / Modelo</th><th>Contato / Grupo</th><th>Responsáveis</th><th>Prazo</th><th>Competência</th>
+                  <th>Tarefa / Modelo</th><th>Contato / Grupo</th><th>Responsáveis</th><th>Time</th><th>Prazo</th><th>Competência</th>
                   <th>Prioridade</th><th>Status</th><th>Processo</th><th style="width:80px">Ações</th>
                 </tr></thead>
                 <tbody id="tskAtrasadasBody"></tbody>
@@ -756,6 +743,9 @@
               </select>
               <select class="form-control" id="filtroRespTsk" onchange="filtrarTarefas()" style="width:120px;padding:7px 10px;font-size:12px">
                 <option value="">Responsável</option>
+              </select>
+              <select class="form-control" id="filtroTimeTsk" onchange="filtrarTarefas()" style="width:120px;padding:7px 10px;font-size:12px">
+                <option value="">Time</option>
               </select>
               <div style="display:flex;flex-direction:column;gap:1px">
                 <span style="font-size:9px;font-weight:700;color:#a0aec0;letter-spacing:.3px;line-height:1">PRAZO</span>
@@ -784,7 +774,7 @@
               <table class="tsk-table">
                 <thead><tr>
                   <th style="width:32px"><input type="checkbox" id="tskSelectAll" onchange="tskToggleSelectAll(this)"></th>
-                  <th>Tarefa / Modelo</th><th>Contato / Grupo</th><th>Responsáveis</th><th>Prazo</th><th>Competência</th>
+                  <th>Tarefa / Modelo</th><th>Contato / Grupo</th><th>Responsáveis</th><th>Time</th><th>Prazo</th><th>Competência</th>
                   <th>Prioridade</th><th>Status</th><th>Processo</th><th style="width:80px">Ações</th>
                 </tr></thead>
                 <tbody id="tarefasBody"></tbody>
@@ -1119,8 +1109,8 @@
 
                 <div class="rdp-subsecao">Métricas</div>
                 <div class="form-row" style="margin-bottom:8px">
-                  <div class="form-group"><label>Tempo Humano (min)</label><input type="number" class="form-control" id="dpTempoHumano" value="0" min="0"></div>
-                  <div class="form-group"><label>SLA Ideal (min)</label><input type="number" class="form-control" id="dpSla" value="0" min="0"></div>
+                  <div class="form-group"><label>Tempo de Execução Humana (min) *</label><input type="number" class="form-control" id="dpTempoHumano" value="0" min="1" required></div>
+                  <div class="form-group"><label>Lead Time (min) *</label><input type="number" class="form-control" id="dpSla" value="0" min="1" required></div>
                   <div class="form-group form-full"><label>Descrição</label><textarea class="form-control" id="dpDescricao" rows="2" placeholder="O que este robô faz?"></textarea></div>
                 </div>
 
@@ -1596,7 +1586,7 @@ senha = campos.get('senha', '')</pre>
         <!-- Qtd geradas (recorrente) -->
         <div class="form-group" style="margin:0" id="tQtdGeradasRow">
           <label style="font-size:11px;font-weight:700;color:#4a5568;display:block;margin-bottom:4px">QTD DE CICLOS A GERAR <span style="font-weight:400;color:#a0aec0">(por contato)</span></label>
-          <input type="number" class="form-control" id="tQtdGeradas" min="1" max="120" value="12">
+          <input type="number" class="form-control" id="tQtdGeradas" min="1" max="120" value="1">
         </div>
 
         <!-- Data fixa — multi-date picker -->
@@ -1667,12 +1657,12 @@ senha = campos.get('senha', '')</pre>
       <div class="tsk-modal-section" style="margin:20px -20px 16px;padding:10px 20px">👥 Responsáveis e Contatos</div>
       <div style="display:grid;grid-template-columns:1fr;gap:14px">
         <div class="form-group" style="margin:0">
-          <label style="font-size:11px;font-weight:700;color:#4a5568;display:block;margin-bottom:4px">RESPONSÁVEIS <span style="font-weight:400;color:#a0aec0">(vírgula)</span></label>
-          <input type="text" class="form-control" id="tResponsaveis" placeholder="Ex: João, Maria">
+          <label style="font-size:11px;font-weight:700;color:#4a5568;display:block;margin-bottom:4px">RESPONSÁVEIS <span style="font-weight:400;color:#a0aec0">(do organograma — Nivelamento de Conhecimento > Nosso Time)</span></label>
+          <div class="tsk-multi-sel" id="tResponsaveisMulti" style="max-height:120px"></div>
         </div>
         <div class="form-group" style="margin:0">
-          <label style="font-size:11px;font-weight:700;color:#4a5568;display:block;margin-bottom:4px">ÁREAS</label>
-          <input type="text" class="form-control" id="tAreas" placeholder="Ex: TI, Financeiro">
+          <label style="font-size:11px;font-weight:700;color:#4a5568;display:block;margin-bottom:4px">TIME <span style="font-weight:400;color:#a0aec0">(do organograma)</span></label>
+          <div class="tsk-multi-sel" id="tAreasMulti" style="max-height:120px"></div>
         </div>
         <div class="form-group" style="margin:0">
           <label style="font-size:11px;font-weight:700;color:#4a5568;display:block;margin-bottom:4px">CONTATOS INDIVIDUAIS</label>
@@ -1921,8 +1911,8 @@ senha = campos.get('senha', '')</pre>
     <!-- Métricas -->
     <div class="modal-secao-titulo" style="border-color:#cbd5e0;color:#718096">Métricas e Info</div>
     <div class="form-row">
-<div class="form-group"><label>Tempo Humano (min)</label><input type="number" class="form-control" id="rTempoHumano" value="0" min="0"></div>
-      <div class="form-group"><label>SLA Ideal (min)</label><input type="number" class="form-control" id="rSla" value="0" min="0"></div>
+<div class="form-group"><label>Tempo de Execução Humana (min) *</label><input type="number" class="form-control" id="rTempoHumano" value="0" min="1" required></div>
+      <div class="form-group"><label>Lead Time (min) *</label><input type="number" class="form-control" id="rSla" value="0" min="1" required></div>
       <div class="form-group form-full"><label>Descrição</label><textarea class="form-control" id="rDescricao" rows="2" placeholder="O que este robô faz?"></textarea></div>
     </div>
 
@@ -2092,7 +2082,7 @@ senha = campos.get('senha', '')</pre>
     'tPrazo','tPrazoTipo','tPrazoInicioRec',
     'tCompTipo','tCompGranularidade','tCompOffsetVal','tCompOffsetUnid',
     'tVencTipo','tVencOffsetVal','tVencOffsetUnid',
-    'tEditId','tContatosMulti','tGruposMulti','tQtdGeradas',
+    'tEditId','tContatosMulti','tGruposMulti','tQtdGeradas','tResponsaveisMulti','tAreasMulti',
   ]);
   function tskMarkDirty(el) {
     if (!document.getElementById('tEditId')?.value) return;
@@ -2229,7 +2219,7 @@ senha = campos.get('senha', '')</pre>
     document.querySelectorAll('.ops-menu-item').forEach(b => b.classList.remove('active'));
     document.getElementById('secao-' + id).classList.add('active');
     btn.classList.add('active');
-    if (id === 'dashboard') { if (robos.length) renderDashboardRobos(); else carregarRobos(); }
+    if (id === 'dashboard') carregarDashboard();
     if (id === 'configuracoes') { carregarContatos(); carregarEmailTemplates(); renderAssinaturas(); carregarSmtp(); }
     if (id === 'tarefas') carregarTarefas();
     if (id === 'processos') carregarProcessos();
@@ -2879,12 +2869,38 @@ senha = campos.get('senha', '')</pre>
 
   function _gesc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+  // ===== ORGANOGRAMA (Nivelamento de Conhecimento > Nosso Time) =====
+  // Fonte única de verdade pra "quem existe" e "quem está em qual time" — usado nos dropdowns
+  // de Responsáveis/Time de Tarefas e Processos, e na visão "Por Time" do dashboard.
+  let orgDepartamentos = [], orgMembros = [], _orgCarregado = false;
+
+  async function carregarOrganograma(force) {
+    if (_orgCarregado && !force) return;
+    try {
+      const res = await fetch('/api/overview', { headers: HEADERS });
+      const ov = res.ok ? await res.json() : null;
+      orgDepartamentos = ov?.organograma?.departamentos || [];
+      orgMembros = ov?.organograma?.membros || [];
+      _orgCarregado = true;
+    } catch (e) { console.error('Erro ao carregar organograma:', e); }
+  }
+
+  // Nome do time de uma pessoa, pelo depId do membro no organograma. 'Sem Time' se a pessoa
+  // não bate com nenhum membro cadastrado (nome digitado avulso, organograma incompleto, etc).
+  function _orgTimeDaPessoa(nomePessoa) {
+    const membro = orgMembros.find(m => m.nome === nomePessoa);
+    if (!membro) return 'Sem Time';
+    const dep = orgDepartamentos.find(d => String(d.id) === String(membro.depId));
+    return dep ? dep.nome : 'Sem Time';
+  }
+
   // ===== TAREFAS =====
   let tarefas = [];
 
   async function carregarTarefas() {
     try {
       if (!Array.isArray(contatos) || !contatos.length) await carregarContatos();
+      await carregarOrganograma();
       const res = await fetch('/api/tarefas', { headers: HEADERS });
       if (res.status === 401) { window.location.href = '/'; return; }
       const data = await res.json();
@@ -2898,6 +2914,26 @@ senha = campos.get('senha', '')</pre>
         _tagSel.innerHTML = '<option value="">Tags</option>'
           + _allTags.map(tg => `<option value="${tg}"${tg===_prevTag?' selected':''}>${tg}</option>`).join('');
       }
+      // Populate responsável/time filters — inclui "(Sem responsável)"/"(Sem time)" pra quem não tem nada atribuído
+      const _naoModelo = tarefas.filter(t=>!t.isModelo);
+      const _respSel = document.getElementById('filtroRespTsk');
+      if (_respSel) {
+        const _prevResp = _respSel.value;
+        const _allResp = [...new Set(_naoModelo.flatMap(t => t.responsaveis||[]))].sort();
+        const _temSemResp = _naoModelo.some(t => !(t.responsaveis||[]).length);
+        _respSel.innerHTML = '<option value="">Responsável</option>'
+          + (_temSemResp ? `<option value="__sem__"${_prevResp==='__sem__'?' selected':''}>(Sem responsável)</option>` : '')
+          + _allResp.map(r => `<option value="${_gesc(r)}"${r===_prevResp?' selected':''}>${_gesc(r)}</option>`).join('');
+      }
+      const _timeSel = document.getElementById('filtroTimeTsk');
+      if (_timeSel) {
+        const _prevTime = _timeSel.value;
+        const _allTimes = [...new Set(_naoModelo.flatMap(t => t.areas||[]))].sort();
+        const _temSemTime = _naoModelo.some(t => !(t.areas||[]).length);
+        _timeSel.innerHTML = '<option value="">Time</option>'
+          + (_temSemTime ? `<option value="__sem__"${_prevTime==='__sem__'?' selected':''}>(Sem time)</option>` : '')
+          + _allTimes.map(a => `<option value="${_gesc(a)}"${a===_prevTime?' selected':''}>${_gesc(a)}</option>`).join('');
+      }
       renderTarefasStats();
       _tskRenderVisibleArea();
       renderModelos();
@@ -2910,14 +2946,14 @@ senha = campos.get('senha', '')</pre>
     const hojeAtiva = document.getElementById('tskAreaHoje')?.style.display === 'block';
     if (hojeAtiva) { renderTskHoje(); const tb=document.getElementById('tarefasBody'); if (tb) tb.innerHTML=''; }
     else {
-      renderTarefas();
+      renderTarefas((Array.isArray(tarefas)?tarefas:[]).filter(t=>!t.isModelo));
       const h=document.getElementById('tskHojeBody'), a=document.getElementById('tskAtrasadasBody');
       if (h) h.innerHTML=''; if (a) a.innerHTML='';
     }
   }
 
   function renderTarefasStats() {
-    const _tsk = Array.isArray(tarefas) ? tarefas : [];
+    const _tsk = (Array.isArray(tarefas) ? tarefas : []).filter(t=>!t.isModelo);
     const total = _tsk.length;
     const pendentes = _tsk.filter(t=>t.status==='Pendente').length;
     const progresso = _tsk.filter(t=>t.status==='Em Progresso').length;
@@ -2936,6 +2972,7 @@ senha = campos.get('senha', '')</pre>
     const st   = document.getElementById('filtroStatusTsk').value;
     const pr   = document.getElementById('filtroPriTsk').value;
     const resp = document.getElementById('filtroRespTsk')?.value || '';
+    const timeF = document.getElementById('filtroTimeTsk')?.value || '';
     const comp = document.getElementById('filtroCompTsk')?.value || '';
     const prazoM = document.getElementById('filtroPrazoTsk')?.value || '';
     const tagF = document.getElementById('filtroTagTsk')?.value || '';
@@ -2943,10 +2980,20 @@ senha = campos.get('senha', '')</pre>
     const hoje = new Date(); hoje.setHours(23,59,59,0);
     const _st  = t => ['Concluída','Dispensada','Concluída Atrasada'].includes(t.status) ? t.status : (t.prazo && new Date(t.prazo+'T23:59:59') < hoje ? 'Atrasada' : (t.status||'Pendente'));
     const lista = tarefas.filter(t => {
+      // Modelo (o "macro" que gera as tarefas) só aparece na aba Modelos de Tarefas — a Lista
+      // de Tarefas mostra só os itens gerados de fato ("micro"), nunca o modelo em si.
+      if (t.isModelo) return false;
       if (q && !(t.titulo||'').toLowerCase().includes(q)) return false;
       if (st && _st(t) !== st) return false;
       if (pr && t.prioridade !== pr) return false;
-      if (resp && !(t.responsaveis||[]).some(r=>r.toLowerCase().includes(resp.toLowerCase()))) return false;
+      if (resp) {
+        if (resp === '__sem__') { if ((t.responsaveis||[]).length) return false; }
+        else if (!(t.responsaveis||[]).some(r=>r.toLowerCase().includes(resp.toLowerCase()))) return false;
+      }
+      if (timeF) {
+        if (timeF === '__sem__') { if ((t.areas||[]).length) return false; }
+        else if (!(t.areas||[]).some(a=>a.toLowerCase().includes(timeF.toLowerCase()))) return false;
+      }
       if (prazoM && (t.prazo||'').slice(0,7) !== prazoM) return false;
       if (comp) {
         const tc = (t.competenciaFixa||t.competencia||'').slice(0,7);
@@ -2981,7 +3028,9 @@ senha = campos.get('senha', '')</pre>
   function renderTarefas(lista, tbodyId) {
     const tbody = document.getElementById(tbodyId||'tarefasBody');
     if (!tbody) return;
-    const _arr = lista||tarefas; const itens = Array.isArray(_arr)?_arr:[];
+    // Sem lista explícita = renderização padrão da Lista de Tarefas, que nunca deve incluir o
+    // Modelo em si (o "macro") — só os itens que ele gerou. Modelo só aparece em Modelos de Tarefas.
+    const _arr = lista||(Array.isArray(tarefas)?tarefas:[]).filter(t=>!t.isModelo); const itens = Array.isArray(_arr)?_arr:[];
     const hoje = new Date(); hoje.setHours(23,59,59,0);
     const _st = t => ['Concluída','Dispensada','Concluída Atrasada'].includes(t.status) ? t.status
       : (t.prazo && new Date(t.prazo+'T23:59:59') < hoje ? 'Atrasada' : (t.status||'Pendente'));
@@ -2991,7 +3040,7 @@ senha = campos.get('senha', '')</pre>
     };
     const priClass = {'Urgente':'pri-urgente','Alta':'pri-alta','Media':'pri-media','Baixa':'pri-baixa'};
     if (!itens.length) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;color:#a0aec0">Nenhuma tarefa encontrada</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:40px;color:#a0aec0">Nenhuma tarefa encontrada</td></tr>`;
       return;
     }
     tbody.innerHTML = itens.map(t => {
@@ -3020,6 +3069,7 @@ senha = campos.get('senha', '')</pre>
         </td>
         <td style="font-size:11px;color:#4a5568;max-width:130px;white-space:normal">${_ctDisp?`<span style="background:#f0f4ff;color:#2d3748;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600">${_gesc(_ctDisp)}</span>`:''}</td>
         <td><div class="tsk-resp">${resp}</div></td>
+        <td style="font-size:11px;color:#718096">${(t.areas||[]).join(', ')||'—'}</td>
         <td style="font-size:12px;white-space:nowrap">${t.prazo||'—'}</td>
         <td style="font-size:11px;color:#718096">${t.competenciaFixa||t.competencia||'—'}</td>
         <td><span class="pri-badge ${priClass[t.prioridade]||''}">${t.prioridade||'—'}</span></td>
@@ -3038,7 +3088,7 @@ senha = campos.get('senha', '')</pre>
         </td>
       </tr>
       <tr id="tsk-det-${t._id}" style="display:none" class="tsk-detail-row">
-        <td colspan="10">
+        <td colspan="11">
           <div class="tsk-detail-inner">
             <!-- Col 1: Observações + Comentários -->
             <div>
@@ -3131,6 +3181,8 @@ senha = campos.get('senha', '')</pre>
     // Populate multi-selects
     document.getElementById('tContatosMulti').innerHTML = (Array.isArray(contatos)?contatos:[]).map(c=>`<label><input type="checkbox" value="${c._id}" class="tck-cont" onchange="tskUpdateGeracaoInfo()"><span>${c.nome}</span></label>`).join('') || '<span style="font-size:11px;color:#a0aec0">Nenhum contato cadastrado</span>';
     document.getElementById('tGruposMulti').innerHTML = gruposContatos.map(g=>`<label><input type="checkbox" value="${g.nome}" class="tck-grp" onchange="tskUpdateGeracaoInfo()"><span>${g.nome}</span></label>`).join('') || '<span style="font-size:11px;color:#a0aec0">Nenhum grupo cadastrado</span>';
+    document.getElementById('tResponsaveisMulti').innerHTML = orgMembros.map(m=>`<label><input type="checkbox" value="${_gesc(m.nome)}" class="tck-resp"><span>${_gesc(m.nome)}</span></label>`).join('') || '<span style="font-size:11px;color:#a0aec0">Nenhuma pessoa no organograma — cadastre em Nivelamento de Conhecimento > Nosso Time</span>';
+    document.getElementById('tAreasMulti').innerHTML = orgDepartamentos.map(d=>`<label><input type="checkbox" value="${_gesc(d.nome)}" class="tck-area"><span>${_gesc(d.nome)}</span></label>`).join('') || '<span style="font-size:11px;color:#a0aec0">Nenhum time no organograma — cadastre em Nivelamento de Conhecimento > Nosso Time</span>';
     document.getElementById('tEmailTemplate').innerHTML = '<option value="">Nenhum</option>' + emailTemplates.map(t=>`<option value="${t._id}">${t.nome}</option>`).join('');
     // Populate linked model select
     const vinSel = document.getElementById('tTarefaVinculada');
@@ -3155,7 +3207,7 @@ senha = campos.get('senha', '')</pre>
     _tskPrazosFixos = [];
     tskRenderPrazosFixos();
     // Clear form
-    ['tTitulo','tApelido','tResponsaveis','tAreas','tGrupo','tTags','tBccEmails'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+    ['tTitulo','tApelido','tGrupo','tTags','tBccEmails'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
     document.getElementById('tDetalhamento').value='';
     document.getElementById('tPrioridade').value='Media';
     document.getElementById('tStatus').value='Pendente';
@@ -3168,7 +3220,7 @@ senha = campos.get('senha', '')</pre>
     const _rvov=document.getElementById('tVencOffsetVal');if(_rvov)_rvov.value=0;
     const _rvou=document.getElementById('tVencOffsetUnid');if(_rvou)_rvou.value='dias';
     document.getElementById('tAgrupamento').value='individual';
-    document.getElementById('tQtdGeradas').value=12;
+    document.getElementById('tQtdGeradas').value=1;
     const tv=document.getElementById('tTarefaVinculada');if(tv)tv.value='';
     ['lem1d','lem5d','lem10d','lem15d','lem20d','lem25d','lem30d'].forEach(lid=>{const el=document.getElementById(lid);if(el)el.checked=false;});
     tskTogglePrazoTipo(); tskToggleVencimento(); tskToggleCompGranularidade();
@@ -3179,8 +3231,8 @@ senha = campos.get('senha', '')</pre>
         document.getElementById('tTitulo').value=t.titulo||'';
         document.getElementById('tApelido').value=t.apelido||'';
         document.getElementById('tDetalhamento').value=t.detalhamento||t.descricao||'';
-        document.getElementById('tResponsaveis').value=(t.responsaveis||[]).join(', ');
-        document.getElementById('tAreas').value=(t.areas||[]).join(', ');
+        (t.responsaveis||[]).forEach(nome=>{const cb=document.querySelector(`.tck-resp[value="${CSS.escape(nome)}"]`);if(cb)cb.checked=true;});
+        (t.areas||[]).forEach(nome=>{const cb=document.querySelector(`.tck-area[value="${CSS.escape(nome)}"]`);if(cb)cb.checked=true;});
         document.getElementById('tPrioridade').value=t.prioridade||'Media';
         document.getElementById('tStatus').value=t.status||'Pendente';
         const _tg=document.getElementById('tGrupo');if(_tg)_tg.value=t.grupo||'';
@@ -3205,7 +3257,7 @@ senha = campos.get('senha', '')</pre>
         (t.gruposIds||[]).forEach(g=>{const cb=document.querySelector(`.tck-grp[value="${g}"]`);if(cb)cb.checked=true;});
         (t.lembretes||[]).forEach(v=>{const el=document.getElementById('lem'+v);if(el)el.checked=true;});
         // tipo derivado do prazoTipo agora (radio removido)
-        document.getElementById('tQtdGeradas').value=t.qtdGeradas||12;
+        document.getElementById('tQtdGeradas').value=t.qtdGeradas||1;
         tskToggleRecorrente(); tskTogglePrazoTipo(); tskToggleVencimento();
       }
     }
@@ -3221,7 +3273,7 @@ senha = campos.get('senha', '')</pre>
 
     const tipo      = (document.getElementById('tPrazoTipo').value !== 'fixa') ? 'recorrente' : 'unica';
     const prazoTipo = document.getElementById('tPrazoTipo').value;
-    const qtdCiclos = parseInt(document.getElementById('tQtdGeradas').value)||12;
+    const qtdCiclos = parseInt(document.getElementById('tQtdGeradas').value)||1;
     const prazoFixo = document.getElementById('tPrazo').value;
     const prazoInicioRec = document.getElementById('tPrazoInicioRec')?.value || prazoFixo;
     const compGranularidade = document.getElementById('tCompGranularidade')?.value || 'mes';
@@ -3243,8 +3295,8 @@ senha = campos.get('senha', '')</pre>
       titulo, apelido:document.getElementById('tApelido').value,
       detalhamento:document.getElementById('tDetalhamento').value,
       tipo, prazoTipo, compGranularidade,
-      responsaveis:document.getElementById('tResponsaveis').value.split(',').map(r=>r.trim()).filter(Boolean),
-      areas:document.getElementById('tAreas').value.split(',').map(a=>a.trim()).filter(Boolean),
+      responsaveis:[...document.querySelectorAll('.tck-resp:checked')].map(cb=>cb.value),
+      areas:[...document.querySelectorAll('.tck-area:checked')].map(cb=>cb.value),
       prioridade:document.getElementById('tPrioridade').value,
       status:document.getElementById('tStatus').value,
       grupo:gruposIds.length > 0 ? gruposIds[0] : '',
@@ -3300,7 +3352,7 @@ senha = campos.get('senha', '')</pre>
         // Per-field scope: update pending items for fields marked 'pendentes'
         const _pend=(Array.isArray(tarefas)?tarefas:[]).filter(t=>!t.isModelo&&t.modeloId===id&&t.status==='Pendente');
         if (_pend.length && Object.keys(_tskDirtyFields).length) {
-          const _sm={tTitulo:'titulo',tApelido:'apelido',tDetalhamento:'detalhamento',tResponsaveis:'responsaveis',tAreas:'areas',tPrioridade:'prioridade',tStatus:'status',tGrupo:'grupo',tTags:'tags',tEmailTemplate:'emailTemplateId',tBccEmails:'bccEmails',tAgrupamento:'agrupamento'};
+          const _sm={tTitulo:'titulo',tApelido:'apelido',tDetalhamento:'detalhamento',tPrioridade:'prioridade',tStatus:'status',tGrupo:'grupo',tTags:'tags',tEmailTemplate:'emailTemplateId',tBccEmails:'bccEmails',tAgrupamento:'agrupamento'};
           const _pu={};
           for (const [eid,key] of Object.entries(_sm)) if (_tskDirtyFields[eid]==='pendentes') _pu[key]=base[key];
           if (Object.keys(_tskDirtyFields).some(k=>k.startsWith('lem')&&_tskDirtyFields[k]==='pendentes')) _pu.lembretes=base.lembretes;
@@ -3349,7 +3401,7 @@ senha = campos.get('senha', '')</pre>
   async function tskGerarItens(modeloId) {
     const modelo = tarefas.find(t=>t._id===modeloId);
     if (!modelo) return;
-    const _qt = modelo.qtdGeradas || 12;
+    const _qt = modelo.qtdGeradas || 1;
     const _params = await new Promise(res => {
       const ov = document.createElement('div');
       ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center';
@@ -3445,7 +3497,7 @@ senha = campos.get('senha', '')</pre>
         }
       } else {
         // Gerar lote conforme configurações do modelo
-        const qt=modelo.qtdGeradas||12;
+        const qt=modelo.qtdGeradas||1;
         const pt=modelo.prazoTipo||'fixa';
         const start=modelo.prazo||hoje;
         const prazos=pt==='fixa'?(modelo.prazosFixos?.length?modelo.prazosFixos:[start]):[...Array(qt)].map((_,i)=>{
@@ -3691,7 +3743,7 @@ senha = campos.get('senha', '')</pre>
   async function tskAlterarPri(id, pri) {
     await fetch(`/api/tarefas/${id}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({ prioridade:pri }) });
     const t = tarefas.find(t=>t._id===id);
-    if (t) { t.prioridade = pri; renderTarefas(); }
+    if (t) { t.prioridade = pri; renderTarefas(tarefas.filter(t=>!t.isModelo)); }
   }
 
 
@@ -3862,6 +3914,7 @@ senha = campos.get('senha', '')</pre>
     const prazoM = document.getElementById('filtroPrazoTsk')?.value || '';
     const comp   = document.getElementById('filtroCompTsk')?.value || '';
     const lista = tarefas.filter(t => {
+      if (t.isModelo) return false;
       if (q && !(t.titulo||'').toLowerCase().includes(q)) return false;
       if (st && _st(t) !== st) return false;
       if (pr && t.prioridade !== pr) return false;
@@ -4004,6 +4057,9 @@ senha = campos.get('senha', '')</pre>
       const ovData     = rO.ok ? await rO.json() : {};
       if (rR.ok) robos = await rR.json();
       prcDepartamentos = ovData.organograma?.departamentos || [];
+      orgDepartamentos = ovData.organograma?.departamentos || [];
+      orgMembros = ovData.organograma?.membros || [];
+      _orgCarregado = true;
       prcRenderRep();
       prcRenderExec();
     } catch(e) { console.error(e); }
@@ -4073,11 +4129,17 @@ senha = campos.get('senha', '')</pre>
     }).join('');
   }
 
+  function _prcPopularOrgMulti() {
+    document.getElementById('prcModeloRespMulti').innerHTML = orgMembros.map(m=>`<label><input type="checkbox" value="${_gesc(m.nome)}" class="prc-tck-resp"><span>${_gesc(m.nome)}</span></label>`).join('') || '<span style="font-size:11px;color:#a0aec0">Nenhuma pessoa no organograma</span>';
+    document.getElementById('prcModeloAreasMulti').innerHTML = orgDepartamentos.map(d=>`<label><input type="checkbox" value="${_gesc(d.nome)}" class="prc-tck-area"><span>${_gesc(d.nome)}</span></label>`).join('') || '<span style="font-size:11px;color:#a0aec0">Nenhum time no organograma</span>';
+  }
+
   function prcAbrirNovoModelo() {
     document.getElementById('prcModeloId').value = '';
     document.getElementById('prcModeloTitulo').textContent = 'Novo Processo';
-    ['prcModeloNome','prcModeloDesc','prcModeloCat','prcModeloResp','prcModeloTags'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['prcModeloNome','prcModeloDesc','prcModeloCat','prcModeloTags','prcModeloLeadTime'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('prcModeloVer').value='v1.0';
+    _prcPopularOrgMulti();
     const _ativRadio = document.querySelector('input[name="prcModeloAtivacao"][value="paralelo"]');
     if (_ativRadio) _ativRadio.checked = true;
     document.getElementById('modalPrcModelo').style.display='flex';
@@ -4090,9 +4152,12 @@ senha = campos.get('senha', '')</pre>
     document.getElementById('prcModeloNome').value = proc.nome||'';
     document.getElementById('prcModeloDesc').value = proc.descricao||'';
     document.getElementById('prcModeloCat').value = proc.categoria||'';
-    document.getElementById('prcModeloResp').value = (proc.responsaveis||[]).join(', ');
+    _prcPopularOrgMulti();
+    (proc.responsaveis||[]).forEach(nome=>{const cb=document.querySelector(`.prc-tck-resp[value="${CSS.escape(nome)}"]`);if(cb)cb.checked=true;});
+    (proc.areas||[]).forEach(nome=>{const cb=document.querySelector(`.prc-tck-area[value="${CSS.escape(nome)}"]`);if(cb)cb.checked=true;});
     document.getElementById('prcModeloTags').value = (proc.tags||[]).join(', ');
     document.getElementById('prcModeloVer').value = proc.versao||'v1.0';
+    document.getElementById('prcModeloLeadTime').value = proc.leadTimeEsperado||'';
     const _ativVal = proc.ativacaoTarefas||'paralelo';
     const _ativRadio = document.querySelector(`input[name="prcModeloAtivacao"][value="${_ativVal}"]`);
     if (_ativRadio) _ativRadio.checked = true;
@@ -4104,12 +4169,16 @@ senha = campos.get('senha', '')</pre>
   async function prcSalvarModelo() {
     const nome = document.getElementById('prcModeloNome').value.trim();
     if (!nome) { alert('Nome obrigatório.'); return; }
+    const leadTimeEsperado = parseInt(document.getElementById('prcModeloLeadTime').value)||0;
+    if (leadTimeEsperado <= 0) { alert('Lead Time Esperado é obrigatório e deve ser maior que zero.'); return; }
     const id = document.getElementById('prcModeloId').value;
     const dados = {
       nome, descricao:document.getElementById('prcModeloDesc').value,
       categoria:document.getElementById('prcModeloCat').value,
       versao:document.getElementById('prcModeloVer').value||'v1.0',
-      responsaveis:document.getElementById('prcModeloResp').value.split(',').map(s=>s.trim()).filter(Boolean),
+      leadTimeEsperado,
+      responsaveis:[...document.querySelectorAll('.prc-tck-resp:checked')].map(cb=>cb.value),
+      areas:[...document.querySelectorAll('.prc-tck-area:checked')].map(cb=>cb.value),
       tags:document.getElementById('prcModeloTags').value.split(',').map(s=>s.trim()).filter(Boolean),
       ativacaoTarefas: document.querySelector('input[name="prcModeloAtivacao"]:checked')?.value || 'paralelo',
     };
@@ -5354,8 +5423,8 @@ senha = campos.get('senha', '')</pre>
       titulo:d.tituloTarefa||'', apelido:d.apelido||'', detalhamento:d.instrucao||'',
       tipo, prazoTipo, status:'Pendente', prioridade:d.prioridade||'Media',
       tags:(d.tags||'').split(',').map(t=>t.trim()).filter(Boolean),
-      responsaveis:(d.responsaveis||'').split(',').map(r=>r.trim()).filter(Boolean),
-      areas:(d.areas||'').split(',').map(a=>a.trim()).filter(Boolean),
+      responsaveis:Array.isArray(d.responsaveis)?d.responsaveis:[],
+      areas:Array.isArray(d.areas)?d.areas:[],
       gruposIds:d.grupoIds||[], agrupamento:d.agrupamento||'individual',
       emailTemplateId:d.emailTemplateId||null, bccEmails:d.bcc||'',
       tarefaVinculadaId:d.tarefaVinculadaId||null, lembretes:d.lembretes||[],
@@ -5988,14 +6057,14 @@ senha = campos.get('senha', '')</pre>
       +row(lbl('TIPO DE PRAZO DE ENTREGA')+`<select class="form-control" style="margin-top:3px;font-size:11px" onchange="prcBuilderUpdateDados('${el.id}','prazoTipo',this.value);prcBuilderRenderCfg('${el.id}')">${[['fixa','📌 Data fixa'],['diaria','📆 Diária'],['semanal','📅 Semanal'],['quinzenal','📅 Quinzenal'],['mensal','🗓️ Mensal'],['semestral','🗓️ Semestral'],['anual','🗓️ Anual']].map(([v,l])=>`<option value="${v}" ${prazoTipo===v?'selected':''}>${l}</option>`).join('')}</select>`)
       +(prazoTipo==='fixa'
         ?row(lbl('PRAZO (DIAS APÓS ATIVAÇÃO) <span style="font-weight:400;color:#a0aec0">— 0 = imediatamente</span>')+inp('prazoDias',d.prazoDias||'','Ex: 3','number','min="0"'))
-        :row(lbl('QTD DE CICLOS A GERAR <span style="font-weight:400;color:#a0aec0">(por contato)</span>')+inp('qtdCiclos',d.qtdCiclos||12,'','number','min="1" max="120"')))
+        :row(lbl('QTD DE CICLOS A GERAR <span style="font-weight:400;color:#a0aec0">(por contato)</span>')+inp('qtdCiclos',d.qtdCiclos||1,'','number','min="1" max="120"')))
       +row(lbl('COMPETÊNCIA')+`<select class="form-control" style="margin-top:3px;font-size:11px" onchange="prcBuilderUpdateDados('${el.id}','compTipo',this.value);prcBuilderRenderCfg('${el.id}')"><option value="nenhum" ${compTipo==='nenhum'?'selected':''}>Sem competência</option><option value="igual_prazo" ${compTipo==='igual_prazo'?'selected':''}>Igual ao prazo</option><option value="offset" ${compTipo==='offset'?'selected':''}>Prazo + deslocamento</option></select>`
         +(compTipo==='offset'?`<div style="display:flex;gap:6px;margin-top:4px"><input type="number" value="${d.compOffsetVal||0}" class="form-control" style="width:64px;font-size:11px" onchange="prcBuilderUpdateDados('${el.id}','compOffsetVal',this.value)"><select class="form-control" style="font-size:11px" onchange="prcBuilderUpdateDados('${el.id}','compOffsetUnid',this.value)">${['dias','semanas','meses','anos'].map(u=>`<option ${(d.compOffsetUnid||'meses')===u?'selected':''}>${u}</option>`).join('')}</select></div>`:''))
       +row(lbl('VENCIMENTO')+`<select class="form-control" style="margin-top:3px;font-size:11px" onchange="prcBuilderUpdateDados('${el.id}','vencTipo',this.value);prcBuilderRenderCfg('${el.id}')"><option value="nenhum" ${vencTipo==='nenhum'?'selected':''}>Sem vencimento</option><option value="igual_prazo" ${vencTipo==='igual_prazo'?'selected':''}>Igual ao prazo</option><option value="offset_prazo" ${vencTipo==='offset_prazo'?'selected':''}>Prazo + deslocamento</option></select>`
         +(vencTipo==='offset_prazo'?`<div style="display:flex;gap:6px;margin-top:4px"><input type="number" value="${d.vencOffsetVal||0}" class="form-control" style="width:64px;font-size:11px" onchange="prcBuilderUpdateDados('${el.id}','vencOffsetVal',this.value)"><select class="form-control" style="font-size:11px" onchange="prcBuilderUpdateDados('${el.id}','vencOffsetUnid',this.value)">${['dias','semanas','meses','anos'].map(u=>`<option ${(d.vencOffsetUnid||'dias')===u?'selected':''}>${u}</option>`).join('')}</select></div>`:''))
       +sec('👥 RESPONSÁVEIS E CONTATOS')
-      +row(lbl('RESPONSÁVEIS <span style="font-weight:400;color:#a0aec0">(vírgula)</span>')+inp('responsaveis',d.responsaveis||'','Ex: João, Maria'))
-      +row(lbl('ÁREAS')+inp('areas',d.areas||'','Ex: TI, Financeiro'))
+      +row(lbl('RESPONSÁVEIS <span style="font-weight:400;color:#a0aec0">(do organograma)</span>')+`<div style="margin-top:3px;max-height:110px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;padding:4px 6px">${orgMembros.length===0?'<div style="font-size:10px;color:#a0aec0;padding:2px">Nenhuma pessoa no organograma</div>':orgMembros.map(m=>`<label style="display:flex;align-items:center;gap:5px;font-size:10px;padding:2px 0;cursor:pointer"><input type="checkbox" ${(Array.isArray(d.responsaveis)?d.responsaveis:[]).includes(m.nome)?'checked':''} onchange="prcBuilderToggleArr('${el.id}','responsaveis','${_gesc(m.nome)}',this.checked)">${_gesc(m.nome)}</label>`).join('')}</div>`)
+      +row(lbl('TIME <span style="font-weight:400;color:#a0aec0">(do organograma)</span>')+`<div style="margin-top:3px;max-height:90px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;padding:4px 6px">${orgDepartamentos.length===0?'<div style="font-size:10px;color:#a0aec0;padding:2px">Nenhum time no organograma</div>':orgDepartamentos.map(dp=>`<label style="display:flex;align-items:center;gap:5px;font-size:10px;padding:2px 0;cursor:pointer"><input type="checkbox" ${(Array.isArray(d.areas)?d.areas:[]).includes(dp.nome)?'checked':''} onchange="prcBuilderToggleArr('${el.id}','areas','${_gesc(dp.nome)}',this.checked)">${_gesc(dp.nome)}</label>`).join('')}</div>`)
       +row(lbl('CONTATOS INDIVIDUAIS')+`<div style="margin-top:3px;max-height:110px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;padding:4px 6px">${(contatos||[]).length===0?'<div style="font-size:10px;color:#a0aec0;padding:2px">Sem contatos cadastrados</div>':(contatos||[]).map(c=>`<label style="display:flex;align-items:center;gap:5px;font-size:10px;padding:2px 0;cursor:pointer"><input type="checkbox" ${selContatos.includes(c._id)?'checked':''} onchange="prcBuilderToggleArr('${el.id}','contatoIds','${c._id}',this.checked)">${_gesc(c.nome||c.email||'')}</label>`).join('')}</div>`)
       +row(lbl('GRUPOS DE CONTATOS')+`<div style="margin-top:3px;max-height:90px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:6px;padding:4px 6px">${(gruposContatos||[]).length===0?'<div style="font-size:10px;color:#a0aec0;padding:2px">Sem grupos cadastrados</div>':(gruposContatos||[]).map(g=>`<label style="display:flex;align-items:center;gap:5px;font-size:10px;padding:2px 0;cursor:pointer"><input type="checkbox" ${selGrupos.includes(g.id||g._id)?'checked':''} onchange="prcBuilderToggleArr('${el.id}','grupoIds','${g.id||g._id}',this.checked)">${_gesc(g.nome||'')}</label>`).join('')}</div>`)
       +row(lbl('AGRUPAMENTO DE E-MAIL')+`<select class="form-control" style="margin-top:3px;font-size:11px" onchange="prcBuilderUpdateDados('${el.id}','agrupamento',this.value)"><option value="individual" ${(d.agrupamento||'individual')==='individual'?'selected':''}>Individual (por contato)</option><option value="agrupado" ${d.agrupamento==='agrupado'?'selected':''}>Agrupado (por grupo)</option></select>`)
@@ -7560,6 +7629,428 @@ senha = campos.get('senha', '')</pre>
     if(volumetria) volumetria.innerHTML = Object.entries(deps).sort((a,b)=>b[1]-a[1]).map(([d,n],i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:14px">${medals[i]||'▫️'}</span><span style="font-size:11px;color:#1e2a4a;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${d}</span><div style="flex:2;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden"><div style="height:100%;background:${cores[i%cores.length]};border-radius:3px;width:${Math.round(n/maxV*100)}%"></div></div><span style="font-size:11px;font-weight:700;color:${cores[i%cores.length]};min-width:20px;text-align:right">${n}</span></div>`).join('')||'<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem dados</div>';
   }
 
+  // ===== DASHBOARD (Eficiência e Produtividade / Automação) =====
+  let dashEscopo = 'global'; // 'global' | 'pessoa' | 'time'
+  let dashGran = 'mes'; // 'dia' | 'semana' | 'mes'
+
+  async function carregarDashboard() {
+    const jobs = [];
+    if (!robos.length) jobs.push(carregarRobos());
+    if (!_execsRobos.length) jobs.push(carregarExecsRobos());
+    if (!tarefas.length) jobs.push(carregarTarefas());
+    if (!proExecs.length) jobs.push(carregarProcessos());
+    if (jobs.length) await Promise.all(jobs);
+    renderDashEficiencia();
+    renderDashAutomacao();
+  }
+
+  function mudarDashTab(id, btn) {
+    document.querySelectorAll('#secao-dashboard > .com-tabs .com-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('dash-eficiencia').style.display = id==='eficiencia' ? '' : 'none';
+    document.getElementById('dash-automacao').style.display = id==='automacao' ? '' : 'none';
+  }
+
+  // Controle de quebra (mostrar times / mostrar pessoas) independente por bloco — cada bloco
+  // (Prazo, Volume, Backlog) minimiza pra Total geral, Total por time, ou tudo, sem afetar os
+  // outros blocos. Lead Time por Processo não participa — é sempre por processo, global.
+  const DASH_BLOCOS = ['prazo','volume','backlog'];
+  let dashQuebra = { prazo:{times:true,pessoas:true}, volume:{times:true,pessoas:true}, backlog:{times:true,pessoas:true} };
+  const DASH_BLOCO_RENDER = { prazo:()=>renderDashPrazo(tarefas.filter(t=>!t.isModelo)), volume:()=>renderDashVolume(), backlog:()=>renderDashBacklog(tarefas.filter(t=>!t.isModelo)) };
+
+  function _dashQuebraCtrlHtml(bloco) {
+    const q = dashQuebra[bloco];
+    return `<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:#4a5568;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:normal"><input type="checkbox" ${q.times?'checked':''} onchange="dashSetQuebraBloco('${bloco}','times',this.checked)"> Times</label>`
+      + `<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:#4a5568;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:normal"><input type="checkbox" ${q.pessoas?'checked':''} onchange="dashSetQuebraBloco('${bloco}','pessoas',this.checked)"> Pessoas</label>`;
+  }
+
+  function dashSetEscopo(v, btn) {
+    dashEscopo = v;
+    document.querySelectorAll('#dashEscopoTabs .com-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    DASH_BLOCOS.forEach(bloco => {
+      const ctrl = document.getElementById('dashQuebraCtrl-'+bloco);
+      if (!ctrl) return;
+      ctrl.style.display = v==='time' ? 'flex' : 'none';
+      if (v==='time') ctrl.innerHTML = _dashQuebraCtrlHtml(bloco);
+    });
+    // Lead Time por Processo não faz sentido quebrado por time/pessoa — só existe na visão Global.
+    const leadTimeBloco = document.getElementById('dashLeadTimeBloco');
+    if (leadTimeBloco) leadTimeBloco.style.display = v==='global' ? '' : 'none';
+    renderDashEficiencia();
+  }
+
+  function dashSetQuebraBloco(bloco, campo, checked) {
+    dashQuebra[bloco][campo] = checked;
+    DASH_BLOCO_RENDER[bloco]();
+  }
+
+  function dashSetGran(v, btn) {
+    dashGran = v;
+    document.querySelectorAll('#dashGranTabs .com-tab').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    renderDashVolume();
+  }
+
+  let dashVolRangeDe = '', dashVolRangeAte = '';
+
+  function dashSetVolRange() {
+    dashVolRangeDe = document.getElementById('dashVolDeInp')?.value || '';
+    dashVolRangeAte = document.getElementById('dashVolAteInp')?.value || '';
+    renderDashVolume();
+  }
+
+  function dashLimparVolRange() {
+    dashVolRangeDe = ''; dashVolRangeAte = '';
+    const de = document.getElementById('dashVolDeInp'), ate = document.getElementById('dashVolAteInp');
+    if (de) de.value = ''; if (ate) ate.value = '';
+    renderDashVolume();
+  }
+
+  // ---- Buckets: navegação por range (inclui períodos futuros, não só passado) ----
+  function _dashKeyToDate(key, gran) {
+    if (gran==='mes') { const [y,m]=key.split('-'); return new Date(Date.UTC(+y, +m-1, 1)); }
+    if (gran==='dia') { const [y,m,d]=key.split('-'); return new Date(Date.UTC(+y, +m-1, +d)); }
+    const [y,w] = key.split('-W');
+    const simple = new Date(Date.UTC(+y,0,1 + (+w-1)*7));
+    const dow = simple.getUTCDay() || 7;
+    if (dow <= 4) simple.setUTCDate(simple.getUTCDate() - dow + 1); else simple.setUTCDate(simple.getUTCDate() + 8 - dow);
+    return simple;
+  }
+
+  function _dashAddPeriod(d, gran, n) {
+    const r = new Date(d);
+    if (gran==='dia') r.setUTCDate(r.getUTCDate()+n);
+    else if (gran==='semana') r.setUTCDate(r.getUTCDate()+n*7);
+    else r.setUTCMonth(r.getUTCMonth()+n);
+    return r;
+  }
+
+  function _dashBucketsRange(gran, startKey, endKey) {
+    const out = [];
+    let a = _dashKeyToDate(startKey, gran), b = _dashKeyToDate(endKey, gran);
+    if (a > b) { const tmp=a; a=b; b=tmp; }
+    let cur = a, guard = 0;
+    while (cur <= b && guard < 500) {
+      out.push(_dashBucketKeyFromDate(cur, gran));
+      cur = _dashAddPeriod(cur, gran, 1);
+      guard++;
+    }
+    return out;
+  }
+
+  // Janela padrão: passado + futuro, centrada em hoje — pra previsto (prazos futuros) sempre
+  // aparecer mesmo sem o usuário mexer em filtro nenhum (era o bug: janela só ia até hoje).
+  function _dashDefaultWindow(gran) {
+    const now = new Date();
+    const back = gran==='dia'?7:6, fwd = gran==='dia'?7:6;
+    const startKey = _dashBucketKeyFromDate(_dashAddPeriod(now,gran,-back), gran);
+    const endKey = _dashBucketKeyFromDate(_dashAddPeriod(now,gran,fwd), gran);
+    return [startKey, endKey];
+  }
+
+  function _dashKpiRow(items) {
+    return `<div style="display:grid;grid-template-columns:repeat(${items.length},1fr);gap:12px">` +
+      items.map(it=>`<div style="background:white;border-radius:12px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.06);border-top:3px solid ${it.cor}">
+        <div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${it.label}</div>
+        <div style="font-size:26px;font-weight:800;color:${it.cor}">${it.valor}</div>
+      </div>`).join('') + `</div>`;
+  }
+
+  function _dashTabela(cols, rows) {
+    if (!rows.length) return `<div style="background:white;border-radius:10px;padding:24px;text-align:center;color:#a0aec0;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)">Sem dados para exibir.</div>`;
+    return `<div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow:hidden;overflow-x:auto">
+      <table class="tsk-table"><thead><tr>${cols.map(c=>`<th>${_gesc(c)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${_gesc(String(c))}</td>`).join('')}</tr>`).join('')}</tbody></table>
+    </div>`;
+  }
+
+  function _dashBarRow(nome, valorLabel, valorNum, cor, max) {
+    max = max || valorNum || 1;
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:11px;color:#1e2a4a;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_gesc(nome)}</span>
+      <div style="flex:2;height:6px;background:#f1f5f9;border-radius:3px;overflow:hidden"><div style="height:100%;background:${cor};border-radius:3px;width:${Math.min(valorNum/max*100,100)}%"></div></div>
+      <span style="font-size:11px;font-weight:700;color:${cor};min-width:30px;text-align:right">${valorLabel}</span>
+    </div>`;
+  }
+
+  // Agrupa itens (tarefas ou execuções, cada um com um array `campo` de nomes de pessoas) por
+  // TIME — o time de cada pessoa vem do organograma (Nivelamento de Conhecimento > Nosso Time),
+  // não de um campo "área" solto. Pessoas sem organograma caem em "Sem Time". Retorna
+  // { [nomeTime]: { todos:[itens], pessoas:{ [nomePessoa]: [itens] } } }.
+  function _dashGroupByTime(lista, campo) {
+    const grupos = {};
+    lista.forEach(item => {
+      const nomes = (item[campo]||[]).filter(Boolean);
+      const lista_ = nomes.length ? nomes : ['(Sem responsável)'];
+      const timesTocados = new Set();
+      lista_.forEach(nome => {
+        const time = nome === '(Sem responsável)' ? 'Sem Time' : _orgTimeDaPessoa(nome);
+        if (!grupos[time]) grupos[time] = { todos: [], pessoas: {} };
+        if (!grupos[time].pessoas[nome]) grupos[time].pessoas[nome] = [];
+        grupos[time].pessoas[nome].push(item);
+        if (!timesTocados.has(time)) { grupos[time].todos.push(item); timesTocados.add(time); }
+      });
+    });
+    return grupos;
+  }
+
+  // statsFn(itens) -> objeto com os valores das métricas (chaves batendo com colunas[].key).
+  // colunas: [{key, label}]. Tabela padrão (mesmo componente _dashTabela usado em todo o resto
+  // do dashboard): uma linha por time, com as pessoas do time logo abaixo (indentado), e uma
+  // linha "Total" ao final agregando tudo — sem componente novo, sem interação de expandir/colapsar.
+  function _dashRenderTimeTable(grupos, statsFn, colunas, bloco) {
+    const q = dashQuebra[bloco] || {times:true, pessoas:true};
+    const times = Object.entries(grupos).sort((a,b)=>b[1].todos.length-a[1].todos.length);
+    const rows = [];
+    times.forEach(([nomeTime, g]) => {
+      if (q.times) {
+        const s = statsFn(g.todos);
+        rows.push([nomeTime, ...colunas.map(c=>s[c.key])]);
+      }
+      if (q.pessoas) {
+        const pessoas = Object.entries(g.pessoas).sort((a,b)=>b[1].length-a[1].length);
+        pessoas.forEach(([nomePessoa, itens]) => {
+          const sp = statsFn(itens);
+          rows.push(['    '+nomePessoa, ...colunas.map(c=>sp[c.key])]);
+        });
+      }
+    });
+    if (times.length) {
+      const vistos = new Set();
+      const todosItens = [];
+      times.forEach(([,g]) => g.todos.forEach(item => { if (!vistos.has(item)) { vistos.add(item); todosItens.push(item); } }));
+      const sTotal = statsFn(todosItens);
+      rows.push(['Total', ...colunas.map(c=>sTotal[c.key])]);
+    }
+    return _dashTabela(['Time / Pessoa', ...colunas.map(c=>c.label)], rows);
+  }
+
+  function _isoWeekKey(d) {
+    const dt = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = dt.getUTCDay() || 7;
+    dt.setUTCDate(dt.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(dt.getUTCFullYear(),0,1));
+    const weekNo = Math.ceil((((dt - yearStart) / 86400000) + 1)/7);
+    return `${dt.getUTCFullYear()}-W${String(weekNo).padStart(2,'0')}`;
+  }
+
+  function _dashBucketKeyFromDate(d, gran) {
+    if (gran==='dia') return d.toISOString().slice(0,10);
+    if (gran==='mes') return d.toISOString().slice(0,7);
+    return _isoWeekKey(d);
+  }
+
+  function _dashBucketKey(dateStr, gran) {
+    const d = new Date(String(dateStr).length<=10 ? dateStr+'T12:00:00' : dateStr);
+    if (isNaN(d)) return null;
+    return _dashBucketKeyFromDate(d, gran);
+  }
+
+  function _dashBucketLabel(key, gran) {
+    if (gran==='dia') { const [,m,dd]=key.split('-'); return `${dd}/${m}`; }
+    if (gran==='mes') { const [y,m]=key.split('-'); const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']; return `${MESES[+m-1]}/${y.slice(2)}`; }
+    return key.replace(/^\d{4}-/,'');
+  }
+
+  function _dashPrazoStats(lista) {
+    const validos = lista.filter(t => t.prazo && ['Concluída','Concluída Atrasada'].includes(t.status) && t.dataConclusao);
+    const atrasadas = validos.filter(t => t.status === 'Concluída Atrasada');
+    const noPrazo = validos.filter(t => t.status === 'Concluída');
+    const diffDias = (a,b) => (new Date(a) - new Date(b)) / 86400000;
+    const atrasoMedio = atrasadas.length ? atrasadas.reduce((s,t)=>s+diffDias(t.dataConclusao, t.prazo+'T00:00:00'),0)/atrasadas.length : 0;
+    const antecipMedia = noPrazo.length ? noPrazo.reduce((s,t)=>s+Math.max(diffDias(t.prazo+'T00:00:00', t.dataConclusao),0),0)/noPrazo.length : 0;
+    return {
+      total: validos.length,
+      pctAtraso: validos.length ? Math.round(atrasadas.length/validos.length*100) : 0,
+      atrasoMedio: Math.round(atrasoMedio),
+      pctNoPrazo: validos.length ? Math.round(noPrazo.length/validos.length*100) : 0,
+      antecipMedia: Math.round(antecipMedia)
+    };
+  }
+
+  function renderDashPrazo(lista) {
+    const area = document.getElementById('dashPrazoArea');
+    if (!area) return;
+    if (dashEscopo === 'global') {
+      const s = _dashPrazoStats(lista);
+      area.innerHTML = _dashKpiRow([
+        {label:'% Atraso', valor:s.pctAtraso+'%', cor:'#e53e3e'},
+        {label:'Atraso Médio (dias)', valor:s.atrasoMedio, cor:'#e53e3e'},
+        {label:'% Entrega no Prazo', valor:s.pctNoPrazo+'%', cor:'#38a169'},
+        {label:'Antecipação Média (dias)', valor:s.antecipMedia, cor:'#38a169'}
+      ]) + `<div style="font-size:11px;color:#a0aec0;margin-top:6px">${s.total} tarefa(s) concluída(s) com prazo definido</div>`;
+      return;
+    }
+    const grupos = _dashGroupByTime(lista, 'responsaveis');
+    area.innerHTML = _dashRenderTimeTable(grupos, itens => {
+      const s = _dashPrazoStats(itens);
+      return { concluidas: s.total, pctAtraso: s.pctAtraso+'%', atrasoMedio: s.atrasoMedio, pctNoPrazo: s.pctNoPrazo+'%', antecipMedia: s.antecipMedia };
+    }, [
+      {key:'concluidas', label:'Concluídas'},
+      {key:'pctAtraso', label:'% Atraso'},
+      {key:'atrasoMedio', label:'Atraso Méd. (dias)'},
+      {key:'pctNoPrazo', label:'% No Prazo'},
+      {key:'antecipMedia', label:'Antecip. Méd. (dias)'},
+    ], 'prazo');
+  }
+
+  // "Cumprido" = das tarefas com PREVISTO num bucket, quantas já estão concluídas HOJE —
+  // não importa em qual bucket a conclusão real caiu. Resolve o problema de "previsto x
+  // concluído nunca bate 100%" quando algo é concluído antes do prazo (cai num bucket
+  // anterior ao do previsto). É diferente de "Concluído no período", que é a atividade real
+  // (quanto foi de fato concluído naquele bucket, seja lá qual for o prazo original).
+  function _dashVolumeCalc(lista, key, gran) {
+    const doPeriodo = lista.filter(t => t.prazo && _dashBucketKey(t.prazo,gran)===key);
+    const concluidoNoPeriodo = lista.filter(t => t.dataConclusao && ['Concluída','Concluída Atrasada'].includes(t.status) && _dashBucketKey(t.dataConclusao,gran)===key);
+    const cumprido = doPeriodo.filter(t => ['Concluída','Concluída Atrasada'].includes(t.status));
+    return { previsto: doPeriodo.length, concluidoPeriodo: concluidoNoPeriodo.length, cumprido: cumprido.length, pct: doPeriodo.length ? Math.round(cumprido.length/doPeriodo.length*100) : 0 };
+  }
+
+  function renderDashVolume(lista) {
+    lista = lista || tarefas.filter(t=>!t.isModelo);
+    const area = document.getElementById('dashVolumeArea');
+    if (!area) return;
+
+    let buckets;
+    if (dashVolRangeDe && dashVolRangeAte) {
+      buckets = _dashBucketsRange(dashGran, _dashBucketKey(dashVolRangeDe,dashGran), _dashBucketKey(dashVolRangeAte,dashGran));
+    } else {
+      const [s,e] = _dashDefaultWindow(dashGran);
+      buckets = _dashBucketsRange(dashGran, s, e);
+    }
+
+    if (dashEscopo === 'global') {
+      const porBucket = {}; buckets.forEach(b=>{ porBucket[b] = _dashVolumeCalc(lista, b, dashGran); });
+      const max = Math.max(1,...buckets.map(b=>Math.max(porBucket[b].previsto,porBucket[b].concluidoPeriodo,porBucket[b].cumprido)));
+      const barW = dashGran==='dia'?34:56;
+      area.innerHTML = `<div style="background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:18px 20px">
+        <div style="display:flex;gap:14px;font-size:11px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#3b5bdb;display:inline-block"></span>Previsto</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#38a169;display:inline-block"></span>Concluído no período</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#2d1b69;display:inline-block"></span>Cumprido do previsto</span>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:8px;height:140px;overflow-x:auto;padding-bottom:4px">
+          ${buckets.map(b=>{const c=porBucket[b];return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:${barW}px">
+            <div style="display:flex;align-items:flex-end;gap:2px;height:110px">
+              <div title="Previsto: ${c.previsto}" style="width:10px;background:#3b5bdb;border-radius:2px 2px 0 0;height:${c.previsto>0?Math.max(c.previsto/max*110,3):0}px"></div>
+              <div title="Concluído no período: ${c.concluidoPeriodo}" style="width:10px;background:#38a169;border-radius:2px 2px 0 0;height:${c.concluidoPeriodo>0?Math.max(c.concluidoPeriodo/max*110,3):0}px"></div>
+              <div title="Cumprido do previsto: ${c.cumprido} (${c.pct}%)" style="width:10px;background:#2d1b69;border-radius:2px 2px 0 0;height:${c.cumprido>0?Math.max(c.cumprido/max*110,3):0}px"></div>
+            </div>
+            <div style="font-size:9px;color:#a0aec0;white-space:nowrap">${_dashBucketLabel(b,dashGran)}</div>
+          </div>`;}).join('')}
+        </div>
+      </div>`;
+      return;
+    }
+    const grupos = _dashGroupByTime(lista, 'responsaveis');
+    const bucketSet = new Set(buckets);
+    area.innerHTML = _dashRenderTimeTable(grupos, itens => {
+      let previsto=0, concluidoPeriodo=0, cumprido=0;
+      itens.forEach(t=>{
+        if (t.prazo && bucketSet.has(_dashBucketKey(t.prazo,dashGran))) { previsto++; if (['Concluída','Concluída Atrasada'].includes(t.status)) cumprido++; }
+        if (t.dataConclusao && ['Concluída','Concluída Atrasada'].includes(t.status) && bucketSet.has(_dashBucketKey(t.dataConclusao,dashGran))) concluidoPeriodo++;
+      });
+      return { previsto, concluidoPeriodo, cumprido, pctCumprido: previsto? Math.round(cumprido/previsto*100)+'%':'—' };
+    }, [
+      {key:'previsto', label:'Previsto'},
+      {key:'concluidoPeriodo', label:'Concluído no Período'},
+      {key:'cumprido', label:'Cumprido do Previsto'},
+      {key:'pctCumprido', label:'% Cumprido'},
+    ], 'volume');
+  }
+
+  function renderDashBacklog(lista) {
+    const area = document.getElementById('dashBacklogArea');
+    if (!area) return;
+    const pendentes = lista.filter(t=>!['Concluída','Concluída Atrasada','Dispensada'].includes(t.status||'Pendente'));
+    if (dashEscopo==='global') {
+      area.innerHTML = _dashKpiRow([{label:'Pendências Acumuladas', valor: pendentes.length, cor:'#b7791f'}]);
+      return;
+    }
+    const grupos = _dashGroupByTime(pendentes, 'responsaveis');
+    area.innerHTML = _dashRenderTimeTable(grupos, itens => ({ pendencias: itens.length }), [{key:'pendencias', label:'Pendências'}], 'backlog');
+  }
+
+  // Lead Time por Processo sempre mostra por processo, global — não faz parte da quebra
+  // Por Time/Pessoa do dashboard (processo não é "de" uma pessoa/time como tarefa é).
+  function renderDashLeadTime() {
+    const area = document.getElementById('dashLeadTimeArea');
+    if (!area) return;
+    const procMap = {}; processos.forEach(p=>procMap[p._id]={nome:p.nome, meta:p.leadTimeEsperado||0});
+    const concluidos = proExecs.filter(e=>e.concluidoEm && e.criadoEm);
+    const porProc = {};
+    concluidos.forEach(e=>{ (porProc[e.processoId||'(sem processo)']=porProc[e.processoId||'(sem processo)']||[]).push(e); });
+    const linhas = Object.entries(porProc).map(([pid,arr])=>{
+      const info = procMap[pid] || {};
+      const media = arr.reduce((s,e)=>s+(new Date(e.concluidoEm)-new Date(e.criadoEm))/60000,0)/arr.length;
+      const meta = info.meta||0;
+      const pct = meta>0 ? Math.round(meta/media*100) : null;
+      return { nome: info.nome||'(processo removido)', media, meta, pct };
+    }).sort((a,b)=>(a.pct??999)-(b.pct??999));
+    area.innerHTML = _dashTabela(['Processo','Lead Time Meta','Lead Time Real','% Atingimento'], linhas.map(l=>[l.nome, l.meta?l.meta+' min':'—', l.media.toFixed(1)+' min', l.pct!==null?l.pct+'%':'—']));
+  }
+
+  function renderDashEficiencia() {
+    const lista = tarefas.filter(t=>!t.isModelo);
+    renderDashPrazo(lista);
+    renderDashVolume(lista);
+    renderDashBacklog(lista);
+    renderDashLeadTime();
+  }
+
+  function renderDashAutomacao() {
+    const totalRobos = robos.length;
+    const el = id => document.getElementById(id);
+    if (el('dashAutoTotal')) el('dashAutoTotal').textContent = totalRobos;
+
+    const execsConcluidos = _execsRobos.filter(e=>e.status==='concluido');
+    const execsErro = _execsRobos.filter(e=>e.status==='erro');
+    const totalExecsFinal = execsConcluidos.length + execsErro.length;
+    const pctFalhas = totalExecsFinal ? Math.round(execsErro.length/totalExecsFinal*100) : 0;
+    if (el('dashAutoFalhas')) el('dashAutoFalhas').textContent = pctFalhas+'%';
+    if (el('dashAutoFalhasSub')) el('dashAutoFalhasSub').textContent = `${execsErro.length} de ${totalExecsFinal} execuções concluídas/com erro (não conta interrompidas nem não-disparadas)`;
+
+    const roboPorId = {}; robos.forEach(r=>roboPorId[r._id]=r);
+    let humanSec = 0, robotSec = 0;
+    execsConcluidos.forEach(e=>{
+      robotSec += e.duracao||0;
+      humanSec += ((roboPorId[e.roboId]?.tempoHumanoMinutos)||0)*60;
+    });
+    const economizadoH = Math.max(humanSec-robotSec,0)/3600;
+    if (el('dashAutoEconomizado')) el('dashAutoEconomizado').textContent = Math.round(economizadoH);
+    if (el('dashAutoEconomizadoSub')) el('dashAutoEconomizadoSub').textContent = `${(humanSec/3600).toFixed(1)}h manual → ${(robotSec/3600).toFixed(1)}h robô`;
+
+    const errosPorRobo = {};
+    execsErro.forEach(e=>{ errosPorRobo[e.roboNome||'—'] = (errosPorRobo[e.roboNome||'—']||0)+1; });
+    const top3Erros = Object.entries(errosPorRobo).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    if (el('dashAutoTopErros')) el('dashAutoTopErros').innerHTML = top3Erros.length
+      ? top3Erros.map(([nome,n])=>_dashBarRow(nome,n,n,'#e53e3e',top3Erros[0][1])).join('')
+      : '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem erros registrados 🎉</div>';
+
+    const duracoesPorRobo = {};
+    execsConcluidos.forEach(e=>{ (duracoesPorRobo[e.roboNome||'—'] = duracoesPorRobo[e.roboNome||'—']||[]).push(e.duracao||0); });
+    const top3Longas = Object.entries(duracoesPorRobo).map(([nome,arr])=>[nome, arr.reduce((s,d)=>s+d,0)/arr.length]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    const maxDur = top3Longas.length ? top3Longas[0][1] : 1;
+    if (el('dashAutoTopLongas')) el('dashAutoTopLongas').innerHTML = top3Longas.length
+      ? top3Longas.map(([nome,d])=>_dashBarRow(nome, d<60?Math.round(d)+'s':Math.round(d/60)+'m', d, '#2d1b69', maxDur)).join('')
+      : '<div style="color:#a0aec0;font-size:12px;text-align:center;padding:16px">Sem dados de execução</div>';
+
+    // Lead Time: meta (cadastrada no robô, em minutos) x real (duração média das execuções concluídas)
+    const linhasLead = robos.map(r=>{
+      const meta = r.slaMinutos||0;
+      const durs = duracoesPorRobo[r.nome] || [];
+      const realMin = durs.length ? (durs.reduce((s,d)=>s+d,0)/durs.length)/60 : null;
+      const pct = (realMin!==null && realMin>0 && meta>0) ? Math.round(meta/realMin*100) : null;
+      return { nome:r.nome, meta, realMin, pct };
+    }).filter(l=>l.meta>0 || l.realMin!==null).sort((a,b)=>(a.pct??999)-(b.pct??999));
+    const leadArea = el('dashAutoLeadTimeArea');
+    if (leadArea) leadArea.innerHTML = _dashTabela(
+      ['Robô','Lead Time Meta','Lead Time Real','% Atingimento'],
+      linhasLead.map(l=>[l.nome, l.meta?l.meta+' min':'—', l.realMin!==null?l.realMin.toFixed(1)+' min':'—', l.pct!==null?l.pct+'%':'—'])
+    );
+  }
+
   // ---- Produção sub-tabs ----
   function mudarProdTab(tab) {
     ['exec','lista'].forEach(t=>{
@@ -7841,8 +8332,8 @@ senha = campos.get('senha', '')</pre>
       dpAtualizarSchedule();
     }
 
-    set('dpTempoHumano', r.tempoHumano || 0);
-    set('dpSla', r.sla || 0);
+    set('dpTempoHumano', r.tempoHumanoMinutos || 0);
+    set('dpSla', r.slaMinutos || 0);
     set('dpDescricao', r.descricao);
 
     // Histórico de ZIPs aplicados
@@ -7914,6 +8405,8 @@ senha = campos.get('senha', '')</pre>
     if (!detalheRoboAtual) return;
     const get  = id => (document.getElementById(id)?.value||'').trim();
     const getN = id => parseInt(document.getElementById(id)?.value) || 0;
+    if (getN('dpTempoHumano') <= 0) { hocToast('Tempo de Execução Humana é obrigatório e deve ser maior que zero.', 'erro'); return; }
+    if (getN('dpSla') <= 0) { hocToast('Lead Time é obrigatório e deve ser maior que zero.', 'erro'); return; }
     const sch = {
       ativo:            document.getElementById('dpScheduleAtivo')?.checked || false,
       frequencia:       get('dpScheduleFreq'),
@@ -7937,7 +8430,7 @@ senha = campos.get('senha', '')</pre>
       arquivoPrincipal: get('dpArquivoPrincipal'), comandoExecucao: get('dpComando'),
       pacotesPip: get('dpPacotesPip').split('\n').map(s=>s.trim()).filter(Boolean),
       preComando: get('dpPreComando'), webhookUrl: get('dpWebhookUrl'),
-      schedule: sch, tempoHumano: getN('dpTempoHumano'), sla: getN('dpSla'),
+      schedule: sch, tempoHumanoMinutos: getN('dpTempoHumano'), slaMinutos: getN('dpSla'),
       descricao: get('dpDescricao'),
     };
     const res = await fetch('/api/robos/' + detalheRoboAtual, { method: 'PUT', headers: HEADERS, body: JSON.stringify(body) });
@@ -8401,6 +8894,10 @@ senha = campos.get('senha', '')</pre>
   async function salvarRobo() {
     const nome = document.getElementById('rNome').value.trim();
     if (!nome) { alert('Nome obrigatório.'); return; }
+    const tempoHumanoVal = parseInt(document.getElementById('rTempoHumano').value)||0;
+    const slaVal = parseInt(document.getElementById('rSla').value)||0;
+    if (tempoHumanoVal <= 0) { alert('Tempo de Execução Humana é obrigatório e deve ser maior que zero.'); return; }
+    if (slaVal <= 0) { alert('Lead Time é obrigatório e deve ser maior que zero.'); return; }
     const id  = document.getElementById('rEditId').value;
     const amb = document.getElementById('rAmbiente').value;
     const vt  = document.querySelector('input[name="rVinculo"]:checked')?.value||'git';
@@ -8430,8 +8927,8 @@ senha = campos.get('senha', '')</pre>
       timeout:            parseInt(document.getElementById('rTimeout').value)||30,
       duracaoEstimada:    parseInt(document.getElementById('rDuracaoEstimada').value)||15,
       descricao:          document.getElementById('rDescricao').value,
-      tempoHumanoMinutos: parseInt(document.getElementById('rTempoHumano').value)||0,
-      slaMinutos:         parseInt(document.getElementById('rSla').value)||0,
+      tempoHumanoMinutos: tempoHumanoVal,
+      slaMinutos:         slaVal,
       schedule: {
         ativo:           schedAtivo,
         frequencia:      schedFreq,
@@ -9225,7 +9722,7 @@ function copiarPixBloqueio(codigo) {
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
   // Pré-carrega dados do dashboard ao abrir a página
-  carregarRobos();
+  carregarDashboard();
 </script>
   <script src="/global.js"></script>
 <script src="perfil-modal.js"></script>
@@ -9251,8 +9748,12 @@ function copiarPixBloqueio(codigo) {
         <div><label style="font-size:11px;font-weight:700;color:#718096">VERSÃO</label>
           <input type="text" id="prcModeloVer" class="form-control" value="v1.0" style="margin-top:4px"></div>
       </div>
-      <div><label style="font-size:11px;font-weight:700;color:#718096">RESPONSÁVEIS</label>
-        <input type="text" id="prcModeloResp" class="form-control" placeholder="Nomes separados por vírgula" style="margin-top:4px"></div>
+      <div><label style="font-size:11px;font-weight:700;color:#718096">LEAD TIME ESPERADO (MIN) *</label>
+        <input type="number" id="prcModeloLeadTime" class="form-control" min="1" placeholder="Ex: 7200" style="margin-top:4px"></div>
+      <div><label style="font-size:11px;font-weight:700;color:#718096">RESPONSÁVEIS <span style="font-weight:400;color:#a0aec0">(do organograma)</span></label>
+        <div class="tsk-multi-sel" id="prcModeloRespMulti" style="max-height:100px;margin-top:4px"></div></div>
+      <div><label style="font-size:11px;font-weight:700;color:#718096">TIME <span style="font-weight:400;color:#a0aec0">(do organograma)</span></label>
+        <div class="tsk-multi-sel" id="prcModeloAreasMulti" style="max-height:100px;margin-top:4px"></div></div>
       <div><label style="font-size:11px;font-weight:700;color:#718096">TAGS</label>
         <input type="text" id="prcModeloTags" class="form-control" placeholder="Tags separadas por vírgula" style="margin-top:4px"></div>
       <div><label style="font-size:11px;font-weight:700;color:#718096">ATIVAÇÃO DAS TAREFAS</label>
@@ -9786,6 +10287,7 @@ function copiarPixBloqueio(codigo) {
   };
 })();
 </script>
+<script src="/sidebar-permissoes.js"></script>
 
 </body>
 </html>

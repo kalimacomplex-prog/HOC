@@ -1841,8 +1841,12 @@
     // Permissão de aprovação
     fetch('/api/usuarios/minhas-permissoes',{headers:{'Authorization':'Bearer '+localStorage.getItem('token')}})
       .then(r=>r.json()).then(p=>{
-        tapPermAprovar = !!(p.isAdmin || p.permissoes?.gestaoProjetos?.aprovar);
+        tapPermAprovar = !!(p.isAdmin || p.permissoes?.gestaoProjetos?.aprovarExecucao);
         document.getElementById('btnAprovarTAP').style.display = tapPermAprovar ? 'flex' : 'none';
+        // Escopo e Cronograma já podem ter renderizado o toolbar antes desta permissão chegar —
+        // atualiza de novo agora que tapPermAprovar é conhecido (senão o botão só aparece ao trocar de aba e voltar).
+        try { eapRenderToolbar(); } catch(e) {}
+        try { cronogramaRenderToolbar(); } catch(e) {}
       }).catch(()=>{});
     // Estudo de Caso biblioteca
     carregarDadosEC();
@@ -1898,7 +1902,7 @@
     _carregarTermoEncView();
     fetch('/api/usuarios/minhas-permissoes',{headers:{'Authorization':'Bearer '+localStorage.getItem('token')}})
       .then(r=>r.json()).then(p=>{
-        termoEncPermAprovar = !!(p.isAdmin || p.permissoes?.gestaoProjetos?.aprovar);
+        termoEncPermAprovar = !!(p.isAdmin || p.permissoes?.gestaoProjetos?.aprovarExecucao);
         const bta = document.getElementById('btnAprovarTermoEnc');
         if (bta && termoEncPermAprovar) { const tst = (projeto.encerramento?.termo?.status||'Rascunho'); bta.style.display = tst !== 'Aprovado' ? '' : 'none'; }
       }).catch(()=>{});
@@ -2192,21 +2196,26 @@
     _solicitarAprovCRId = crId || null;
     const descEl = document.getElementById('solicitarAprovDesc');
     if (descEl) {
-      if (source === 'cr') descEl.textContent = 'Selecione o usuário que deverá aprovar este Change Request.';
-      else if (source === 'termoEnc') descEl.textContent = 'Selecione o usuário que deverá aprovar o Termo de Encerramento.';
-      else if (source === 'eap') descEl.textContent = 'Selecione o usuário que deverá aprovar este EAP (Escopo do Projeto).';
-      else if (source === 'cronograma') descEl.textContent = 'Selecione o usuário que deverá aprovar o Baseline Planejado do cronograma.';
-      else descEl.textContent = 'Selecione o usuário que deverá aprovar este TAP.';
+      const sufixo = ' A lista mostra só quem tem permissão de aprovar execução de projetos.';
+      if (source === 'cr') descEl.textContent = 'Selecione o usuário que deverá aprovar este Change Request.' + sufixo;
+      else if (source === 'termoEnc') descEl.textContent = 'Selecione o usuário que deverá aprovar o Termo de Encerramento.' + sufixo;
+      else if (source === 'eap') descEl.textContent = 'Selecione o usuário que deverá aprovar este EAP (Escopo do Projeto).' + sufixo;
+      else if (source === 'cronograma') descEl.textContent = 'Selecione o usuário que deverá aprovar o Baseline Planejado do cronograma.' + sufixo;
+      else descEl.textContent = 'Selecione o usuário que deverá aprovar este TAP.' + sufixo;
     }
-    fetch('/api/usuarios', { headers:{'Authorization':'Bearer '+localStorage.getItem('token')} })
+    fetch('/api/usuarios/com-permissao/gestaoProjetos/aprovarExecucao', { headers:{'Authorization':'Bearer '+localStorage.getItem('token')} })
       .then(r=>r.json()).then(users=>{
         const lista = document.getElementById('solicitarAprovUserList');
-        lista.innerHTML = users.map(u=>`
-          <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:6px;transition:border-color .15s">
-            <input type="radio" name="tapAprovUser" value="${u._id}" style="accent-color:#2d1b69">
-            <span style="font-size:13px;font-weight:600;color:#1e2a4a">${u.nome}</span>
-            <span style="font-size:11px;color:#718096;margin-left:auto">${u.email||''}</span>
-          </label>`).join('');
+        if (!users.length) {
+          lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Nenhum usuário tem permissão para aprovar execução de projetos ainda.</div>';
+        } else {
+          lista.innerHTML = users.map(u=>`
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:6px;transition:border-color .15s">
+              <input type="radio" name="tapAprovUser" value="${u._id}" style="accent-color:#2d1b69">
+              <span style="font-size:13px;font-weight:600;color:#1e2a4a">${u.nome}</span>
+              <span style="font-size:11px;color:#718096;margin-left:auto">${u.email||''}</span>
+            </label>`).join('');
+        }
         document.getElementById('modalSolicitarAprov').classList.add('aberto');
       }).catch(()=>alert('Erro ao carregar usuários.'));
   }
@@ -4956,7 +4965,7 @@
     if (btnAdd)  btnAdd.style.display  = (rascunho && !_eapViewMode) ? '' : 'none';
     if (btnNova) btnNova.style.display = aprovado ? '' : 'none';
     if (btnSolic) btnSolic.style.display = rascunho ? '' : 'none';
-    if (btnAprov) btnAprov.style.display = pendente ? '' : 'none';
+    if (btnAprov) btnAprov.style.display = (!aprovado && tapPermAprovar) ? '' : 'none';
     if (btnVT) {
       btnVT.style.display = rascunho ? '' : 'none';
       btnVT.textContent = _eapViewMode ? '✏️ Modo Edição' : '👁️ Modo Visualização';
@@ -5272,7 +5281,8 @@
   }
 
   function eapAprovar() {
-    const v=escopoGetVersao(); if(!v||v.status!=='pendente_aprovacao') return;
+    if (!tapPermAprovar) return;
+    const v=escopoGetVersao(); if(!v||v.status==='aprovado') return;
     const aprovador=prompt(`Confirmar aprovação da Versão ${v.versao}?\n\nSeu nome:`); if(!aprovador) return;
     v.status='aprovado'; v.aprovadoPor=aprovador; v.aprovadoEm=new Date().toISOString().split('T')[0];
     projeto.escopoVersoes=escopoVersoes; agendarSalvarProjeto(); eapRenderAll();
@@ -5461,10 +5471,11 @@
     if(action){
       if(v.status==='rascunho'){
         action.innerHTML=`<div style="font-size:11px;color:#718096;margin-bottom:8px">Baseline em edição. Solicite aprovação para tornar as datas planejadas imutáveis.</div>
-          <button onclick="cronogramaSolicitar()" style="width:100%;padding:7px;background:#f5f0ff;color:#7c3aed;border:1.5px solid #c4b5fd;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">📨 Solicitar Aprovação</button>`;
+          <button onclick="cronogramaSolicitar()" style="width:100%;padding:7px;background:#f5f0ff;color:#7c3aed;border:1.5px solid #c4b5fd;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">📨 Solicitar Aprovação</button>`
+          + (tapPermAprovar ? `<button onclick="cronogramaAprovar()" style="width:100%;padding:7px;margin-top:6px;background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">✅ Aprovar Baseline</button>` : '');
       } else if(v.status==='pendente_aprovacao'){
-        action.innerHTML=`<div style="font-size:11px;color:#c05621;margin-bottom:8px">⏳ Aguardando aprovação de <strong>${v.solicitadoPara||'?'}</strong></div>
-          <button onclick="cronogramaAprovar()" style="width:100%;padding:7px;background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">✅ Aprovar Baseline</button>`;
+        action.innerHTML=`<div style="font-size:11px;color:#c05621;margin-bottom:8px">⏳ Aguardando aprovação de <strong>${v.solicitadoPara||'?'}</strong></div>`
+          + (tapPermAprovar ? `<button onclick="cronogramaAprovar()" style="width:100%;padding:7px;background:#f0fdf4;color:#16a34a;border:1.5px solid #86efac;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">✅ Aprovar Baseline</button>` : '');
       } else if(v.status==='aprovado'){
         action.innerHTML=`<div style="font-size:11px;color:#276749;margin-bottom:8px">✅ Aprovado por <strong>${v.aprovadoPor||'?'}</strong> em ${v.aprovadoEm?(new Date(v.aprovadoEm).toLocaleDateString('pt-BR')):'?'}</div>
           <button onclick="cronogramaNovaVersao()" style="width:100%;padding:7px;background:#f5f0ff;color:#7c3aed;border:1.5px solid #c4b5fd;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">➕ Nova Versão</button>`;
@@ -5512,6 +5523,7 @@
     _abrirUserPickerAprov('cronograma');
   }
   function cronogramaAprovar(){
+    if(!tapPermAprovar) return;
     if(!confirm('Aprovar este baseline planejado? As datas planejadas ficam imutáveis até uma nova versão ser criada e aprovada.'))return;
     const v=_cronGetVersao(); if(!v)return;
     const me=(() => { try { return JSON.parse(atob(localStorage.getItem('token').split('.')[1])).nome || 'Você'; } catch(e){ return 'Você'; } })();
@@ -7277,6 +7289,7 @@
     document.getElementById('modalDispensarCR').classList.add('aberto');
   }
   function confirmarDispensarCR() {
+    if (!tapPermAprovar) return;
     const motivo = document.getElementById('dispensarMotivo').value.trim();
     if (!motivo) { alert('Informe o motivo da dispensa.'); return; }
     const id = document.getElementById('dispensarCRId').value;
@@ -7476,6 +7489,7 @@
     if(btnA&&termoEncPermAprovar) btnA.style.display=status!=='Aprovado'?'':'none';
   }
   function aprovarTermoEnc(){
+    if(!termoEncPermAprovar) return;
     if(!confirm('Confirma a aprovação do Termo de Encerramento?')) return;
     const t=projeto.encerramento?.termo||{};
     const versoes=t.versoes||[];
@@ -8223,5 +8237,6 @@ function copiarPixBloqueio(codigo) {
 </script>
   <script src="/global.js"></script>
 <script src="perfil-modal.js"></script>
+<script src="/sidebar-permissoes.js"></script>
 </body>
 </html>

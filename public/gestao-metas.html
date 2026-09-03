@@ -338,6 +338,22 @@
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+  let podeEditarMetas = usuario.perfil === 'Admin';
+  (async () => {
+    try {
+      const r = await fetch('/api/usuarios/minhas-permissoes', { headers: HEADERS });
+      if (r.ok) {
+        const p = await r.json();
+        podeEditarMetas = p.isAdmin || !!(p.permissoes?.gestaoMetas?.editar);
+        if (!podeEditarMetas) {
+          const btnRes = document.getElementById('btnEditarResultados');
+          const btnEst = document.getElementById('btnEditarEstrutura');
+          if (btnRes) btnRes.style.display = 'none';
+          if (btnEst) btnEst.style.display = 'none';
+        }
+      }
+    } catch(e) {}
+  })();
 
   function mudarTab(id, btn) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -533,6 +549,7 @@
   }
 
   function ativarModo(modo) {
+    if (!podeEditarMetas) return;
     modoEdicao = modo;
     document.getElementById('btnEditarResultados').classList.toggle('ativo', modo==='resultados');
     document.getElementById('btnEditarEstrutura').classList.toggle('ativo', modo==='estrutura');
@@ -563,6 +580,7 @@
   }
 
   function abrirModalLinha() {
+    if (!podeEditarMetas) return;
     const cats = [...new Set(bowlerData.map(r => r.categoria))];
     document.getElementById('listaCategorias').innerHTML = cats.map(c=>`<option value="${c}">`).join('');
     document.getElementById('novaCategoria').value = '';
@@ -710,7 +728,8 @@
 
   function getDadosFiltrados() {
     const mesesIdx = getMesesIdx();
-    if (!filtroSecaoAtiva || !filtroSelecionados.size) return { rows: [], mesesIdx };
+    // Sem filtro ativo é "Todos os dados" (rótulo do próprio filtro) — não é pra ficar vazio.
+    if (!filtroSecaoAtiva || !filtroSelecionados.size) return { rows: bowlerData, mesesIdx };
     const rows = bowlerData.filter(r => {
       if (filtroSecaoAtiva === 'area')  return filtroSelecionados.has(r.area);
       if (filtroSecaoAtiva === 'categ') return filtroSelecionados.has(r.categoria);
@@ -1275,5 +1294,6 @@
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
+<script src="/sidebar-permissoes.js"></script>
 </body>
 </html>

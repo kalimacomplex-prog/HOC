@@ -196,7 +196,7 @@
       <div class="page-header-info">
         <div class="page-title">Ideias Livres</div>
       </div>
-      <button class="btn-primary" onclick="abrirDrawer()" style="margin-top:4px">+ Nova Ideia</button>
+      <button class="btn-primary" id="btnNovaIdeia" onclick="abrirDrawer()" style="margin-top:4px">+ Nova Ideia</button>
     </div>
 
     <div class="painel">
@@ -328,7 +328,7 @@
 <div class="modal-overlay" id="modalNotifOverlay">
   <div class="modal-card">
     <div class="modal-titulo">Enviar para Aprovação</div>
-    <div class="modal-sub">Selecione um membro para ser notificado sobre esta ideia (opcional)</div>
+    <div class="modal-sub">Selecione quem deve ser notificado — a lista mostra só quem tem permissão para aprovar ideias</div>
     <div class="modal-lista" id="modalUserLista"></div>
     <div class="modal-footer">
       <button class="btn-cancelar-drawer" onclick="fecharModalNotif()" style="flex:1">Cancelar</button>
@@ -750,11 +750,11 @@
     lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Carregando...</div>';
     try {
       if (!usuariosCache.length) {
-        const res = await fetch('/api/usuarios', { headers: HEADERS });
+        const res = await fetch('/api/usuarios/com-permissao/ideiasLivres/aprovar', { headers: HEADERS });
         usuariosCache = await res.json();
       }
       const outros = usuariosCache.filter(u => u._id !== (usuario.id || usuario._id));
-      if (!outros.length) { lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Nenhum outro usuário encontrado.</div>'; return; }
+      if (!outros.length) { lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Nenhum usuário com permissão para aprovar ideias, além de você.</div>'; return; }
       lista.innerHTML = outros.map(u => `
         <div class="modal-user-item" onclick="selecionarUserModal('${u._id}', this)">
           <div class="modal-avatar">${(u.nome||'?')[0].toUpperCase()}</div>
@@ -789,6 +789,7 @@
         podePublicar = p.isAdmin || !!(p.permissoes?.ideiasLivres?.aprovar);
         podeAprovarIdeias = p.isAdmin || !!(p.permissoes?.ideiasLivres?.aprovar);
         if (podePublicar) document.getElementById('btnPublicarImediato').style.display = '';
+        renderIdeias();
       }
     } catch(e) {}
   })();
@@ -967,5 +968,6 @@ function copiarPixBloqueio(codigo) {
 </script>
   <script src="/global.js"></script>
 <script src="perfil-modal.js"></script>
+<script src="/sidebar-permissoes.js"></script>
 </body>
 </html>

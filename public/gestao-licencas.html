@@ -414,6 +414,19 @@
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
   let licencas = [], documentosTemp = [];
+  let podeEditarLicencas = usuario.perfil === 'Admin';
+  (async () => {
+    try {
+      const r = await fetch('/api/usuarios/minhas-permissoes', { headers: HEADERS });
+      if (r.ok) {
+        const p = await r.json();
+        podeEditarLicencas = p.isAdmin || !!(p.permissoes?.gestaoLicencas?.editar);
+        const btnAdd = document.querySelector('button[onclick="abrirModalLicenca()"]');
+        if (btnAdd) btnAdd.style.display = podeEditarLicencas ? '' : 'none';
+        renderLicencas();
+      }
+    } catch(e) {}
+  })();
 
   // ===== UTILS =====
   function fmtMoeda(v) { return 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2}); }
@@ -525,8 +538,8 @@
         <td><span class="status-badge ${STATUS_CLASS[getStatusEfetivo(l)]||'status-ativa'}">${STATUS_ICON[getStatusEfetivo(l)]||''} ${getStatusEfetivo(l)}</span></td>
         <td><button class="btn-acao btn-acao-det" onclick="verDetalhes('${l._id}')" title="Ver detalhes">👁️</button></td>
         <td style="display:flex;gap:4px">
-          <button class="btn-acao btn-acao-edit" onclick="editarLicenca('${l._id}')" title="Editar">✏️</button>
-          <button class="btn-acao btn-acao-del" onclick="deletarLicenca('${l._id}')" title="Excluir">🗑️</button>
+          ${podeEditarLicencas ? `<button class="btn-acao btn-acao-edit" onclick="editarLicenca('${l._id}')" title="Editar">✏️</button>
+          <button class="btn-acao btn-acao-del" onclick="deletarLicenca('${l._id}')" title="Excluir">🗑️</button>` : ''}
         </td>
       </tr>`;
     }).join('');
@@ -691,6 +704,7 @@
   }
 
   function abrirModalLicenca() {
+    if (!podeEditarLicencas) return;
     document.getElementById('licEditId').value = '';
     document.getElementById('modalLicTitulo').textContent = 'Nova Licença';
     document.getElementById('secRenovacoes').style.display = 'none';
@@ -1065,5 +1079,6 @@ function copiarPixBloqueio(codigo) {
 </script>
   <script src="/global.js"></script>
 <script src="perfil-modal.js"></script>
+<script src="/sidebar-permissoes.js"></script>
 </body>
 </html>

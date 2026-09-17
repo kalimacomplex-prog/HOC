@@ -100,12 +100,12 @@ app.use('/api/webhook/asaas', express.raw({ type: 'application/json' }));
 
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
-app.use(express.static('public', {
+app.use(express.static(path.join(__dirname, 'public'), {
   setHeaders: (res, filePath) => {
     // .html sempre fresco (mudanças no app têm que aparecer sem hard-refresh) e os
     // arquivos do Agent também — cache de navegador nesses já causou gente testar
     // versão antiga do agent.py/iniciar.vbs mesmo depois de eu corrigir algo.
-    if (filePath.endsWith('.html') || filePath.endsWith('.py') || filePath.endsWith('.vbs') || filePath.endsWith('.bat')) {
+    if (filePath.endsWith('.html') || filePath.endsWith('.py') || filePath.endsWith('.vbs') || filePath.endsWith('.bat') || filePath.endsWith('.js') || filePath.endsWith('.css')) {
       res.setHeader('Cache-Control', 'no-store');
     }
   }

@@ -68,16 +68,28 @@ document.getElementById('form').addEventListener('submit', async (e) => {
       badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
     }
   }
+  const NOTIF_ICON = {
+    sucesso: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>', color:'#00754F'},
+    erro: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+    aviso: {svg:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', color:'#8A6200'},
+    info: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>', color:'var(--accent)'},
+    licenca_vencendo: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>', color:'#8A6200'},
+    licenca_vencida: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+  };
+  function _notifIconHtml(tipo) {
+    const cfg = NOTIF_ICON[tipo] || NOTIF_ICON.info;
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2">${cfg.svg}</svg>`;
+  }
   function renderNotificacoes(notifs) {
     const lista = document.getElementById('notifLista');
     if (!lista) return;
     if (!notifs || notifs.length === 0) {
-      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
+      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
       return;
     }
     lista.innerHTML = notifs.map(n => `
       <div class="notif-item ${!n.lida?'nao-lida':''} tipo-${n.tipo}" onclick="abrirNotif('${n._id}','${n.link||''}')">
-        <div class="notif-icone ${n.tipo}">${n.icone||'🔔'}</div>
+        <div class="notif-icone ${n.tipo}">${_notifIconHtml(n.tipo)}</div>
         <div class="notif-corpo">
           <div class="notif-titulo-item">${n.titulo}</div>
           <div class="notif-msg">${n.mensagem}</div>

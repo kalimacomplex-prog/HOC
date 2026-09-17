@@ -1,56 +1,58 @@
 (function () {
+  var LBL = 'font-size:11px;font-weight:600;color:#6B7080;margin-bottom:5px;display:block;';
+  var INP = 'width:100%;height:38px;padding:0 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;color:#0B0B0F;outline:none;font-family:inherit;background:white;box-sizing:border-box;';
   var MODAL_HTML = `
-<div id="modalPerfilOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:2000;">
-  <div style="background:white;border-radius:12px;width:100%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,0.12);overflow:hidden;">
+<div id="modalPerfilOverlay" style="position:fixed;inset:0;background:rgba(11,11,15,0.45);display:none;align-items:center;justify-content:center;z-index:2000;font-family:'Plus Jakarta Sans',sans-serif;">
+  <div style="background:white;border-radius:16px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 64px rgba(11,11,15,0.2);border:1px solid #ECEDF0;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0;">
-      <span style="font-size:16px;font-weight:700;color:#1e2a4a;">Meu Perfil</span>
-      <button id="btnFecharModalPerfil" style="background:none;border:none;font-size:20px;cursor:pointer;color:#a0aec0;line-height:1;">×</button>
+      <span style="font-size:16px;font-weight:800;color:#0B0B0F;">Meu Perfil</span>
+      <button id="btnFecharModalPerfil" style="width:34px;height:34px;box-sizing:border-box;border-radius:9px;background:#F1F2F5;color:#4A4E5A;border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;padding:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div style="display:flex;gap:2px;margin:16px 24px 0;border-bottom:2px solid #e2e8f0;">
-      <button class="tab active" id="perfilTabDados" onclick="__perfilTab('dados')">Dados Pessoais</button>
-      <button class="tab" id="perfilTabSenha" onclick="__perfilTab('senha')">Senha</button>
+    <div style="display:inline-flex;background:#F1F2F5;border-radius:10px;padding:3px;gap:2px;margin:10px 24px 0;">
+      <button id="perfilTabDados" onclick="__perfilTab('dados')" style="height:32px;padding:0 16px;border-radius:8px;font-size:12.5px;font-weight:700;border:none;cursor:pointer;background:white;color:#0B0B0F;box-shadow:0 1px 3px rgba(11,11,15,0.1);">Dados Pessoais</button>
+      <button id="perfilTabSenha" onclick="__perfilTab('senha')" style="height:32px;padding:0 16px;border-radius:8px;font-size:12.5px;font-weight:700;border:none;cursor:pointer;background:transparent;color:#6B7080;">Senha</button>
     </div>
 
     <!-- Aba Dados Pessoais -->
     <div id="perfilSecDados" style="padding:20px 24px 24px;">
       <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px;">
-        <div id="perfilFotoPreview" style="width:72px;height:72px;border-radius:50%;background:#6b46c1;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:white;overflow:hidden;margin-bottom:8px;cursor:pointer;" onclick="document.getElementById('perfilFotoInput').click()">?</div>
+        <div id="perfilFotoPreview" style="width:72px;height:72px;border-radius:50%;background:var(--accent,#2F5CFF);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:white;overflow:hidden;margin-bottom:8px;cursor:pointer;" onclick="document.getElementById('perfilFotoInput').click()">?</div>
         <input type="file" id="perfilFotoInput" accept="image/*" style="display:none;">
-        <button style="font-size:12px;color:#2d1b69;background:none;border:none;cursor:pointer;font-weight:600;" onclick="document.getElementById('perfilFotoInput').click()">Alterar foto</button>
+        <button style="font-size:12px;color:#0B0B0F;background:none;border:none;cursor:pointer;font-weight:600;font-family:inherit;" onclick="document.getElementById('perfilFotoInput').click()">Alterar foto</button>
       </div>
-      <div class="form-group">
-        <label>Nome</label>
-        <input type="text" id="perfilNome" placeholder="Seu nome completo">
+      <div style="margin-bottom:14px;">
+        <label style="${LBL}">Nome</label>
+        <input type="text" id="perfilNome" placeholder="Seu nome completo" style="${INP}">
       </div>
-      <div class="form-group">
-        <label>Cargo</label>
-        <input type="text" id="perfilCargo" placeholder="Seu cargo ou função">
+      <div style="margin-bottom:14px;">
+        <label style="${LBL}">Cargo</label>
+        <input type="text" id="perfilCargo" placeholder="Seu cargo ou função" style="${INP}">
       </div>
-      <div id="perfilDadosMsg" style="font-size:12px;padding:8px 12px;border-radius:6px;display:none;margin-bottom:8px;"></div>
+      <div id="perfilDadosMsg" style="font-size:12px;padding:8px 12px;border-radius:8px;display:none;margin-bottom:8px;"></div>
       <div style="display:flex;gap:10px;margin-top:20px;">
-        <button class="btn-cancelar" id="perfilCancelarDados" style="flex:1;">Cancelar</button>
-        <button class="btn-confirmar" onclick="__perfilSalvarDados()" style="flex:2;">Salvar alterações</button>
+        <button id="perfilCancelarDados" style="flex:1;height:40px;padding:0 16px;background:#F1F2F5;color:#4A4E5A;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Cancelar</button>
+        <button onclick="__perfilSalvarDados()" style="flex:1;height:40px;padding:0 16px;background:linear-gradient(135deg, var(--accent,#2F5CFF), color-mix(in srgb, var(--accent,#2F5CFF) 80%, black));box-shadow:0 2px 8px color-mix(in srgb, var(--accent,#2F5CFF) 35%, transparent);border:none;border-radius:9px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salvar alterações</button>
       </div>
     </div>
 
     <!-- Aba Senha -->
     <div id="perfilSecSenha" style="padding:20px 24px 24px;display:none;">
-      <div class="form-group">
-        <label>Senha atual</label>
-        <input type="password" id="perfilSenhaAtual" placeholder="Digite sua senha atual">
+      <div style="margin-bottom:14px;">
+        <label style="${LBL}">Senha atual</label>
+        <input type="password" id="perfilSenhaAtual" placeholder="Digite sua senha atual" style="${INP}">
       </div>
-      <div class="form-group">
-        <label>Nova senha</label>
-        <input type="password" id="perfilNovaSenha" placeholder="Mínimo 6 caracteres">
+      <div style="margin-bottom:14px;">
+        <label style="${LBL}">Nova senha</label>
+        <input type="password" id="perfilNovaSenha" placeholder="Mínimo 6 caracteres" style="${INP}">
       </div>
-      <div class="form-group">
-        <label>Confirmar nova senha</label>
-        <input type="password" id="perfilConfirmarSenha" placeholder="Repita a nova senha">
+      <div style="margin-bottom:14px;">
+        <label style="${LBL}">Confirmar nova senha</label>
+        <input type="password" id="perfilConfirmarSenha" placeholder="Repita a nova senha" style="${INP}">
       </div>
-      <div id="perfilSenhaMsg" style="font-size:12px;padding:8px 12px;border-radius:6px;display:none;margin-bottom:8px;"></div>
+      <div id="perfilSenhaMsg" style="font-size:12px;padding:8px 12px;border-radius:8px;display:none;margin-bottom:8px;"></div>
       <div style="display:flex;gap:10px;margin-top:20px;">
-        <button class="btn-cancelar" id="perfilCancelarSenha" style="flex:1;">Cancelar</button>
-        <button class="btn-confirmar" onclick="__perfilSalvarSenha()" style="flex:2;">Salvar senha</button>
+        <button id="perfilCancelarSenha" style="flex:1;height:40px;padding:0 16px;background:#F1F2F5;color:#4A4E5A;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Cancelar</button>
+        <button onclick="__perfilSalvarSenha()" style="flex:1;height:40px;padding:0 16px;background:linear-gradient(135deg, var(--accent,#2F5CFF), color-mix(in srgb, var(--accent,#2F5CFF) 80%, black));box-shadow:0 2px 8px color-mix(in srgb, var(--accent,#2F5CFF) 35%, transparent);border:none;border-radius:9px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Salvar senha</button>
       </div>
     </div>
   </div>
@@ -66,9 +68,9 @@
     if (!el) return;
     el.textContent = texto;
     el.style.display = 'block';
-    el.style.background = ok ? '#f0fff4' : '#fff5f5';
-    el.style.color = ok ? '#276749' : '#c53030';
-    el.style.border = ok ? '1px solid #c6f6d5' : '1px solid #fed7d7';
+    el.style.background = ok ? 'color-mix(in srgb,#00B37E 10%,white)' : 'color-mix(in srgb,#FF2E4D 8%,white)';
+    el.style.color = ok ? '#00754F' : '#FF2E4D';
+    el.style.border = ok ? '1px solid color-mix(in srgb,#00B37E 30%,white)' : '1px solid color-mix(in srgb,#FF2E4D 30%,white)';
   }
 
   function _hideMsg(id) {
@@ -80,8 +82,13 @@
     ['Dados', 'Senha'].forEach(function (t) {
       var sec = document.getElementById('perfilSec' + t);
       var btn = document.getElementById('perfilTab' + t);
-      if (sec) sec.style.display = (t.toLowerCase() === tab) ? 'block' : 'none';
-      if (btn) btn.classList.toggle('active', t.toLowerCase() === tab);
+      var isAtivo = t.toLowerCase() === tab;
+      if (sec) sec.style.display = isAtivo ? 'block' : 'none';
+      if (btn) {
+        btn.style.background = isAtivo ? 'white' : 'transparent';
+        btn.style.color = isAtivo ? '#0B0B0F' : '#6B7080';
+        btn.style.boxShadow = isAtivo ? '0 1px 3px rgba(11,11,15,0.1)' : 'none';
+      }
     });
   };
 
@@ -138,7 +145,7 @@
       } else {
         avatarEl.innerHTML = '';
         avatarEl.textContent = (usuario.nome || '?')[0].toUpperCase();
-        avatarEl.style.background = '#6b46c1';
+        avatarEl.style.background = 'var(--accent, #2F5CFF)';
       }
     }
   }
@@ -165,7 +172,7 @@
     } else {
       preview.innerHTML = '';
       preview.textContent = (usuario.nome || '?')[0].toUpperCase();
-      preview.style.background = '#6b46c1';
+      preview.style.background = 'var(--accent, #2F5CFF)';
     }
   }
 

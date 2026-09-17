@@ -5,161 +5,218 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HOC - Ideias Livres</title>
   <link rel="stylesheet" href="style-global.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
-    .page-header-info p { font-size: 12px; color: #718096; margin-top: 2px; }
-    .painel { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; overflow: hidden; }
-    .painel-header { padding: 14px 20px; border-bottom: 1px solid #f0f2f5; font-size: 13px; font-weight: 700; color: #1e2a4a; }
-    .painel-tabs { display: flex; gap: 2px; padding: 8px 12px; border-bottom: 1px solid #f0f2f5; overflow-x: auto; }
-    .painel-tab { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; color: #718096; border: none; background: none; white-space: nowrap; transition: all 0.2s; }
-    .painel-tab:hover { background: #f5f0ff; color: #2d1b69; }
-    .painel-tab.active { background: #2d1b69; color: white; }
-    .painel-content { padding: 16px 20px; }
-    .painel-tab-content { display: none; }
-    .painel-tab-content.active { display: block; }
-    .ranking-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f8fafc; }
-    .ranking-pos { font-size: 12px; font-weight: 700; color: #a0aec0; width: 20px; }
-    .ranking-avatar { width: 28px; height: 28px; border-radius: 50%; background: #2d1b69; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; }
-    .ranking-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; }
-    .ranking-sub { font-size: 11px; color: #718096; }
-    .ranking-valor { font-size: 12px; font-weight: 700; color: #2d1b69; margin-left: auto; }
-    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
-    .stat-box { background: #f8fafc; border-radius: 8px; padding: 14px; text-align: center; }
-    .stat-val { font-size: 24px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
-    .stat-lbl { font-size: 11px; color: #718096; }
-    .stat-saving { color: #38a169; }
-    .impacto-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; background: #f8fafc; border-radius: 7px; margin-bottom: 8px; }
-    .impacto-titulo { font-size: 12px; font-weight: 600; color: #1e2a4a; flex: 1; }
-    .impacto-saving { font-size: 12px; font-weight: 700; color: #38a169; }
-    .cat-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #f8fafc; border-radius: 7px; margin-bottom: 6px; }
-    .cat-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; background: #f5f0ff; color: #2d1b69; white-space: nowrap; }
-    .cat-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; flex: 1; }
-    .cat-count { font-size: 12px; font-weight: 700; color: #2d1b69; }
-    .repo-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-    .search-input { flex: 1; min-width: 200px; padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
-    .search-input:focus { border-color: #2d1b69; }
-    .btn-filtros { padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: #4a5568; }
-    .btn-filtros:hover { border-color: #2d1b69; color: #2d1b69; }
-    .filtros-panel { background: white; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 14px; display: none; }
-    .filtros-panel.aberto { display: block; }
-    .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 10px; }
-    .filtro-group label { display: block; font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
-    .filtro-select { width: 100%; padding: 7px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; outline: none; background: white; }
-    .filtro-select:focus { border-color: #2d1b69; }
+    :root { --accent: #2F5CFF; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F6F7F9; }
+
+    /* ===== Sidebar (padrão do sistema) ===== */
+    .sidebar { width: max-content; min-width: 200px; max-width: 320px; background: #0B0B0F; padding: 0; transition: width 0.18s ease; overflow: hidden; }
+    .sidebar-logo { height: 64px; padding: 0 20px; border-bottom: none; margin-bottom: 0; }
+    .sidebar-logo rect { fill: var(--accent); }
+    .sidebar.recolhida { width: 68px; min-width: 68px; }
+    .sidebar.recolhida .logo-text, .sidebar.recolhida .side-label, .sidebar.recolhida .sidebar-sistema-label, .sidebar.recolhida .btn-sidebar-label { display: none; }
+    .sidebar-menu { display: flex; flex-direction: column; padding: 12px; gap: 3px; }
+    .menu-item { width: 100%; gap: 14px; padding: 9px 12px; border-radius: 9px; color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 600; margin-bottom: 0; white-space: nowrap; }
+    .menu-item:hover { background: rgba(255,255,255,0.08); color: white; }
+    .menu-item.active { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; }
+    .sidebar-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); position: relative; }
+    .sidebar-sistema { position: relative; margin-bottom: 4px; }
+    .sidebar-sistema > summary { border-radius: 9px; padding: 9px 12px; gap: 10px; background: transparent; color: rgba(255,255,255,0.65); font-size: 12.5px; font-weight: 600; }
+    .sidebar-sistema > summary:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sidebar-sistema > summary svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-sistema-items { position: absolute; bottom: calc(100% + 8px); left: 0; width: 190px; background: #17171A; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 8px; z-index: 50; border: none; }
+    .sidebar-sistema-items .menu-item { font-size: 12px; padding: 8px 12px; width: 100%; border: none; background: transparent; font-family: inherit; text-align: left; cursor: pointer; }
+    .btn-sair { border-radius: 6px; padding: 8px 12px; font-size: 12px; background: transparent; }
+    .btn-sair:hover { background: rgba(255,255,255,0.08); }
+    .btn-recolher { width: 100%; height: 38px; border-radius: 9px; background: transparent; border: none; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+    .btn-recolher:hover { background: rgba(255,255,255,0.08); color: white; }
+    .color-picker-back { display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 4px; }
+    .color-picker-back:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-family: inherit; }
+    .color-swatch:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+    .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
+    .color-hex-input { width: 100%; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
+
+    /* ===== Topbar + conteúdo ===== */
+    .main { min-width: 0; }
+    .header { padding: 0 24px; height: 56px; box-shadow: none; border-bottom: 1px solid #ECEDF0; }
+    .content { padding: 24px 40px 32px; max-width: 1480px; margin: 0 auto; }
+    .btn-primary { height: 38px; padding: 0 16px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: none; }
+    .btn-primary:hover { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); }
+    .btn-fechar { width: 34px; height: 34px; box-sizing: border-box; border-radius: 9px; background: #F1F2F5; color: #4A4E5A; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+
+    /* ===== Cards de resumo + rankings ===== */
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 14px; }
+    .stat-box { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 18px; text-align: center; }
+    .stat-val { font-size: 22px; font-weight: 800; color: #0B0B0F; margin-bottom: 8px; }
+    .stat-lbl { font-size: 11.5px; font-weight: 600; color: #6B7080; }
+    .stat-saving { color: #00B37E; }
+    .rank-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; margin-bottom: 18px; }
+    .rank-painel { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 16px; }
+    .rank-painel-titulo { font-size: 11px; font-weight: 800; color: #0B0B0F; margin-bottom: 10px; }
+    .ranking-item { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-bottom: 1px solid #F2F3F5; }
+    .ranking-item:last-child { border-bottom: none; }
+    .ranking-pos { font-size: 10px; font-weight: 700; color: #9CA0AC; min-width: 14px; }
+    .ranking-nome { font-size: 11px; font-weight: 600; color: #0B0B0F; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ranking-sub { font-size: 10px; color: #9CA0AC; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ranking-valor { font-size: 10.5px; font-weight: 700; color: var(--accent); white-space: nowrap; margin-left: auto; }
+
+    /* ===== Filtros ===== */
+    .btn-filtros { height: 38px; padding: 0 14px; border-radius: 9px; background: white; border: 1.5px solid #E5E7EB; color: #33363F; font-size: 12.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+    .btn-filtros:hover { border-color: var(--accent); color: var(--accent); }
+    .filtros-panel { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 18px; margin-bottom: 16px; display: none; flex-wrap: wrap; gap: 12px; }
+    .filtros-panel.aberto { display: flex; }
+    .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 12px; flex: 1; }
+    .filtro-group label { display: block; font-size: 11px; font-weight: 600; color: #6B7080; margin-bottom: 5px; }
+    .filtro-select { width: 100%; height: 36px; padding: 0 10px; border: 1.5px solid #E5E7EB; border-radius: 8px; font-size: 12.5px; outline: none; background: white; color: #33363F; box-sizing: border-box; }
+    .filtro-select:focus { border-color: var(--accent); }
+
+    /* ===== Grid de ideias ===== */
     .ideias-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(320px,1fr)); gap: 14px; }
-    .ideia-card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1.5px solid transparent; transition: all 0.2s; cursor: pointer; }
-    .ideia-card:hover { border-color: #2d1b69; box-shadow: 0 4px 16px rgba(45,27,105,0.1); }
-    .ideia-card.rascunho { background: #f8fafc; opacity: 0.8; }
+    .ideia-card { background: white; border-radius: 14px; padding: 18px; border: 1.5px solid #ECEDF0; transition: border-color 0.15s; cursor: pointer; }
+    .ideia-card:hover { border-color: var(--accent); }
+    .ideia-card.rascunho { background: #FAFBFC; opacity: 0.85; }
     .ideia-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; margin-bottom: 8px; }
     .ideia-badges { display: flex; gap: 5px; flex-wrap: wrap; }
-    .badge-tipo { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
-    .badge-aprovacao { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; }
-    .badge-aprovado { background: #f0fff4; color: #276749; }
-    .badge-pendente { background: #fffaf0; color: #c05621; }
-    .badge-dispensado { background: #fff5f5; color: #c53030; }
-    .badge-rascunho { background: #f0f2f5; color: #718096; }
-    .ideia-titulo { font-size: 14px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; line-height: 1.3; }
-    .ideia-desc { font-size: 12px; color: #718096; line-height: 1.5; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .badge-tipo { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 5px; }
+    .badge-aprovacao { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 5px; }
+    .badge-aprovado { background: color-mix(in srgb,#00B37E 16%,white); color: #00754F; }
+    .badge-pendente { background: color-mix(in srgb,#FFAE00 16%,white); color: #8A6200; }
+    .badge-dispensado { background: color-mix(in srgb,#FF2E4D 14%,white); color: #B3123A; }
+    .badge-rascunho { background: #F1F2F5; color: #6B7080; }
+    .ideia-titulo { font-size: 14px; font-weight: 800; color: #0B0B0F; margin-bottom: 6px; line-height: 1.3; }
+    .ideia-desc { font-size: 12px; color: #6B7080; line-height: 1.6; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+    .ideia-meta-item { display: inline-flex; align-items: center; gap: 4px; }
     .ideia-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-    .ideia-meta-item { font-size: 11px; color: #718096; }
-    .ideia-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid #f0f2f5; flex-wrap: wrap; gap: 6px; }
-    .ideia-area { font-size: 11px; font-weight: 600; padding: 2px 7px; background: #f0f2f5; color: #4a5568; border-radius: 3px; }
-    .ideia-status-sel { border: none; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; cursor: pointer; outline: none; }
-    .status-nao-iniciada { background: #f0f2f5; color: #718096; }
-    .status-em-implementacao { background: #f5f0ff; color: #2d1b69; }
-    .status-concluida { background: #f0fff4; color: #276749; }
-    .status-cancelada { background: #fff5f5; color: #c53030; }
+    .ideia-meta-item { font-size: 11px; color: #9CA0AC; }
+    .ideia-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid #F2F3F5; flex-wrap: wrap; gap: 6px; }
+    .ideia-area { font-size: 11px; font-weight: 700; padding: 2px 8px; background: #F1F2F5; color: #4A4E5A; border-radius: 5px; }
+    .ideia-status-sel { border: none; font-size: 10.5px; font-weight: 700; padding: 4px 9px; border-radius: 5px; cursor: pointer; outline: none; }
+    .status-nao-iniciada { background: #F1F2F5; color: #6B7080; }
+    .status-em-implementacao { background: color-mix(in srgb,var(--accent) 16%,white); color: var(--accent); }
+    .status-concluida { background: color-mix(in srgb,#00B37E 16%,white); color: #00754F; }
+    .status-cancelada { background: color-mix(in srgb,#FF2E4D 16%,white); color: #B3123A; }
     .ideia-card.aprovada { cursor: default; }
-    .drawer-aviso-aprovada { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 7px; padding: 10px 14px; font-size: 12px; color: #276749; font-weight: 600; margin-bottom: 14px; display: none; }
+    .ideia-icon-btn { width: 26px; height: 26px; border-radius: 6px; border: none; background: #F1F2F5; cursor: pointer; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+    .drawer-aviso-aprovada { background: color-mix(in srgb,#00B37E 8%,white); border: 1px solid color-mix(in srgb,#00B37E 30%,white); border-radius: 9px; padding: 10px 14px; font-size: 12px; color: #00754F; font-weight: 600; margin-bottom: 14px; display: none; }
     .drawer-aviso-aprovada.visivel { display: flex; align-items: center; gap: 8px; }
-    .btn-aprovar { padding: 4px 8px; background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-    .btn-dispensar { padding: 4px 8px; background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-    .btn-editar-card { padding: 4px 8px; background: #f5f0ff; color: #2d1b69; border: none; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-    .btn-deletar-card { padding: 4px 8px; background: #fff5f5; color: #c53030; border: none; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .btn-aprovar { padding: 4px 9px; background: color-mix(in srgb,#00B37E 12%,white); color: #00754F; border: none; border-radius: 5px; font-size: 10.5px; font-weight: 700; cursor: pointer; }
+    .btn-dispensar { padding: 4px 9px; background: color-mix(in srgb,#FF2E4D 10%,white); color: #B3123A; border: none; border-radius: 5px; font-size: 10.5px; font-weight: 700; cursor: pointer; }
     .tags-lista { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
-    .tag { font-size: 10px; padding: 2px 6px; background: #f0f2f5; color: #718096; border-radius: 10px; }
-    .empty-state { text-align: center; padding: 48px; color: #a0aec0; grid-column: 1/-1; }
-    .tipo-inovacao { background: #ebf0ff; color: #3b5bdb; }
-    .tipo-sustentabilidade { background: #f0fff4; color: #276749; }
-    .tipo-resolucao { background: #fff5f5; color: #c53030; }
-    .tipo-seguranca { background: #fffaf0; color: #c05621; }
-    .tipo-pokayoke-prev { background: #faf5ff; color: #6b46c1; }
-    .tipo-pokayoke-det { background: #fff0f6; color: #97266d; }
-    .tipo-riscos { background: #f0fff4; color: #276749; }
-    .tipo-melhoria { background: #f0f2f5; color: #718096; }
-    .tipo-outros { background: #f0f2f5; color: #718096; }
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; z-index: 1000; }
+    .tag { font-size: 10px; padding: 2px 7px; background: #F1F2F5; color: #6B7080; border-radius: 999px; }
+    .empty-state { text-align: center; padding: 48px; color: #9CA0AC; grid-column: 1/-1; }
+    .tipo-inovacao { background: color-mix(in srgb,#3B5BDB 14%,white); color: #3B5BDB; }
+    .tipo-sustentabilidade { background: color-mix(in srgb,#00B37E 14%,white); color: #00754F; }
+    .tipo-resolucao { background: color-mix(in srgb,#FF2E4D 14%,white); color: #B3123A; }
+    .tipo-seguranca { background: color-mix(in srgb,#FFAE00 14%,white); color: #8A6200; }
+    .tipo-pokayoke-prev { background: color-mix(in srgb,#6B46C1 14%,white); color: #6B46C1; }
+    .tipo-pokayoke-det { background: color-mix(in srgb,#97266D 14%,white); color: #97266D; }
+    .tipo-riscos { background: color-mix(in srgb,#00B37E 14%,white); color: #00754F; }
+    .tipo-melhoria { background: #F1F2F5; color: #6B7080; }
+    .tipo-outros { background: #F1F2F5; color: #6B7080; }
+
+    /* ===== Drawer ===== */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(11,11,15,0.45); display: none; z-index: 1000; }
     .drawer-overlay.aberto { display: block; }
-    .drawer { position: fixed; top: 0; right: 0; width: 520px; height: 100vh; background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.12); overflow-y: auto; padding: 24px; z-index: 1001; transform: translateX(100%); transition: transform 0.3s; }
+    .drawer { position: fixed; top: 0; right: 0; width: 520px; max-width: 94vw; height: 100vh; background: white; box-shadow: -4px 0 24px rgba(0,0,0,0.12); overflow-y: auto; padding: 0; z-index: 1001; transform: translateX(100%); transition: transform 0.3s; display: flex; flex-direction: column; }
     .drawer-overlay.aberto .drawer { transform: translateX(0); }
-    .drawer-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #f0f2f5; }
-    .drawer-titulo { font-size: 16px; font-weight: 700; color: #1e2a4a; }
-    .drawer-sub { font-size: 12px; color: #718096; margin-top: 2px; }
-    .sec-titulo { font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f0f2f5; }
+    .drawer-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 22px 24px; border-bottom: 1px solid #ECEDF0; flex-shrink: 0; }
+    .drawer-titulo { font-size: 16px; font-weight: 800; color: #0B0B0F; }
+    .drawer-sub { font-size: 12px; color: #9CA0AC; margin-top: 2px; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 22px 24px; }
+    .sec-titulo { font-size: 11px; font-weight: 800; color: #0B0B0F; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #F0F2F5; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-group { margin-bottom: 12px; }
+    .form-group { margin-bottom: 14px; }
     .form-group.full { grid-column: 1/-1; }
-    .tipos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .tipo-option { display: flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; cursor: pointer; font-size: 12px; color: #4a5568; transition: all 0.2s; }
-    .tipo-option:hover { border-color: #2d1b69; background: #f8fafc; }
-    .tipo-option input[type="radio"] { accent-color: #2d1b69; }
-    .tipo-option.selecionado { border-color: #2d1b69; background: #f5f0ff; color: #2d1b69; font-weight: 600; }
-    .editor-toolbar { display: flex; gap: 3px; padding: 5px; background: #f8fafc; border-radius: 6px 6px 0 0; border: 1.5px solid #e2e8f0; border-bottom: none; flex-wrap: wrap; }
-    .toolbar-btn { padding: 4px 7px; border: none; background: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #4a5568; }
-    .toolbar-btn:hover { background: #e2e8f0; }
-    .editor-area { min-height: 100px; padding: 10px; border: 1.5px solid #e2e8f0; border-radius: 0 0 6px 6px; outline: none; font-size: 13px; line-height: 1.6; color: #1e2a4a; }
-    .editor-area:focus { border-color: #2d1b69; }
-    .rascunho-aviso { font-size: 11px; color: #718096; padding: 6px 10px; background: #f8fafc; border-radius: 6px; display: none; margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 700; color: #6B7080; margin-bottom: 5px; }
+    .form-group input[type="text"], .form-group input[type="date"], .form-group select { width: 100%; height: 38px; padding: 0 12px; border-radius: 9px; border: 1.5px solid #E5E7EB; font-size: 12.5px; color: #0B0B0F; box-sizing: border-box; outline: none; font-family: inherit; background: white; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+    .tipos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tipo-option { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border: 1.5px solid #E5E7EB; border-radius: 9px; cursor: pointer; font-size: 12px; color: #33363F; transition: all 0.15s; }
+    .tipo-option:hover { border-color: var(--accent); background: #FAFBFC; }
+    .tipo-option input[type="radio"] { accent-color: var(--accent); }
+    .tipo-option.selecionado { border-color: var(--accent); background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); font-weight: 700; }
+    .editor-toolbar { display: flex; gap: 2px; padding: 6px; background: white; border-radius: 8px 8px 0 0; border: 1.5px solid #E5E7EB; border-bottom: none; flex-wrap: wrap; }
+    .toolbar-btn { padding: 0; width: 26px; height: 26px; border: none; background: none; border-radius: 6px; cursor: pointer; font-size: 11.5px; color: #33363F; display: flex; align-items: center; justify-content: center; }
+    .toolbar-btn:hover { background: #F1F2F5; }
+    .editor-area { min-height: 100px; padding: 10px 12px; border: 1.5px solid #E5E7EB; border-radius: 0 0 8px 8px; outline: none; font-size: 12.5px; line-height: 1.6; color: #0B0B0F; box-sizing: border-box; }
+    .editor-area:focus { border-color: var(--accent); }
+    .rascunho-aviso { font-size: 11px; color: #6B7080; padding: 6px 10px; background: #F1F2F5; border-radius: 8px; display: none; margin-bottom: 10px; }
     .rascunho-aviso.visivel { display: flex; align-items: center; gap: 5px; }
-    .drawer-footer { display: flex; gap: 8px; margin-top: 20px; padding-top: 14px; border-top: 1px solid #f0f2f5; }
-    .btn-rascunho { flex: 1; padding: 10px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .btn-enviar { flex: 2; padding: 10px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .btn-cancelar-drawer { padding: 10px 16px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .btn-publicar { flex: 1; padding: 10px; background: #276749; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .badge-publicada { background: #e6f4ff; color: #0969da; }
-    .anexos-area { margin-top: 8px; }
-    .anexo-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #f8fafc; border-radius: 6px; margin-bottom: 4px; font-size: 12px; border: 1px solid #e2e8f0; }
-    .anexo-nome { flex: 1; color: #1e2a4a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: none; }
-    .anexo-nome:hover { text-decoration: underline; color: #2d1b69; }
-    .anexo-del { background: none; border: none; color: #c53030; cursor: pointer; font-size: 16px; padding: 0 4px; line-height: 1; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 2000; align-items: center; justify-content: center; }
+    .drawer-footer { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 24px; border-top: 1px solid #ECEDF0; flex-shrink: 0; }
+    .drawer-footer-row { display: flex; gap: 8px; width: 100%; }
+    .btn-rascunho { flex: 1; height: 40px; padding: 0 16px; background: white; border: 1.5px solid #E5E7EB; color: #33363F; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-enviar { flex: 1; height: 40px; padding: 0 16px; background: #00B37E; color: white; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-cancelar-drawer { flex: 1; height: 40px; padding: 0 16px; background: white; border: 1.5px solid #E5E7EB; color: #33363F; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-publicar { width: 100%; height: 44px; padding: 0 16px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border: none; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .upload-area { border: 2px dashed #E5E7EB; border-radius: 12px; padding: 22px; text-align: center; cursor: pointer; transition: all 0.15s; background: white; }
+    .upload-area:hover { border-color: var(--accent); background: #F7F9FF; }
+    .upload-area input { display: none; }
+    .upload-lista { margin-top: 10px; }
+    .upload-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white; border-radius: 9px; border: 1px solid #ECEDF0; margin-bottom: 6px; }
+    .upload-item-nome { font-size: 12px; font-weight: 600; color: #0B0B0F; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-decoration: none; }
+    .upload-item-tam { font-size: 11px; color: #9CA0AC; }
+    .upload-item-del { background: #FFE9EC; border: none; color: #FF2E4D; border-radius: 5px; cursor: pointer; padding: 2px 6px; font-size: 11px; }
+
+    /* ===== Modal (seleção de usuário) ===== */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(11,11,15,0.45); display: none; z-index: 2000; align-items: center; justify-content: center; }
     .modal-overlay.aberto { display: flex; }
-    .modal-card { background: white; border-radius: 12px; padding: 24px; width: 420px; max-width: 95vw; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
-    .modal-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
-    .modal-sub { font-size: 12px; color: #718096; margin-bottom: 16px; }
-    .modal-lista { flex: 1; overflow-y: auto; border: 1.5px solid #e2e8f0; border-radius: 8px; margin-bottom: 14px; max-height: 320px; }
-    .modal-user-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f2f5; transition: background 0.15s; }
+    .modal-card { background: white; border-radius: 16px; padding: 0; width: 420px; max-width: 95vw; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(11,11,15,0.2); border: 1px solid #ECEDF0; overflow: hidden; }
+    .modal-titulo { font-size: 16px; font-weight: 800; color: #0B0B0F; margin-bottom: 4px; }
+    .modal-sub { font-size: 12px; color: #9CA0AC; margin-bottom: 0; }
+    .modal-lista { flex: 1; overflow-y: auto; border: 1.5px solid #ECEDF0; border-radius: 10px; margin: 0 24px 20px; max-height: 320px; }
+    .modal-user-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #F2F3F5; transition: background 0.15s; }
     .modal-user-item:last-child { border-bottom: none; }
-    .modal-user-item:hover { background: #f5f0ff; }
-    .modal-user-item.selecionado { background: #f5f0ff; outline: 2px solid #2d1b69; outline-offset: -2px; }
-    .modal-avatar { width: 32px; height: 32px; border-radius: 50%; background: #2d1b69; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
-    .modal-footer { display: flex; gap: 8px; }
+    .modal-user-item:hover { background: #FAFBFC; }
+    .modal-user-item.selecionado { background: color-mix(in srgb,var(--accent) 8%,white); outline: 2px solid var(--accent); outline-offset: -2px; }
+    .modal-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+    .modal-footer { display: flex; gap: 8px; padding: 0 24px 24px; }
+    .hoc-select-wrap { position: relative; display: inline-block; width: 100%; }
+    .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
+    .hoc-select-trigger { appearance: none; -webkit-appearance: none; -moz-appearance: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: white; cursor: pointer; font-family: inherit; }
+    .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
+    .hoc-select-trigger.open svg { transform: rotate(180deg); }
+    .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+    .hoc-select-panel { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; background: white; border: 1px solid #ECEDF0; border-radius: 10px; box-shadow: 0 12px 32px rgba(11,11,15,0.16); padding: 6px; z-index: 60; max-height: 260px; overflow-y: auto; }
+    .hoc-select-panel.open { display: block; }
+    .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
+    .hoc-select-item:hover { background: #F1F2F5; }
+    .hoc-select-item.selected { background: color-mix(in srgb, #00B37E 14%, white); color: #00754F; }
   </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
-    <span class="logo-text">Business Manager</span>
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8"/><text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="800">H</text></svg>
+    <span class="logo-text side-label">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
-    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item active" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
-    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
+    <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
+    <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
+    <a class="menu-item active" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
     <details class="sidebar-sistema" id="sistemaMenu">
-      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
-      <div class="sidebar-sistema-items">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="side-label sidebar-sistema-label">Sistema</span><svg class="sidebar-sistema-chevron side-label" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items" id="sistemaItemsWrap">
+        <button class="menu-item" onclick="mostrarCorSistemaNoMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Cor do Sistema</button>
         <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
         <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
         <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
       </div>
     </details>
+    <button class="btn-recolher" id="btnRecolher" onclick="toggleSidebarRecolhida()" title="Recolher/Expandir">
+      <svg id="iconRecolher" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      <span class="side-label btn-sidebar-label" id="lblRecolher">Recolher</span>
+    </button>
   </div>
 </div>
 
@@ -167,6 +224,10 @@
   <div id="bannerAssinatura" style="display:none"></div>
   <div class="header" style="justify-content:flex-end">
     <div class="header-right">
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -174,66 +235,54 @@
         </button>
         <div class="notif-dropdown" id="notifDropdown">
           <div class="notif-drop-header">
-            <span class="notif-drop-titulo">🔔 Notificações</span>
+            <span class="notif-drop-titulo" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Notificações</span>
             <div class="notif-drop-acoes">
-              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button>
+              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar</button>
             </div>
           </div>
           <div class="notif-lista" id="notifLista">
-            <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
+            <div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Carregando...</div></div>
           </div>
         </div>
-      </div>
-      <div class="header-user">
-        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
-        <div class="user-avatar" id="userAvatar">?</div>
       </div>
     </div>
   </div>
 
   <div class="content">
-    <div class="page-header">
-      <div class="page-header-info">
-        <div class="page-title">Ideias Livres</div>
-      </div>
-      <button class="btn-primary" id="btnNovaIdeia" onclick="abrirDrawer()" style="margin-top:4px">+ Nova Ideia</button>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Total de Ideias</div></div>
+      <div class="stat-box"><div class="stat-val stat-saving" id="statImplementadas">0</div><div class="stat-lbl">Implementadas</div></div>
+      <div class="stat-box"><div class="stat-val" id="statProgresso">0</div><div class="stat-lbl">Em Implementação</div></div>
     </div>
-
-    <div class="painel">
-      <div class="painel-header">📊 Resumo</div>
-      <div class="painel-content">
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-          <div class="stat-box"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">Total de Ideias</div></div>
-          <div class="stat-box"><div class="stat-val" id="statImplementadas">0</div><div class="stat-lbl">Implementadas</div></div>
-          <div class="stat-box"><div class="stat-val" id="statProgresso">0</div><div class="stat-lbl">Em Progresso</div></div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
-          <div style="background:#f8fafc;border-radius:8px;padding:12px">
-            <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:10px">💡 Top Propositores</div>
-            <div id="listaPropositores"></div>
-          </div>
-          <div style="background:#f8fafc;border-radius:8px;padding:12px">
-            <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:10px">✅ Top Implementadores</div>
-            <div id="listaImplementadores"></div>
-          </div>
-          <div style="background:#f8fafc;border-radius:8px;padding:12px">
-            <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:10px">💰 Maior Ganho Financeiro Mensal</div>
-            <div id="listaSaving"></div>
-          </div>
-          <div style="background:#f8fafc;border-radius:8px;padding:12px">
-            <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:10px">⭐ Destaques</div>
-            <div id="listaDestaques"></div>
-          </div>
-          <div style="background:#f8fafc;border-radius:8px;padding:12px">
-            <div style="font-size:11px;font-weight:700;color:#1e2a4a;margin-bottom:10px">📊 Categorias Valorizadas</div>
-            <div id="listaCategorias"></div>
-          </div>
-        </div>
+    <div class="rank-grid">
+      <div class="rank-painel">
+        <div class="rank-painel-titulo">Top Propositores</div>
+        <div id="listaPropositores"></div>
+      </div>
+      <div class="rank-painel">
+        <div class="rank-painel-titulo">Top Implementadores</div>
+        <div id="listaImplementadores"></div>
+      </div>
+      <div class="rank-painel">
+        <div class="rank-painel-titulo">Maior Ganho Financeiro Mensal</div>
+        <div id="listaSaving"></div>
+      </div>
+      <div class="rank-painel">
+        <div class="rank-painel-titulo">Destaques</div>
+        <div id="listaDestaques"></div>
+      </div>
+      <div class="rank-painel">
+        <div class="rank-painel-titulo">Categorias Valorizadas</div>
+        <div id="listaCategorias"></div>
       </div>
     </div>
 
-    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
-      <button class="btn-filtros" onclick="toggleFiltros()">⚙️ Filtros</button>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
+      <button class="btn-filtros" onclick="toggleFiltros()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="1.8" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.8" fill="currentColor" stroke="none"/><circle cx="7" cy="18" r="1.8" fill="currentColor" stroke="none"/></svg>
+        Filtros
+      </button>
+      <button class="btn-primary" id="btnNovaIdeia" onclick="abrirDrawer()">+ Nova Ideia</button>
     </div>
 
     <div class="filtros-panel" id="filtrosPanel">
@@ -264,8 +313,9 @@
         <div class="drawer-titulo" id="drawerTitulo">Nova Ideia de Melhoria</div>
         <div class="drawer-sub">Compartilhe sua ideia para melhorar nossos processos</div>
       </div>
-      <button class="btn-fechar" onclick="fecharDrawer()" style="font-size:20px;background:none;border:none;cursor:pointer;color:#a0aec0">×</button>
+      <button class="btn-fechar" onclick="fecharDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
+    <div class="drawer-body">
     <div class="rascunho-aviso" id="rascunhoAviso">✓ Rascunho salvo</div>
     <div class="drawer-aviso-aprovada" id="drawerAvisoAprovada">✅ Esta ideia está aprovada e não pode ser editada. Apenas o status de implementação pode ser alterado no card.</div>
     <div style="margin-bottom:16px">
@@ -275,7 +325,7 @@
         <div class="form-group"><label>Responsável</label><input type="text" id="ideaResponsavel" placeholder="Nome ou departamento"></div>
         <div class="form-group"><label>Área Beneficiada</label><input type="text" id="ideaArea" placeholder="Ex: Comercial, RH"></div>
         <div class="form-group"><label>Data da Proposta</label><input type="date" id="ideaData"></div>
-        <div class="form-group"><label>Complexidade</label><select id="ideaComplexidade"><option value="">Selecione...</option><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
+        <div class="form-group"><label>Complexidade</label><select id="ideaComplexidade" style="width:100%;height:38px;padding:0 12px;border-radius:9px;border:1.5px solid #E5E7EB;font-size:12.5px;color:#0B0B0F"><option value="">Selecione...</option><option>Baixa</option><option>Média</option><option>Alta</option></select></div>
       </div>
     </div>
     <div style="margin-bottom:16px">
@@ -298,37 +348,46 @@
         <button class="toolbar-btn" onclick="fmt('bold')"><b>B</b></button>
         <button class="toolbar-btn" onclick="fmt('italic')"><i>I</i></button>
         <button class="toolbar-btn" onclick="fmt('underline')"><u>U</u></button>
-        <button class="toolbar-btn" onclick="fmt('insertUnorderedList')">• Lista</button>
-        <button class="toolbar-btn" onclick="fmt('formatBlock','h3')">H3</button>
-        <button class="toolbar-btn" onclick="document.getElementById('ideaAnexoInput').click()" style="margin-left:auto;border:1px solid #e2e8f0">📎 Anexar</button>
       </div>
       <div class="editor-area" id="ideaDescricao" contenteditable="true"></div>
-      <input type="file" id="ideaAnexoInput" multiple accept=".pdf,.doc,.docx,.xlsx,.xls,.pptx,.png,.jpg,.jpeg,.zip,.txt" style="display:none" onchange="subirArquivos(this.files)">
-      <div class="anexos-area" id="anexosFormLista"></div>
     </div>
     <div style="margin-bottom:16px">
       <div class="sec-titulo">Classificação</div>
       <div class="form-grid">
         <div class="form-group"><label>Ganho Financeiro</label><input type="text" id="ideaGanhoFin" placeholder="Ex: R$ 5.000"></div>
-        <div class="form-group"><label>Período</label><select id="ideaPeriodo"><option value="">Selecione...</option><option>Dia</option><option>Mês</option><option>Semestre</option><option>Ano</option></select></div>
+        <div class="form-group"><label>Período</label><select id="ideaPeriodo" style="width:100%;height:38px;padding:0 12px;border-radius:9px;border:1.5px solid #E5E7EB;font-size:12.5px;color:#0B0B0F"><option value="">Selecione...</option><option>Dia</option><option>Mês</option><option>Semestre</option><option>Ano</option></select></div>
         <div class="form-group full"><label>Outros Ganhos</label><input type="text" id="ideaOutrosGanhos" placeholder="Ex: Redução de retrabalho, melhora de qualidade"></div>
         <div class="form-group full"><label>Tags (separadas por vírgula)</label><input type="text" id="ideaTags" placeholder="Ex: automação, eficiência"></div>
       </div>
     </div>
+    <div id="btnAnexarTrigger" style="margin-bottom:16px">
+      <div class="sec-titulo">Documentos Anexos (Máx. 3, 5MB cada)</div>
+      <div class="upload-area" onclick="document.getElementById('ideaAnexoInput').click()">
+        <input type="file" id="ideaAnexoInput" multiple accept=".pdf,.doc,.docx,.xlsx,.xls,.pptx,.png,.jpg,.jpeg,.zip,.txt" onchange="subirArquivos(this.files)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="2" style="margin-bottom:8px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div style="font-size:13px;font-weight:600;color:#33363F">Clique para selecionar arquivos</div>
+      </div>
+      <div class="upload-lista" id="anexosFormLista"></div>
+    </div>
     <input type="hidden" id="ideaEditId">
+    </div>
     <div class="drawer-footer">
-      <button class="btn-cancelar-drawer" onclick="fecharDrawer()">Cancelar</button>
-      <button class="btn-rascunho" onclick="salvarIdeia('rascunho')">💾 Rascunho</button>
-      <button class="btn-publicar" id="btnPublicarImediato" onclick="salvarIdeia('aprovada')" style="display:none">✅ Registrar como Aprovada</button>
-      <button class="btn-enviar" onclick="abrirModalNotif()">✓ Enviar para Aprovação</button>
+      <div class="drawer-footer-row">
+        <button class="btn-cancelar-drawer" onclick="fecharDrawer()">Cancelar</button>
+        <button class="btn-rascunho" onclick="salvarIdeia('rascunho')">Rascunho</button>
+        <button class="btn-enviar" onclick="abrirModalNotif()">Enviar para Aprovação</button>
+      </div>
+      <button class="btn-publicar" id="btnPublicarImediato" onclick="salvarIdeia('aprovada')" style="display:none">Registrar como Aprovada</button>
     </div>
   </div>
 </div>
 <!-- Modal seleção de usuário para notificação -->
 <div class="modal-overlay" id="modalNotifOverlay">
   <div class="modal-card">
-    <div class="modal-titulo">Enviar para Aprovação</div>
-    <div class="modal-sub">Selecione quem deve ser notificado — a lista mostra só quem tem permissão para aprovar ideias</div>
+    <div style="padding:22px 24px 16px">
+      <div class="modal-titulo">Enviar para Aprovação</div>
+      <div class="modal-sub">Selecione quem deve ser notificado — a lista mostra só quem tem permissão para aprovar ideias</div>
+    </div>
     <div class="modal-lista" id="modalUserLista"></div>
     <div class="modal-footer">
       <button class="btn-cancelar-drawer" onclick="fecharModalNotif()" style="flex:1">Cancelar</button>
@@ -355,6 +414,64 @@
   document.getElementById('userPerfil').textContent = usuario.perfil || '-';
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
   const isAdmin = usuario.perfil === 'Admin';
+
+  // ===== Sidebar: recolher/expandir + cor do sistema =====
+  const CORES_SISTEMA = [
+    { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
+    { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
+    { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
+    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
+  ];
+  function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
+  function setAccentColor(hex) {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+    if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
+  }
+  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+
+  const sidebarEl = document.getElementById('sidebarEl');
+  function aplicarSidebarRecolhida(recolhida) {
+    sidebarEl.classList.toggle('recolhida', recolhida);
+    document.getElementById('iconRecolher').innerHTML = recolhida
+      ? '<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>'
+      : '<polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>';
+    const lbl = document.getElementById('lblRecolher');
+    if (lbl) lbl.textContent = recolhida ? 'Expandir' : 'Recolher';
+  }
+  function toggleSidebarRecolhida() {
+    const recolhida = !sidebarEl.classList.contains('recolhida');
+    localStorage.setItem('sidebarRecolhida', recolhida ? '1' : '0');
+    aplicarSidebarRecolhida(recolhida);
+  }
+  aplicarSidebarRecolhida(localStorage.getItem('sidebarRecolhida') === '1');
+
+  const SISTEMA_ITEMS_HTML = document.getElementById('sistemaItemsWrap').innerHTML;
+  function mostrarCorSistemaNoMenu() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = 'cor';
+    const atual = (localStorage.getItem('accentColor') || '#2F5CFF').toLowerCase();
+    wrap.innerHTML = `
+      <button class="color-picker-back" onclick="voltarMenuSistema()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Cor do Sistema
+      </button>
+      ${CORES_SISTEMA.map(c => `
+        <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
+          <span class="color-swatch-rect" style="background:${c.hex}"></span>
+          <span class="color-swatch-label">${c.nome}</span>
+        </button>`).join('')}
+      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+  }
+  function voltarMenuSistema() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = '';
+    wrap.innerHTML = SISTEMA_ITEMS_HTML;
+  }
+  document.getElementById('sistemaMenu').addEventListener('toggle', (e) => { if (!e.target.open) voltarMenuSistema(); });
+
   let ideias = [];
   let podePublicar = isAdmin;
   let podeAprovarIdeias = isAdmin;
@@ -400,15 +517,15 @@
 
   function miniLista(containerId, items, opts = {}) {
     const el = document.getElementById(containerId);
-    if (!items.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:11px;padding:4px 0">Sem dados</div>'; return; }
+    if (!items.length) { el.innerHTML = '<div style="color:#9CA0AC;font-size:11px;padding:4px 0">Sem dados</div>'; return; }
     el.innerHTML = items.map((item, i) => `
-      <div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #eff1f5">
-        ${opts.rank !== false ? `<span style="font-size:10px;color:#a0aec0;min-width:18px;font-weight:700">#${i+1}</span>` : ''}
+      <div class="ranking-item">
+        ${opts.rank !== false ? `<span class="ranking-pos">#${i+1}</span>` : ''}
         <div style="flex:1;min-width:0">
-          <div style="font-size:11px;color:#1e2a4a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.nome}">${item.nome}</div>
-          ${item.sub ? `<div style="font-size:10px;color:#a0aec0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.sub}</div>` : ''}
+          <div class="ranking-nome" title="${item.nome}">${item.nome}</div>
+          ${item.sub ? `<div class="ranking-sub">${item.sub}</div>` : ''}
         </div>
-        ${item.valor ? `<span style="font-size:11px;font-weight:700;color:#2d1b69;white-space:nowrap;margin-left:4px">${item.valor}</span>` : ''}
+        ${item.valor ? `<span class="ranking-valor">${item.valor}</span>` : ''}
       </div>`).join('');
   }
 
@@ -479,18 +596,22 @@
       const statusCls = { 'Não Iniciada':'status-nao-iniciada','Em Implementação':'status-em-implementacao','Concluída':'status-concluida','Cancelada':'status-cancelada' }[ideia.status]||'status-nao-iniciada';
       const tags = ideia.tags ? ideia.tags.split(',').map(t=>`<span class="tag">${t.trim()}</span>`).join('') : '';
       const btnAprovar = (podeAprovarIdeias && ideia.aprovacao==='pendente') ? `<button class="btn-aprovar" onclick="aprovar('${ideia._id}',event)">✓ Aprovar</button><button class="btn-dispensar" onclick="dispensar('${ideia._id}',event)">✕</button>` : '';
-      const btnEditar = isAprovada ? '' : `<button class="btn-editar-card" onclick="editarIdeia('${ideia._id}',event)">✏️</button>`;
+      const btnEditar = isAprovada ? '' : `<button class="ideia-icon-btn" style="color:var(--accent)" onclick="editarIdeia('${ideia._id}',event)" title="Editar">✎</button>`;
+      const btnDestaque = `<button class="ideia-icon-btn" style="${ideia.destacada?'background:color-mix(in srgb,#FFAE00 18%,white);color:#8A6200':''}" onclick="toggleDestaque('${ideia._id}',event)" title="${ideia.destacada?'Remover destaque':'Destacar ideia'}"><svg width="13" height="13" viewBox="0 0 24 24" fill="${ideia.destacada?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>`;
+      const btnDeletar = `<button class="ideia-icon-btn" style="color:#FF2E4D" onclick="deletarIdeia('${ideia._id}',event)" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg></button>`;
+      const descTexto = ideia.descricao ? ideia.descricao.replace(/<[^>]*>/g,'') : '';
+      const descTruncada = descTexto.length > 140 ? descTexto.slice(0,140).trim()+'…' : descTexto;
       return `
         <div class="ideia-card ${isRascunho?'rascunho':''} ${isAprovada?'aprovada':''}" onclick="${isAprovada?'':'editarIdeia(\''+ideia._id+'\')'}">
           <div class="ideia-card-top"><div class="ideia-badges">${ideia.tipo?`<span class="badge-tipo ${TIPOS_CLASSE[ideia.tipo]||'tipo-outros'}">${ideia.tipo}</span>`:''}</div>${badgeAprov}</div>
           <div class="ideia-titulo">${ideia.titulo}</div>
-          <div class="ideia-desc">${ideia.descricao?ideia.descricao.replace(/<[^>]*>/g,''):'—'}</div>
+          <div class="ideia-desc">${descTruncada||'—'}</div>
           <div class="ideia-meta">
-            ${ideia.responsavel?`<span class="ideia-meta-item">👤 ${ideia.responsavel}</span>`:''}
-            ${ideia.data?`<span class="ideia-meta-item">📅 ${tempoRelativo(ideia.data)}</span>`:''}
-            ${ideia.ganho?`<span class="ideia-meta-item">💰 ${ideia.ganho}${ideia.periodo?'/'+ideia.periodo.toLowerCase():''}</span>`:''}
+            ${ideia.responsavel?`<span class="ideia-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${ideia.responsavel}</span>`:''}
+            ${ideia.data?`<span class="ideia-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${tempoRelativo(ideia.data)}</span>`:''}
+            ${ideia.ganho?`<span class="ideia-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>${ideia.ganho}${ideia.periodo?'/'+ideia.periodo.toLowerCase():''}</span>`:''}
             ${ideia.outrosGanhos?`<span class="ideia-meta-item">✨ ${ideia.outrosGanhos}</span>`:''}
-            ${ideia.complexidade?`<span class="ideia-meta-item">🎯 ${ideia.complexidade}</span>`:''}
+            ${ideia.complexidade?`<span class="ideia-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>${ideia.complexidade}</span>`:''}
           </div>
           ${tags?`<div class="tags-lista">${tags}</div>`:''}
           <div class="ideia-footer">
@@ -503,8 +624,8 @@
                 <option ${ideia.status==='Cancelada'?'selected':''}>Cancelada</option>
               </select>
               ${btnEditar}
-              <button class="btn-deletar-card" onclick="deletarIdeia('${ideia._id}',event)">🗑️</button>
-              <button onclick="toggleDestaque('${ideia._id}',event)" style="padding:4px 8px;border:none;border-radius:4px;font-size:13px;cursor:pointer;background:${ideia.destacada?'#fffbeb':'#f0f2f5'}" title="${ideia.destacada?'Remover destaque':'Destacar ideia'}">${ideia.destacada?'⭐':'☆'}</button>
+              ${btnDestaque}
+              ${btnDeletar}
               ${btnAprovar}
             </div>
           </div>
@@ -574,7 +695,7 @@
       document.getElementById('ideaDescricao').contentEditable = disabled ? 'false' : 'true';
       document.querySelectorAll('.tipo-option').forEach(el => { el.style.pointerEvents = disabled ? 'none' : ''; });
       document.getElementById('ideaAnexoInput').disabled = disabled;
-      document.querySelector('.toolbar-btn[onclick*="ideaAnexoInput"]').style.display = disabled ? 'none' : '';
+      document.getElementById('btnAnexarTrigger').style.display = disabled ? 'none' : '';
     };
     if (id) {
       const ideia = ideias.find(i=>i._id===id);
@@ -709,12 +830,11 @@
   function renderAnexosForm() {
     const el = document.getElementById('anexosFormLista');
     if (!anexosForm.length) { el.innerHTML = ''; return; }
-    const icone = nome => nome.match(/\.pdf$/i)?'📄':nome.match(/\.(doc|docx)$/i)?'📝':nome.match(/\.(xls|xlsx)$/i)?'📊':nome.match(/\.(ppt|pptx)$/i)?'📑':nome.match(/\.(png|jpg|jpeg|gif)$/i)?'🖼️':'📎';
     el.innerHTML = anexosForm.map((a, i) => `
-      <div class="anexo-item">
-        <span style="font-size:15px">${icone(a.nome)}</span>
-        <a class="anexo-nome" href="${a.url}" target="_blank" title="${a.nome}">${a.nome}</a>
-        <button class="anexo-del" onclick="removerAnexo(${i})" title="Remover">×</button>
+      <div class="upload-item">
+        <a class="upload-item-nome" href="${a.url}" target="_blank" title="${a.nome}">${a.nome}</a>
+        ${a.tamanho?`<span class="upload-item-tam">${(a.tamanho/1024).toFixed(0)} KB</span>`:''}
+        <button class="upload-item-del" onclick="removerAnexo(${i})">✕</button>
       </div>`).join('');
   }
 
@@ -779,6 +899,80 @@
   }
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href='/'; }
 
+  function hocEnhanceSelect(sel) {
+    if (!sel || sel._hocEnhanced) return;
+    sel._hocEnhanced = true;
+    const originalStyle = sel.getAttribute('style') || '';
+    const originalClass = sel.className || '';
+    const styleParts = originalStyle.split(';').map(s=>s.trim()).filter(Boolean);
+    const marginParts = styleParts.filter(p=>/^margin/i.test(p));
+    const triggerStyle = styleParts.filter(p=>!/^margin/i.test(p)).join(';');
+
+    const wrap = document.createElement('span');
+    wrap.className = 'hoc-select-wrap';
+    if (marginParts.length) wrap.setAttribute('style', marginParts.join(';'));
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    sel.classList.add('hoc-select-native');
+    sel.tabIndex = -1;
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = ('hoc-select-trigger ' + originalClass).trim();
+    trigger.setAttribute('style', triggerStyle);
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'hoc-select-trigger-label';
+    trigger.appendChild(labelSpan);
+    trigger.insertAdjacentHTML('beforeend', '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>');
+
+    const panel = document.createElement('div');
+    panel.className = 'hoc-select-panel';
+
+    wrap.appendChild(trigger);
+    wrap.appendChild(panel);
+
+    function syncLabel() {
+      const opt = sel.options[sel.selectedIndex];
+      labelSpan.textContent = opt ? opt.textContent : '';
+    }
+    function renderPanel() {
+      panel.innerHTML = '';
+      [...sel.options].forEach((opt, i) => {
+        const item = document.createElement('div');
+        item.className = 'hoc-select-item' + (i === sel.selectedIndex ? ' selected' : '');
+        item.textContent = opt.textContent;
+        item.onclick = () => {
+          sel.selectedIndex = i;
+          syncLabel();
+          panel.classList.remove('open');
+          trigger.classList.remove('open');
+          sel.dispatchEvent(new Event('change', {bubbles:true}));
+        };
+        panel.appendChild(item);
+      });
+    }
+    trigger.onclick = (e) => {
+      e.stopPropagation();
+      const willOpen = !panel.classList.contains('open');
+      document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+      if (willOpen) { renderPanel(); panel.classList.add('open'); trigger.classList.add('open'); }
+    };
+    syncLabel();
+
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    Object.defineProperty(sel, 'value', {
+      get() { return desc.get.call(sel); },
+      set(v) { desc.set.call(sel, v); syncLabel(); },
+      configurable: true
+    });
+    new MutationObserver(syncLabel).observe(sel, {childList:true, subtree:true});
+  }
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+  });
+  function hocEnhanceSelects(ids) { ids.forEach(id => hocEnhanceSelect(document.getElementById(id))); }
+  hocEnhanceSelects(['ideaComplexidade','ideaPeriodo']);
+
   carregarIdeias();
 
   (async () => {
@@ -839,16 +1033,28 @@
     }
   }
 
+  const NOTIF_ICON = {
+    sucesso: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>', color:'#00754F'},
+    erro: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+    aviso: {svg:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', color:'#8A6200'},
+    info: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>', color:'var(--accent)'},
+    licenca_vencendo: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>', color:'#8A6200'},
+    licenca_vencida: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+  };
+  function _notifIconHtml(tipo) {
+    const cfg = NOTIF_ICON[tipo] || NOTIF_ICON.info;
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2">${cfg.svg}</svg>`;
+  }
   function renderNotificacoes(notifs) {
     const lista = document.getElementById('notifLista');
     if (!lista) return;
     if (!notifs || notifs.length === 0) {
-      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
+      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
       return;
     }
     lista.innerHTML = notifs.map(n => `
       <div class="notif-item ${!n.lida?'nao-lida':''} tipo-${n.tipo}" onclick="abrirNotif('${n._id}','${n.link||''}')">
-        <div class="notif-icone ${n.tipo}">${n.icone||'🔔'}</div>
+        <div class="notif-icone ${n.tipo}">${_notifIconHtml(n.tipo)}</div>
         <div class="notif-corpo">
           <div class="notif-titulo-item">${n.titulo}</div>
           <div class="notif-msg">${n.mensagem}</div>

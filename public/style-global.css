@@ -37,7 +37,7 @@ body { font-family: 'Inter', sans-serif; background: #f0f2f5; display: flex; min
 .user-info { text-align: right; }
 .user-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; }
 .user-perfil { font-size: 11px; color: #718096; }
-.user-avatar { width: 32px; height: 32px; background: #6b46c1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; }
+.user-avatar { width: 32px; height: 32px; background: var(--accent, #2F5CFF); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; }
 
 /* ===== NOTIFICAÇÕES ===== */
 .notif-wrap { position: relative; }
@@ -55,17 +55,17 @@ body { font-family: 'Inter', sans-serif; background: #f0f2f5; display: flex; min
 .notif-badge.vermelho { background: #c53030; }
 
 /* Dropdown */
-.notif-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 360px; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.14); z-index: 500; display: none; overflow: hidden; }
+.notif-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 360px; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.14); z-index: 500; display: none; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; }
 .notif-dropdown.aberto { display: block; }
 .notif-drop-header { padding: 14px 16px; border-bottom: 1px solid #f0f2f5; display: flex; align-items: center; justify-content: space-between; }
-.notif-drop-titulo { font-size: 14px; font-weight: 700; color: #1e2a4a; }
+.notif-drop-titulo { font-size: 14px; font-weight: 700; color: #0B0B0F; }
 .notif-drop-acoes { display: flex; gap: 8px; }
-.btn-ler-todas { font-size: 11px; color: #2d1b69; background: none; border: none; cursor: pointer; font-weight: 600; }
+.btn-ler-todas { font-size: 11px; color: var(--accent); background: none; border: none; cursor: pointer; font-weight: 600; }
 .btn-ler-todas:hover { text-decoration: underline; }
 .notif-lista { max-height: 380px; overflow-y: auto; }
 .notif-item { display: flex; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: background 0.2s; text-decoration: none; }
 .notif-item:hover { background: #f8fafc; }
-.notif-item.nao-lida { background: #fafbff; border-left: 3px solid #2d1b69; }
+.notif-item.nao-lida { background: #fafbff; border-left: 3px solid var(--accent); }
 .notif-item.nao-lida:hover { background: #f0f4ff; }
 .notif-item.tipo-licenca_vencida { border-left: 3px solid #c53030; background: #fff8f8; }
 .notif-item.tipo-licenca_vencida:hover { background: #fff0f0; }
@@ -81,7 +81,7 @@ body { font-family: 'Inter', sans-serif; background: #f0f2f5; display: flex; min
 .notif-icone.licenca_vencendo { background: #fffaf0; }
 .notif-icone.licenca_vencida { background: #fff5f5; }
 .notif-corpo { flex: 1; min-width: 0; }
-.notif-titulo-item { font-size: 12px; font-weight: 700; color: #1e2a4a; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notif-titulo-item { font-size: 12px; font-weight: 700; color: #0B0B0F; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .notif-msg { font-size: 11px; color: #718096; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .notif-tempo { font-size: 10px; color: #a0aec0; margin-top: 3px; white-space: nowrap; }
 .notif-del { background: none; border: none; color: #a0aec0; cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 3px; flex-shrink: 0; align-self: flex-start; }

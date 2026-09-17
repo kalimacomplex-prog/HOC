@@ -5,118 +5,128 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HOC - Overview</title>
   <link rel="stylesheet" href="style-global.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root { --accent: #2F5CFF; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F6F7F9; }
     .sobre-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; }
     .sobre-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .sobre-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; }
+    .sobre-titulo { font-size: 15px; font-weight: 700; color: #0B0B0F; }
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .info-item { margin-bottom: 12px; }
-    .info-label { font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .info-value { font-size: 13px; color: #1e2a4a; line-height: 1.5; }
-    .info-input { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e2a4a; outline: none; font-family: inherit; }
-    .info-input:focus { border-color: #2d1b69; }
-    .info-textarea { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e2a4a; outline: none; font-family: inherit; resize: vertical; min-height: 70px; }
-    .info-textarea:focus { border-color: #2d1b69; }
+    .info-label { font-size: 11px; font-weight: 600; color: #9CA0AC; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .info-value { font-size: 13px; color: #0B0B0F; line-height: 1.5; }
+    .info-input { width: 100%; padding: 8px 12px; border: 1.5px solid #ECEDF0; border-radius: 6px; font-size: 13px; color: #0B0B0F; outline: none; font-family: inherit; }
+    .info-input:focus { border-color: var(--accent); }
+    .info-textarea { width: 100%; padding: 8px 12px; border: 1.5px solid #ECEDF0; border-radius: 6px; font-size: 13px; color: #0B0B0F; outline: none; font-family: inherit; resize: vertical; min-height: 70px; }
+    .info-textarea:focus { border-color: var(--accent); }
     .mvv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
-    .mvv-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-top: 3px solid #2d1b69; }
-    .mvv-titulo { font-size: 11px; font-weight: 700; color: #2d1b69; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .mvv-texto { font-size: 13px; color: #4a5568; line-height: 1.5; }
-    .mvv-textarea { width: 100%; border: none; outline: none; font-size: 13px; color: #4a5568; line-height: 1.5; font-family: inherit; resize: none; min-height: 60px; background: transparent; }
+    .mvv-card { background: #FAFBFC; border: 1px solid #ECEDF0; border-top: 3px solid var(--accent); border-radius: 12px; padding: 18px; }
+    .mvv-titulo { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .mvv-texto { font-size: 13px; color: #33363F; line-height: 1.5; }
+    .mvv-textarea { width: 100%; border: none; outline: none; font-size: 13px; color: #33363F; line-height: 1.5; font-family: inherit; resize: none; min-height: 60px; background: transparent; }
     .timeline { position: relative; padding-left: 20px; }
-    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 1.5px; background: #e2e8f0; }
+    .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 1.5px; background: #ECEDF0; }
     .timeline-item { position: relative; margin-bottom: 16px; }
-    .timeline-dot { position: absolute; left: -17px; top: 3px; width: 10px; height: 10px; background: #2d1b69; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 2px #2d1b69; }
-    .timeline-ano { font-size: 11px; font-weight: 700; color: #2d1b69; margin-bottom: 2px; }
-    .timeline-desc { font-size: 13px; color: #4a5568; line-height: 1.4; }
-    .btn-add-timeline { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 8px; display: none; }
-    .btn-add-timeline:hover { background: #e2e8f0; }
+    .timeline-dot { position: absolute; left: -17px; top: 3px; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 2px var(--accent); }
+    .timeline-ano { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+    .timeline-desc { font-size: 13px; color: #33363F; line-height: 1.4; }
+    .btn-add-timeline { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #F1F2F5; color: #6B7080; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 8px; display: none; }
+    .btn-add-timeline:hover { background: #ECEDF0; }
     .esg-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
     .esg-card { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .esg-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 10px; }
-    .esg-e { background: #f0fff4; color: #276749; }
+    .esg-e { background: color-mix(in srgb,#00B37E 10%,white); color: #00754F; }
     .esg-s { background: #ebf0ff; color: #3b5bdb; }
     .esg-g { background: #faf5ff; color: #6b46c1; }
-    .esg-texto { font-size: 13px; color: #4a5568; line-height: 1.5; }
-    .esg-textarea { width: 100%; border: none; outline: none; font-size: 13px; color: #4a5568; line-height: 1.5; font-family: inherit; resize: none; min-height: 50px; background: transparent; }
+    .esg-texto { font-size: 13px; color: #33363F; line-height: 1.5; }
+    .esg-textarea { width: 100%; border: none; outline: none; font-size: 13px; color: #33363F; line-height: 1.5; font-family: inherit; resize: none; min-height: 50px; background: transparent; }
     .time-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
     .deps-lista { display: flex; gap: 8px; flex-wrap: wrap; }
-    .dep-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; transition: all 0.2s; }
-    .dep-btn:hover { border-color: #2d1b69; color: #2d1b69; }
-    .dep-btn.active { background: #2d1b69; color: white; border-color: #2d1b69; }
+    .dep-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid #ECEDF0; background: white; color: #6B7080; transition: all 0.2s; }
+    .dep-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .dep-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
     .time-acoes { display: flex; gap: 8px; }
-    .org-container { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 24px; min-height: 480px; position: relative; overflow: hidden; }
+    .org-container { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 24px; min-height: 480px; position: relative; overflow: hidden; width: 100%; min-width: 0; box-sizing: border-box; }
     .org-canvas { position: relative; width: 100%; height: 480px; }
     .org-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-    .org-node { position: absolute; width: 180px; background: white; border-radius: 10px; padding: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); border: 2px solid #e2e8f0; cursor: move; user-select: none; transition: box-shadow 0.2s; }
+    .org-node { position: absolute; width: 180px; background: white; border-radius: 10px; padding: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); border: 2px solid #ECEDF0; cursor: move; user-select: none; transition: box-shadow 0.2s; }
     .org-node:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-    .org-node.dragging { box-shadow: 0 8px 28px rgba(45,27,105,0.25); border-color: #2d1b69; z-index: 1000; }
+    .org-node.dragging { box-shadow: 0 8px 28px rgba(45,27,105,0.25); border-color: var(--accent); z-index: 1000; }
     .org-node-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .org-node-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
     .org-node-actions { display: flex; gap: 3px; opacity: 0; transition: opacity 0.2s; }
     .org-node:hover .org-node-actions { opacity: 1; }
     .org-node-btn { width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-    .org-node-btn.edit { background: #f0f2f5; color: #2d1b69; }
-    .org-node-btn.del { background: #fff5f5; color: #c53030; }
-    .org-node-btn.link { background: #f0fff4; color: #276749; }
-    .org-node-nome { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
-    .org-node-cargo { font-size: 11px; color: #2d1b69; font-weight: 600; margin-bottom: 3px; }
-    .org-node-area { font-size: 11px; color: #718096; margin-bottom: 3px; }
-    .org-node-email { font-size: 10px; color: #a0aec0; }
-    .org-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: #a0aec0; gap: 12px; }
-    .dep-cor-0 { background: #2d1b69; border-color: #2d1b69; }
-    .dep-cor-1 { background: #38a169; border-color: #38a169; }
+    .org-node-btn.edit { background: #F1F2F5; color: var(--accent); }
+    .org-node-btn.del { background: color-mix(in srgb,#FF2E4D 8%,white); color: #FF2E4D; }
+    .org-node-btn.link { background: color-mix(in srgb,#00B37E 10%,white); color: #00754F; }
+    .org-node-nome { font-size: 13px; font-weight: 700; color: #0B0B0F; margin-bottom: 3px; }
+    .org-node-cargo { font-size: 11px; color: var(--accent); font-weight: 600; margin-bottom: 3px; }
+    .org-node-area { font-size: 11px; color: #6B7080; margin-bottom: 3px; }
+    .org-node-email { font-size: 10px; color: #9CA0AC; }
+    .org-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: #9CA0AC; gap: 12px; }
+    .dep-cor-0 { background: var(--accent); border-color: var(--accent); }
+    .dep-cor-1 { background: #00B37E; border-color: #00B37E; }
     .dep-cor-2 { background: #3b5bdb; border-color: #3b5bdb; }
     .dep-cor-3 { background: #e53e3e; border-color: #e53e3e; }
     .dep-cor-4 { background: #d69e2e; border-color: #d69e2e; }
     .dep-cor-5 { background: #00b5d8; border-color: #00b5d8; }
-    .modo-conexao-aviso { padding: 8px 14px; background: #f0fff4; border-radius: 6px; font-size: 12px; color: #276749; display: none; margin-bottom: 12px; }
+    .modo-conexao-aviso { padding: 8px 14px; background: color-mix(in srgb,#00B37E 10%,white); border-radius: 6px; font-size: 12px; color: #00754F; display: none; margin-bottom: 12px; }
     .modo-conexao-aviso.ativo { display: block; }
-    .org-node.selecionado-conexao { border-color: #38a169; box-shadow: 0 0 0 3px rgba(56,161,105,0.3); }
+    .org-node.selecionado-conexao { border-color: #00B37E; box-shadow: 0 0 0 3px rgba(56,161,105,0.3); }
     .conn-del-btn { opacity: 0; transition: opacity 0.15s; }
-    .bib-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .bib-header { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 24px; }
+    .bib-header .hoc-select-wrap { width: auto; flex-shrink: 0; }
     .bib-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
-    .pasta-sidebar-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 7px 8px 7px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #718096; margin-bottom: 2px; transition: all 0.2s; gap: 4px; }
-    .pasta-sidebar-btn:hover { background: #f8fafc; color: #1e2a4a; }
+    .pasta-sidebar-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 7px 8px 7px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #6B7080; margin-bottom: 2px; transition: all 0.2s; gap: 4px; }
+    .pasta-sidebar-btn:hover { background: #FAFBFC; color: #0B0B0F; }
     .pasta-sidebar-btn:hover .pasta-acoes { opacity: 1; }
-    .pasta-sidebar-btn.active { background: #f5f0ff; color: #2d1b69; font-weight: 700; }
+    .pasta-sidebar-btn.active { background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); font-weight: 700; }
     .pasta-acoes { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
-    .pasta-acao-btn { background: none; border: none; cursor: pointer; padding: 1px 3px; border-radius: 3px; font-size: 10px; color: #a0aec0; line-height: 1; }
-    .pasta-acao-btn:hover { background: #e2e8f0; color: #4a5568; }
-    .pasta-children { padding-left: 12px; border-left: 1.5px solid #e2e8f0; margin-left: 10px; }
-    .bib-search { flex: 1; min-width: 200px; padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
-    .bib-search:focus { border-color: #2d1b69; }
-    .upload-drop-zone { border: 2px dashed #e2e8f0; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; color: #a0aec0; font-size: 13px; }
-    .upload-drop-zone:hover, .upload-drop-zone.drag-over { border-color: #2d1b69; background: #f5f0ff; color: #2d1b69; }
+    .pasta-acao-btn { background: none; border: none; cursor: pointer; padding: 1px 3px; border-radius: 3px; font-size: 10px; color: #9CA0AC; line-height: 1; }
+    .pasta-acao-btn:hover { background: #ECEDF0; color: #33363F; }
+    .pasta-children { padding-left: 12px; border-left: 1.5px solid #ECEDF0; margin-left: 10px; }
+    .bib-search { flex: 1; min-width: 200px; padding: 8px 14px; border: 1.5px solid #ECEDF0; border-radius: 6px; font-size: 13px; outline: none; }
+    .bib-search:focus { border-color: var(--accent); }
+    .upload-drop-zone { border: 2px dashed #ECEDF0; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; color: #9CA0AC; font-size: 13px; }
+    .upload-drop-zone:hover, .upload-drop-zone.drag-over { border-color: var(--accent); background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); }
     .bib-explorer { padding: 8px; }
-    .bib-breadcrumb { display: flex; align-items: center; gap: 4px; padding: 8px 10px; font-size: 11px; color: #718096; flex-wrap: wrap; border-bottom: 1px solid #f0f2f5; margin-bottom: 6px; }
-    .bib-breadcrumb span { cursor: pointer; color: #2d1b69; font-weight: 600; }
+    .bib-breadcrumb { display: flex; align-items: center; gap: 4px; padding: 8px 10px; font-size: 11px; color: #6B7080; flex-wrap: wrap; border-bottom: 1px solid #F1F2F5; margin-bottom: 6px; }
+    .bib-breadcrumb span { cursor: pointer; color: var(--accent); font-weight: 600; }
     .bib-breadcrumb span:hover { text-decoration: underline; }
     .bib-breadcrumb .sep { color: #cbd5e0; cursor: default; }
-    .pasta-explorer-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; color: #4a5568; transition: all 0.15s; margin-bottom: 2px; gap: 4px; }
-    .pasta-explorer-item:hover { background: #f8fafc; color: #1e2a4a; }
+    .pasta-explorer-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; color: #33363F; transition: all 0.15s; margin-bottom: 2px; gap: 4px; }
+    .pasta-explorer-item:hover { background: #FAFBFC; color: #0B0B0F; }
     .pasta-explorer-item:hover .pasta-acoes { opacity: 1; }
-    .pasta-explorer-item.active { background: #f5f0ff; color: #2d1b69; font-weight: 700; }
-    .versao-historia { background: #f8fafc; border-radius: 8px; border: 1.5px solid #e2e8f0; overflow: hidden; display: none; width: 280px; flex-shrink: 0; align-self: flex-start; max-height: calc(100vh - 220px); overflow-y: auto; }
+    .pasta-explorer-item.active { background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); font-weight: 700; }
+    .versao-historia { background: #FAFBFC; border-radius: 8px; border: 1.5px solid #ECEDF0; overflow: hidden; display: none; width: 280px; flex-shrink: 0; align-self: flex-start; max-height: calc(100vh - 220px); overflow-y: auto; }
     .versao-historia.aberto { display: block; }
-    .versao-historia-header { padding: 10px 14px; font-size: 12px; font-weight: 700; color: #1e2a4a; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
-    .versao-historia-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #f0f2f5; font-size: 12px; color: #4a5568; }
+    .versao-historia-header { padding: 10px 14px; font-size: 12px; font-weight: 700; color: #0B0B0F; border-bottom: 1px solid #ECEDF0; display: flex; align-items: center; justify-content: space-between; }
+    .versao-historia-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #F1F2F5; font-size: 12px; color: #33363F; }
     .versao-historia-item:last-child { border-bottom: none; }
-    .versao-historia-item.atual { background: #f0fff4; }
-    .editor-area[contenteditable="false"] { background: #f8fafc; color: #718096; cursor: not-allowed; }
-    .toolbar-select { padding: 4px 6px; border: 1px solid #e2e8f0; border-radius: 4px; font-size: 12px; color: #4a5568; background: white; cursor: pointer; outline: none; }
-    .toolbar-sep { width: 1px; background: #e2e8f0; margin: 0 2px; align-self: stretch; }
-    .wiki-table { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
-    .wiki-tag { display: inline-block; padding: 2px 7px; background: #f0f2f5; color: #4a5568; border-radius: 4px; font-size: 11px; margin-right: 3px; }
-    .versao-badge { display: inline-block; padding: 2px 7px; background: #f0f2f5; color: #4a5568; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .versao-historia-item.atual { background: color-mix(in srgb,#00B37E 10%,white); }
+    .editor-area[contenteditable="false"] { background: #FAFBFC; color: #6B7080; cursor: not-allowed; }
+    .toolbar-select { padding: 4px 6px; border: 1px solid #ECEDF0; border-radius: 4px; font-size: 12px; color: #33363F; background: white; cursor: pointer; outline: none; }
+    .toolbar-sep { width: 1px; background: #ECEDF0; margin: 0 2px; align-self: stretch; }
+    .wiki-table { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow: hidden; }
+    .wiki-table table { width: 100%; border-collapse: collapse; }
+    .wiki-table th { text-align: center; padding: 11px 12px; font-size: 10.5px; font-weight: 700; color: white; background: #0B0B0F; text-transform: none; letter-spacing: normal; }
+    .wiki-table td { text-align: center; padding: 11px 12px; font-size: 12.5px; color: #33363F; border-bottom: 1px solid #F2F3F5; }
+    .wiki-table tr:last-child td { border-bottom: none; }
+    .wiki-table tr:hover td { background: #FAFBFF; }
+    .wiki-tag { display: inline-block; padding: 2px 7px; background: #F1F2F5; color: #33363F; border-radius: 4px; font-size: 11px; margin-right: 3px; }
+    .versao-badge { display: inline-block; padding: 2px 7px; background: #F1F2F5; color: #33363F; border-radius: 4px; font-size: 11px; font-weight: 600; }
     .wiki-editor { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: none; }
     .wiki-editor.active { display: block; }
-    .editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #f0f2f5; }
-    .editor-titulo-input { font-size: 18px; font-weight: 700; color: #1e2a4a; border: none; outline: none; flex: 1; margin-right: 16px; font-family: inherit; }
-    .editor-toolbar { display: flex; gap: 3px; padding: 6px; background: #f8fafc; border-radius: 6px; border: 1.5px solid #e2e8f0; flex-wrap: wrap; margin-bottom: 8px; }
-    .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #4a5568; }
-    .toolbar-btn:hover { background: #e2e8f0; }
+    .editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #F1F2F5; }
+    .editor-titulo-input { font-size: 18px; font-weight: 700; color: #0B0B0F; border: none; outline: none; flex: 1; margin-right: 16px; font-family: inherit; }
+    .editor-toolbar { display: flex; gap: 3px; padding: 6px; background: #FAFBFC; border-radius: 6px; border: 1.5px solid #ECEDF0; flex-wrap: wrap; margin-bottom: 8px; }
+    .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #33363F; }
+    .toolbar-btn:hover { background: #ECEDF0; }
     .editor-wrap { background: #dde3e8; padding: 24px 20px; border-radius: 6px; min-height: 400px; overflow-y: auto; }
-    .editor-area { min-height: 600px; padding: 56px 72px; border: none; outline: none; font-size: 13px; line-height: 1.8; color: #1e2a4a; background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.12); width: 100%; max-width: 720px; margin: 0 auto; display: block; }
+    .editor-area { min-height: 600px; padding: 56px 72px; border: none; outline: none; font-size: 13px; line-height: 1.8; color: #0B0B0F; background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.12); width: 100%; max-width: 720px; margin: 0 auto; display: block; }
     .editor-area:focus { outline: none; }
     .editor-area[contenteditable="false"] { cursor: default; }
     .editor-area ul, .editor-area ol { padding-left: 24px; margin: 4px 0; }
@@ -124,168 +134,257 @@
     .editor-area ol { list-style-type: decimal; }
     .editor-area li { margin: 2px 0; }
     .editor-area ul ul, .editor-area ol ol, .editor-area ul ol, .editor-area ol ul { padding-left: 24px; margin: 2px 0; }
-    .editor-area h1 { font-size: 24px; font-weight: 700; margin: 0 0 12px; color: #1e2a4a; }
-    .editor-area h2 { font-size: 19px; font-weight: 700; margin: 20px 0 8px; color: #1e2a4a; }
-    .editor-area h3 { font-size: 16px; font-weight: 700; margin: 16px 0 6px; color: #1e2a4a; }
-    .editor-area h4 { font-size: 14px; font-weight: 700; margin: 12px 0 4px; color: #1e2a4a; }
+    .editor-area h1 { font-size: 24px; font-weight: 700; margin: 0 0 12px; color: #0B0B0F; }
+    .editor-area h2 { font-size: 19px; font-weight: 700; margin: 20px 0 8px; color: #0B0B0F; }
+    .editor-area h3 { font-size: 16px; font-weight: 700; margin: 16px 0 6px; color: #0B0B0F; }
+    .editor-area h4 { font-size: 14px; font-weight: 700; margin: 12px 0 4px; color: #0B0B0F; }
     .editor-area p { margin: 0 0 8px; }
-    .editor-area pre { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; padding: 10px 14px; font-size: 12px; overflow-x: auto; }
+    .editor-area pre { background: #FAFBFC; border: 1px solid #ECEDF0; border-radius: 4px; padding: 10px 14px; font-size: 12px; overflow-x: auto; }
     .editor-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
     .oraculo-wrap { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .oraculo-hero { text-align: center; margin-bottom: 28px; }
     .oraculo-icon { font-size: 40px; margin-bottom: 10px; }
-    .oraculo-titulo { font-size: 20px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
-    .oraculo-sub { font-size: 13px; color: #718096; }
+    .oraculo-titulo { font-size: 20px; font-weight: 700; color: #0B0B0F; margin-bottom: 6px; }
+    .oraculo-sub { font-size: 13px; color: #6B7080; }
     .oraculo-atalhos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
-    .atalho { background: #f8fafc; border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; border: 1.5px solid #e2e8f0; transition: all 0.2s; }
-    .atalho:hover { border-color: #2d1b69; background: #f5f0ff; }
+    .atalho { background: #FAFBFC; border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; border: 1.5px solid #ECEDF0; transition: all 0.2s; }
+    .atalho:hover { border-color: var(--accent); background: color-mix(in srgb,var(--accent) 8%,white); }
     .atalho-icon { font-size: 20px; margin-bottom: 6px; }
-    .atalho-label { font-size: 12px; font-weight: 600; color: #4a5568; }
-    .chat-box { border: 1.5px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
-    .chat-msgs { min-height: 180px; max-height: 280px; overflow-y: auto; padding: 14px; background: #f8fafc; }
+    .atalho-label { font-size: 12px; font-weight: 600; color: #33363F; }
+    .chat-box { border: 1.5px solid #ECEDF0; border-radius: 8px; overflow: hidden; }
+    .chat-msgs { min-height: 180px; max-height: 280px; overflow-y: auto; padding: 14px; background: #FAFBFC; }
     .chat-msg { margin-bottom: 10px; display: flex; gap: 8px; }
     .chat-msg.user { flex-direction: row-reverse; }
     .chat-bubble { padding: 10px 14px; border-radius: 10px; font-size: 13px; max-width: 75%; line-height: 1.5; }
-    .chat-msg.bot .chat-bubble { background: white; color: #1e2a4a; border: 1px solid #e2e8f0; }
-    .chat-msg.user .chat-bubble { background: #2d1b69; color: white; }
-    .chat-input-row { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #e2e8f0; background: white; }
-    .chat-input { flex: 1; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; }
-    .chat-send { padding: 8px 16px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.5; }
+    .chat-msg.bot .chat-bubble { background: white; color: #0B0B0F; border: 1px solid #ECEDF0; }
+    .chat-msg.user .chat-bubble { background: var(--accent); color: white; }
+    .chat-input-row { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #ECEDF0; background: white; }
+    .chat-input { flex: 1; padding: 8px 12px; border: 1.5px solid #ECEDF0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; }
+    .chat-send { padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.5; }
     .oraculo-aviso { text-align: center; margin-top: 12px; padding: 8px; background: #fffaf0; border-radius: 6px; font-size: 12px; color: #c05621; }
 
     /* ===== OVERVIEW UX ===== */
     .header-search { display: none; }
-    .header-right { margin-left: auto; }
+    .header-right { flex: 1; display: flex; align-items: center; justify-content: flex-end; }
     .section-bloco { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid #edf2f7; }
-    .section-header { display: flex; align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1.5px solid #f0f2f5; }
-    .section-icon { width: 32px; height: 32px; border-radius: 8px; background: #f5f0ff; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .section-titulo-text { font-size: 11px; font-weight: 700; color: #1e2a4a; text-transform: uppercase; letter-spacing: 0.9px; }
-    .timeline-rich-toolbar { display: flex; gap: 3px; padding: 6px; background: #f8fafc; border-radius: 6px 6px 0 0; border: 1.5px solid #e2e8f0; border-bottom: none; flex-wrap: wrap; }
-    .timeline-rich-editor { min-height: 90px; padding: 10px 12px; border: 1.5px solid #e2e8f0; border-radius: 0 0 6px 6px; outline: none; font-size: 13px; line-height: 1.7; color: #1e2a4a; font-family: inherit; }
-    .timeline-rich-editor:focus { border-color: #2d1b69; }
-    .timeline-rich-editor:empty:before { content: attr(placeholder); color: #a0aec0; pointer-events: none; }
-    .timeline-desc a { color: #2d1b69; text-decoration: underline; }
+    .section-header { display: flex; align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1.5px solid #F1F2F5; }
+    .section-icon { width: 32px; height: 32px; border-radius: 8px; background: color-mix(in srgb,var(--accent) 8%,white); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .section-titulo-text { font-size: 11px; font-weight: 700; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.9px; }
+    .timeline-rich-toolbar { display: flex; gap: 3px; padding: 6px; background: #FAFBFC; border-radius: 6px 6px 0 0; border: 1.5px solid #ECEDF0; border-bottom: none; flex-wrap: wrap; }
+    .timeline-rich-editor { min-height: 90px; padding: 10px 12px; border: 1.5px solid #ECEDF0; border-radius: 0 0 6px 6px; outline: none; font-size: 13px; line-height: 1.7; color: #0B0B0F; font-family: inherit; }
+    .timeline-rich-editor:focus { border-color: var(--accent); }
+    .timeline-rich-editor:empty:before { content: attr(placeholder); color: #9CA0AC; pointer-events: none; }
+    .timeline-desc a { color: var(--accent); text-decoration: underline; }
     .timeline-desc ul, .timeline-desc ol { padding-left: 18px; margin: 4px 0; }
-    .btn-add-timeline { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f5f0ff; color: #2d1b69; border: 1.5px solid #d6bcfa; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-left: auto; }
-    .btn-add-timeline:hover { background: #ede9ff; }
+    .btn-add-timeline { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); border: 1.5px solid color-mix(in srgb,var(--accent) 40%,white); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-left: auto; }
+    .btn-add-timeline:hover { background: color-mix(in srgb,var(--accent) 14%,white); }
     .mvv-grid { margin-bottom: 0; }
     .esg-card { border: 1px solid #edf2f7; }
     .timeline-item { cursor: default; }
     .timeline-item:hover .timeline-del { opacity: 1; }
-    .timeline-del { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: #c53030; cursor: pointer; font-size: 12px; padding: 0 4px; }
-    .timeline-edit { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: #2d1b69; cursor: pointer; font-size: 12px; padding: 0 4px; }
+    .timeline-del { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: #FF2E4D; cursor: pointer; font-size: 12px; padding: 0 4px; }
+    .timeline-edit { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; padding: 0 4px; }
     .timeline-item:hover .timeline-edit { opacity: 1; }
-    .rich-toolbar { display: none; gap: 3px; padding: 5px; background: #f8fafc; border-radius: 6px 6px 0 0; border: 1.5px solid #e2e8f0; border-bottom: none; flex-wrap: wrap; margin-top: 8px; }
-    .rich-editor { min-height: 60px; padding: 8px 10px; border: 1.5px solid transparent; border-radius: 6px; outline: none; font-size: 13px; line-height: 1.7; color: #1e2a4a; font-family: inherit; }
+    .rich-toolbar { display: none; gap: 3px; padding: 5px; background: #FAFBFC; border-radius: 6px 6px 0 0; border: 1.5px solid #ECEDF0; border-bottom: none; flex-wrap: wrap; margin-top: 8px; }
+    .rich-editor { min-height: 60px; padding: 8px 10px; border: 1.5px solid transparent; border-radius: 6px; outline: none; font-size: 13px; line-height: 1.7; color: #0B0B0F; font-family: inherit; }
     .rich-toolbar + .rich-editor { border-radius: 0 0 6px 6px; border-top: none; }
-    .rich-editor[contenteditable="true"] { border-color: #e2e8f0; cursor: text; }
-    .rich-editor[contenteditable="true"]:focus { border-color: #2d1b69; }
-    .rich-editor:empty:before { content: attr(placeholder); color: #a0aec0; pointer-events: none; }
+    .rich-editor[contenteditable="true"] { border-color: #ECEDF0; cursor: text; }
+    .rich-editor[contenteditable="true"]:focus { border-color: var(--accent); }
+    .rich-editor:empty:before { content: attr(placeholder); color: #9CA0AC; pointer-events: none; }
     .rich-editor ul, .rich-editor ol,
     .timeline-rich-editor ul, .timeline-rich-editor ol,
     .timeline-desc ul, .timeline-desc ol { padding-left: 20px; margin: 4px 0; list-style-position: outside; }
     .rich-editor ul, .timeline-rich-editor ul, .timeline-desc ul { list-style-type: disc; }
     .rich-editor ol, .timeline-rich-editor ol, .timeline-desc ol { list-style-type: decimal; }
-    .rich-editor a, .timeline-desc a { color: #2d1b69; text-decoration: underline; }
+    .rich-editor a, .timeline-desc a { color: var(--accent); text-decoration: underline; }
     .edit-barra-global { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
     .dep-sidebar-row { display:flex; align-items:center; justify-content:space-between; padding:7px 8px; border-radius:6px; cursor:pointer; transition:all 0.2s; margin-bottom:2px; }
-    .dep-sidebar-row:hover { background:#f8fafc; }
+    .dep-sidebar-row:hover { background:#FAFBFC; }
     .dep-sidebar-row:hover .dep-row-acoes { opacity:1; }
-    .dep-sidebar-row.active { background:#f5f0ff; }
+    .dep-sidebar-row.active { background:color-mix(in srgb,var(--accent) 8%,white); }
     .dep-row-acoes { display:flex; gap:2px; opacity:0; transition:opacity 0.2s; flex-shrink:0; }
     .conn-handle { position:absolute; width:12px; height:12px; background:white; border:2px solid; border-radius:50%; cursor:crosshair; opacity:0; transition:opacity 0.15s; z-index:10; }
     .org-node:hover .conn-handle { opacity:1; }
-    .org-container { overflow:visible !important; }
+    .org-container { overflow-x:auto !important; overflow-y:visible !important; }
     .org-nome-wrap { position:relative; }
-    .secao-tbl { border-radius:8px; border:1px solid #e2e8f0; overflow:hidden; }
+    .secao-tbl { border-radius:8px; border:1px solid #ECEDF0; overflow:hidden; }
     .secao-tbl table { width:100%; border-collapse:collapse; }
     .secao-tbl-wrap { overflow-x:auto; }
     .mvv-titulo { overflow:hidden; }
-    .org-nome-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1.5px solid #e2e8f0; border-top:none; border-radius:0 0 6px 6px; max-height:160px; overflow-y:auto; display:none; z-index:200; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-    .org-nome-item { padding:8px 12px; cursor:pointer; border-bottom:1px solid #f0f2f5; }
-    .org-nome-item:hover { background:#f8fafc; }
+    .org-nome-dropdown { position:absolute; top:100%; left:0; right:0; background:white; border:1.5px solid #ECEDF0; border-top:none; border-radius:0 0 6px 6px; max-height:160px; overflow-y:auto; display:none; z-index:200; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .org-nome-item { padding:8px 12px; cursor:pointer; border-bottom:1px solid #F1F2F5; }
+    .org-nome-item:hover { background:#FAFBFC; }
 
     /* ===== FLUXO DE VALOR ===== */
     .fv-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
     .fv-toolbar-left { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
-    .btn-fv { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #4a5568; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
-    .btn-fv:hover { border-color: #2d1b69; color: #2d1b69; }
-    .btn-fv.primary { background: #2d1b69; color: white; border-color: #2d1b69; }
+    .btn-fv { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #ECEDF0; background: white; color: #33363F; display: flex; align-items: center; gap: 5px; transition: all 0.2s; }
+    .btn-fv:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-fv.primary { background: var(--accent); color: white; border-color: var(--accent); }
     .btn-fv.primary:hover { background: #3d2b89; }
-    .btn-fv.danger { background: #fff5f5; color: #c53030; border-color: #feb2b2; }
+    .btn-fv.danger { background: color-mix(in srgb,#FF2E4D 8%,white); color: #FF2E4D; border-color: color-mix(in srgb,#FF2E4D 35%,white); }
     .modo-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-    .modo-edicao { background: #f5f0ff; color: #2d1b69; }
-    .modo-viz { background: #f0f2f5; color: #718096; }
+    .modo-edicao { background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); }
+    .modo-viz { background: #F1F2F5; color: #6B7080; }
     .fv-layout { display: flex; gap: 0; align-items: flex-start; }
     .fv-main { flex: 1; min-width: 0; transition: all 0.3s; }
     .fv-picker-panel { width: 0; overflow: hidden; transition: width 0.3s ease; flex-shrink: 0; }
     .fv-picker-panel.open { width: 360px; }
-    .fv-picker-inner { width: 360px; background: white; border-left: 1.5px solid #e2e8f0; border-radius: 0 10px 10px 0; min-height: 540px; max-height: calc(100vh - 140px); overflow-y: auto; padding: 18px; box-shadow: 4px 0 20px rgba(0,0,0,.06) inset; display: flex; flex-direction: column; }
+    .fv-picker-inner { width: 360px; background: white; border-left: 1.5px solid #ECEDF0; border-radius: 0 10px 10px 0; min-height: 540px; max-height: calc(100vh - 140px); overflow-y: auto; padding: 18px; box-shadow: 4px 0 20px rgba(0,0,0,.06) inset; display: flex; flex-direction: column; }
     .fv-canvas-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; position: relative; transition: border-radius 0.3s; }
     .fv-picker-panel.open + * { display:none; } /* no sibling needed */
     .fv-layout:has(.fv-picker-panel.open) .fv-canvas-wrap { border-radius: 10px 0 0 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .fv-canvas { width: 100%; height: 520px; position: relative; background: #f8fafc; background-image: radial-gradient(circle, #cbd5e0 1px, transparent 1px); background-size: 24px 24px; overflow: hidden; }
-    .fv-block { position: absolute; min-width: 140px; background: white; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); border: 2px solid #e2e8f0; cursor: move; user-select: none; transition: box-shadow 0.2s; z-index: 10; }
-    .fv-block:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-color: #2d1b69; }
-    .fv-block.selected { border-color: #2d1b69; box-shadow: 0 0 0 3px rgba(45,27,105,0.2); }
+    .fv-canvas { width: 100%; height: 520px; position: relative; background: #FAFBFC; background-image: radial-gradient(circle, #cbd5e0 1px, transparent 1px); background-size: 24px 24px; overflow: hidden; }
+    .fv-block { position: absolute; min-width: 140px; background: white; border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); border: 2px solid #ECEDF0; cursor: move; user-select: none; transition: box-shadow 0.2s; z-index: 10; }
+    .fv-block:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-color: var(--accent); }
+    .fv-block.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,27,105,0.2); }
     .fv-block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .fv-block-icon { font-size: 18px; }
-    .fv-block-del { background: #fff5f5; border: none; color: #c53030; border-radius: 4px; cursor: pointer; padding: 2px 5px; font-size: 10px; opacity: 0; transition: opacity 0.2s; }
+    .fv-block-del { background: color-mix(in srgb,#FF2E4D 8%,white); border: none; color: #FF2E4D; border-radius: 4px; cursor: pointer; padding: 2px 5px; font-size: 10px; opacity: 0; transition: opacity 0.2s; }
     .fv-block:hover .fv-block-del { opacity: 1; }
-    .fv-block-nome { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
-    .fv-block-obs { font-size:10px;color:#718096;margin-top:4px;font-style:italic;line-height:1.4; }
-    .fv-block-tipo { font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.3px;margin-top:2px; }
-    .fv-port { position:absolute;width:12px;height:12px;border-radius:50%;background:#2d1b69;border:2px solid white;cursor:crosshair;opacity:0;transition:opacity .15s;z-index:15;box-shadow:0 1px 4px rgba(0,0,0,.2);pointer-events:none; }
+    .fv-block-nome { font-size: 13px; font-weight: 700; color: #0B0B0F; margin-bottom: 3px; }
+    .fv-block-obs { font-size:10px;color:#6B7080;margin-top:4px;font-style:italic;line-height:1.4; }
+    .fv-block-tipo { font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.3px;margin-top:2px; }
+    .fv-port { position:absolute;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid white;cursor:crosshair;opacity:0;transition:opacity .15s;z-index:15;box-shadow:0 1px 4px rgba(0,0,0,.2);pointer-events:none; }
     .fv-block:hover .fv-port { opacity:1;pointer-events:auto; }
-    .fv-port.pending { opacity:1;background:#f6c90e;border-color:#2d1b69;pointer-events:auto; }
+    .fv-port.pending { opacity:1;background:#f6c90e;border-color:var(--accent);pointer-events:auto; }
     .fv-port-right  { right:-7px;top:50%;transform:translateY(-50%); }
     .fv-port-left   { left:-7px;top:50%;transform:translateY(-50%); }
     .fv-port-top    { top:-7px;left:50%;transform:translateX(-50%); }
     .fv-port-bot    { bottom:-7px;left:50%;transform:translateX(-50%); }
-    .fv-text-node { position: absolute; background: transparent; border: none; font-size: 13px; color: #1e2a4a; cursor: move; z-index: 10; min-width: 80px; padding: 4px; }
-    .fv-text-node.editing { background: white; border: 1.5px solid #2d1b69; border-radius: 4px; outline: none; }
+    .fv-text-node { position: absolute; background: transparent; border: none; font-size: 13px; color: #0B0B0F; cursor: move; z-index: 10; min-width: 80px; padding: 4px; }
+    .fv-text-node.editing { background: white; border: 1.5px solid var(--accent); border-radius: 4px; outline: none; }
     .fv-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 5; }
     .fv-svg foreignObject { pointer-events: all; }
-    .fv-minimap { position: absolute; bottom: 10px; right: 10px; width: 120px; height: 70px; background: rgba(255,255,255,0.9); border: 1px solid #e2e8f0; border-radius: 6px; font-size: 9px; color: #a0aec0; display: flex; align-items: center; justify-content: center; }
+    .fv-minimap { position: absolute; bottom: 10px; right: 10px; width: 120px; height: 70px; background: rgba(255,255,255,0.9); border: 1px solid #ECEDF0; border-radius: 6px; font-size: 9px; color: #9CA0AC; display: flex; align-items: center; justify-content: center; }
     .sem-permissao-overlay { position: absolute; inset: 0; background: rgba(248,250,252,0.7); display: flex; align-items: center; justify-content: center; z-index: 20; border-radius: 10px; }
     .sem-permissao-card { background: white; border-radius: 10px; padding: 24px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+
+    /* ===== Sidebar (padrão do sistema) ===== */
+    .sidebar { width: max-content; min-width: 200px; max-width: 320px; background: #0B0B0F; padding: 0; transition: width 0.18s ease; overflow: hidden; }
+    .sidebar-logo { height: 64px; padding: 0 20px; border-bottom: none; margin-bottom: 0; }
+    .sidebar-logo rect { fill: var(--accent); }
+    .sidebar.recolhida { width: 68px; min-width: 68px; }
+    .sidebar.recolhida .logo-text, .sidebar.recolhida .side-label, .sidebar.recolhida .sidebar-sistema-label, .sidebar.recolhida .btn-sidebar-label { display: none; }
+    .sidebar-menu { display: flex; flex-direction: column; padding: 12px; gap: 3px; }
+    .menu-item { width: 100%; gap: 14px; padding: 9px 12px; border-radius: 9px; color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 600; margin-bottom: 0; white-space: nowrap; }
+    .menu-item:hover { background: rgba(255,255,255,0.08); color: white; }
+    .menu-item.active { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; }
+    .sidebar-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); position: relative; }
+    .sidebar-sistema { position: relative; margin-bottom: 4px; }
+    .sidebar-sistema > summary { border-radius: 9px; padding: 9px 12px; gap: 10px; background: transparent; color: rgba(255,255,255,0.65); font-size: 12.5px; font-weight: 600; }
+    .sidebar-sistema > summary:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sidebar-sistema > summary svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-sistema-items { position: absolute; bottom: calc(100% + 8px); left: 0; width: 190px; background: #17171A; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 8px; z-index: 50; border: none; }
+    .sidebar-sistema-items .menu-item { font-size: 12px; padding: 8px 12px; width: 100%; border: none; background: transparent; font-family: inherit; text-align: left; cursor: pointer; }
+    .btn-sair { border-radius: 6px; padding: 8px 12px; font-size: 12px; background: transparent; }
+    .btn-sair:hover { background: rgba(255,255,255,0.08); }
+    .btn-recolher { width: 100%; height: 38px; border-radius: 9px; background: transparent; border: none; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+    .btn-recolher:hover { background: rgba(255,255,255,0.08); color: white; }
+    .color-picker-back { display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 4px; }
+    .color-picker-back:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-family: inherit; }
+    .color-swatch:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+    .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
+    .color-hex-input { width: 100%; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
+
+    /* ===== Topbar + abas + conteúdo ===== */
+    .main { min-width: 0; }
+    .header { padding: 0 24px; height: 56px; box-shadow: none; border-bottom: 1px solid #ECEDF0; }
+    .header-lado { flex: 1; display: flex; }
+    .content { padding: 24px 40px 32px; max-width: 1480px; margin: 0 auto; }
+    .content.content-wide { max-width: none; }
+    .tabs-central { display: inline-flex; align-items: center; background: #F1F2F5; border-radius: 10px; padding: 3px; gap: 2px; }
+    .tab { height: 32px; padding: 0 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; border: none; background: transparent; color: #6B7080; margin-bottom: 0; }
+    .tab:hover { color: #33363F; }
+    .tab.active { background: white; color: #0B0B0F; box-shadow: 0 1px 3px rgba(11,11,15,0.1); border-color: transparent; }
+    .btn-primary { height: 38px; padding: 0 16px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: none; }
+    .btn-primary:hover { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); }
+    .btn-secondary { height: 38px; padding: 0 16px; background: #F1F2F5; color: #4A4E5A; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    label { font-size: 11px; font-weight: 600; color: #6B7080; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 11px; font-weight: 700; color: #6B7080; margin-bottom: 5px; }
+    input[type="text"], input[type="email"], input[type="date"], input[type="number"], input[type="password"], select, textarea { border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13px; color: #0B0B0F; font-family: inherit; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
+    .modal-overlay { background: rgba(11,11,15,0.45); }
+    .modal { border-radius: 16px; box-shadow: 0 24px 64px rgba(11,11,15,0.2); border: 1px solid #ECEDF0; max-width: 640px; }
+    .modal-titulo { font-size: 16px; font-weight: 800; color: #0B0B0F; }
+    .btn-fechar { width: 34px; height: 34px; box-sizing: border-box; border-radius: 9px; background: #F1F2F5; color: #4A4E5A; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; padding: 0; }
+    .btn-fechar:hover { background: #E5E7EB; }
+    .modal-footer { display: flex; gap: 10px; margin-top: 0; }
+    .btn-cancelar { flex: 1; padding: 10px 16px; font-size: 13px; cursor: pointer; background: white; border: 1.5px solid #E5E7EB; border-radius: 9px; color: #33363F; font-weight: 600; }
+    .btn-cancelar:hover { background: #F1F2F5; }
+    .btn-confirmar { flex: 1; padding: 10px 16px; font-size: 13px; cursor: pointer; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); border: none; border-radius: 9px; color: white; font-weight: 700; }
+    .colunas-filtro-wrap { position: relative; }
+    .colunas-filtro-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border: 1px solid #ECEDF0; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); min-width: 210px; z-index: 200; padding: 6px; }
+    .colunas-filtro-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
+    .colunas-filtro-item:hover { background: #F1F2F5; }
+    .colunas-filtro-item.travado { color: #9CA0AC; cursor: default; }
+    .colunas-filtro-item.travado:hover { background: transparent; }
+    .btn-modo { height: 38px; padding: 0 16px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid #E5E7EB; background: white; color: #33363F; }
+    .btn-modo:hover { background: #F1F2F5; }
+    .hoc-select-wrap { position: relative; display: inline-block; width: 100%; }
+    .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
+    .hoc-select-trigger { appearance: none; -webkit-appearance: none; -moz-appearance: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: white; cursor: pointer; font-family: inherit; }
+    .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
+    .hoc-select-trigger.open svg { transform: rotate(180deg); }
+    .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+    .hoc-select-panel { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; background: white; border: 1px solid #ECEDF0; border-radius: 10px; box-shadow: 0 12px 32px rgba(11,11,15,0.16); padding: 6px; z-index: 60; max-height: 260px; overflow-y: auto; }
+    .hoc-select-panel.open { display: block; }
+    .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
+    .hoc-select-item:hover { background: #F1F2F5; }
+    .hoc-select-item.selected { background: color-mix(in srgb, #00B37E 14%, white); color: #00754F; }
   </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
-    <span class="logo-text">Business Manager</span>
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8"/><text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="800">H</text></svg>
+    <span class="logo-text side-label">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item active" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
-    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
-    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item active" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
+    <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
+    <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
+    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
     <details class="sidebar-sistema" id="sistemaMenu">
-      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
-      <div class="sidebar-sistema-items">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="side-label sidebar-sistema-label">Sistema</span><svg class="sidebar-sistema-chevron side-label" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items" id="sistemaItemsWrap">
+        <button class="menu-item" onclick="mostrarCorSistemaNoMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Cor do Sistema</button>
         <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
         <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
         <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
       </div>
     </details>
+    <button class="btn-recolher" id="btnRecolher" onclick="toggleSidebarRecolhida()" title="Recolher/Expandir">
+      <svg id="iconRecolher" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      <span class="side-label btn-sidebar-label" id="lblRecolher">Recolher</span>
+    </button>
   </div>
 </div>
 
 <div class="main">
   <div id="bannerAssinatura" style="display:none"></div>
   <div class="header">
-    <div class="header-search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" placeholder="Buscar...">
+    <div class="header-lado"></div>
+    <div class="tabs-central" id="opModuleTabs">
+      <button class="tab active" onclick="mudarTab('visao-geral', this)">Visão Geral</button>
+      <button class="tab" onclick="mudarTab('nosso-time', this)">Nosso Time</button>
+      <button class="tab" onclick="mudarTab('biblioteca', this)">Biblioteca</button>
+      <button class="tab" onclick="mudarTab('oraculo', this)">Oráculo</button>
     </div>
     <div class="header-right">
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -293,58 +392,51 @@
         </button>
         <div class="notif-dropdown" id="notifDropdown">
           <div class="notif-drop-header">
-            <span class="notif-drop-titulo">🔔 Notificações</span>
+            <span class="notif-drop-titulo" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Notificações</span>
             <div class="notif-drop-acoes">
-              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button>
+              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar</button>
             </div>
           </div>
           <div class="notif-lista" id="notifLista">
-            <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
+            <div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Carregando...</div></div>
           </div>
         </div>
-      </div>
-      <div class="header-user">
-        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
-        <div class="user-avatar" id="userAvatar">?</div>
       </div>
     </div>
   </div>
 
   <div class="content">
-    <div class="page-title" style="text-transform:uppercase;letter-spacing:0.5px">Overview</div>
-
-    <div class="tabs">
-      <button class="tab active" onclick="mudarTab('visao-geral', this)">Visão Geral</button>
-      <button class="tab" onclick="mudarTab('nosso-time', this)">Nosso Time</button>
-      <button class="tab" onclick="mudarTab('biblioteca', this)">Biblioteca</button>
-      <button class="tab" onclick="mudarTab('oraculo', this)">Oráculo</button>
-    </div>
-
     <!-- VISÃO GERAL -->
     <div class="tab-content active" id="tab-visao-geral">
+      <div style="background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));border-radius:16px;padding:28px 32px;color:white;margin-bottom:20px">
+        <div style="font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-bottom:8px">Boas Vindas!</div>
+        <div style="font-size:20px;font-weight:800;margin-bottom:8px">Tudo o que você precisa saber para começar</div>
+        <div style="font-size:13px;opacity:.9;line-height:1.6;max-width:640px">Esta página reúne a história, a cultura e os compromissos da nossa empresa.</div>
+      </div>
       <div class="edit-barra-global">
-        <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()" style="font-size:12px;padding:6px 12px">✏️ Editar</button>
-        <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none;font-size:12px;padding:6px 12px">💾 Salvar</button>
-        <button id="btnNovaSecao" onclick="abrirModalNovaSecao()" style="display:none;font-size:12px;padding:6px 12px;background:white;border:1.5px solid #2d1b69;color:#2d1b69;border-radius:6px;cursor:pointer;font-weight:600">+ Nova Seção</button>
+        <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()">Editar</button>
+        <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none">Salvar</button>
+        <button class="btn-secondary" id="btnNovaSecao" onclick="abrirModalNovaSecao()" style="display:none">+ Nova Seção</button>
       </div>
       <!-- ===== FLUXO DE VALOR (gerenciado por renderSecoes) ===== -->
       <div id="fvSecaoWrap" style="display:none;margin-bottom:24px">
-        <div style="background:white;border-radius:12px;padding:20px 24px;box-shadow:0 1px 4px rgba(0,0,0,0.06)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div style="font-size:15px;font-weight:700;color:#1e2a4a">🗺️ Fluxo de Valor do Negócio</div>
-            <div id="fvCtrl"></div>
+        <div style="background:white;border:1px solid #ECEDF0;border-radius:14px;padding:24px">
+          <div class="section-header" style="display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:18px;border-bottom:1.5px solid #F1F2F5">
+            <div class="section-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l7-.5M7.5 8.3L11 16M16.5 8.3L13 16"/></svg></div>
+            <span class="section-titulo-text">Fluxo de Valor do Negócio</span>
+            <div id="fvCtrl" style="margin-left:auto"></div>
           </div>
-          <div id="fvOcultoMsg" style="display:none;background:#f8fafc;border:2px dashed #e2e8f0;border-radius:8px;padding:20px;text-align:center;color:#a0aec0">
+          <div id="fvOcultoMsg" style="display:none;background:#FAFBFC;border:2px dashed #ECEDF0;border-radius:8px;padding:20px;text-align:center;color:#9CA0AC">
             <div style="font-size:22px;margin-bottom:6px">🗺️</div>
-            <div style="font-size:13px;font-weight:600;color:#718096;margin-bottom:4px">Seção oculta no modo visualização</div>
+            <div style="font-size:13px;font-weight:600;color:#6B7080;margin-bottom:4px">Seção oculta no modo visualização</div>
             <div style="font-size:12px">Use o botão <b>Mostrar</b> acima para reexibir no modo de visualização.</div>
           </div>
           <div id="fvSecaoInner">
             <div class="fv-toolbar">
               <div class="fv-toolbar-left" id="fvToolbarEdicao" style="display:none">
                 <button class="btn-fv primary" id="btnElemento" onclick="toggleElementoPicker()">+ Elemento ▾</button>
-                <div style="display:flex;align-items:center;gap:3px;border-left:1.5px solid #e2e8f0;margin-left:4px;padding-left:10px">
-                  <span style="font-size:10px;color:#a0aec0;font-weight:700;letter-spacing:.4px;margin-right:2px">CONEXÃO</span>
+                <div style="display:flex;align-items:center;gap:3px;border-left:1.5px solid #ECEDF0;margin-left:4px;padding-left:10px">
+                  <span style="font-size:10px;color:#9CA0AC;font-weight:700;letter-spacing:.4px;margin-right:2px">CONEXÃO</span>
                   <button class="btn-fv primary" id="btnConPush"  onclick="setConStyle('push')"  title="Push — fluxo empurrado (seta sólida)"
                     style="padding:5px 10px;font-size:11px;display:flex;align-items:center;gap:4px">
                     <svg width="22" height="10" viewBox="0 0 22 10"><line x1="1" y1="5" x2="16" y2="5" stroke="currentColor" stroke-width="2"/><polygon points="14,2 20,5 14,8" fill="currentColor"/></svg>Push
@@ -371,7 +463,7 @@
                 <div class="fv-canvas-wrap">
                   <div class="fv-canvas" id="fvCanvas">
                     <svg class="fv-svg" id="fvSvg"></svg>
-                    <div id="fvEmpty" style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:10px;color:#a0aec0">
+                    <div id="fvEmpty" style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:10px;color:#9CA0AC">
                       <div style="font-size:36px">🗺️</div>
                       <div style="font-size:13px">Nenhum bloco adicionado.</div>
                       <div style="font-size:11px">Clique em "Editar" para começar a mapear o fluxo de valor.</div>
@@ -381,8 +473,8 @@
                   <div class="sem-permissao-overlay" id="semPermissaoOverlay" style="display:none">
                     <div class="sem-permissao-card">
                       <div style="font-size:32px;margin-bottom:8px">🔒</div>
-                      <div style="font-size:14px;font-weight:700;color:#1e2a4a;margin-bottom:4px">Sem permissão de edição</div>
-                      <div style="font-size:12px;color:#718096">Apenas usuários com permissão podem editar o fluxo de valor.</div>
+                      <div style="font-size:14px;font-weight:700;color:#0B0B0F;margin-bottom:4px">Sem permissão de edição</div>
+                      <div style="font-size:12px;color:#6B7080">Apenas usuários com permissão podem editar o fluxo de valor.</div>
                     </div>
                   </div>
                 </div>
@@ -392,29 +484,29 @@
               <div class="fv-picker-panel" id="fvPickerPanel">
                 <div class="fv-picker-inner" id="fvElementoPicker">
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-                    <div style="font-size:13px;font-weight:700;color:#1e2a4a">Biblioteca de Elementos</div>
-                    <button onclick="fecharElementoPicker()" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:18px;line-height:1;padding:0">×</button>
+                    <div style="font-size:13px;font-weight:700;color:#0B0B0F">Biblioteca de Elementos</div>
+                    <button onclick="fecharElementoPicker()" style="background:none;border:none;cursor:pointer;color:#9CA0AC;font-size:18px;line-height:1;padding:0">×</button>
                   </div>
                   <div id="fvElementoGrid" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
-                  <div style="border-top:1px solid #f0f2f5;padding-top:14px">
+                  <div style="border-top:1px solid #F1F2F5;padding-top:14px">
                     <div id="fvPickerNomeRow" style="margin-bottom:10px">
-                      <div style="font-size:11px;font-weight:600;color:#4a5568;margin-bottom:5px">Nome do Elemento *</div>
+                      <div style="font-size:11px;font-weight:600;color:#33363F;margin-bottom:5px">Nome do Elemento *</div>
                       <input type="text" id="fvElNome" class="form-control" placeholder="Ex: Receber Pedido" style="font-size:12px">
                     </div>
                     <div id="fvPickerTabelaRow" style="display:none;margin-bottom:10px">
                       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                         <div>
-                          <div style="font-size:11px;font-weight:600;color:#4a5568;margin-bottom:4px">Colunas</div>
+                          <div style="font-size:11px;font-weight:600;color:#33363F;margin-bottom:4px">Colunas</div>
                           <input type="number" id="fvTabelaCols" class="form-control" value="3" min="1" max="8" style="font-size:12px">
                         </div>
                         <div>
-                          <div style="font-size:11px;font-weight:600;color:#4a5568;margin-bottom:4px">Linhas</div>
+                          <div style="font-size:11px;font-weight:600;color:#33363F;margin-bottom:4px">Linhas</div>
                           <input type="number" id="fvTabelaRows" class="form-control" value="3" min="1" max="20" style="font-size:12px">
                         </div>
                       </div>
                     </div>
                     <div id="fvPickerObsRow">
-                      <div style="font-size:11px;font-weight:600;color:#4a5568;margin-bottom:5px" id="fvPickerObsLabel">Observação</div>
+                      <div style="font-size:11px;font-weight:600;color:#33363F;margin-bottom:5px" id="fvPickerObsLabel">Observação</div>
                       <textarea id="fvElObs" class="form-control" rows="2" placeholder="Anotação sobre o elemento..." style="font-size:12px;resize:vertical;margin-bottom:12px"></textarea>
                     </div>
                     <div style="display:flex;gap:8px">
@@ -434,35 +526,33 @@
 
     <!-- NOSSO TIME -->
     <div class="tab-content" id="tab-nosso-time">
-      <div style="display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start">
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:4px;background:white;border:1.5px solid #ECEDF0;border-radius:9px;padding:3px 8px">
+          <button onclick="ajustarZoom(-1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#6B7080;padding:0 2px;line-height:1" title="Diminuir">−</button>
+          <span id="zoomLabel" style="font-size:11px;font-weight:600;color:#33363F;min-width:32px;text-align:center">100%</span>
+          <button onclick="ajustarZoom(1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#6B7080;padding:0 2px;line-height:1" title="Aumentar">+</button>
+        </div>
+        <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12.5px;padding:0 16px;height:38px;border-radius:9px">+ Membro</button>
+      </div>
+      <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start">
         <!-- Sidebar Departamentos -->
-        <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;position:sticky;top:72px">
-          <div style="padding:12px 14px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between">
-            <span style="font-size:12px;font-weight:700;color:#1e2a4a">DEPARTAMENTOS</span>
-            <button onclick="abrirModalDep()" style="padding:3px 7px;background:#f0f2f5;border:none;border-radius:4px;font-size:11px;cursor:pointer;color:#4a5568;font-weight:600">+ Novo</button>
+        <div style="background:white;border:1px solid #ECEDF0;border-radius:14px;overflow:hidden;position:sticky;top:80px">
+          <div style="height:44px;padding:0 14px;border-bottom:1px solid #F0F2F5;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box">
+            <span style="font-size:11px;font-weight:800;color:#0B0B0F;text-transform:uppercase;letter-spacing:.03em">Departamentos</span>
+            <button onclick="abrirModalDep()" style="padding:3px 8px;background:#F1F2F5;border:none;border-radius:6px;font-size:10.5px;cursor:pointer;color:#4A4E5A;font-weight:700">+ Novo</button>
           </div>
           <div id="depsSidebar" style="padding:8px">
-            <div style="padding:12px 10px;font-size:12px;color:#a0aec0;text-align:center">Nenhum departamento</div>
+            <div style="padding:12px 10px;font-size:12px;color:#9CA0AC;text-align:center">Nenhum departamento</div>
           </div>
         </div>
         <!-- Canvas -->
-        <div>
-          <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:12px">
-            <div style="display:flex;align-items:center;gap:4px;background:white;border:1.5px solid #e2e8f0;border-radius:6px;padding:3px 8px">
-              <button onclick="ajustarZoom(-1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#718096;padding:0 2px;line-height:1" title="Diminuir">−</button>
-              <span id="zoomLabel" style="font-size:11px;font-weight:600;color:#4a5568;min-width:32px;text-align:center">100%</span>
-              <button onclick="ajustarZoom(1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#718096;padding:0 2px;line-height:1" title="Aumentar">+</button>
-            </div>
-            <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px;padding:6px 12px">+ Membro</button>
-          </div>
-          <div class="org-container">
-            <div class="org-canvas" id="orgCanvas">
-              <svg class="org-svg" id="orgSvg"></svg>
-              <div class="org-empty" id="orgEmpty" style="display:flex">
-                <div style="font-size:40px">👥</div>
-                <div style="font-size:14px;color:#a0aec0">Nenhum membro adicionado ainda</div>
-                <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px">+ Adicionar Membro</button>
-              </div>
+        <div class="org-container">
+          <div class="org-canvas" id="orgCanvas">
+            <svg class="org-svg" id="orgSvg"></svg>
+            <div class="org-empty" id="orgEmpty" style="display:flex">
+              <div style="font-size:40px">👥</div>
+              <div style="font-size:14px;color:#9CA0AC">Nenhum membro adicionado ainda</div>
+              <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px">+ Adicionar Membro</button>
             </div>
           </div>
         </div>
@@ -472,35 +562,53 @@
     <!-- BIBLIOTECA -->
     <div class="tab-content" id="tab-biblioteca">
       <div id="bibLista">
-        <div style="display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start">
+        <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start">
           <!-- Sidebar Pastas (Explorer) -->
-          <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;position:sticky;top:72px">
-            <div style="padding:10px 14px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between">
-              <span style="font-size:12px;font-weight:700;color:#1e2a4a">PASTAS</span>
-              <button onclick="criarPasta()" style="padding:3px 7px;background:#f0f2f5;border:none;border-radius:4px;font-size:11px;cursor:pointer;color:#4a5568;font-weight:600">+ Nova</button>
+          <div>
+            <div style="height:38px;margin-bottom:16px" aria-hidden="true"></div>
+            <div style="background:white;border:1px solid #ECEDF0;border-radius:14px;overflow:hidden;position:sticky;top:80px">
+              <div style="height:44px;padding:0 14px;border-bottom:1px solid #F0F2F5;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box">
+                <span style="font-size:11px;font-weight:800;color:#0B0B0F;text-transform:uppercase;letter-spacing:.03em">Pastas</span>
+                <button onclick="criarPasta()" style="padding:3px 8px;background:#F1F2F5;border:none;border-radius:6px;font-size:10.5px;cursor:pointer;color:#4A4E5A;font-weight:700">+ Nova</button>
+              </div>
+              <div id="pastasSidebar" class="bib-explorer"></div>
             </div>
-            <div id="pastasSidebar" class="bib-explorer"></div>
           </div>
           <!-- Conteúdo -->
           <div>
-            <div class="bib-header">
-              <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()">
-              <select id="filtroStatus" onchange="filtrarWikis()" style="padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;background:white">
-                <option value="">Todos os Status</option>
-                <option value="Rascunho">Rascunho</option>
-                <option value="Aprovado">Aprovado</option>
-                <option value="Pendente">Pendente</option>
-              </select>
-            </div>
-            <div class="bib-toolbar">
-              <button class="btn-secondary" onclick="novoDocExterno()" style="font-size:12px;padding:6px 10px">📎 Doc. Externo</button>
-              <button class="btn-primary" onclick="novoWiki()" style="font-size:12px;padding:6px 12px">+ Novo Wiki</button>
+            <div class="bib-header" style="margin-bottom:16px">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex:1;min-width:0">
+                <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()" style="max-width:360px">
+                <select id="filtroStatus" onchange="filtrarWikis()" style="height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;background:white;color:#33363F;width:170px">
+                  <option value="">Todos os Status</option>
+                  <option value="Rascunho">Rascunho</option>
+                  <option value="Aprovado">Aprovado</option>
+                  <option value="Pendente">Pendente</option>
+                </select>
+                <div class="colunas-filtro-wrap">
+                  <button class="btn-modo" onclick="toggleColunasWikiDrop()">Colunas</button>
+                  <div class="colunas-filtro-drop" id="dropColunasWiki" style="display:none"></div>
+                </div>
+              </div>
+              <div class="bib-toolbar" style="margin-bottom:0">
+                <button class="btn-secondary" onclick="novoDocExterno()" style="font-size:12.5px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Carregar arquivo</button>
+                <button class="btn-primary" onclick="novoWiki()">+ Novo Wiki</button>
+              </div>
             </div>
             <div class="wiki-table">
-              <table>
-                <thead><tr><th>Nome</th><th>Pasta</th><th>Tags</th><th>Responsável</th><th>Status</th><th>Versão</th><th>Atualizado</th><th>Ações</th></tr></thead>
-                <tbody id="wikisBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Carregando wikis...</td></tr></tbody>
-              </table>
+            <table>
+              <thead><tr>
+                <th style="width:30%">Nome</th>
+                <th data-col="pasta">Pasta</th>
+                <th data-col="tags">Tags</th>
+                <th data-col="responsavel">Responsável</th>
+                <th data-col="status">Status</th>
+                <th data-col="versao">Versão</th>
+                <th data-col="atualizado">Atualizado</th>
+                <th>Ações</th>
+              </tr></thead>
+              <tbody id="wikisBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:#9CA0AC">Carregando wikis...</td></tr></tbody>
+            </table>
             </div>
           </div>
         </div>
@@ -513,9 +621,9 @@
             <button class="btn-secondary" id="btnHistorico" onclick="toggleHistorico()" style="font-size:12px">🕐 Versões</button>
             <button class="btn-secondary" id="btnNovaVersao" onclick="novaVersaoWiki()" style="font-size:12px;display:none">+ Nova Versão</button>
             <button class="btn-secondary" onclick="exportarPDF()" style="font-size:12px">📄 PDF</button>
-            <span id="autoSaveIndicator" style="font-size:11px;color:#a0aec0;min-width:60px;text-align:right"></span>
+            <span id="autoSaveIndicator" style="font-size:11px;color:#9CA0AC;min-width:60px;text-align:right"></span>
             <button class="btn-secondary" id="btnSolicitarAprovWiki" onclick="abrirModalSolicitarAprovWiki()" style="font-size:12px;display:none">📨 Solicitar Aprovação</button>
-            <button class="btn-primary" id="btnAprovarWiki" onclick="aprovarWiki()" style="background:#38a169;font-size:12px;display:none">✓ Aprovar</button>
+            <button class="btn-primary" id="btnAprovarWiki" onclick="aprovarWiki()" style="background:#00B37E;font-size:12px;display:none">✓ Aprovar</button>
           </div>
         </div>
         <div class="editor-meta">
@@ -553,7 +661,7 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('strikeThrough')" title="Tachado" style="text-decoration:line-through">S</button>
               <div class="toolbar-sep"></div>
               <label title="Cor do texto" style="display:flex;align-items:center;cursor:pointer;padding:2px 4px;border-radius:4px">
-                <span style="font-size:11px;margin-right:3px;color:#4a5568">A</span>
+                <span style="font-size:11px;margin-right:3px;color:#33363F">A</span>
                 <input type="color" id="editorColor" value="#000000" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;background:none" onchange="fmt('foreColor',this.value)" title="Cor do texto">
               </label>
               <div class="toolbar-sep"></div>
@@ -573,7 +681,7 @@
           <div class="versao-historia" id="versaoHistoria">
             <div class="versao-historia-header">
               <span>Histórico de Versões</span>
-              <button onclick="toggleHistorico()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#a0aec0">×</button>
+              <button onclick="toggleHistorico()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#9CA0AC">×</button>
             </div>
             <div id="versaoHistoriaBody"></div>
           </div>
@@ -613,8 +721,8 @@
 <!-- Modal Timeline -->
 <div class="modal-overlay" id="modalSolicitarAprovWiki">
   <div class="modal" style="max-width:420px">
-    <div class="modal-header"><span class="modal-titulo">📨 Solicitar Aprovação</span><button class="btn-fechar" onclick="fecharModal('modalSolicitarAprovWiki')">×</button></div>
-    <p style="font-size:13px;color:#4a5568;margin:0 0 12px">Selecione quem deve ser notificado — a lista mostra só quem tem permissão de aprovar wikis:</p>
+    <div class="modal-header"><span class="modal-titulo">📨 Solicitar Aprovação</span><button class="btn-fechar" onclick="fecharModal('modalSolicitarAprovWiki')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <p style="font-size:13px;color:#33363F;margin:0 0 12px">Selecione quem deve ser notificado — a lista mostra só quem tem permissão de aprovar wikis:</p>
     <div id="solicitarAprovWikiUserList" style="max-height:320px;overflow-y:auto"></div>
     <div class="modal-footer" style="margin-top:12px"><button class="btn-cancelar" onclick="fecharModal('modalSolicitarAprovWiki')">Cancelar</button><button class="btn-confirmar" onclick="_enviarSolicitacaoAprovWiki()">📨 Enviar</button></div>
   </div>
@@ -622,7 +730,7 @@
 
 <div class="modal-overlay" id="modalTimeline">
   <div class="modal" style="max-width:520px">
-    <div class="modal-header"><span class="modal-titulo">Adicionar Marco Histórico</span><button class="btn-fechar" onclick="fecharModal('modalTimeline')">×</button></div>
+    <div class="modal-header"><span class="modal-titulo">Adicionar Marco Histórico</span><button class="btn-fechar" onclick="fecharModal('modalTimeline')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="form-group"><label>Ano</label><input type="text" id="timelineAno" placeholder="Ex: 2020"></div>
     <div class="form-group">
       <label>Descrição</label>
@@ -642,7 +750,7 @@
 <!-- Modal Nova Seção -->
 <div class="modal-overlay" id="modalNovaSecao">
   <div class="modal" style="max-width:420px">
-    <div class="modal-header"><span class="modal-titulo">Nova Seção</span><button class="btn-fechar" onclick="fecharModal('modalNovaSecao')">×</button></div>
+    <div class="modal-header"><span class="modal-titulo">Nova Seção</span><button class="btn-fechar" onclick="fecharModal('modalNovaSecao')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div style="display:flex;gap:10px;align-items:flex-end">
       <div class="form-group" style="width:72px;margin-bottom:0">
         <label>Ícone</label>
@@ -653,7 +761,7 @@
         <input type="text" id="novaSecaoNome" placeholder="Ex: Diferenciais" onkeypress="if(event.key==='Enter')confirmarNovaSecao()">
       </div>
     </div>
-    <p style="font-size:12px;color:#718096;margin:10px 0 0">Após criar, use os botões "+ Adicionar" para incluir campos, cards, tabelas ou linha do tempo.</p>
+    <p style="font-size:12px;color:#6B7080;margin:10px 0 0">Após criar, use os botões "+ Adicionar" para incluir campos, cards, tabelas ou linha do tempo.</p>
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalNovaSecao')">Cancelar</button><button class="btn-confirmar" onclick="confirmarNovaSecao()">Criar Seção</button></div>
   </div>
 </div>
@@ -661,7 +769,7 @@
 <!-- Modal Editar Seção -->
 <div class="modal-overlay" id="modalEditSecao">
   <div class="modal" style="max-width:420px">
-    <div class="modal-header"><span class="modal-titulo">Editar Seção</span><button class="btn-fechar" onclick="fecharModal('modalEditSecao')">×</button></div>
+    <div class="modal-header"><span class="modal-titulo">Editar Seção</span><button class="btn-fechar" onclick="fecharModal('modalEditSecao')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div style="display:flex;gap:10px;align-items:flex-end">
       <div class="form-group" style="width:72px;margin-bottom:0">
         <label>Ícone</label>
@@ -680,7 +788,7 @@
 <!-- Modal Departamento -->
 <div class="modal-overlay" id="modalDep">
   <div class="modal">
-    <div class="modal-header"><span class="modal-titulo">Novo Departamento</span><button class="btn-fechar" onclick="fecharModal('modalDep')">×</button></div>
+    <div class="modal-header"><span class="modal-titulo">Novo Departamento</span><button class="btn-fechar" onclick="fecharModal('modalDep')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="form-group"><label>Nome do Departamento</label><input type="text" id="depNome" placeholder="Ex: Tecnologia, RH..."></div>
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalDep')">Cancelar</button><button class="btn-confirmar" onclick="adicionarDep()">Criar</button></div>
   </div>
@@ -689,7 +797,7 @@
 <!-- Modal Membro -->
 <div class="modal-overlay" id="modalMembro">
   <div class="modal">
-    <div class="modal-header"><span class="modal-titulo" id="modalMembroTitulo">Novo Membro</span><button class="btn-fechar" onclick="fecharModal('modalMembro')">×</button></div>
+    <div class="modal-header"><span class="modal-titulo" id="modalMembroTitulo">Novo Membro</span><button class="btn-fechar" onclick="fecharModal('modalMembro')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="form-group org-nome-wrap">
       <label>Nome *</label>
       <input type="text" id="membroNome" placeholder="Nome completo ou buscar usuário cadastrado..." autocomplete="off" oninput="filtrarUsuariosDropdown()">
@@ -706,7 +814,7 @@
 <!-- Modal Editar Departamento -->
 <div class="modal-overlay" id="modalEditDep">
   <div class="modal" style="max-width:400px">
-    <div class="modal-header"><span class="modal-titulo">Editar Departamento</span><button class="btn-fechar" onclick="fecharModal('modalEditDep')">×</button></div>
+    <div class="modal-header"><span class="modal-titulo">Editar Departamento</span><button class="btn-fechar" onclick="fecharModal('modalEditDep')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="form-group"><label>Nome do Departamento</label><input type="text" id="editDepNome" placeholder="Ex: Tecnologia, RH..." onkeypress="if(event.key==='Enter')confirmarEditarDep()"></div>
     <input type="hidden" id="editDepId">
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalEditDep')">Cancelar</button><button class="btn-confirmar" onclick="confirmarEditarDep()">Salvar</button></div>
@@ -719,7 +827,7 @@
   <div class="modal" style="max-width:400px">
     <div class="modal-header">
       <span class="modal-titulo">📁 Nova Pasta</span>
-      <button class="btn-fechar" onclick="fecharModal('modalNovaPasta')">×</button>
+      <button class="btn-fechar" onclick="fecharModal('modalNovaPasta')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="form-group">
       <label>Nome da Pasta *</label>
@@ -727,7 +835,7 @@
     </div>
     <div class="form-group">
       <label>Pasta pai (opcional)</label>
-      <select id="novaPastaParent" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;background:white">
+      <select id="novaPastaParent" style="width:100%;padding:8px 12px;border:1.5px solid #ECEDF0;border-radius:6px;font-size:13px;outline:none;background:white">
         <option value="">— Raiz (sem pasta pai) —</option>
       </select>
     </div>
@@ -743,7 +851,7 @@
   <div class="modal" style="max-width:400px">
     <div class="modal-header">
       <span class="modal-titulo">✏️ Editar Pasta</span>
-      <button class="btn-fechar" onclick="fecharModal('modalEditPasta')">×</button>
+      <button class="btn-fechar" onclick="fecharModal('modalEditPasta')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <input type="hidden" id="editPastaId">
     <div class="form-group">
@@ -752,7 +860,7 @@
     </div>
     <div class="form-group">
       <label>Mover para dentro de</label>
-      <select id="editPastaParent" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;background:white">
+      <select id="editPastaParent" style="width:100%;padding:8px 12px;border:1.5px solid #ECEDF0;border-radius:6px;font-size:13px;outline:none;background:white">
         <option value="">— Raiz —</option>
       </select>
     </div>
@@ -768,7 +876,7 @@
   <div class="modal" style="max-width:460px">
     <div class="modal-header">
       <span class="modal-titulo">📎 Adicionar Documento</span>
-      <button class="btn-fechar" onclick="fecharModal('modalDocExterno')">×</button>
+      <button class="btn-fechar" onclick="fecharModal('modalDocExterno')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="form-group">
       <label>Título *</label>
@@ -791,7 +899,7 @@
 <!-- Modal Editar Bloco Fluxo de Valor -->
 <div class="modal-overlay" id="modalFvEditar">
   <div class="modal" style="max-width:400px">
-    <div class="modal-header"><span class="modal-titulo">Editar Elemento</span><button class="btn-fechar" onclick="fecharModal('modalFvEditar')">×</button></div>
+    <div class="modal-header"><span class="modal-titulo">Editar Elemento</span><button class="btn-fechar" onclick="fecharModal('modalFvEditar')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="form-group"><label>Nome *</label><input type="text" id="fvEditNome" class="form-control" placeholder="Nome do elemento" onkeydown="if(event.key==='Enter')salvarEditarFvBloco()"></div>
     <div class="form-group" style="margin-top:12px"><label>Observação</label><textarea id="fvEditObs" class="form-control" rows="3" placeholder="Descrição ou anotação (opcional)" style="resize:vertical"></textarea></div>
     <div class="modal-footer" style="margin-top:16px">
@@ -820,16 +928,148 @@
   document.getElementById('userPerfil').textContent = usuario.perfil || '-';
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
 
+  // ===== Sidebar: recolher/expandir + cor do sistema =====
+  const CORES_SISTEMA = [
+    { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
+    { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
+    { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
+    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
+  ];
+  function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
+  function setAccentColor(hex) {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+    if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
+  }
+  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+
+  const sidebarEl = document.getElementById('sidebarEl');
+  function aplicarSidebarRecolhida(recolhida) {
+    sidebarEl.classList.toggle('recolhida', recolhida);
+    document.getElementById('iconRecolher').innerHTML = recolhida
+      ? '<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>'
+      : '<polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>';
+    const lbl = document.getElementById('lblRecolher');
+    if (lbl) lbl.textContent = recolhida ? 'Expandir' : 'Recolher';
+  }
+  function toggleSidebarRecolhida() {
+    const recolhida = !sidebarEl.classList.contains('recolhida');
+    localStorage.setItem('sidebarRecolhida', recolhida ? '1' : '0');
+    aplicarSidebarRecolhida(recolhida);
+  }
+  aplicarSidebarRecolhida(localStorage.getItem('sidebarRecolhida') === '1');
+
+  const SISTEMA_ITEMS_HTML = document.getElementById('sistemaItemsWrap').innerHTML;
+  function mostrarCorSistemaNoMenu() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = 'cor';
+    const atual = (localStorage.getItem('accentColor') || '#2F5CFF').toLowerCase();
+    wrap.innerHTML = `
+      <button class="color-picker-back" onclick="voltarMenuSistema()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Cor do Sistema
+      </button>
+      ${CORES_SISTEMA.map(c => `
+        <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
+          <span class="color-swatch-rect" style="background:${c.hex}"></span>
+          <span class="color-swatch-label">${c.nome}</span>
+        </button>`).join('')}
+      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+  }
+  function voltarMenuSistema() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = '';
+    wrap.innerHTML = SISTEMA_ITEMS_HTML;
+  }
+  document.getElementById('sistemaMenu').addEventListener('toggle', (e) => { if (!e.target.open) voltarMenuSistema(); });
+
+  function hocEnhanceSelect(sel) {
+    if (!sel || sel._hocEnhanced) return;
+    sel._hocEnhanced = true;
+    const originalStyle = sel.getAttribute('style') || '';
+    const originalClass = sel.className || '';
+    const styleParts = originalStyle.split(';').map(s=>s.trim()).filter(Boolean);
+    const marginParts = styleParts.filter(p=>/^margin/i.test(p));
+    const triggerStyle = styleParts.filter(p=>!/^margin/i.test(p)).join(';');
+
+    const wrap = document.createElement('span');
+    wrap.className = 'hoc-select-wrap';
+    if (marginParts.length) wrap.setAttribute('style', marginParts.join(';'));
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    sel.classList.add('hoc-select-native');
+    sel.tabIndex = -1;
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = ('hoc-select-trigger ' + originalClass).trim();
+    trigger.setAttribute('style', triggerStyle);
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'hoc-select-trigger-label';
+    trigger.appendChild(labelSpan);
+    trigger.insertAdjacentHTML('beforeend', '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>');
+
+    const panel = document.createElement('div');
+    panel.className = 'hoc-select-panel';
+
+    wrap.appendChild(trigger);
+    wrap.appendChild(panel);
+
+    function syncLabel() {
+      const opt = sel.options[sel.selectedIndex];
+      labelSpan.textContent = opt ? opt.textContent : '';
+    }
+    function renderPanel() {
+      panel.innerHTML = '';
+      [...sel.options].forEach((opt, i) => {
+        const item = document.createElement('div');
+        item.className = 'hoc-select-item' + (i === sel.selectedIndex ? ' selected' : '');
+        item.textContent = opt.textContent;
+        item.onclick = () => {
+          sel.selectedIndex = i;
+          syncLabel();
+          panel.classList.remove('open');
+          trigger.classList.remove('open');
+          sel.dispatchEvent(new Event('change', {bubbles:true}));
+        };
+        panel.appendChild(item);
+      });
+    }
+    trigger.onclick = (e) => {
+      e.stopPropagation();
+      const willOpen = !panel.classList.contains('open');
+      document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+      if (willOpen) { renderPanel(); panel.classList.add('open'); trigger.classList.add('open'); }
+    };
+    syncLabel();
+
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    Object.defineProperty(sel, 'value', {
+      get() { return desc.get.call(sel); },
+      set(v) { desc.set.call(sel, v); syncLabel(); },
+      configurable: true
+    });
+    new MutationObserver(syncLabel).observe(sel, {childList:true, subtree:true});
+  }
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+  });
+  function hocEnhanceSelects(ids) { ids.forEach(id => hocEnhanceSelect(document.getElementById(id))); }
+
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
 
   // ===== TABS =====
   document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
   document.getElementById('tab-visao-geral').style.display = 'block';
+  hocEnhanceSelect(document.getElementById('filtroStatus'));
   function mudarTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-' + id).style.display = 'block';
     btn.classList.add('active');
+    document.querySelector('.content').classList.toggle('content-wide', id === 'nosso-time' || id === 'biblioteca');
     if (id === 'biblioteca') { if (pastas.length === 0) carregarPastas(); else carregarWikis(); }
     if (id === 'nosso-time') requestAnimationFrame(fitOrgNodes);
   }
@@ -854,17 +1094,17 @@
     return [
       {id:'resumo',emoji:'🏢',nome:'Sobre a Empresa',campos:camposSobre},
       {id:'mvv',emoji:'🎯',nome:'Missão, Visão e Valores',campos:[
-        {id:'missao',tipo:'rich',label:'🎯 Missão',valor:mvv.missao||''},
-        {id:'visao',tipo:'rich',label:'👁️ Visão',valor:mvv.visao||''},
-        {id:'valores',tipo:'rich',label:'💎 Valores',valor:mvv.valores||''},
+        {id:'missao',tipo:'rich',label:'Missão',valor:mvv.missao||''},
+        {id:'visao',tipo:'rich',label:'Visão',valor:mvv.visao||''},
+        {id:'valores',tipo:'rich',label:'Valores',valor:mvv.valores||''},
       ]},
       {id:'historia',emoji:'📅',nome:'História',campos:[
         {id:'tl_historia',tipo:'timeline',dados:{items:data.timeline||[]}}
       ]},
       {id:'highlights',emoji:'🌱',nome:'Highlights ESG',campos:[
-        {id:'esg-e',tipo:'rich',label:'🌱 E — Ambiental',valor:esg.e||''},
-        {id:'esg-s',tipo:'rich',label:'👥 S — Social',valor:esg.s||''},
-        {id:'esg-g',tipo:'rich',label:'⚖️ G — Governança',valor:esg.g||''},
+        {id:'esg-e',tipo:'rich',label:'E — Ambiental',valor:esg.e||''},
+        {id:'esg-s',tipo:'rich',label:'S — Social',valor:esg.s||''},
+        {id:'esg-g',tipo:'rich',label:'G — Governança',valor:esg.g||''},
       ]},
     ];
   }
@@ -926,8 +1166,15 @@
   }
 
   // ===== RENDER =====
-  const _sBtnBase = 'background:#f0f2f5;border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#4a5568';
-  const _sBtnDel  = 'background:#fff5f5;border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#c53030';
+  const _sBtnBase = 'background:#F1F2F5;border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#33363F';
+  const _sBtnDel  = 'background:color-mix(in srgb,#FF2E4D 8%,white);border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#FF2E4D';
+  const _secCtrlBase = 'width:26px;height:26px;border-radius:6px;border:none;background:#F1F2F5;color:#6B7080;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+  const _secCtrlEdit = 'width:26px;height:26px;border-radius:6px;border:none;background:color-mix(in srgb,#FFAE00 16%,white);color:#B37800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+  const _secCtrlDel  = 'width:26px;height:26px;border-radius:6px;border:none;background:color-mix(in srgb,#FF2E4D 12%,white);color:#FF2E4D;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+  const _secIconUp    = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  const _secIconDown  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
+  const _secIconEdit  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>';
+  const _secIconRemove = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 
   let fvLoaded = false;
   let _fvWrapNode = null; // cached ref — getElementById fails on detached nodes
@@ -980,10 +1227,10 @@
     const ctrl = fvWrap.querySelector('#fvCtrl');
     if (ctrl) {
       if (modoEdicao) {
-        let h = '<div style="display:flex;gap:4px;align-items:center">';
-        if (vi > 0) h += `<button onclick="moverSecao(${ri},-1)" style="${_sBtnBase}" title="Subir">↑</button>`;
-        if (vi < total-1) h += `<button onclick="moverSecao(${ri},1)" style="${_sBtnBase}" title="Descer">↓</button>`;
-        h += `<button onclick="toggleFvVisivel(${ri})" style="${_sBtnBase}">${hidden?'Mostrar':'Ocultar'}</button>`;
+        let h = '<div style="display:flex;gap:6px;align-items:center">';
+        if (vi > 0) h += `<button onclick="moverSecao(${ri},-1)" style="${_secCtrlBase}" title="Subir">${_secIconUp}</button>`;
+        if (vi < total-1) h += `<button onclick="moverSecao(${ri},1)" style="${_secCtrlBase}" title="Descer">${_secIconDown}</button>`;
+        h += `<button onclick="toggleFvVisivel(${ri})" style="${_sBtnBase};height:26px" title="${hidden?'Mostrar':'Ocultar'}">${hidden?'Mostrar':'Ocultar'}</button>`;
         h += '</div>';
         ctrl.innerHTML = h;
       } else {
@@ -1010,23 +1257,37 @@
     renderSecoes();
   }
 
+  const _SEC_ICON_SVG = {
+    resumo: '<path d="M3 21h18M6 21V7l6-4 6 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/>',
+    mvv: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    historia: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+    highlights: '<path d="M11 20A7 7 0 019.8 6.1C15.5 5 17 4.5 19 3c.4 2 .6 5-1 7-1.4 1.7-3.9 2.9-6.6 3.9"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
+    'fluxo-valor': '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l7-.5M7.5 8.3L11 16M16.5 8.3L13 16"/>',
+  };
+  function _secIconHtml(s) {
+    const svg = _SEC_ICON_SVG[s.id];
+    return svg
+      ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svg}</svg>`
+      : (s.emoji || '📋');
+  }
+
   function renderSecao(s, vi, ri, total) {
     const isE = modoEdicao;
-    const ctrl = isE ? `<div style="display:flex;gap:4px;align-items:center;margin-left:auto;flex-shrink:0">
-      ${vi>0?`<button onclick="moverSecao(${ri},-1)" style="${_sBtnBase}" title="Subir">↑</button>`:''}
-      ${vi<total-1?`<button onclick="moverSecao(${ri},1)" style="${_sBtnBase}" title="Descer">↓</button>`:''}
-      <button onclick="editarSecaoMeta(${ri})" style="${_sBtnBase}" title="Editar nome">✏️</button>
-      <button onclick="removerSecao(${ri})" style="${_sBtnDel}" title="Remover seção">✕</button>
+    const ctrl = isE ? `<div style="display:flex;gap:6px;align-items:center;margin-left:auto;flex-shrink:0">
+      ${vi>0?`<button onclick="moverSecao(${ri},-1)" style="${_secCtrlBase}" title="Subir">${_secIconUp}</button>`:''}
+      ${vi<total-1?`<button onclick="moverSecao(${ri},1)" style="${_secCtrlBase}" title="Descer">${_secIconDown}</button>`:''}
+      <button onclick="editarSecaoMeta(${ri})" style="${_secCtrlEdit}" title="Editar nome">${_secIconEdit}</button>
+      <button onclick="removerSecao(${ri})" style="${_secCtrlDel}" title="Remover seção">${_secIconRemove}</button>
     </div>` : '';
-    const hdr = `<div class="section-header" style="display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:18px;border-bottom:1.5px solid #f0f2f5">
-      <div class="section-icon">${s.emoji||'📋'}</div>
+    const hdr = `<div class="section-header" style="display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:18px;border-bottom:1.5px solid #F1F2F5">
+      <div class="section-icon">${_secIconHtml(s)}</div>
       <span class="section-titulo-text">${s.nome}</span>
       ${ctrl}
     </div>`;
     const campos = s.campos||[];
     const body = campos.length
       ? _renderCamposAgrupados(s, campos, ri)
-      : (modoEdicao ? '<p style="color:#a0aec0;font-size:12px;margin:0 0 8px">Use "+ Adicionar" abaixo para incluir conteúdo.</p>' : '');
+      : (modoEdicao ? '<p style="color:#9CA0AC;font-size:12px;margin:0 0 8px">Use "+ Adicionar" abaixo para incluir conteúdo.</p>' : '');
     const addBar = modoEdicao ? _renderAddBar(ri) : '';
     return `<div class="section-bloco" data-ri="${ri}">${hdr}${body}${addBar}</div>`;
   }
@@ -1055,7 +1316,7 @@
     }).join('');
   }
 
-  const _labelInputStyle = 'flex:1;min-width:0;border:none;border-bottom:1.5px solid #d6bcfa;outline:none;font-size:11px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:0.5px;background:transparent;padding:0 0 1px 0;font-family:inherit';
+  const _labelInputStyle = 'flex:1;min-width:0;border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:11px;font-weight:700;color:#33363F;text-transform:uppercase;letter-spacing:0.5px;background:transparent;padding:0 0 1px 0;font-family:inherit';
 
   function _renderGrupoSimples(s, items, ri) {
     const html = items.map(({c,ci})=>{
@@ -1073,21 +1334,26 @@
     return `<div class="info-grid">${html}</div>`;
   }
 
+  function _stripLeadingEmoji(s) {
+    return (s||'').replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}]️?\s*/u, '');
+  }
+
   function _renderGrupoRich(s, items, ri) {
     const cards = items.map(({c,ci})=>{
       const eid = 'rich-'+s.id+'-'+ci;
+      const labelLimpo = _stripLeadingEmoji(c.label);
       const del = modoEdicao ? `<button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};padding:1px 5px;float:right;margin-left:6px">✕</button>` : '';
       const titleEl = modoEdicao
-        ? `${del}<input type="text" value="${_esc(c.label)}" oninput="secoesData[${ri}].campos[${ci}].label=this.value" style="border:none;border-bottom:1.5px solid #d6bcfa;outline:none;font-size:12px;font-weight:700;color:#1e2a4a;background:transparent;padding:0 0 2px 0;width:calc(100% - 36px);font-family:inherit">`
-        : c.label;
-      const tb = modoEdicao ? `<div style="display:flex;gap:3px;padding:5px;background:#f8fafc;border-radius:6px 6px 0 0;border:1.5px solid #e2e8f0;border-bottom:none;flex-wrap:wrap;margin-top:8px">
+        ? `${del}<input type="text" value="${_esc(labelLimpo)}" oninput="secoesData[${ri}].campos[${ci}].label=this.value" style="border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:12px;font-weight:700;color:#0B0B0F;background:transparent;padding:0 0 2px 0;width:calc(100% - 36px);font-family:inherit">`
+        : labelLimpo;
+      const tb = modoEdicao ? `<div style="display:flex;gap:3px;padding:5px;background:#FAFBFC;border-radius:6px 6px 0 0;border:1.5px solid #ECEDF0;border-bottom:none;flex-wrap:wrap;margin-top:8px">
         <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','bold')"><b>B</b></button>
         <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','italic')"><i>I</i></button>
         <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','insertUnorderedList')">• Lista</button>
         <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','insertOrderedList')">1. Lista</button>
         <button class="toolbar-btn" onmousedown="event.preventDefault();inserirLink('${eid}')">🔗</button>
       </div>` : '';
-      const val = c.valor||(modoEdicao?'':`<span style="color:#a0aec0">Clique em Editar para adicionar.</span>`);
+      const val = c.valor||(modoEdicao?'':`<span style="color:#9CA0AC">Clique em Editar para adicionar.</span>`);
       return `<div class="mvv-card"><div class="mvv-titulo">${titleEl}</div>${tb}<div class="mvv-texto rich-editor" id="${eid}" contenteditable="${modoEdicao}" onkeydown="_ovRichKeydown(event)">${val}</div></div>`;
     }).join('');
     return `<div class="mvv-grid">${cards}</div>`;
@@ -1096,10 +1362,10 @@
   function _renderCampoTimeline(s, c, ci, ri) {
     const items = (c.dados&&c.dados.items)||[];
     const addBtn = modoEdicao ? `<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-      <button onclick="abrirModalTimeline(${ri},${ci})" style="font-size:11px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600">+ Marco</button>
+      <button onclick="abrirModalTimeline(${ri},${ci})" style="font-size:11px;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white);border:1.5px solid color-mix(in srgb,var(--accent) 40%,white);border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600">+ Marco</button>
       <button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel}">✕ Remover linha do tempo</button>
     </div>` : '';
-    if (!items.length) return addBtn+`<p style="color:#a0aec0;font-size:13px">Nenhum marco adicionado ainda.</p>`;
+    if (!items.length) return addBtn+`<p style="color:#9CA0AC;font-size:13px">Nenhum marco adicionado ainda.</p>`;
     const html = items.map((item,i)=>`
       <div class="timeline-item">
         <div class="timeline-dot"></div>
@@ -1119,17 +1385,17 @@
     const cols = d.colunas||[], rows = d.linhas||[];
     const ncols = Math.max(cols.length,1);
     const colW = (100/ncols).toFixed(1)+'%';
-    const bs = 'border:1px solid #e2e8f0;padding:7px 10px;font-size:12px;word-break:break-word;vertical-align:top';
+    const bs = 'border:1px solid #ECEDF0;padding:7px 10px;font-size:12px;word-break:break-word;vertical-align:top';
     const colgroup = `<colgroup>${cols.map(()=>`<col style="width:${colW}">`).join('')}${modoEdicao?'<col style="width:40px">':''}</colgroup>`;
     const thead = `<tr>
-      ${cols.map((col,coli)=>`<th style="${bs};font-weight:700;background:${col.bgColor||'#f8fafc'};color:${col.textColor||'#1e2a4a'}">
+      ${cols.map((col,coli)=>`<th style="${bs};font-weight:700;background:${col.bgColor||'#FAFBFC'};color:${col.textColor||'#0B0B0F'}">
         ${modoEdicao?`<div style="display:flex;gap:4px;align-items:center">
           <input type="text" value="${_esc(col.nome||'')}" oninput="secoesData[${ri}].campos[${ci}].dados.colunas[${coli}].nome=this.value" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-weight:700;font-size:12px;color:inherit;font-family:inherit">
-          <input type="color" title="Cor fundo" value="${col.bgColor||'#f8fafc'}" onchange="_tblColCor(${ri},${ci},${coli},'bgColor',this.value,this.closest('th'))" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;flex-shrink:0">
+          <input type="color" title="Cor fundo" value="${col.bgColor||'#FAFBFC'}" onchange="_tblColCor(${ri},${ci},${coli},'bgColor',this.value,this.closest('th'))" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;flex-shrink:0">
           <button onclick="removerColunaTabela(${ri},${ci},${coli})" style="${_sBtnDel};padding:1px 4px">✕</button>
         </div>`:(col.nome||'—')}
       </th>`).join('')}
-      ${modoEdicao?`<th style="${bs};background:#f8fafc"><button onclick="adicionarColunaTabela(${ri},${ci})" style="font-size:11px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:4px;padding:3px 8px;cursor:pointer;font-weight:600">+Col</button></th>`:''}
+      ${modoEdicao?`<th style="${bs};background:#FAFBFC"><button onclick="adicionarColunaTabela(${ri},${ci})" style="font-size:11px;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white);border:1.5px solid color-mix(in srgb,var(--accent) 40%,white);border-radius:4px;padding:3px 8px;cursor:pointer;font-weight:600">+Col</button></th>`:''}
     </tr>`;
     const tbody = rows.map((row,r)=>`<tr>
       ${cols.map((col,coli)=>{
@@ -1139,22 +1405,22 @@
             <textarea oninput="_tblCellVal(${ri},${ci},${r},${coli},this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-family:inherit;font-size:inherit;color:inherit;resize:none;overflow:hidden;line-height:1.4" rows="1">${_esc(cell.valor||'')}</textarea>
             <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
               <input type="color" title="Cor fundo" value="${cell.bgColor||'#ffffff'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'bgColor',this.value,this.closest('td'))" style="width:16px;height:16px;border:none;padding:0;cursor:pointer">
-              <input type="color" title="Cor texto" value="${cell.textColor||'#1e2a4a'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'textColor',this.value,this.closest('td'))" style="width:16px;height:16px;border:none;padding:0;cursor:pointer">
+              <input type="color" title="Cor texto" value="${cell.textColor||'#0B0B0F'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'textColor',this.value,this.closest('td'))" style="width:16px;height:16px;border:none;padding:0;cursor:pointer">
             </div>
           </div>`:(cell.valor||'—')}
         </td>`;
       }).join('')}
-      ${modoEdicao?`<td style="${bs};background:#fff5f5"><button onclick="removerLinhaTabela(${ri},${ci},${r})" style="${_sBtnDel};padding:1px 4px">✕</button></td>`:''}
+      ${modoEdicao?`<td style="${bs};background:color-mix(in srgb,#FF2E4D 8%,white)"><button onclick="removerLinhaTabela(${ri},${ci},${r})" style="${_sBtnDel};padding:1px 4px">✕</button></td>`:''}
     </tr>`).join('');
     const delBtn = modoEdicao?`<div style="margin-bottom:8px"><button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel}">✕ Remover tabela</button></div>`:'';
-    const addRow = modoEdicao?`<div style="margin-top:8px"><button onclick="adicionarLinhaTabela(${ri},${ci})" style="font-size:12px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:600">+ Linha</button></div>`:'';
+    const addRow = modoEdicao?`<div style="margin-top:8px"><button onclick="adicionarLinhaTabela(${ri},${ci})" style="font-size:12px;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white);border:1.5px solid color-mix(in srgb,var(--accent) 40%,white);border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:600">+ Linha</button></div>`:'';
     return `${delBtn}<div class="secao-tbl-wrap"><div class="secao-tbl"><table style="table-layout:fixed">${colgroup}<thead>${thead}</thead><tbody>${tbody}</tbody></table></div></div>${addRow}`;
   }
 
   function _renderAddBar(ri) {
-    const bs2 = 'font-size:11px;color:#2d1b69;background:#f5f0ff;border:1.5px solid #d6bcfa;border-radius:5px;padding:4px 10px;cursor:pointer;font-weight:600';
-    return `<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #e2e8f0;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-      <span style="font-size:11px;color:#718096;font-weight:600;flex-shrink:0">+ Adicionar:</span>
+    const bs2 = 'font-size:11px;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white);border:1.5px solid color-mix(in srgb,var(--accent) 40%,white);border-radius:5px;padding:4px 10px;cursor:pointer;font-weight:600';
+    return `<div style="margin-top:14px;padding-top:12px;border-top:1px dashed #ECEDF0;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;color:#6B7080;font-weight:600;flex-shrink:0">+ Adicionar:</span>
       <button onclick="addCampo(${ri},'texto')" style="${bs2}">Texto</button>
       <button onclick="addCampo(${ri},'textarea')" style="${bs2}">Texto longo</button>
       <button onclick="addCampo(${ri},'rich')" style="${bs2}">Card</button>
@@ -1185,14 +1451,14 @@
     else if (tipo==='textarea') campo={id,tipo:'textarea',label:'Campo',valor:''};
     else if (tipo==='rich')     campo={id,tipo:'rich',label:'Novo Card',valor:''};
     else if (tipo==='timeline') campo={id,tipo:'timeline',dados:{items:[]}};
-    else if (tipo==='tabela')   campo={id,tipo:'tabela',dados:{colunas:[{nome:'Coluna 1',bgColor:'#f8fafc',textColor:'#1e2a4a'}],linhas:[[{valor:'',bgColor:'',textColor:''}]]}};
+    else if (tipo==='tabela')   campo={id,tipo:'tabela',dados:{colunas:[{nome:'Coluna 1',bgColor:'#FAFBFC',textColor:'#0B0B0F'}],linhas:[[{valor:'',bgColor:'',textColor:''}]]}};
     if (campo) { (secoesData[ri].campos=secoesData[ri].campos||[]).push(campo); renderSecoes(); }
   }
 
   function removerCampo(ri, ci) { coletarRichEditors(); secoesData[ri].campos.splice(ci,1); renderSecoes(); }
 
   // ===== TABELA CRUD =====
-  function adicionarColunaTabela(ri,ci){secoesData[ri].campos[ci].dados.colunas.push({nome:'Nova Coluna',bgColor:'#f8fafc',textColor:'#1e2a4a'});(secoesData[ri].campos[ci].dados.linhas||[]).forEach(row=>row.push({valor:'',bgColor:'',textColor:''}));renderSecoes();}
+  function adicionarColunaTabela(ri,ci){secoesData[ri].campos[ci].dados.colunas.push({nome:'Nova Coluna',bgColor:'#FAFBFC',textColor:'#0B0B0F'});(secoesData[ri].campos[ci].dados.linhas||[]).forEach(row=>row.push({valor:'',bgColor:'',textColor:''}));renderSecoes();}
   function removerColunaTabela(ri,ci,coli){secoesData[ri].campos[ci].dados.colunas.splice(coli,1);(secoesData[ri].campos[ci].dados.linhas||[]).forEach(row=>row.splice(coli,1));renderSecoes();}
   function adicionarLinhaTabela(ri,ci){const row=(secoesData[ri].campos[ci].dados.colunas||[]).map(()=>({valor:'',bgColor:'',textColor:''}));(secoesData[ri].campos[ci].dados.linhas=secoesData[ri].campos[ci].dados.linhas||[]).push(row);renderSecoes();}
   function removerLinhaTabela(ri,ci,r){secoesData[ri].campos[ci].dados.linhas.splice(r,1);renderSecoes();}
@@ -1246,7 +1512,7 @@
   }
 
   // ===== NOSSO TIME — API =====
-  const DEP_CORES = ['#2d1b69','#38a169','#3b5bdb','#e53e3e','#d69e2e','#00b5d8'];
+  const DEP_CORES = ['var(--accent)','#00B37E','#3b5bdb','#e53e3e','#d69e2e','#00b5d8'];
   let departamentos = [], membros = [], conexoes = [], depAtivo = null;
   let dragging = null, dragOffset = { x:0, y:0 };
   let conectandoDe = null; // { memberId, side }
@@ -1264,7 +1530,7 @@
   function getLarguraCard() { return ZOOM_LARGURAS[zoomNivel]; }
   function getFontScale() { return ZOOM_NIVEIS[zoomNivel] / 100; }
   function getDepIdx(depId) { return departamentos.findIndex(d => d.id == depId); }
-  function getDepCor(depId) { const idx = getDepIdx(depId); return idx >= 0 ? DEP_CORES[idx % DEP_CORES.length] : '#2d1b69'; }
+  function getDepCor(depId) { const idx = getDepIdx(depId); return idx >= 0 ? DEP_CORES[idx % DEP_CORES.length] : 'var(--accent)'; }
 
   async function carregarUsuariosCadastrados() {
     try {
@@ -1284,8 +1550,8 @@
     dd.style.display = 'block';
     dd.innerHTML = usuariosFiltrados.map((u, i) => `
       <div class="org-nome-item" onmousedown="selecionarUsuarioCadastrado(${i})">
-        <div style="font-size:13px;font-weight:600;color:#1e2a4a">${u.nome}</div>
-        <div style="font-size:11px;color:#718096">${u.cargo||'Sem cargo'}${u.email ? ' · ' + u.email : ''}</div>
+        <div style="font-size:13px;font-weight:600;color:#0B0B0F">${u.nome}</div>
+        <div style="font-size:11px;color:#6B7080">${u.cargo||'Sem cargo'}${u.email ? ' · ' + u.email : ''}</div>
       </div>`).join('');
   }
 
@@ -1377,15 +1643,15 @@
     if (!sidebar) return;
     const sel = document.getElementById('membroDep');
     if (sel) { sel.innerHTML = '<option value="">Selecione...</option>'; departamentos.forEach(dep => { sel.innerHTML += `<option value="${dep.id}">${dep.nome}</option>`; }); }
-    if (departamentos.length === 0) { sidebar.innerHTML = '<div style="padding:12px 10px;font-size:12px;color:#a0aec0;text-align:center">Nenhum departamento</div>'; return; }
+    if (departamentos.length === 0) { sidebar.innerHTML = '<div style="padding:12px 10px;font-size:12px;color:#9CA0AC;text-align:center">Nenhum departamento</div>'; return; }
     sidebar.innerHTML = departamentos.map((dep, i) => {
       const cor = DEP_CORES[i % DEP_CORES.length];
       const isActive = depAtivo == dep.id;
       return `<div class="dep-sidebar-row${isActive ? ' active' : ''}" onclick="selecionarDepSidebar(${dep.id})">
         <span style="font-size:12px;font-weight:500;color:${cor};flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">● ${dep.nome}</span>
         <div class="dep-row-acoes">
-          <button onclick="editarDep(${dep.id},event)" style="background:#f0f2f5;border:none;border-radius:4px;cursor:pointer;padding:2px 4px;font-size:10px" title="Renomear">✏️</button>
-          <button onclick="deletarDep(${dep.id},event)" style="background:#fff5f5;border:none;border-radius:4px;cursor:pointer;padding:2px 4px;font-size:10px" title="Remover">🗑️</button>
+          <button onclick="editarDep(${dep.id},event)" style="background:#F1F2F5;border:none;border-radius:4px;cursor:pointer;padding:2px 4px;font-size:10px" title="Renomear">✏️</button>
+          <button onclick="deletarDep(${dep.id},event)" style="background:color-mix(in srgb,#FF2E4D 8%,white);border:none;border-radius:4px;cursor:pointer;padding:2px 4px;font-size:10px" title="Remover">🗑️</button>
         </div>
       </div>`;
     }).join('');
@@ -1583,7 +1849,7 @@
     marker.setAttribute('id','arrowhead'); marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','6');
     marker.setAttribute('refX','7'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
     const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    poly.setAttribute('points','0 0, 8 3, 0 6'); poly.setAttribute('fill','#2d1b69');
+    poly.setAttribute('points','0 0, 8 3, 0 6'); poly.setAttribute('fill','var(--accent)');
     marker.appendChild(poly); defs.appendChild(marker); svg.appendChild(defs);
 
     const membrosVisiveis = depAtivo ? membros.filter(m => m.depId == depAtivo) : membros;
@@ -1614,7 +1880,7 @@
       const { d, mx, my } = buildOrthogonalPath(x1, y1, c.fromSide || null, entry.x, entry.y, entry.side);
       const path = document.createElementNS('http://www.w3.org/2000/svg','path');
       path.setAttribute('d', d); path.setAttribute('fill','none');
-      path.setAttribute('stroke','#2d1b69'); path.setAttribute('stroke-width','1.5');
+      path.setAttribute('stroke','var(--accent)'); path.setAttribute('stroke-width','1.5');
       path.setAttribute('stroke-opacity','0.65'); path.setAttribute('marker-end','url(#arrowhead)');
       svg.appendChild(path);
 
@@ -1627,7 +1893,7 @@
 
       const btn = document.createElement('div');
       btn.className = 'conn-del-btn';
-      btn.style.cssText = `position:absolute;left:${mx-9}px;top:${my-9}px;width:18px;height:18px;background:white;border:1.5px solid #e2e8f0;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:#c53030;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,0.12);opacity:0;transition:opacity .15s;`;
+      btn.style.cssText = `position:absolute;left:${mx-9}px;top:${my-9}px;width:18px;height:18px;background:white;border:1.5px solid #ECEDF0;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:#FF2E4D;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,0.12);opacity:0;transition:opacity .15s;`;
       btn.title = 'Remover conexão';
       btn.textContent = '×';
       btn.addEventListener('click', async ev => {
@@ -1670,8 +1936,8 @@
         ? `<img src="${fotoUrl}" style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:block">`
         : `<div style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;background:#edf2f7;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:flex;align-items:center;justify-content:center">
             <svg viewBox="0 0 24 24" width="${Math.round(22*fScale)}" height="${Math.round(22*fScale)}" fill="none">
-              <circle cx="12" cy="8" r="4" fill="#a0aec0"/>
-              <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" fill="#a0aec0"/>
+              <circle cx="12" cy="8" r="4" fill="#9CA0AC"/>
+              <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" fill="#9CA0AC"/>
             </svg>
           </div>`;
       const nomeFontSize = Math.round(13 * fScale);
@@ -1692,9 +1958,9 @@
           <button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()" title="Remover">🗑️</button>
         </div>
         ${fotoHtml}
-        <div data-fit data-fit-max="${nomeFontSize}" style="font-size:${nomeFontSize}px;font-weight:600;color:#1e2a4a;margin-bottom:2px;line-height:1.3;white-space:nowrap;overflow:hidden">${nomeHtml}</div>
+        <div data-fit data-fit-max="${nomeFontSize}" style="font-size:${nomeFontSize}px;font-weight:600;color:#0B0B0F;margin-bottom:2px;line-height:1.3;white-space:nowrap;overflow:hidden">${nomeHtml}</div>
         <div data-fit data-fit-max="${cargoFontSize}" style="font-size:${cargoFontSize}px;color:${cor};font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden">${m.cargo}</div>
-        ${m.email && fScale >= 1.0 ? `<div data-fit data-fit-max="${Math.round(10*fScale)}" style="font-size:${Math.round(10*fScale)}px;color:#a0aec0;margin-top:1px;white-space:nowrap;overflow:hidden">${m.email}</div>` : ''}
+        ${m.email && fScale >= 1.0 ? `<div data-fit data-fit-max="${Math.round(10*fScale)}" style="font-size:${Math.round(10*fScale)}px;color:#9CA0AC;margin-top:1px;white-space:nowrap;overflow:hidden">${m.email}</div>` : ''}
       `;
 
       node.addEventListener('mouseenter', () => { node.querySelector('.org-node-actions').style.opacity = '1'; });
@@ -1741,7 +2007,7 @@
         if (!temp) {
           temp = document.createElementNS('http://www.w3.org/2000/svg','path');
           temp.id = 'conn-temp';
-          temp.setAttribute('fill','none'); temp.setAttribute('stroke','#2d1b69');
+          temp.setAttribute('fill','none'); temp.setAttribute('stroke','var(--accent)');
           temp.setAttribute('stroke-width','1.5'); temp.setAttribute('stroke-dasharray','5,3');
           temp.setAttribute('stroke-opacity','0.5');
           svg.appendChild(temp);
@@ -1854,9 +2120,13 @@
     const parentId = pastaAtiva;
     const subpastas = pastas.filter(p => (p.parentId || null) === (parentId || null));
 
+    const isRoot = pastaAtiva === null;
+    const _iconHome = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+    const _iconPasta = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>`;
+
     // Breadcrumb
     let breadcrumb = `<div class="bib-breadcrumb">`;
-    breadcrumb += `<span onclick="navegarPasta(null,'')">🏠</span>`;
+    breadcrumb += `<span onclick="navegarPasta(null,'')" style="display:flex;align-items:center;gap:5px${isRoot?';color:var(--accent);font-weight:700':''}">${_iconHome}Todos os Documentos</span>`;
     caminhoNavegacao.forEach((item, i) => {
       breadcrumb += `<span class="sep">›</span><span onclick="irBreadcrumb(${i})">${item.nome}</span>`;
     });
@@ -1865,11 +2135,11 @@
     // Pastas do nível atual
     let itens = '';
     if (subpastas.length === 0 && caminhoNavegacao.length === 0) {
-      itens = `<div style="padding:20px 10px;text-align:center;color:#a0aec0;font-size:12px">Nenhuma pasta criada.<br>Clique em <strong>+ Nova</strong> para começar.</div>`;
+      itens = `<div style="padding:20px 10px;text-align:center;color:#9CA0AC;font-size:12px">Nenhuma pasta criada.<br>Clique em <strong>+ Nova</strong> para começar.</div>`;
     } else {
       itens = subpastas.map(p => `
         <div class="pasta-explorer-item" onclick="navegarPasta(${p.id},'${p.nome.replace(/'/g,"\\'")}')">
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">📂 ${p.nome}</span>
+          <span style="display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${_iconPasta}${p.nome}</span>
           <span class="pasta-acoes">
             <span class="pasta-acao-btn" onclick="abrirEditPasta(${p.id},event)" title="Renomear / Mover">✏️</span>
             <span class="pasta-acao-btn" onclick="removerPasta(${p.id},event)" title="Remover">×</span>
@@ -1879,7 +2149,7 @@
 
     // Botão voltar se não estiver na raiz
     const btnVoltar = pastaAtiva !== null
-      ? `<div onclick="voltarPasta()" style="display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:#718096;margin-bottom:4px" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">&larr; Voltar</div>`
+      ? `<div onclick="voltarPasta()" style="display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:12px;color:#6B7080;margin-bottom:4px" onmouseover="this.style.background='#FAFBFC'" onmouseout="this.style.background=''">&larr; Voltar</div>`
       : '';
 
     sidebar.innerHTML = breadcrumb + btnVoltar + itens;
@@ -2024,7 +2294,7 @@
       <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('strikeThrough')" title="Tachado" style="text-decoration:line-through">S</button>
       <div class="toolbar-sep"></div>
       <label title="Cor do texto" style="display:flex;align-items:center;cursor:pointer;padding:2px 4px;border-radius:4px">
-        <span style="font-size:11px;margin-right:3px;color:#4a5568">A</span>
+        <span style="font-size:11px;margin-right:3px;color:#33363F">A</span>
         <input type="color" id="editorColor" value="#000000" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;background:none" onchange="fmt('foreColor',this.value)" title="Cor do texto">
       </label>
       <div class="toolbar-sep"></div>
@@ -2114,7 +2384,7 @@
     win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${titulo}</title><style>
       @page{margin:0;size:A4}
       *{margin:0;padding:0;box-sizing:border-box}
-      body{font-family:'Segoe UI',sans-serif;font-size:13px;line-height:1.8;color:#1e2a4a;padding:15mm 20mm}
+      body{font-family:'Segoe UI',sans-serif;font-size:13px;line-height:1.8;color:#0B0B0F;padding:15mm 20mm}
       h1{font-size:24px;font-weight:700;margin:0 0 12px}
       h2{font-size:19px;font-weight:700;margin:20px 0 8px}
       h3{font-size:16px;font-weight:700;margin:16px 0 6px}
@@ -2142,18 +2412,18 @@
   function abrirModalSolicitarAprovWiki() {
     if (!wikiEditando) { alert('Salve primeiro.'); return; }
     const lista = document.getElementById('solicitarAprovWikiUserList');
-    lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Carregando...</div>';
+    lista.innerHTML = '<div style="padding:12px;color:#6B7080;font-size:12px">Carregando...</div>';
     document.getElementById('modalSolicitarAprovWiki').classList.add('aberto');
     fetch('/api/usuarios/com-permissao/overview/aprovar', { headers: HEADERS }).then(r=>r.json()).then(users=>{
       _usuariosAprovWiki = (users||[]).filter(u => u._id !== (usuario.id || usuario._id));
-      if (!_usuariosAprovWiki.length) { lista.innerHTML = '<div style="padding:12px;color:#718096;font-size:12px">Nenhum usuário com permissão para aprovar wikis, além de você.</div>'; return; }
+      if (!_usuariosAprovWiki.length) { lista.innerHTML = '<div style="padding:12px;color:#6B7080;font-size:12px">Nenhum usuário com permissão para aprovar wikis, além de você.</div>'; return; }
       lista.innerHTML = _usuariosAprovWiki.map(u=>`
-        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;margin-bottom:6px">
-          <input type="radio" name="wikiAprovUser" value="${u._id}" style="accent-color:#2d1b69">
-          <span style="font-size:13px;font-weight:600;color:#1e2a4a">${u.nome}</span>
-          <span style="font-size:11px;color:#718096;margin-left:auto">${u.email||''}</span>
+        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #ECEDF0;border-radius:8px;cursor:pointer;margin-bottom:6px">
+          <input type="radio" name="wikiAprovUser" value="${u._id}" style="accent-color:var(--accent)">
+          <span style="font-size:13px;font-weight:600;color:#0B0B0F">${u.nome}</span>
+          <span style="font-size:11px;color:#6B7080;margin-left:auto">${u.email||''}</span>
         </label>`).join('');
-    }).catch(()=>{ lista.innerHTML = '<div style="padding:12px;color:#c53030;font-size:12px">Erro ao carregar usuários.</div>'; });
+    }).catch(()=>{ lista.innerHTML = '<div style="padding:12px;color:#FF2E4D;font-size:12px">Erro ao carregar usuários.</div>'; });
   }
   async function _enviarSolicitacaoAprovWiki() {
     const sel = document.querySelector('input[name="wikiAprovUser"]:checked');
@@ -2209,24 +2479,24 @@
   }
 
   function _renderHistoricoBody(versoes) {
-    const statusCor = { 'Aprovado':'#276749', 'Rascunho':'#718096', 'Pendente':'#b7791f' };
-    const statusBg  = { 'Aprovado':'#f0fff4', 'Rascunho':'#f0f2f5', 'Pendente':'#fffbeb' };
+    const statusCor = { 'Aprovado':'#00754F', 'Rascunho':'#6B7080', 'Pendente':'#b7791f' };
+    const statusBg  = { 'Aprovado':'color-mix(in srgb,#00B37E 10%,white)', 'Rascunho':'#F1F2F5', 'Pendente':'#fffbeb' };
     const ativoVersao = versoes.find(v => v.ativo);
     const ativoInfo = ativoVersao
-      ? `<div style="padding:8px 14px;background:#f0fff4;border-bottom:1px solid #c6f6d5;font-size:11px;color:#276749;font-weight:600;">✓ Versão ativa: ${ativoVersao.versao} — ${ativoVersao.responsavel||'—'}</div>`
+      ? `<div style="padding:8px 14px;background:color-mix(in srgb,#00B37E 10%,white);border-bottom:1px solid color-mix(in srgb,#00B37E 30%,white);font-size:11px;color:#00754F;font-weight:600;">✓ Versão ativa: ${ativoVersao.versao} — ${ativoVersao.responsavel||'—'}</div>`
       : '';
     document.getElementById('versaoHistoriaBody').innerHTML = ativoInfo + versoes.slice().reverse().map(v => {
       const isAtual = v._id === wikiEditando;
       const isAtivo = !!v.ativo;
       return `<div class="versao-historia-item${isAtivo?' atual':''}">
-        <span style="font-weight:700;color:#2d1b69;min-width:36px">${v.versao}</span>
-        ${isAtivo ? '<span style="padding:1px 6px;background:#c6f6d5;color:#276749;border-radius:10px;font-size:10px;font-weight:700;flex-shrink:0">ATIVO</span>' : ''}
-        <span style="padding:2px 8px;border-radius:10px;font-size:11px;background:${statusBg[v.status]||'#f0f2f5'};color:${statusCor[v.status]||'#718096'}">${v.status}</span>
-        <span style="flex:1;color:#4a5568">${v.responsavel||'—'}</span>
-        <span style="color:#a0aec0;flex-shrink:0">${new Date(v.criadoEm).toLocaleDateString('pt-BR')}</span>
+        <span style="font-weight:700;color:var(--accent);min-width:36px">${v.versao}</span>
+        ${isAtivo ? '<span style="padding:1px 6px;background:color-mix(in srgb,#00B37E 30%,white);color:#00754F;border-radius:10px;font-size:10px;font-weight:700;flex-shrink:0">ATIVO</span>' : ''}
+        <span style="padding:2px 8px;border-radius:10px;font-size:11px;background:${statusBg[v.status]||'#F1F2F5'};color:${statusCor[v.status]||'#6B7080'}">${v.status}</span>
+        <span style="flex:1;color:#33363F">${v.responsavel||'—'}</span>
+        <span style="color:#9CA0AC;flex-shrink:0">${new Date(v.criadoEm).toLocaleDateString('pt-BR')}</span>
         <div style="display:flex;gap:4px;flex-shrink:0">
-          ${!isAtual ? `<button onclick="editarWiki('${v._id}')" style="padding:2px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:11px">Abrir</button>` : ''}
-          ${!isAtivo ? `<button onclick="ativarVersao('${v._id}')" style="padding:2px 8px;background:#f0fff4;color:#276749;border:none;border-radius:4px;cursor:pointer;font-size:11px">Ativar</button>` : ''}
+          ${!isAtual ? `<button onclick="editarWiki('${v._id}')" style="padding:2px 8px;background:#ebf0ff;color:var(--accent);border:none;border-radius:4px;cursor:pointer;font-size:11px">Abrir</button>` : ''}
+          ${!isAtivo ? `<button onclick="ativarVersao('${v._id}')" style="padding:2px 8px;background:color-mix(in srgb,#00B37E 10%,white);color:#00754F;border:none;border-radius:4px;cursor:pointer;font-size:11px">Ativar</button>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -2236,27 +2506,27 @@
     const panel = document.getElementById('versaoHistoria');
     if (panel.classList.contains('aberto')) { panel.classList.remove('aberto'); return; }
     if (!wikiEditando) {
-      document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#718096">Salve o documento antes de ver o histórico.</div>';
+      document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#6B7080">Salve o documento antes de ver o histórico.</div>';
       panel.classList.add('aberto');
       return;
     }
-    document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#718096">Carregando...</div>';
+    document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#6B7080">Carregando...</div>';
     panel.classList.add('aberto');
     try {
       const res = await fetch(`/api/wikis/${wikiEditando}/versoes`, { headers: HEADERS });
       const data = await res.json();
       if (!res.ok) {
-        document.getElementById('versaoHistoriaBody').innerHTML = `<div style="padding:14px;font-size:12px;color:#c53030">Erro ao carregar: ${data.erro||res.status}</div>`;
+        document.getElementById('versaoHistoriaBody').innerHTML = `<div style="padding:14px;font-size:12px;color:#FF2E4D">Erro ao carregar: ${data.erro||res.status}</div>`;
         return;
       }
       const versoes = Array.isArray(data) ? data : [];
       if (versoes.length === 0) {
-        document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#718096">Nenhuma versão encontrada.</div>';
+        document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#6B7080">Nenhuma versão encontrada.</div>';
         return;
       }
       _renderHistoricoBody(versoes);
     } catch(e) {
-      document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#c53030">Erro de conexão.</div>';
+      document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#FF2E4D">Erro de conexão.</div>';
       console.error(e);
     }
   }
@@ -2291,6 +2561,47 @@
     return ids;
   }
 
+  let colunasVisiveisWiki = { pasta: true, tags: false, responsavel: true, status: true, versao: true, atualizado: true };
+  try {
+    const salvoWiki = JSON.parse(localStorage.getItem('ov_colunasVisiveisWiki') || 'null');
+    if (salvoWiki) colunasVisiveisWiki = { ...colunasVisiveisWiki, ...salvoWiki };
+  } catch(e) {}
+
+  function toggleColunaWiki(key) {
+    colunasVisiveisWiki[key] = !colunasVisiveisWiki[key];
+    try { localStorage.setItem('ov_colunasVisiveisWiki', JSON.stringify(colunasVisiveisWiki)); } catch(e) {}
+    renderColunasWikiDrop();
+    aplicarColunasWiki();
+  }
+  function renderColunasWikiDrop() {
+    const drop = document.getElementById('dropColunasWiki');
+    if (!drop) return;
+    const opcoes = [
+      { key: 'pasta', label: 'Pasta' },
+      { key: 'tags', label: 'Tags' },
+      { key: 'responsavel', label: 'Responsável' },
+      { key: 'status', label: 'Status' },
+      { key: 'versao', label: 'Versão' },
+      { key: 'atualizado', label: 'Atualizado' },
+    ];
+    drop.innerHTML = `
+      <label class="colunas-filtro-item travado"><input type="checkbox" checked disabled> Nome</label>
+      ${opcoes.map(o => `<label class="colunas-filtro-item"><input type="checkbox" ${colunasVisiveisWiki[o.key]?'checked':''} onchange="toggleColunaWiki('${o.key}')"> ${o.label}</label>`).join('')}
+    `;
+  }
+  function toggleColunasWikiDrop() {
+    const d = document.getElementById('dropColunasWiki');
+    const abrir = d.style.display !== 'block';
+    if (abrir) renderColunasWikiDrop();
+    d.style.display = abrir ? 'block' : 'none';
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('.colunas-filtro-wrap')) { const d = document.getElementById('dropColunasWiki'); if (d) d.style.display='none'; } });
+  function aplicarColunasWiki() {
+    document.querySelectorAll('#tab-biblioteca [data-col]').forEach(el => {
+      el.style.display = colunasVisiveisWiki[el.dataset.col] === false ? 'none' : '';
+    });
+  }
+
   function renderWikis(lista) {
     const tbody = document.getElementById('wikisBody');
     let filtro = lista !== undefined ? lista : wikis;
@@ -2304,34 +2615,36 @@
       else if (!ex.ativo && new Date(w.criadoEm) > new Date(ex.criadoEm)) { grupos.set(gid, w); }
     });
     filtro = Array.from(grupos.values());
-    if (filtro.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Nenhum documento encontrado.</td></tr>'; return; }
+    if (filtro.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#9CA0AC">Nenhum documento encontrado.</td></tr>'; aplicarColunasWiki(); return; }
     const statusCor = { 'Aprovado':'badge-verde', 'Rascunho':'badge-cinza', 'Pendente':'badge-amarelo' };
     tbody.innerHTML = filtro.map(w => {
       const pasta = pastas.find(p => p.id === w.pastaId);
       const pastaOpts = pastas.map(p => `<option value="${p.id}" ${w.pastaId===p.id?'selected':''}>${p.nome}</option>`).join('');
-      const icone = w.tipo === 'externo' ? '📎' : '📝';
       const linkDoc = w.urlExterno
-        ? `<a href="${w.urlExterno}" target="_blank" download="${w.nomeArquivo||''}" title="${w.nomeArquivo||'Abrir'}" style="font-size:11px;color:#2d1b69;margin-left:4px">⬇</a>`
+        ? `<a href="${w.urlExterno}" target="_blank" download="${w.nomeArquivo||''}" title="${w.nomeArquivo||'Abrir'}" style="font-size:11px;color:var(--accent);margin-left:4px">⬇</a>`
         : '';
       return `<tr>
-        <td><span style="margin-right:4px">${icone}</span><strong>${w.titulo}</strong>${linkDoc}</td>
-        <td>
-          <select onchange="moverWikiPasta('${w._id}',this.value)" ${_podeEditarWiki?'':'disabled'} style="font-size:11px;padding:2px 4px;border:1px solid #e2e8f0;border-radius:4px;color:#718096;background:white;cursor:pointer">
+        <td><strong>${w.titulo}</strong>${linkDoc}</td>
+        <td data-col="pasta">
+          <select onchange="moverWikiPasta('${w._id}',this.value)" ${_podeEditarWiki?'':'disabled'} style="font-size:11px;padding:2px 4px;border:1px solid #ECEDF0;border-radius:4px;color:#6B7080;background:white;cursor:pointer">
             <option value="">Sem pasta</option>
             ${pastaOpts}
           </select>
         </td>
-        <td>${w.tags ? w.tags.split(',').map(t=>`<span class="wiki-tag">${t.trim()}</span>`).join('') : '—'}</td>
-        <td>${w.responsavel||'—'}</td>
-        <td><span class="badge ${statusCor[w.status]||'badge-cinza'}">${w.status}</span></td>
-        <td><span class="versao-badge">${w.versao}</span></td>
-        <td>${new Date(w.atualizadoEm||w.criadoEm).toLocaleDateString('pt-BR')}</td>
+        <td data-col="tags">${w.tags ? w.tags.split(',').map(t=>`<span class="wiki-tag">${t.trim()}</span>`).join('') : '—'}</td>
+        <td data-col="responsavel">${w.responsavel||'—'}</td>
+        <td data-col="status"><span class="badge ${statusCor[w.status]||'badge-cinza'}">${w.status}</span></td>
+        <td data-col="versao"><span class="versao-badge">${w.versao}</span></td>
+        <td data-col="atualizado">${new Date(w.atualizadoEm||w.criadoEm).toLocaleDateString('pt-BR')}</td>
         <td style="white-space:nowrap">
-          ${w.tipo !== 'externo' ? `<button onclick="editarWiki('${w._id}')" style="padding:4px 8px;background:#ebf0ff;color:#2d1b69;border:none;border-radius:4px;cursor:pointer;font-size:12px">✏️</button>` : ''}
-          <button onclick="deletarWiki('${w._id}')" style="padding:4px 8px;background:#fff5f5;color:#c53030;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin-left:2px">🗑️</button>
+          <div style="display:inline-flex;gap:6px">
+            ${w.tipo !== 'externo' ? `<button onclick="editarWiki('${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></button>` : ''}
+            <button onclick="deletarWiki('${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:#FF2E4D;cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
+          </div>
         </td>
       </tr>`;
     }).join('');
+    aplicarColunasWiki();
   }
 
   async function moverWikiPasta(id, pastaIdStr) {
@@ -2351,7 +2664,7 @@
     if (pastaAtiva === null && !q && !st) {
       renderWikis([]);
       const tbody = document.getElementById('wikisBody');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#a0aec0">Selecione uma pasta para ver os documentos.</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#9CA0AC">Selecione uma pasta para ver os documentos.</td></tr>';
       return;
     }
     renderWikis(wikis.filter(w => {
@@ -2380,7 +2693,7 @@
       const f = input.files[0];
       const mb = (f.size / 1024 / 1024).toFixed(1);
       label.innerHTML = `📄 <strong>${f.name}</strong><br><span style="font-size:11px">${mb} MB</span>`;
-      document.getElementById('docUploadZone').style.borderColor = '#2d1b69';
+      document.getElementById('docUploadZone').style.borderColor = 'var(--accent)';
     }
   }
 
@@ -2648,16 +2961,28 @@
     }
   }
 
+  const NOTIF_ICON = {
+    sucesso: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>', color:'#00754F'},
+    erro: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+    aviso: {svg:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', color:'#8A6200'},
+    info: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>', color:'var(--accent)'},
+    licenca_vencendo: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>', color:'#8A6200'},
+    licenca_vencida: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+  };
+  function _notifIconHtml(tipo) {
+    const cfg = NOTIF_ICON[tipo] || NOTIF_ICON.info;
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2">${cfg.svg}</svg>`;
+  }
   function renderNotificacoes(notifs) {
     const lista = document.getElementById('notifLista');
     if (!lista) return;
     if (!notifs || notifs.length === 0) {
-      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
+      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
       return;
     }
     lista.innerHTML = notifs.map(n => `
       <div class="notif-item ${!n.lida?'nao-lida':''} tipo-${n.tipo}" onclick="abrirNotif('${n._id}','${n.link||''}')">
-        <div class="notif-icone ${n.tipo}">${n.icone||'🔔'}</div>
+        <div class="notif-icone ${n.tipo}">${_notifIconHtml(n.tipo)}</div>
         <div class="notif-corpo">
           <div class="notif-titulo-item">${n.titulo}</div>
           <div class="notif-msg">${n.mensagem}</div>
@@ -2815,25 +3140,25 @@
       <div class="fv-port fv-port-top${isPendingT?' pending':''}"   onclick="clicarPorta('${b.id}','top',event)"    title="↑ Conectar"></div>
       <div class="fv-port fv-port-bot${isPendingT?' pending':''}"   onclick="clicarPorta('${b.id}','bottom',event)" title="↓ Conectar"></div>` : '';
 
-    const headerCells = cols.map((c,ci) => `<th style="padding:5px 8px;font-size:11px;font-weight:700;color:#1e2a4a;border-bottom:1.5px solid #e2e8f0;border-right:1px solid #f0f2f5;white-space:nowrap;min-width:70px;background:#f8fafc;position:relative">
+    const headerCells = cols.map((c,ci) => `<th style="padding:5px 8px;font-size:11px;font-weight:700;color:#0B0B0F;border-bottom:1.5px solid #ECEDF0;border-right:1px solid #F1F2F5;white-space:nowrap;min-width:70px;background:#FAFBFC;position:relative">
       ${edt ? `<span contenteditable="true" onblur="event.stopPropagation();fvTabelaEditColNome(this,'${b.id}',${ci})"
         style="outline:none;display:block;cursor:text" title="Editar nome da coluna">${_gesc(c)}</span>` : _gesc(c)}
-      ${edt && cols.length > 1 ? `<button onclick="event.stopPropagation();fvTabelaDelCol('${b.id}',${ci})" style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;background:#fff5f5;border:1px solid #feb2b2;color:#c53030;font-size:11px;cursor:pointer;z-index:5;line-height:1;display:none;padding:0" class="fv-tbl-delcol">−</button>` : ''}
-      ${edt ? `<button onclick="event.stopPropagation();fvTabelaAddCol('${b.id}',${ci+1})" style="position:absolute;right:-9px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:#f5f0ff;border:none;color:#2d1b69;font-size:12px;cursor:pointer;z-index:5;line-height:1;display:none;padding:0" class="fv-tbl-addbtn">+</button>` : ''}
+      ${edt && cols.length > 1 ? `<button onclick="event.stopPropagation();fvTabelaDelCol('${b.id}',${ci})" style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;background:color-mix(in srgb,#FF2E4D 8%,white);border:1px solid color-mix(in srgb,#FF2E4D 35%,white);color:#FF2E4D;font-size:11px;cursor:pointer;z-index:5;line-height:1;display:none;padding:0" class="fv-tbl-delcol">−</button>` : ''}
+      ${edt ? `<button onclick="event.stopPropagation();fvTabelaAddCol('${b.id}',${ci+1})" style="position:absolute;right:-9px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:color-mix(in srgb,var(--accent) 8%,white);border:none;color:var(--accent);font-size:12px;cursor:pointer;z-index:5;line-height:1;display:none;padding:0" class="fv-tbl-addbtn">+</button>` : ''}
     </th>`).join('');
 
     const dataRows = rows.map((row, ri) => `<tr>
-      ${row.map((cell, ci) => `<td style="padding:4px 7px;font-size:11px;color:#4a5568;border-bottom:1px solid #f0f2f5;border-right:1px solid #f0f2f5">
+      ${row.map((cell, ci) => `<td style="padding:4px 7px;font-size:11px;color:#33363F;border-bottom:1px solid #F1F2F5;border-right:1px solid #F1F2F5">
         ${edt ? `<span contenteditable="true" onblur="event.stopPropagation();fvTabelaEditCell(this,'${b.id}',${ri},${ci})"
           style="outline:none;display:block;min-width:50px;cursor:text">${_gesc(cell)}</span>` : _gesc(cell)}
       </td>`).join('')}
-      ${edt ? `<td style="width:20px;padding:2px"><button onclick="event.stopPropagation();fvTabelaDelRow('${b.id}',${ri})" style="width:16px;height:16px;border-radius:50%;background:#fff5f5;border:none;color:#c53030;font-size:10px;cursor:pointer;line-height:1;padding:0">−</button></td>` : ''}
+      ${edt ? `<td style="width:20px;padding:2px"><button onclick="event.stopPropagation();fvTabelaDelRow('${b.id}',${ri})" style="width:16px;height:16px;border-radius:50%;background:color-mix(in srgb,#FF2E4D 8%,white);border:none;color:#FF2E4D;font-size:10px;cursor:pointer;line-height:1;padding:0">−</button></td>` : ''}
     </tr>`).join('');
 
     el.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1.5px solid #e2e8f0;background:#f5f0ff;border-radius:10px 10px 0 0">
-        <div style="font-size:12px;font-weight:700;color:#2d1b69;display:flex;align-items:center;gap:6px">
-          <svg width="13" height="13" viewBox="0 0 40 40" fill="none"><rect x="4" y="6" width="32" height="28" rx="1" stroke="#2d1b69" stroke-width="2.5"/><line x1="4" y1="14" x2="36" y2="14" stroke="#2d1b69" stroke-width="2"/><line x1="4" y1="22" x2="36" y2="22" stroke="#2d1b69" stroke-width="2"/><line x1="18" y1="6" x2="18" y2="34" stroke="#2d1b69" stroke-width="2"/></svg>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1.5px solid #ECEDF0;background:color-mix(in srgb,var(--accent) 8%,white);border-radius:10px 10px 0 0">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 40 40" fill="none"><rect x="4" y="6" width="32" height="28" rx="1" stroke="var(--accent)" stroke-width="2.5"/><line x1="4" y1="14" x2="36" y2="14" stroke="var(--accent)" stroke-width="2"/><line x1="4" y1="22" x2="36" y2="22" stroke="var(--accent)" stroke-width="2"/><line x1="18" y1="6" x2="18" y2="34" stroke="var(--accent)" stroke-width="2"/></svg>
           ${edt ? `<span contenteditable="true" onblur="event.stopPropagation();fvTabelaEditNome(this,'${b.id}')" style="outline:none;cursor:text;border-bottom:1px dashed #9b72ef" title="Clique para editar o título">${_gesc(b.nome||'Tabela')}</span>` : _gesc(b.nome||'Tabela')}
         </div>
         ${edt ? `<button class="fv-block-del" onclick="event.stopPropagation();removerBloco('${b.id}')">&#x2715;</button>` : ''}
@@ -2845,7 +3170,7 @@
           <tbody>${dataRows}</tbody>
         </table>
       </div>
-      ${edt ? `<button onclick="event.stopPropagation();fvTabelaAddRow('${b.id}')" style="width:100%;padding:4px;border:none;background:none;color:#2d1b69;font-size:11px;cursor:pointer;border-top:1px solid #f0f2f5;border-radius:0 0 10px 10px">+ Linha</button>` : ''}
+      ${edt ? `<button onclick="event.stopPropagation();fvTabelaAddRow('${b.id}')" style="width:100%;padding:4px;border:none;background:none;color:var(--accent);font-size:11px;cursor:pointer;border-top:1px solid #F1F2F5;border-radius:0 0 10px 10px">+ Linha</button>` : ''}
     `;
 
     el.addEventListener('mousedown', e => {
@@ -2881,10 +3206,10 @@
       <div style="background:#f0ebff;padding:16px;display:flex;align-items:center;justify-content:center;position:relative;border-radius:8px 8px 0 0">
         ${iconSvg}
         ${fvModo==='edicao' ? `
-          <button class="fv-block-del" onclick="event.stopPropagation();abrirEditarFvBloco('${b.id}')" title="Editar" style="position:absolute;top:6px;left:6px;background:#ede9fe;border-color:#c4b5fd;color:#2d1b69;font-size:11px">✏</button>
+          <button class="fv-block-del" onclick="event.stopPropagation();abrirEditarFvBloco('${b.id}')" title="Editar" style="position:absolute;top:6px;left:6px;background:color-mix(in srgb,var(--accent) 14%,white);border-color:#c4b5fd;color:var(--accent);font-size:11px">✏</button>
           <button class="fv-block-del" onclick="event.stopPropagation();removerBloco('${b.id}')" style="position:absolute;top:6px;right:6px">&#x2715;</button>` : ''}
       </div>
-      <div style="padding:9px 13px;border-top:1.5px solid #e2e8f0">
+      <div style="padding:9px 13px;border-top:1.5px solid #ECEDF0">
         <div class="fv-block-nome">${b.nome}</div>
         ${b.obs ? `<div class="fv-block-obs">${b.obs}</div>` : ''}
       </div>`;
@@ -2916,7 +3241,7 @@
       el.title = 'Duplo clique para editar — arraste para mover';
       const del = document.createElement('button');
       del.innerHTML = '&#x2715;';
-      del.style.cssText = 'position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:#fff5f5;border:1px solid #feb2b2;color:#c53030;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;line-height:1;z-index:20';
+      del.style.cssText = 'position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:color-mix(in srgb,#FF2E4D 8%,white);border:1px solid color-mix(in srgb,#FF2E4D 35%,white);color:#FF2E4D;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;line-height:1;z-index:20';
       del.onclick = e => { e.stopPropagation(); removerTexto(t.id); };
       el.appendChild(del);
       el.addEventListener('mouseenter', () => del.style.display = 'flex');
@@ -3068,17 +3393,17 @@
         fo.style.display = 'none';
         fo.style.pointerEvents = 'all';
         const est = c.estilo || 'push';
-        fo.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;gap:2px;align-items:center;justify-content:center;background:white;border:1px solid #e2e8f0;border-radius:20px;padding:3px 5px;box-shadow:0 1px 6px rgba(0,0,0,.14)">
-          <button onclick="fvSetEstilo('${c.id}','push')" title="Push" style="width:22px;height:22px;border-radius:50%;border:${est==='push'?'2px solid #2d1b69':'1px solid #e2e8f0'};background:${est==='push'?'#ede9fe':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
-            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="4" x2="10" y2="4" stroke="#2d1b69" stroke-width="1.5"/><polygon points="8,1 14,4 8,7" fill="#2d1b69"/></svg>
+        fo.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" style="display:flex;gap:2px;align-items:center;justify-content:center;background:white;border:1px solid #ECEDF0;border-radius:20px;padding:3px 5px;box-shadow:0 1px 6px rgba(0,0,0,.14)">
+          <button onclick="fvSetEstilo('${c.id}','push')" title="Push" style="width:22px;height:22px;border-radius:50%;border:${est==='push'?'2px solid var(--accent)':'1px solid #ECEDF0'};background:${est==='push'?'color-mix(in srgb,var(--accent) 14%,white)':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="4" x2="10" y2="4" stroke="var(--accent)" stroke-width="1.5"/><polygon points="8,1 14,4 8,7" fill="var(--accent)"/></svg>
           </button>
-          <button onclick="fvSetEstilo('${c.id}','pull')" title="Pull" style="width:22px;height:22px;border-radius:50%;border:${est==='pull'?'2px solid #2d1b69':'1px solid #e2e8f0'};background:${est==='pull'?'#ede9fe':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
-            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="4" x2="10" y2="4" stroke="#2d1b69" stroke-width="1.5" stroke-dasharray="3,2"/><polygon points="8,1 14,4 8,7" fill="#2d1b69"/></svg>
+          <button onclick="fvSetEstilo('${c.id}','pull')" title="Pull" style="width:22px;height:22px;border-radius:50%;border:${est==='pull'?'2px solid var(--accent)':'1px solid #ECEDF0'};background:${est==='pull'?'color-mix(in srgb,var(--accent) 14%,white)':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="4" x2="10" y2="4" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,2"/><polygon points="8,1 14,4 8,7" fill="var(--accent)"/></svg>
           </button>
-          <button onclick="fvSetEstilo('${c.id}','sinal')" title="Sinal" style="width:22px;height:22px;border-radius:50%;border:${est==='sinal'?'2px solid #2d1b69':'1px solid #e2e8f0'};background:${est==='sinal'?'#ede9fe':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
-            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><polyline points="0,4 3,1 6,7 9,1 11,4" stroke="#2d1b69" stroke-width="1.5" fill="none"/><polygon points="9,1 14,4 9,7" fill="#2d1b69"/></svg>
+          <button onclick="fvSetEstilo('${c.id}','sinal')" title="Sinal" style="width:22px;height:22px;border-radius:50%;border:${est==='sinal'?'2px solid var(--accent)':'1px solid #ECEDF0'};background:${est==='sinal'?'color-mix(in srgb,var(--accent) 14%,white)':'white'};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="8" xmlns="http://www.w3.org/2000/svg"><polyline points="0,4 3,1 6,7 9,1 11,4" stroke="var(--accent)" stroke-width="1.5" fill="none"/><polygon points="9,1 14,4 9,7" fill="var(--accent)"/></svg>
           </button>
-          <button onclick="removerConexao('${c.id}')" title="Remover" style="width:22px;height:22px;border-radius:50%;border:1px solid #fed7d7;background:#fff5f5;color:#c53030;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0">&#x2715;</button>
+          <button onclick="removerConexao('${c.id}')" title="Remover" style="width:22px;height:22px;border-radius:50%;border:1px solid #fed7d7;background:color-mix(in srgb,#FF2E4D 8%,white);color:#FF2E4D;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0">&#x2715;</button>
         </div>`;
         svg.appendChild(fo);
 
@@ -3200,173 +3525,173 @@
   function _fvShapeIcon(tipo) {
     const icons = {
       'supplier': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="18" width="32" height="18" rx="1" stroke="#2d1b69" stroke-width="2"/>
-        <rect x="8" y="10" width="8" height="8" stroke="#2d1b69" stroke-width="2"/>
-        <rect x="24" y="10" width="8" height="8" stroke="#2d1b69" stroke-width="2"/>
-        <rect x="8" y="6" width="4" height="4" fill="#2d1b69"/>
-        <rect x="24" y="6" width="4" height="4" fill="#2d1b69"/>
-        <rect x="16" y="24" width="8" height="12" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="10" y1="24" x2="10" y2="36" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="30" y1="24" x2="30" y2="36" stroke="#2d1b69" stroke-width="1.5"/>
+        <rect x="4" y="18" width="32" height="18" rx="1" stroke="var(--accent)" stroke-width="2"/>
+        <rect x="8" y="10" width="8" height="8" stroke="var(--accent)" stroke-width="2"/>
+        <rect x="24" y="10" width="8" height="8" stroke="var(--accent)" stroke-width="2"/>
+        <rect x="8" y="6" width="4" height="4" fill="var(--accent)"/>
+        <rect x="24" y="6" width="4" height="4" fill="var(--accent)"/>
+        <rect x="16" y="24" width="8" height="12" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="10" y1="24" x2="10" y2="36" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="30" y1="24" x2="30" y2="36" stroke="var(--accent)" stroke-width="1.5"/>
       </svg>`,
       'processo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="10" width="32" height="20" rx="2" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="12" y1="10" x2="12" y2="30" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="28" y1="10" x2="28" y2="30" stroke="#2d1b69" stroke-width="1.5"/>
+        <rect x="4" y="10" width="32" height="20" rx="2" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="12" y1="10" x2="12" y2="30" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="28" y1="10" x2="28" y2="30" stroke="var(--accent)" stroke-width="1.5"/>
       </svg>`,
       'tabela': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="6" width="32" height="28" rx="1" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="4" y1="14" x2="36" y2="14" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="4" y1="22" x2="36" y2="22" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="18" y1="6" x2="18" y2="34" stroke="#2d1b69" stroke-width="1.5"/>
+        <rect x="4" y="6" width="32" height="28" rx="1" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="4" y1="14" x2="36" y2="14" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="4" y1="22" x2="36" y2="22" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="18" y1="6" x2="18" y2="34" stroke="var(--accent)" stroke-width="1.5"/>
       </svg>`,
       'manual-info': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="7" y="7" width="26" height="31" rx="2" stroke="#2d1b69" stroke-width="2"/>
-        <rect x="14" y="3" width="12" height="7" rx="2" stroke="#2d1b69" stroke-width="1.8"/>
-        <line x1="12" y1="17" x2="28" y2="17" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="12" y1="23" x2="28" y2="23" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="12" y1="29" x2="22" y2="29" stroke="#2d1b69" stroke-width="1.5"/>
-        <path d="M25 28 L30 33 L28 36 L23 31 Z" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="29" y1="28" x2="32" y2="25" stroke="#2d1b69" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="7" y="7" width="26" height="31" rx="2" stroke="var(--accent)" stroke-width="2"/>
+        <rect x="14" y="3" width="12" height="7" rx="2" stroke="var(--accent)" stroke-width="1.8"/>
+        <line x1="12" y1="17" x2="28" y2="17" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="12" y1="23" x2="28" y2="23" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="12" y1="29" x2="22" y2="29" stroke="var(--accent)" stroke-width="1.5"/>
+        <path d="M25 28 L30 33 L28 36 L23 31 Z" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="29" y1="28" x2="32" y2="25" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
       </svg>`,
       'electronic-info': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="5" width="32" height="22" rx="2" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="20" y1="27" x2="20" y2="34" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="13" y1="34" x2="27" y2="34" stroke="#2d1b69" stroke-width="2"/>
-        <path d="M10 20 C12 13 28 13 30 20" stroke="#2d1b69" stroke-width="1.8" fill="none"/>
-        <path d="M14 22 C16 17 24 17 26 22" stroke="#2d1b69" stroke-width="1.8" fill="none"/>
-        <circle cx="20" cy="24" r="2" fill="#2d1b69"/>
+        <rect x="4" y="5" width="32" height="22" rx="2" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="20" y1="27" x2="20" y2="34" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="13" y1="34" x2="27" y2="34" stroke="var(--accent)" stroke-width="2"/>
+        <path d="M10 20 C12 13 28 13 30 20" stroke="var(--accent)" stroke-width="1.8" fill="none"/>
+        <path d="M14 22 C16 17 24 17 26 22" stroke="var(--accent)" stroke-width="1.8" fill="none"/>
+        <circle cx="20" cy="24" r="2" fill="var(--accent)"/>
       </svg>`,
       'inventory': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <polygon points="20,3 39,36 1,36" stroke="#2d1b69" stroke-width="2.5"/>
-        <rect x="15" y="24" width="5" height="5" fill="#2d1b69" opacity=".5" rx="1"/>
-        <rect x="21" y="24" width="5" height="5" fill="#2d1b69" opacity=".5" rx="1"/>
-        <rect x="18" y="18" width="5" height="5" fill="#2d1b69" opacity=".5" rx="1"/>
+        <polygon points="20,3 39,36 1,36" stroke="var(--accent)" stroke-width="2.5"/>
+        <rect x="15" y="24" width="5" height="5" fill="var(--accent)" opacity=".5" rx="1"/>
+        <rect x="21" y="24" width="5" height="5" fill="var(--accent)" opacity=".5" rx="1"/>
+        <rect x="18" y="18" width="5" height="5" fill="var(--accent)" opacity=".5" rx="1"/>
       </svg>`,
       'fifo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="2" y="13" width="36" height="14" rx="2" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="12" y1="13" x2="12" y2="27" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="22" y1="13" x2="22" y2="27" stroke="#2d1b69" stroke-width="1.5"/>
-        <text x="6" y="24" font-size="9" fill="#2d1b69">1</text>
-        <text x="16" y="24" font-size="9" fill="#2d1b69">2</text>
-        <text x="26" y="24" font-size="9" fill="#2d1b69">3</text>
-        <polygon points="34,17 38,20 34,23" fill="#2d1b69"/>
+        <rect x="2" y="13" width="36" height="14" rx="2" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="12" y1="13" x2="12" y2="27" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="22" y1="13" x2="22" y2="27" stroke="var(--accent)" stroke-width="1.5"/>
+        <text x="6" y="24" font-size="9" fill="var(--accent)">1</text>
+        <text x="16" y="24" font-size="9" fill="var(--accent)">2</text>
+        <text x="26" y="24" font-size="9" fill="var(--accent)">3</text>
+        <polygon points="34,17 38,20 34,23" fill="var(--accent)"/>
       </svg>`,
       'supermarket': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="3" y="4" width="34" height="30" rx="1" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="3" y1="15" x2="37" y2="15" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="3" y1="25" x2="37" y2="25" stroke="#2d1b69" stroke-width="1.5"/>
-        <rect x="7"  y="6"  width="5" height="7" rx="1" fill="#2d1b69" opacity=".45"/>
-        <rect x="15" y="6"  width="5" height="7" rx="1" fill="#2d1b69" opacity=".45"/>
-        <rect x="23" y="6"  width="5" height="7" rx="1" fill="#2d1b69" opacity=".45"/>
-        <rect x="31" y="6"  width="4" height="7" rx="1" fill="#2d1b69" opacity=".45"/>
-        <rect x="7"  y="17" width="7" height="6" rx="1" fill="#2d1b69" opacity=".3"/>
-        <rect x="18" y="17" width="7" height="6" rx="1" fill="#2d1b69" opacity=".3"/>
-        <rect x="29" y="17" width="5" height="6" rx="1" fill="#2d1b69" opacity=".3"/>
-        <text x="20" y="34" text-anchor="middle" font-size="9" font-weight="800" fill="#2d1b69">SM</text>
+        <rect x="3" y="4" width="34" height="30" rx="1" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="3" y1="15" x2="37" y2="15" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="3" y1="25" x2="37" y2="25" stroke="var(--accent)" stroke-width="1.5"/>
+        <rect x="7"  y="6"  width="5" height="7" rx="1" fill="var(--accent)" opacity=".45"/>
+        <rect x="15" y="6"  width="5" height="7" rx="1" fill="var(--accent)" opacity=".45"/>
+        <rect x="23" y="6"  width="5" height="7" rx="1" fill="var(--accent)" opacity=".45"/>
+        <rect x="31" y="6"  width="4" height="7" rx="1" fill="var(--accent)" opacity=".45"/>
+        <rect x="7"  y="17" width="7" height="6" rx="1" fill="var(--accent)" opacity=".3"/>
+        <rect x="18" y="17" width="7" height="6" rx="1" fill="var(--accent)" opacity=".3"/>
+        <rect x="29" y="17" width="5" height="6" rx="1" fill="var(--accent)" opacity=".3"/>
+        <text x="20" y="34" text-anchor="middle" font-size="9" font-weight="800" fill="var(--accent)">SM</text>
       </svg>`,
       'kaizen': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
         <path d="M20,3 L23,14 L34,9 L27,18 L38,20 L27,22 L34,31 L23,26 L20,37 L17,26 L6,31 L13,22 L2,20 L13,18 L6,9 L17,14 Z"
-          stroke="#2d1b69" stroke-width="1.8" fill="none"/>
+          stroke="var(--accent)" stroke-width="1.8" fill="none"/>
       </svg>`,
       'papel': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="12" r="8" stroke="#2d1b69" stroke-width="2"/>
-        <path d="M6 36 C6 28 34 28 34 36" stroke="#2d1b69" stroke-width="2" fill="none"/>
+        <circle cx="20" cy="12" r="8" stroke="var(--accent)" stroke-width="2"/>
+        <path d="M6 36 C6 28 34 28 34 36" stroke="var(--accent)" stroke-width="2" fill="none"/>
       </svg>`,
       'handoff': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M4 14 L24 14" stroke="#2d1b69" stroke-width="2"/>
-        <polygon points="22,10 30,14 22,18" fill="#2d1b69"/>
-        <path d="M36 26 L16 26" stroke="#2d1b69" stroke-width="2"/>
-        <polygon points="18,22 10,26 18,30" fill="#2d1b69"/>
+        <path d="M4 14 L24 14" stroke="var(--accent)" stroke-width="2"/>
+        <polygon points="22,10 30,14 22,18" fill="var(--accent)"/>
+        <path d="M36 26 L16 26" stroke="var(--accent)" stroke-width="2"/>
+        <polygon points="18,22 10,26 18,30" fill="var(--accent)"/>
       </svg>`,
       'aprovacao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="16" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="20" y1="10" x2="20" y2="20" stroke="#2d1b69" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="20" y1="20" x2="28" y2="24" stroke="#2d1b69" stroke-width="2" stroke-linecap="round"/>
-        <line x1="14" y1="4" x2="14" y2="8" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="26" y1="4" x2="26" y2="8" stroke="#2d1b69" stroke-width="2"/>
+        <circle cx="20" cy="20" r="16" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="20" y1="10" x2="20" y2="20" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="20" y1="20" x2="28" y2="24" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+        <line x1="14" y1="4" x2="14" y2="8" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="26" y1="4" x2="26" y2="8" stroke="var(--accent)" stroke-width="2"/>
       </svg>`,
       'decisao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <polygon points="20,4 38,20 20,36 2,20" stroke="#2d1b69" stroke-width="2"/>
+        <polygon points="20,4 38,20 20,36 2,20" stroke="var(--accent)" stroke-width="2"/>
       </svg>`,
       'sistema-ti': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="6" width="32" height="22" rx="2" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="14" y1="34" x2="26" y2="34" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="20" y1="28" x2="20" y2="34" stroke="#2d1b69" stroke-width="2"/>
+        <rect x="4" y="6" width="32" height="22" rx="2" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="14" y1="34" x2="26" y2="34" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="20" y1="28" x2="20" y2="34" stroke="var(--accent)" stroke-width="2"/>
       </svg>`,
       'integracao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="10" cy="20" r="8" stroke="#2d1b69" stroke-width="2"/>
-        <circle cx="30" cy="20" r="8" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="18" y1="20" x2="22" y2="20" stroke="#2d1b69" stroke-width="2"/>
-        <polygon points="20,17 24,20 20,23" fill="#2d1b69"/>
+        <circle cx="10" cy="20" r="8" stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="30" cy="20" r="8" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="18" y1="20" x2="22" y2="20" stroke="var(--accent)" stroke-width="2"/>
+        <polygon points="20,17 24,20 20,23" fill="var(--accent)"/>
       </svg>`,
       'documento': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M8 4 L28 4 L36 12 L36 36 L8 36 Z" stroke="#2d1b69" stroke-width="2"/>
-        <path d="M28 4 L28 12 L36 12" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="14" y1="20" x2="30" y2="20" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="14" y1="26" x2="26" y2="26" stroke="#2d1b69" stroke-width="1.5"/>
+        <path d="M8 4 L28 4 L36 12 L36 36 L8 36 Z" stroke="var(--accent)" stroke-width="2"/>
+        <path d="M28 4 L28 12 L36 12" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="14" y1="20" x2="30" y2="20" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="14" y1="26" x2="26" y2="26" stroke="var(--accent)" stroke-width="1.5"/>
       </svg>`,
       'trigger': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M22 4 L14 20 L20 20 L18 36 L30 16 L23 16 Z" stroke="#2d1b69" stroke-width="2" fill="none"/>
+        <path d="M22 4 L14 20 L20 20 L18 36 L30 16 L23 16 Z" stroke="var(--accent)" stroke-width="2" fill="none"/>
       </svg>`,
       'rpa': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="10" y="16" width="20" height="18" rx="2" stroke="#2d1b69" stroke-width="2"/>
-        <circle cx="20" cy="9" r="5" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="20" y1="14" x2="20" y2="16" stroke="#2d1b69" stroke-width="2"/>
-        <circle cx="16" cy="24" r="2" fill="#2d1b69"/>
-        <circle cx="24" cy="24" r="2" fill="#2d1b69"/>
-        <line x1="14" y1="30" x2="26" y2="30" stroke="#2d1b69" stroke-width="1.5"/>
+        <rect x="10" y="16" width="20" height="18" rx="2" stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="20" cy="9" r="5" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="20" y1="14" x2="20" y2="16" stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="16" cy="24" r="2" fill="var(--accent)"/>
+        <circle cx="24" cy="24" r="2" fill="var(--accent)"/>
+        <line x1="14" y1="30" x2="26" y2="30" stroke="var(--accent)" stroke-width="1.5"/>
       </svg>`,
       'agente-ia': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <ellipse cx="20" cy="18" rx="12" ry="12" stroke="#2d1b69" stroke-width="2"/>
-        <path d="M14 18 C14 14 26 14 26 18" stroke="#2d1b69" stroke-width="1.5"/>
-        <path d="M12 22 C10 18 10 14 14 12" stroke="#2d1b69" stroke-width="1.5"/>
-        <path d="M28 22 C30 18 30 14 26 12" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="20" y1="30" x2="20" y2="34" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="14" y1="34" x2="26" y2="34" stroke="#2d1b69" stroke-width="2"/>
+        <ellipse cx="20" cy="18" rx="12" ry="12" stroke="var(--accent)" stroke-width="2"/>
+        <path d="M14 18 C14 14 26 14 26 18" stroke="var(--accent)" stroke-width="1.5"/>
+        <path d="M12 22 C10 18 10 14 14 12" stroke="var(--accent)" stroke-width="1.5"/>
+        <path d="M28 22 C30 18 30 14 26 12" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="20" y1="30" x2="20" y2="34" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="14" y1="34" x2="26" y2="34" stroke="var(--accent)" stroke-width="2"/>
       </svg>`,
       'hibrido': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="13" cy="12" r="6" stroke="#2d1b69" stroke-width="1.8"/>
-        <path d="M4 32 C4 26 22 26 22 32" stroke="#2d1b69" stroke-width="1.8" fill="none"/>
-        <circle cx="30" cy="26" r="7" stroke="#2d1b69" stroke-width="1.8"/>
-        <circle cx="30" cy="26" r="3" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="30" y1="16" x2="30" y2="19" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="30" y1="33" x2="30" y2="36" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="20" y1="26" x2="23" y2="26" stroke="#2d1b69" stroke-width="1.5"/>
-        <line x1="37" y1="26" x2="40" y2="26" stroke="#2d1b69" stroke-width="1.5"/>
+        <circle cx="13" cy="12" r="6" stroke="var(--accent)" stroke-width="1.8"/>
+        <path d="M4 32 C4 26 22 26 22 32" stroke="var(--accent)" stroke-width="1.8" fill="none"/>
+        <circle cx="30" cy="26" r="7" stroke="var(--accent)" stroke-width="1.8"/>
+        <circle cx="30" cy="26" r="3" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="30" y1="16" x2="30" y2="19" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="30" y1="33" x2="30" y2="36" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="20" y1="26" x2="23" y2="26" stroke="var(--accent)" stroke-width="1.5"/>
+        <line x1="37" y1="26" x2="40" y2="26" stroke="var(--accent)" stroke-width="1.5"/>
       </svg>`,
       'retrabalho': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M32 20 A12 12 0 1 0 20 32" stroke="#2d1b69" stroke-width="2.5" fill="none"/>
-        <polygon points="18,28 26,32 22,40" fill="#2d1b69"/>
+        <path d="M32 20 A12 12 0 1 0 20 32" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
+        <polygon points="18,28 26,32 22,40" fill="var(--accent)"/>
       </svg>`,
       'falha': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="16" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="12" y1="12" x2="28" y2="28" stroke="#2d1b69" stroke-width="2.5"/>
-        <line x1="28" y1="12" x2="12" y2="28" stroke="#2d1b69" stroke-width="2.5"/>
+        <circle cx="20" cy="20" r="16" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="12" y1="12" x2="28" y2="28" stroke="var(--accent)" stroke-width="2.5"/>
+        <line x1="28" y1="12" x2="12" y2="28" stroke="var(--accent)" stroke-width="2.5"/>
       </svg>`,
       'sla': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="16" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="20" y1="10" x2="20" y2="20" stroke="#2d1b69" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="20" y1="20" x2="28" y2="26" stroke="#2d1b69" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="20" cy="20" r="16" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="20" y1="10" x2="20" y2="20" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="20" y1="20" x2="28" y2="26" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
       </svg>`,
       'paralelo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <line x1="8" y1="4" x2="8" y2="36" stroke="#2d1b69" stroke-width="3"/>
-        <line x1="20" y1="4" x2="20" y2="36" stroke="#2d1b69" stroke-width="3"/>
-        <line x1="32" y1="4" x2="32" y2="36" stroke="#2d1b69" stroke-width="3"/>
-        <line x1="4" y1="12" x2="36" y2="12" stroke="#2d1b69" stroke-width="1.5" stroke-dasharray="3,3"/>
-        <line x1="4" y1="28" x2="36" y2="28" stroke="#2d1b69" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="8" y1="4" x2="8" y2="36" stroke="var(--accent)" stroke-width="3"/>
+        <line x1="20" y1="4" x2="20" y2="36" stroke="var(--accent)" stroke-width="3"/>
+        <line x1="32" y1="4" x2="32" y2="36" stroke="var(--accent)" stroke-width="3"/>
+        <line x1="4" y1="12" x2="36" y2="12" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="4" y1="28" x2="36" y2="28" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3"/>
       </svg>`,
       'arquivo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M4 12 L4 34 L36 34 L36 16 L18 16 L14 12 Z" stroke="#2d1b69" stroke-width="2"/>
-        <line x1="4" y1="20" x2="36" y2="20" stroke="#2d1b69" stroke-width="1.5"/>
+        <path d="M4 12 L4 34 L36 34 L36 16 L18 16 L14 12 Z" stroke="var(--accent)" stroke-width="2"/>
+        <line x1="4" y1="20" x2="36" y2="20" stroke="var(--accent)" stroke-width="1.5"/>
       </svg>`,
       'texto': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <line x1="8" y1="10" x2="32" y2="10" stroke="#2d1b69" stroke-width="2.5"/>
-        <line x1="20" y1="10" x2="20" y2="34" stroke="#2d1b69" stroke-width="2.5"/>
-        <line x1="12" y1="34" x2="28" y2="34" stroke="#2d1b69" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="8" y1="10" x2="32" y2="10" stroke="var(--accent)" stroke-width="2.5"/>
+        <line x1="20" y1="10" x2="20" y2="34" stroke="var(--accent)" stroke-width="2.5"/>
+        <line x1="12" y1="34" x2="28" y2="34" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3"/>
       </svg>`,
     };
-    return icons[tipo] || `<svg width="36" height="36" viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="28" height="28" rx="3" stroke="#2d1b69" stroke-width="2"/></svg>`;
+    return icons[tipo] || `<svg width="36" height="36" viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="28" height="28" rx="3" stroke="var(--accent)" stroke-width="2"/></svg>`;
   }
 
   let fvElSelecionado = null;
@@ -3410,16 +3735,16 @@
     FV_CATEGORIAS.forEach(cat => {
       const items = FV_ELEMENTOS.filter(e => e.cat === cat.id);
       if (!items.length) return;
-      html += `<div style="font-size:10px;font-weight:700;color:#a0aec0;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">${cat.label}</div>`;
+      html += `<div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">${cat.label}</div>`;
       items.forEach(el => {
         const sel = el.tipo === cur;
         const ico = _fvShapeIcon(el.tipo);
         html += `<div onclick="selecionarFvEl(this,'${el.tipo}')" data-tipo="${el.tipo}"
-          style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:2px solid ${sel?'#2d1b69':'#e2e8f0'};cursor:pointer;transition:all .15s;background:${sel?'#f5f0ff':'white'};margin-bottom:3px">
+          style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:2px solid ${sel?'var(--accent)':'#ECEDF0'};cursor:pointer;transition:all .15s;background:${sel?'color-mix(in srgb,var(--accent) 8%,white)':'white'};margin-bottom:3px">
           <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ico}</div>
           <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:700;color:#1e2a4a">${el.nome}</div>
-            <div style="font-size:10px;color:#718096;line-height:1.3;margin-top:1px">${el.desc}</div>
+            <div style="font-size:12px;font-weight:700;color:#0B0B0F">${el.nome}</div>
+            <div style="font-size:10px;color:#6B7080;line-height:1.3;margin-top:1px">${el.desc}</div>
           </div>
         </div>`;
       });
@@ -3432,8 +3757,8 @@
     fvElSelecionado = FV_ELEMENTOS.find(e => e.tipo === tipo);
     document.querySelectorAll('#fvElementoGrid [data-tipo]').forEach(d => {
       const sel = d.dataset.tipo === tipo;
-      d.style.borderColor = sel ? '#2d1b69' : '#e2e8f0';
-      d.style.background  = sel ? '#f5f0ff' : 'white';
+      d.style.borderColor = sel ? 'var(--accent)' : '#ECEDF0';
+      d.style.background  = sel ? 'color-mix(in srgb,var(--accent) 8%,white)' : 'white';
     });
     _atualizarCamposPickerTipo(tipo);
   }

@@ -5,153 +5,253 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HOC - Gestão de Licenças</title>
   <link rel="stylesheet" href="style-global.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    .lic-hero { background: linear-gradient(135deg, #2d1b69 0%, #1e2a4a 100%); padding: 20px 28px; margin: -24px -28px 24px; color: white; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-    .lic-hero-info h1 { font-size: 20px; font-weight: 700; margin-bottom: 3px; }
-    .lic-hero-info p { font-size: 12px; color: rgba(255,255,255,0.7); }
-    .lic-hero-acoes { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-lic { padding: 8px 16px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
-    .btn-lic-outline { background: rgba(255,255,255,0.1); color: white; border: 1.5px solid rgba(255,255,255,0.3); }
-    .btn-lic-outline:hover { background: rgba(255,255,255,0.2); }
-    .btn-lic-outline.ativo { background: rgba(255,255,255,0.25); border-color: white; }
-    .btn-lic-add { background: white; color: #2d1b69; }
-    .btn-lic-add:hover { background: #f0f2f5; }
+    :root { --accent: #2F5CFF; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F6F7F9; overflow-x: hidden; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(11,11,15,0.35) transparent; }
+    ::-webkit-scrollbar { height: 10px; width: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(11,11,15,0.18); border-radius: 10px; border: 3px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(11,11,15,0.4); background-clip: padding-box; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+    /* ===== SIDEBAR ===== */
+    .sidebar { width: max-content; min-width: 200px; max-width: 320px; background: #0B0B0F; padding: 0; transition: width 0.18s ease; overflow: hidden; }
+    .sidebar.recolhida { width: 68px; min-width: 68px; }
+    .sidebar-logo { height: 64px; padding: 0 20px; border-bottom: none; margin-bottom: 0; }
+    .sidebar-logo rect { fill: var(--accent); }
+    .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+    .sidebar.recolhida .logo-text, .sidebar.recolhida .side-label, .sidebar.recolhida .sidebar-sistema-label, .sidebar.recolhida .btn-sidebar-label { display: none; }
+    .sidebar-menu { display: flex; flex-direction: column; padding: 12px; gap: 3px; }
+    .menu-item { width: 100%; gap: 14px; padding: 9px 12px; border-radius: 9px; color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 600; margin-bottom: 0; white-space: nowrap; }
+    .menu-item:hover { background: rgba(255,255,255,0.08); color: white; }
+    .menu-item.active { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; }
+    .menu-item svg { width: 18px; height: 18px; opacity: 1; stroke-width: 2; }
+    .sidebar-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); position: relative; }
+    .sidebar-sistema { position: relative; margin-bottom: 4px; }
+    .sidebar-sistema > summary { border-radius: 9px; padding: 9px 12px; gap: 10px; background: transparent; color: rgba(255,255,255,0.65); font-size: 12.5px; font-weight: 600; }
+    .sidebar-sistema > summary:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sidebar-sistema > summary svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-sistema-items { position: absolute; bottom: calc(100% + 8px); left: 0; width: 190px; background: #17171A; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 8px; z-index: 50; border: none; }
+    .sidebar-sistema-items .menu-item { font-size: 12px; padding: 8px 12px; width: 100%; border: none; background: transparent; font-family: inherit; text-align: left; cursor: pointer; }
+    .btn-sair { border-radius: 6px; padding: 8px 12px; font-size: 12px; background: transparent; }
+    .btn-sair:hover { background: rgba(255,255,255,0.08); }
+    .btn-recolher { width: 100%; height: 38px; border-radius: 9px; background: transparent; border: none; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+    .btn-recolher:hover { background: rgba(255,255,255,0.08); color: white; }
+    .color-picker-back { display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 4px; }
+    .color-picker-back:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-family: inherit; }
+    .color-swatch:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+    .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
+    .color-hex-input { width: 100%; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
+
+    /* ===== MAIN (impede que tabelas largas empurrem a página inteira e a sidebar) ===== */
+    .main { min-width: 0; }
+
+    /* ===== TOPBAR ===== */
+    .header { padding: 0 24px; height: 56px; box-shadow: none; border-bottom: 1px solid #ECEDF0; justify-content: flex-end; }
+    .header-right { gap: 14px; }
+    .header-user { gap: 10px; cursor: pointer; padding: 6px 10px 6px 6px; border-radius: 10px; }
+    .header-user:hover { background: #F1F2F5; }
+    .user-info { text-align: left; line-height: 1.25; }
+    .user-nome { font-size: 12.5px; font-weight: 700; color: #0B0B0F; }
+    .user-perfil { font-size: 11px; color: #9CA0AC; }
+    .user-avatar { width: 32px; height: 32px; background: #0B0B0F; font-size: 12px; font-weight: 700; }
+    .notif-btn { width: 34px; height: 34px; border-radius: 8px; background: transparent; }
+    .notif-btn:hover { background: #F1F2F5; }
+    .notif-btn svg { color: var(--accent); }
+    .notif-badge.cinza { background: var(--accent); }
+    .notif-btn.amarelo svg { color: #c05621; }
+    .notif-btn.vermelho svg { color: #c53030; }
+
+    /* ===== CONTENT ===== */
+    .content { padding: 24px 40px 32px; max-width: 1440px; width: 100%; margin: 0 auto; }
+
+    /* ===== RESUMO ===== */
     .resumo-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 20px; }
-    .resumo-card { background: white; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .resumo-card-lbl { font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
-    .resumo-card-val { font-size: 26px; font-weight: 700; color: #1e2a4a; }
-    .sub-verde { color: #38a169; }
-    .sub-amarelo { color: #c05621; }
-    .sub-vermelho { color: #c53030; }
+    .resumo-card { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 18px; box-shadow: none; text-align: center; }
+    .resumo-card-lbl { font-size: 12px; font-weight: 600; color: #6B7080; margin-bottom: 10px; }
+    .resumo-card-val { font-size: 26px; font-weight: 800; color: #0B0B0F; letter-spacing: -0.02em; }
+    .resumo-card-sub { font-size: 11.5px; font-weight: 700; margin-top: 6px; }
+    .sub-verde { color: #00B37E; }
+    .sub-amarelo { color: #FFAE00; }
+    .sub-vermelho { color: #FF2E4D; }
 
-    .lic-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; justify-content: flex-end; }
-    .btn-mais-filtros { padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: #4a5568; }
-    .btn-mais-filtros:hover { border-color: #2d1b69; color: #2d1b69; }
+    /* ===== TOOLBAR ===== */
+    .lic-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; justify-content: flex-start; }
+    .lic-search-wrap { position: relative; flex: 1; max-width: 320px; }
+    .lic-search-input { width: 100%; height: 38px; padding: 0 12px; border-radius: 9px; border: 1.5px solid #E5E7EB; font-size: 13px; outline: none; color: #0B0B0F; font-family: inherit; }
+    .lic-search-input:focus { border-color: var(--accent); }
+    .btn-mais-filtros { padding: 0 14px; height: 38px; background: white; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; color: #33363F; display: flex; align-items: center; gap: 6px; }
+    .btn-mais-filtros:hover { border-color: #0B0B0F; color: #33363F; }
+    .toolbar-acoes-dir { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-lic { height: 38px; padding: 0 14px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .btn-lic-outline { background: white; color: #33363F; border: 1.5px solid #E5E7EB; }
+    .btn-lic-outline:hover { border-color: #0B0B0F; }
+    .btn-lic-add { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; padding: 0 16px; }
 
-    .filtros-avancados { background: white; border-radius: 10px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; display: none; }
+    .filtros-avancados { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 18px; box-shadow: none; margin-bottom: 16px; display: none; }
     .filtros-avancados.aberto { display: block; }
-    .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
-    .filtro-group label { display: block; font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
-    .filtro-input { width: 100%; padding: 7px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; outline: none; background: white; font-family: inherit; }
-    .filtro-input:focus { border-color: #2d1b69; }
+    .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end; }
+    .filtro-group label { display: block; font-size: 11px; font-weight: 600; color: #6B7080; margin-bottom: 4px; }
+    .filtro-input, .filtro-group .filtro-input { width: 100%; height: 36px; padding: 0 10px; border: 1.5px solid #E5E7EB; border-radius: 8px; font-size: 12.5px; outline: none; background: white; font-family: inherit; color: #0B0B0F; box-sizing: border-box; }
+    .filtro-input:focus { border-color: var(--accent); }
 
-    .lic-table-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: auto; }
+    /* ===== TABLE ===== */
+    .lic-table-wrap { background: white; border: 1px solid #ECEDF0; border-radius: 14px; box-shadow: none; overflow: auto; }
     .lic-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; }
-    .lic-table th { padding: 10px 12px; text-align: left; background: #f8fafc; border-bottom: 1.5px solid #e2e8f0; font-size: 11px; font-weight: 700; color: #718096; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
-    .lic-table td { padding: 10px 12px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
-    .lic-table tr:hover td { background: #fafbff; }
+    .lic-table th { padding: 13px 16px; text-align: center; background: #0B0B0F; border-bottom: none; font-size: 11.5px; font-weight: 700; color: white; text-transform: none; letter-spacing: normal; white-space: nowrap; }
+    .lic-table td { padding: 14px 16px; border-bottom: 1px solid #F2F3F5; vertical-align: middle; text-align: center; }
+    .lic-table tr:hover td { background: #FAFBFF; }
     .lic-table tr:last-child td { border-bottom: none; }
-    .lic-nome { font-weight: 700; color: #1e2a4a; }
-    .lic-cat { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #f0f2f5; color: #4a5568; white-space: nowrap; }
+    .lic-nome { font-weight: 700; color: #0B0B0F; }
+    .lic-cat { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 6px; background: #F1F2F5; color: #33363F; white-space: nowrap; }
     .validade-aviso { font-size: 11px; font-weight: 600; }
-    .val-ok { color: #718096; }
-    .val-vencendo { color: #c05621; }
-    .val-vencida { color: #c53030; }
+    .val-ok { color: #6B7080; }
+    .val-vencendo { color: #FFAE00; }
+    .val-vencida { color: #FF2E4D; }
 
-    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
-    .status-ativa { background: #f0fff4; color: #276749; }
-    .status-vencendo { background: #fffaf0; color: #c05621; }
-    .status-vencida { background: #fff5f5; color: #c53030; }
-    .status-renovacao { background: #ebf0ff; color: #3b5bdb; }
-    .status-em-breve { background: #f3f0ff; color: #7048e8; }
+    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; white-space: nowrap; color: white; }
+    .status-ativa { background: #00B37E; }
+    .status-vencendo { background: #FFAE00; }
+    .status-vencida { background: #FF2E4D; }
+    .status-renovacao { background: #2F5CFF; }
+    .status-em-breve { background: #7048e8; }
 
-    .pen-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-    .pen-financeira { background: #fffaf0; color: #c05621; }
-    .pen-reputacional { background: #faf5ff; color: #6b46c1; }
-    .pen-juridica { background: #fff5f5; color: #c53030; }
-    .pen-operacional { background: #f0f2f5; color: #4a5568; }
-    .pen-comercial { background: #f0fff4; color: #276749; }
+    .pen-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+    .pen-financeira { background: #FFF6E0; color: #966000; }
+    .pen-reputacional { background: #F3EEFF; color: #6b46c1; }
+    .pen-juridica { background: #FFE9EC; color: #c53030; }
+    .pen-operacional { background: #F1F2F5; color: #33363F; }
+    .pen-comercial { background: #E3FBF2; color: #00875a; }
 
-    .btn-acao { width: 28px; height: 28px; border: none; border-radius: 5px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.2s; }
-    .btn-acao-edit { background: #f5f0ff; color: #2d1b69; }
-    .btn-acao-edit:hover { background: #e9e0ff; }
-    .btn-acao-del { background: #fff5f5; color: #c53030; }
-    .btn-acao-del:hover { background: #fed7d7; }
-    .btn-acao-det { background: #f0f2f5; color: #4a5568; }
-    .btn-acao-det:hover { background: #e2e8f0; }
+    .btn-acao { width: 30px; height: 30px; border: none; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; background: #F1F2F5; }
+    .btn-acao:hover { background: #E5E7EB; }
+    .btn-acao-edit { color: var(--accent); }
+    .btn-acao-del { color: #FF2E4D; }
+    .btn-acao-det { color: #4A4E5A; }
 
-    /* Modal Licença */
-    .modal-lic { max-width: 680px; max-height: 90vh; overflow-y: auto; }
-    .modal-lic-titulo { font-size: 16px; font-weight: 700; color: #1e2a4a; }
-    .form-sec { margin-bottom: 18px; }
-    .form-sec-titulo { font-size: 11px; font-weight: 700; color: #2d1b69; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f0f2f5; }
-    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    /* Drawer Licença */
+    .lic-drawer-overlay { position: fixed; inset: 0; background: rgba(11,11,15,0.45); z-index: 1000; display: none; animation: fadeIn 0.18s ease; }
+    .lic-drawer-overlay.aberto { display: block; }
+    .lic-drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 520px; max-width: 100vw; background: white; z-index: 1001; box-shadow: -8px 0 32px rgba(0,0,0,0.12); display: none; flex-direction: column; animation: slideIn 0.22s ease; }
+    .lic-drawer-overlay.aberto .lic-drawer { display: flex; }
+    .lic-drawer-header { padding: 22px 28px; border-bottom: 1px solid #ECEDF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .lic-drawer-titulo { font-size: 17px; font-weight: 800; color: #0B0B0F; }
+    .lic-drawer-sub { font-size: 12px; color: #9CA0AC; margin-top: 2px; }
+    .lic-drawer-body { flex: 1; overflow-y: auto; padding: 24px 28px; }
+    .lic-drawer-footer { padding: 18px 28px; border-top: 1px solid #ECEDF0; display: flex; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+
+    .form-sec { margin-bottom: 24px; }
+    .form-sec-titulo { font-size: 11.5px; font-weight: 700; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #ECEDF0; }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
     .form-group { margin-bottom: 0; }
-    .form-group label { display: block; font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
-    .form-control { width: 100%; padding: 8px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; color: #1e2a4a; background: white; }
-    .form-control:focus { border-color: #2d1b69; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #4A4E5A; margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 0 14px; height: 42px; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13.5px; outline: none; font-family: inherit; color: #0B0B0F; background: white; }
+    .form-control:focus { border-color: var(--accent); }
     .form-full { grid-column: 1 / -1; }
     .renov-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 14px; }
-    .renov-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 7px; margin-bottom: 6px; border: 1px solid #e2e8f0; }
-    .renov-item-datas { font-size: 12px; font-weight: 700; color: #1e2a4a; }
-    .renov-item-meta { font-size: 11px; color: #718096; margin-top: 2px; }
+    .renov-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: #F6F7F9; border-radius: 9px; margin-bottom: 6px; border: 1px solid #ECEDF0; }
+    .renov-item-datas { font-size: 12px; font-weight: 700; color: #0B0B0F; }
+    .renov-item-meta { font-size: 11px; color: #6B7080; margin-top: 2px; }
 
     /* Upload */
-    .upload-area { border: 2px dashed #e2e8f0; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; background: #f8fafc; }
-    .upload-area:hover { border-color: #2d1b69; background: #f5f0ff; }
+    .upload-area { border: 2px dashed #E5E7EB; border-radius: 12px; padding: 22px; text-align: center; cursor: pointer; transition: all 0.15s; background: white; }
+    .upload-area:hover { border-color: var(--accent); background: #F7F9FF; }
     .upload-area input { display: none; }
     .upload-lista { margin-top: 10px; }
-    .upload-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 6px; }
-    .upload-item-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; flex: 1; }
-    .upload-item-tam { font-size: 11px; color: #a0aec0; }
-    .upload-item-del { background: #fff5f5; border: none; color: #c53030; border-radius: 4px; cursor: pointer; padding: 2px 6px; font-size: 11px; }
+    .upload-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: white; border-radius: 9px; border: 1px solid #ECEDF0; margin-bottom: 6px; }
+    .upload-item-nome { font-size: 12px; font-weight: 600; color: #0B0B0F; flex: 1; }
+    .upload-item-tam { font-size: 11px; color: #9CA0AC; }
+    .upload-item-del { background: #FFE9EC; border: none; color: #FF2E4D; border-radius: 5px; cursor: pointer; padding: 2px 6px; font-size: 11px; }
+
+    /* Modal Detalhes / Alertas (genérico) */
+    .modal-overlay { background: rgba(11,11,15,0.45); }
+    .modal { border-radius: 16px; box-shadow: 0 8px 32px rgba(11,11,15,0.12); border: 1px solid #ECEDF0; padding: 24px 28px; }
+    .modal-titulo { font-size: 17px; font-weight: 800; color: #0B0B0F; }
+    .btn-fechar { width: 34px; height: 34px; box-sizing: border-box; border-radius: 9px; background: #F1F2F5; color: #4A4E5A; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+    .btn-fechar:hover { background: #E5E7EB; }
+    label { font-size: 12px; font-weight: 600; color: #4A4E5A; }
+    input[type="text"], input[type="email"], input[type="date"], input[type="number"], input[type="password"], select, textarea { border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13.5px; color: #0B0B0F; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-cancelar { flex: 1; padding: 10px; background: white; color: #33363F; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-cancelar:hover { background: #F1F2F5; }
+    .btn-confirmar { flex: 2; padding: 10px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); border: none; color: white; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+    .modal-lic { max-width: 680px; max-height: 90vh; overflow-y: auto; }
+    .modal-lic-titulo { font-size: 16px; font-weight: 700; color: #0B0B0F; }
 
     /* Modal Detalhes */
     .modal-det { max-width: 580px; }
     .det-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-    .det-item label { display: block; font-size: 10px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
-    .det-item span { font-size: 13px; color: #1e2a4a; font-weight: 500; }
-    .doc-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #f8fafc; border-radius: 7px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
+    .det-item label { display: block; font-size: 10px; font-weight: 700; color: #9CA0AC; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+    .det-item span { font-size: 13px; color: #0B0B0F; font-weight: 500; }
+    .doc-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #F6F7F9; border-radius: 9px; margin-bottom: 8px; border: 1px solid #ECEDF0; }
     .doc-icon { font-size: 20px; }
-    .doc-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; flex: 1; }
-    .doc-tam { font-size: 11px; color: #a0aec0; }
-    .btn-baixar { padding: 5px 10px; background: #2d1b69; color: white; border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; }
-    .btn-baixar:hover { background: #3d2b89; }
+    .doc-nome { font-size: 13px; font-weight: 600; color: #0B0B0F; flex: 1; }
+    .doc-tam { font-size: 11px; color: #9CA0AC; }
+    .btn-baixar { padding: 5px 10px; background: var(--accent); color: white; border: none; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
 
     /* Modal Alertas */
     .modal-alertas { max-width: 480px; }
-    .alerta-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px; border: 1px solid #e2e8f0; }
-    .alerta-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; }
+    .alerta-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #F6F7F9; border-radius: 10px; margin-bottom: 8px; border: 1px solid #ECEDF0; }
+    .alerta-nome { font-size: 13px; font-weight: 600; color: #0B0B0F; }
     .alerta-dias { display: flex; align-items: center; gap: 6px; }
-    .alerta-dias input { width: 60px; padding: 4px 8px; border: 1.5px solid #e2e8f0; border-radius: 5px; font-size: 12px; text-align: center; outline: none; }
-    .alerta-dias input:focus { border-color: #2d1b69; }
+    .alerta-dias input { width: 60px; padding: 4px 8px; border: 1.5px solid #E5E7EB; border-radius: 6px; font-size: 12px; text-align: center; outline: none; }
+    .alerta-dias input:focus { border-color: var(--accent); }
 
-    /* Vista relatório */
-    .relatorio-view { display: none; }
-    .relatorio-view.ativo { display: block; }
-    .rel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .btn-exportar { padding: 8px 16px; background: #1e2a4a; color: white; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-    .btn-exportar:hover { background: #2d3f6b; }
+    .empty-state { text-align: center; padding: 60px; color: #9CA0AC; }
 
-    .empty-state { text-align: center; padding: 60px; color: #a0aec0; }
+    .hoc-select-wrap { position: relative; display: inline-block; width: 100%; }
+    .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
+    .hoc-select-trigger { appearance: none; -webkit-appearance: none; -moz-appearance: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: white; cursor: pointer; font-family: inherit; }
+    .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
+    .hoc-select-trigger.open svg { transform: rotate(180deg); }
+    .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+    .hoc-select-panel { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; background: white; border: 1px solid #ECEDF0; border-radius: 10px; box-shadow: 0 12px 32px rgba(11,11,15,0.16); padding: 6px; z-index: 60; max-height: 260px; overflow-y: auto; }
+    .hoc-select-panel.open { display: block; }
+    .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
+    .hoc-select-item:hover { background: #F1F2F5; }
+    .hoc-select-item.selected { background: color-mix(in srgb, #00B37E 14%, white); color: #00754F; }
   </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
-    <span class="logo-text">Business Manager</span>
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8"/><text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="800">H</text></svg>
+    <span class="logo-text side-label">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
-    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
-    <a class="menu-item active" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
+    <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
+    <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
+    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item active" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
     <details class="sidebar-sistema" id="sistemaMenu">
-      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
-      <div class="sidebar-sistema-items">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="side-label sidebar-sistema-label">Sistema</span><svg class="sidebar-sistema-chevron side-label" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items" id="sistemaItemsWrap">
+        <button class="menu-item" onclick="mostrarCorSistemaNoMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Cor do Sistema</button>
         <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
         <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
         <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
       </div>
     </details>
+    <button class="btn-recolher" id="btnRecolher" onclick="toggleSidebarRecolhida()" title="Recolher/Expandir">
+      <svg id="iconRecolher" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      <span class="side-label btn-sidebar-label" id="lblRecolher">Recolher</span>
+    </button>
   </div>
 </div>
 
@@ -160,17 +260,22 @@
   <div class="header">
     <div></div>
     <div class="header-right">
-      
-    <div class="notif-wrap" id="notifWrap">
+
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
+
+      <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
           <span class="notif-badge cinza" id="notifBadge" style="display:none"></span>
         </button>
         <div class="notif-dropdown" id="notifDropdown">
           <div class="notif-drop-header">
-            <span class="notif-drop-titulo">🔔 Notificações</span>
+            <span class="notif-drop-titulo" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Notificações</span>
             <div class="notif-drop-acoes">
-              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button>
+              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar</button>
             </div>
           </div>
           <div class="notif-lista" id="notifLista">
@@ -178,34 +283,17 @@
           </div>
         </div>
       </div>
-      
-      <div class="header-user">
-        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
-        <div class="user-avatar" id="userAvatar">?</div>
-      </div>
     </div>
   </div>
 
   <div class="content">
-    <!-- HERO -->
-    <div class="lic-hero">
-      <div class="lic-hero-info">
-        <h1>Gestão de Licenças</h1>
-        <p>Controle de licenças, custos e renovações</p>
-      </div>
-      <div class="lic-hero-acoes">
-        <button class="btn-lic btn-lic-outline" id="btnRelatorio" onclick="exportarCSV()">📊 Exportar CSV</button>
-        <button class="btn-lic btn-lic-outline" onclick="abrirAlertas()">🔔 Alertas</button>
-        <button class="btn-lic btn-lic-add" onclick="abrirModalLicenca()">+ Adicionar Licença</button>
-      </div>
-    </div>
 
     <!-- RESUMO -->
     <div class="resumo-grid">
       <div class="resumo-card"><div class="resumo-card-lbl">Total de Licenças</div><div class="resumo-card-val" id="resTotal">0</div></div>
-      <div class="resumo-card"><div class="resumo-card-lbl">Ativas</div><div class="resumo-card-val" id="resAtivas">0</div></div>
-      <div class="resumo-card"><div class="resumo-card-lbl">Vencendo em 30 dias</div><div class="resumo-card-val" id="resVencendo">0</div></div>
-      <div class="resumo-card"><div class="resumo-card-lbl">Vencidas</div><div class="resumo-card-val" id="resVencidas">0</div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Ativas</div><div class="resumo-card-val" id="resAtivas">0</div><div class="resumo-card-sub sub-verde" id="resAtivasSub"></div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Vencendo em 30 dias</div><div class="resumo-card-val" id="resVencendo">0</div><div class="resumo-card-sub sub-amarelo" id="resVencendoSub"></div></div>
+      <div class="resumo-card"><div class="resumo-card-lbl">Vencidas</div><div class="resumo-card-val" id="resVencidas">0</div><div class="resumo-card-sub sub-vermelho" id="resVencidasSub"></div></div>
       <div class="resumo-card"><div class="resumo-card-lbl">Custo Mensal</div><div class="resumo-card-val" id="resMensal">—</div></div>
       <div class="resumo-card"><div class="resumo-card-lbl">Custo Anual</div><div class="resumo-card-val" id="resAnual">—</div></div>
     </div>
@@ -213,21 +301,39 @@
     <!-- VISTA TABELA -->
     <div id="vistaTabela">
       <div class="lic-toolbar">
-        <button class="btn-mais-filtros" onclick="toggleFiltros()">⚙️ Filtros</button>
+        <div class="lic-search-wrap">
+          <input type="text" class="lic-search-input" id="fNome" placeholder="Buscar licença..." oninput="filtrarLicencas()">
+        </div>
+        <button class="btn-mais-filtros" onclick="toggleFiltros()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          Filtros
+        </button>
+        <div class="toolbar-acoes-dir">
+          <button class="btn-lic btn-lic-outline" id="btnRelatorio" onclick="exportarCSV()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar CSV
+          </button>
+          <button class="btn-lic btn-lic-outline" onclick="abrirAlertas()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            Alertas
+          </button>
+          <button class="btn-lic btn-lic-add" onclick="abrirModalLicenca()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nova Licença
+          </button>
+        </div>
       </div>
 
       <div class="filtros-avancados" id="filtrosAvancados">
         <div class="filtros-grid">
-          <div class="filtro-group"><label>Nome da Licença</label><input type="text" class="filtro-input" id="fNome" placeholder="Ex: Office 365" oninput="filtrarLicencas()"></div>
           <div class="filtro-group"><label>Categoria</label><select class="filtro-input" id="fCategoria" onchange="filtrarLicencas()"><option value="">Todas</option><option>Software</option><option>SaaS</option><option>Cloud</option><option>Hardware</option><option>Serviço</option><option>Outros</option></select></div>
           <div class="filtro-group"><label>Status</label><select class="filtro-input" id="fStatus" onchange="filtrarLicencas()"><option value="">Todos</option><option>Ativa</option><option>Ativa em Breve</option><option>Vencendo</option><option>Vencida</option><option>Em Renovação</option></select></div>
           <div class="filtro-group"><label>Penalidade</label><select class="filtro-input" id="fPenalidade" onchange="filtrarLicencas()"><option value="">Todas</option><option>Financeira</option><option>Reputacional</option><option>Jurídica</option><option>Operacional</option><option>Comercial</option></select></div>
-          <div class="filtro-group"><label>Fornecedor</label><input type="text" class="filtro-input" id="fFornecedor" placeholder="Ex: Microsoft" oninput="filtrarLicencas()"></div>
-          <div class="filtro-group"><label>Unidade / Filial</label><input type="text" class="filtro-input" id="fUnidade" placeholder="Ex: Matriz" oninput="filtrarLicencas()"></div>
-          <div class="filtro-group"><label>Responsável</label><input type="text" class="filtro-input" id="fResponsavel" placeholder="Ex: João" oninput="filtrarLicencas()"></div>
+          <div class="filtro-group"><input type="text" class="filtro-input" id="fFornecedor" placeholder="Fornecedor..." oninput="filtrarLicencas()"></div>
+          <div class="filtro-group"><input type="text" class="filtro-input" id="fUnidade" placeholder="Unidade / Filial..." oninput="filtrarLicencas()"></div>
+          <div class="filtro-group"><input type="text" class="filtro-input" id="fResponsavel" placeholder="Responsável..." oninput="filtrarLicencas()"></div>
         </div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f2f5">
-          <div style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">Range de Custo</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
             <div class="filtro-group">
               <label>Custo Unitário — De</label>
@@ -256,14 +362,14 @@
         <table class="lic-table">
           <thead>
             <tr>
-              <th>Nome</th><th>Categoria</th><th>Fornecedor</th><th>Qtd.</th>
-              <th>Validade</th><th>Custo Unit.</th><th>Custo Total</th><th>Freq.</th>
+              <th>Nome</th><th>Categoria</th><th>Fornecedor</th><th>Quantidade</th>
+              <th>Validade</th><th>Custo Unit.</th><th>Custo Total</th><th>Frequência</th>
               <th>Penalidade</th><th>Status</th>
-              <th>Detalhes</th><th>Ações</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody id="licencasBody">
-            <tr><td colspan="12" class="empty-state">Carregando licenças...</td></tr>
+            <tr><td colspan="11" class="empty-state">Carregando licenças...</td></tr>
           </tbody>
         </table>
       </div>
@@ -272,18 +378,22 @@
   </div>
 </div>
 
-<!-- Modal Adicionar/Editar Licença -->
-<div class="modal-overlay" id="modalLicenca">
-  <div class="modal modal-lic">
-    <div class="modal-header">
-      <span class="modal-titulo modal-lic-titulo" id="modalLicTitulo">Nova Licença</span>
-      <button class="btn-fechar" onclick="fecharModal('modalLicenca')">×</button>
+<!-- Drawer Adicionar/Editar Licença -->
+<div class="modal-overlay lic-drawer-overlay" id="modalLicenca">
+  <div class="lic-drawer">
+    <div class="lic-drawer-header">
+      <div>
+        <div class="lic-drawer-titulo modal-lic-titulo" id="modalLicTitulo">Nova Licença</div>
+        <div class="lic-drawer-sub">Preencha os dados do contrato</div>
+      </div>
+      <button class="btn-fechar" onclick="fecharModal('modalLicenca')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
+    <div class="lic-drawer-body">
     <div class="form-sec">
       <div class="form-sec-titulo">Informações Principais</div>
       <div class="form-grid-2">
-        <div class="form-group"><label>Nome da Licença *</label><input type="text" class="form-control" id="licNome" placeholder="Ex: Microsoft 365"></div>
+        <div class="form-group form-full"><label>Nome da Licença *</label><input type="text" class="form-control" id="licNome" placeholder="Ex: Microsoft 365"></div>
         <div class="form-group"><label>Categoria *</label>
           <select class="form-control" id="licCategoria">
             <option value="">Selecione...</option><option>Software</option><option>SaaS</option><option>Cloud</option><option>Hardware</option><option>Serviço</option><option>Outros</option>
@@ -292,7 +402,7 @@
         <div class="form-group"><label>Fornecedor</label><input type="text" class="form-control" id="licFornecedor" placeholder="Ex: Microsoft"></div>
         <div class="form-group"><label>Unidade / Filial</label><input type="text" class="form-control" id="licUnidade" placeholder="Ex: Matriz São Paulo"></div>
         <div class="form-group"><label>Responsável</label><input type="text" class="form-control" id="licResponsavel" placeholder="Nome do responsável"></div>
-        <div class="form-group"><label>Email do Responsável</label><input type="email" class="form-control" id="licResponsavelEmail" placeholder="email@empresa.com"></div>
+        <div class="form-group form-full"><label>Email do Responsável</label><input type="email" class="form-control" id="licResponsavelEmail" placeholder="email@empresa.com"></div>
       </div>
     </div>
 
@@ -308,7 +418,7 @@
             <option value="Mensal">Mensal</option><option value="Trimestral">Trimestral</option><option value="Semestral">Semestral</option><option value="Anual">Anual</option>
           </select>
         </div>
-        <div class="form-group"><label>Custo Total (R$)</label><input type="text" class="form-control" id="licCustoTotal" readonly placeholder="—" style="background:#f8fafc;color:#718096;cursor:default"></div>
+        <div class="form-group"><label>Custo Total (R$)</label><input type="text" class="form-control" id="licCustoTotal" readonly placeholder="—" style="background:#F6F7F9;color:#6B7080;cursor:default"></div>
         <div class="form-group"><label>Status</label>
           <select class="form-control" id="licStatus">
             <option>Ativa</option><option>Vencendo</option><option>Vencida</option><option>Em Renovação</option>
@@ -324,37 +434,39 @@
 
     <div class="form-sec">
       <div class="form-sec-titulo">Configuração de Alerta</div>
-      <div class="form-grid-2">
-        <div class="form-group"><label>Alertar com quantos dias de antecedência?</label><input type="number" class="form-control" id="licAlertaDias" value="30" min="1" max="365"></div>
-        <div class="form-group"><label>Observações</label><input type="text" class="form-control" id="licObservacoes" placeholder="Observações adicionais..."></div>
-      </div>
+      <div class="form-group"><label>Dias de antecedência</label><input type="number" class="form-control" id="licAlertaDias" value="30" min="1" max="365"></div>
     </div>
 
     <div class="form-sec">
-      <div class="form-sec-titulo">Documentos Anexos (máx. 3 arquivos, 5MB cada)</div>
+      <div class="form-sec-titulo">Observações</div>
+      <div class="form-group"><input type="text" class="form-control" id="licObservacoes" placeholder="Observações adicionais..."></div>
+    </div>
+
+    <div class="form-sec">
+      <div class="form-sec-titulo">Documentos Anexos (Máx. 3, 5MB cada)</div>
       <div class="upload-area" onclick="document.getElementById('fileInput').click()">
         <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="processarArquivos(event)">
-        <div style="font-size:24px;margin-bottom:6px">📎</div>
-        <div style="font-size:13px;font-weight:600;color:#4a5568">Clique para selecionar arquivos</div>
-        <div style="font-size:11px;color:#a0aec0;margin-top:3px">PDF, DOC, DOCX, PNG, JPG — máx 5MB por arquivo</div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="2" style="margin-bottom:8px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div style="font-size:13px;font-weight:600;color:#33363F">Clique para selecionar arquivos</div>
       </div>
       <div class="upload-lista" id="uploadLista"></div>
     </div>
 
-    <div class="form-sec" id="secRenovacoes" style="display:none">
+    <div class="form-sec" id="secRenovacoes" style="display:none;margin-bottom:0">
       <div class="form-sec-titulo">Registrar Renovação</div>
       <div class="renov-form">
         <div class="form-group"><label>Data de Início</label><input type="date" class="form-control" id="renInicio"></div>
         <div class="form-group"><label>Data de Fim</label><input type="date" class="form-control" id="renFim"></div>
-        <button class="btn-confirmar" onclick="registrarRenovacao()" style="padding:8px 16px;font-size:12px;white-space:nowrap">+ Registrar</button>
+        <button class="btn-confirmar" onclick="registrarRenovacao()" style="padding:0 16px;height:42px;font-size:12px;white-space:nowrap;flex:none">+ Registrar</button>
       </div>
       <div id="historicoRenovacoes"></div>
     </div>
 
     <input type="hidden" id="licEditId">
-    <div class="modal-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalLicenca')">Cancelar</button>
-      <button class="btn-confirmar" onclick="salvarLicenca()">💾 Salvar Licença</button>
+    </div>
+    <div class="lic-drawer-footer">
+      <button class="btn-cancelar" onclick="fecharModal('modalLicenca')" style="flex:none">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarLicenca()" style="flex:none">Salvar Licença</button>
     </div>
   </div>
 </div>
@@ -364,12 +476,12 @@
   <div class="modal modal-det">
     <div class="modal-header">
       <span class="modal-titulo">Detalhes da Licença</span>
-      <button class="btn-fechar" onclick="fecharModal('modalDetalhes')">×</button>
+      <button class="btn-fechar" onclick="fecharModal('modalDetalhes')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div style="font-size:11px;color:#a0aec0;margin-bottom:14px">Informações completas e documentos anexos</div>
+    <div style="font-size:11px;color:#9CA0AC;margin-bottom:14px">Informações completas e documentos anexos</div>
     <div id="detConteudo"></div>
     <div style="margin-top:16px">
-      <div style="font-size:11px;font-weight:700;color:#2d1b69;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Documentos Anexos</div>
+      <div style="font-size:11.5px;font-weight:700;color:#0B0B0F;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px">Documentos Anexos</div>
       <div id="detDocumentos"></div>
     </div>
     <div class="modal-footer" style="margin-top:16px">
@@ -382,14 +494,14 @@
 <div class="modal-overlay" id="modalAlertas">
   <div class="modal modal-alertas">
     <div class="modal-header">
-      <span class="modal-titulo">🔔 Configurar Alertas</span>
-      <button class="btn-fechar" onclick="fecharModal('modalAlertas')">×</button>
+      <span class="modal-titulo">Configurar Alertas</span>
+      <button class="btn-fechar" onclick="fecharModal('modalAlertas')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <p style="font-size:12px;color:#718096;margin-bottom:14px">Configure com quantos dias de antecedência deseja ser alertado para cada licença. O alerta será enviado por email ao responsável e ao administrador no próximo login.</p>
+    <p style="font-size:12px;color:#6B7080;margin-bottom:14px">Configure com quantos dias de antecedência deseja ser alertado para cada licença. O alerta será enviado por email ao responsável e ao administrador no próximo login.</p>
     <div id="alertasLista"></div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalAlertas')">Fechar</button>
-      <button class="btn-confirmar" onclick="salvarAlertas()">💾 Salvar Alertas</button>
+      <button class="btn-confirmar" onclick="salvarAlertas()">Salvar Alertas</button>
     </div>
   </div>
 </div>
@@ -411,6 +523,63 @@
   document.getElementById('userNome').textContent = usuario.nome || '-';
   document.getElementById('userPerfil').textContent = usuario.perfil || '-';
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+
+  // ===== TEMA: sidebar recolhida + cor de destaque =====
+  const CORES_SISTEMA = [
+    { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
+    { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
+    { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
+    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
+  ];
+  function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
+  function setAccentColor(hex) {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+    if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
+  }
+  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+
+  const sidebarEl = document.getElementById('sidebarEl');
+  function aplicarSidebarRecolhida(recolhida) {
+    sidebarEl.classList.toggle('recolhida', recolhida);
+    document.getElementById('iconRecolher').innerHTML = recolhida
+      ? '<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>'
+      : '<polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>';
+    const lbl = document.getElementById('lblRecolher');
+    if (lbl) lbl.textContent = recolhida ? 'Expandir' : 'Recolher';
+  }
+  function toggleSidebarRecolhida() {
+    const recolhida = !sidebarEl.classList.contains('recolhida');
+    localStorage.setItem('sidebarRecolhida', recolhida ? '1' : '0');
+    aplicarSidebarRecolhida(recolhida);
+  }
+  aplicarSidebarRecolhida(localStorage.getItem('sidebarRecolhida') === '1');
+
+  const SISTEMA_ITEMS_HTML = document.getElementById('sistemaItemsWrap').innerHTML;
+  function mostrarCorSistemaNoMenu() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = 'cor';
+    const atual = (localStorage.getItem('accentColor') || '#2F5CFF').toLowerCase();
+    wrap.innerHTML = `
+      <button class="color-picker-back" onclick="voltarMenuSistema()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Cor do Sistema
+      </button>
+      ${CORES_SISTEMA.map(c => `
+        <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
+          <span class="color-swatch-rect" style="background:${c.hex}"></span>
+          <span class="color-swatch-label">${c.nome}</span>
+        </button>`).join('')}
+      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+  }
+  function voltarMenuSistema() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = '';
+    wrap.innerHTML = SISTEMA_ITEMS_HTML;
+  }
+  document.getElementById('sistemaMenu').addEventListener('toggle', (e) => { if (!e.target.open) voltarMenuSistema(); });
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
   let licencas = [], documentosTemp = [];
@@ -436,15 +605,12 @@
     const dias = diasParaVencer(validade);
     if (dias === null) return '<span class="val-ok">—</span>';
     if (status === 'Vencida' || dias < 0) return `<span class="val-vencida">${fmtData(validade)}</span>`;
-    if (dias <= 30) return `<span class="val-vencendo">${fmtData(validade)}<br>Em ${dias} dias ⚠️</span>`;
+    if (dias <= 30) return `<span class="val-vencendo">${fmtData(validade)}<br>Em ${dias} dias</span>`;
     return `<span class="val-ok">${fmtData(validade)}</span>`;
   }
 
   const STATUS_CLASS = { 'Ativa':'status-ativa', 'Vencendo':'status-vencendo', 'Vencida':'status-vencida', 'Em Renovação':'status-renovacao', 'Ativa em Breve':'status-em-breve' };
-  const STATUS_ICON = { 'Ativa':'🟢', 'Vencendo':'🟡', 'Vencida':'🔴', 'Em Renovação':'🔄', 'Ativa em Breve':'🕐' };
   const PEN_CLASS = { 'Financeira':'pen-financeira', 'Reputacional':'pen-reputacional', 'Jurídica':'pen-juridica', 'Operacional':'pen-operacional', 'Comercial':'pen-comercial' };
-  const PEN_ICON = { 'Financeira':'💰', 'Reputacional':'👁️', 'Jurídica':'⚖️', 'Operacional':'⚙️', 'Comercial':'🤝' };
-  const CAT_ICON = { 'Software':'💻', 'SaaS':'📦', 'Cloud':'☁️', 'Hardware':'🖥️', 'Serviço':'🔧', 'Outros':'📄' };
 
   // ===== RENOVAÇÃO STATUS HELPERS =====
   function getUltimaRenovacao(l) {
@@ -513,13 +679,19 @@
     document.getElementById('resVencidas').textContent = vencidas;
     document.getElementById('resMensal').textContent = fmtMoeda(custoMensal);
     document.getElementById('resAnual').textContent = fmtMoeda(custoMensal * 12);
+    document.getElementById('resAtivasSub').textContent = total ? `${Math.round(ativas / total * 100)}% do total` : '';
+    document.getElementById('resVencendoSub').textContent = vencendo > 0 ? 'Requer Atenção' : '';
+    document.getElementById('resVencidasSub').textContent = vencidas > 0 ? 'Ação Imediata' : '';
   }
 
   // ===== TABELA =====
   function renderLicencas(lista) {
     const tbody = document.getElementById('licencasBody');
     const dados = lista !== undefined ? lista : getLicencasFiltradas();
-    if (dados.length === 0) { tbody.innerHTML = `<tr><td colspan="14" class="empty-state"><div style="font-size:32px;margin-bottom:10px">📄</div><div>Nenhuma licença encontrada.</div><div style="font-size:12px;margin-top:6px">Clique em "+ Adicionar Licença" para começar!</div></td></tr>`; return; }
+    if (dados.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="empty-state"><div>Nenhuma licença encontrada.</div><div style="font-size:12px;margin-top:6px">Clique em "Nova Licença" para começar!</div></td></tr>`; return; }
+    const ICON_VER = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    const ICON_EDITAR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>';
+    const ICON_EXCLUIR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg>';
     tbody.innerHTML = dados.map(l => {
       const custoUnit = parseFloat(l.custoUnitario) || (parseFloat(l.custo) || 0);
       const custoTotal = getCustoTotal(l);
@@ -527,19 +699,21 @@
       return `
       <tr>
         <td><div class="lic-nome">${l.nome}</div></td>
-        <td><span class="lic-cat">${CAT_ICON[l.categoria]||'📄'} ${l.categoria||'—'}</span></td>
+        <td><span class="lic-cat">${l.categoria||'—'}</span></td>
         <td>${l.fornecedor||'—'}</td>
         <td>${l.quantidade||'—'}</td>
         <td>${fmtValidade(getValidadeEfetiva(l), getStatusEfetivo(l))}</td>
         <td>${custoUnit ? fmtMoeda(custoUnit) : '—'}</td>
         <td>${custoTotal ? fmtMoeda(custoTotal) : '—'}</td>
         <td>${freq||'—'}</td>
-        <td>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${PEN_ICON[l.penalidade]||''} ${l.penalidade}</span>` : '—'}</td>
-        <td><span class="status-badge ${STATUS_CLASS[getStatusEfetivo(l)]||'status-ativa'}">${STATUS_ICON[getStatusEfetivo(l)]||''} ${getStatusEfetivo(l)}</span></td>
-        <td><button class="btn-acao btn-acao-det" onclick="verDetalhes('${l._id}')" title="Ver detalhes">👁️</button></td>
-        <td style="display:flex;gap:4px">
-          ${podeEditarLicencas ? `<button class="btn-acao btn-acao-edit" onclick="editarLicenca('${l._id}')" title="Editar">✏️</button>
-          <button class="btn-acao btn-acao-del" onclick="deletarLicenca('${l._id}')" title="Excluir">🗑️</button>` : ''}
+        <td>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${l.penalidade}</span>` : '—'}</td>
+        <td><span class="status-badge ${STATUS_CLASS[getStatusEfetivo(l)]||'status-ativa'}">${getStatusEfetivo(l)}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;justify-content:center">
+          <button class="btn-acao btn-acao-det" onclick="verDetalhes('${l._id}')" title="Ver detalhes">${ICON_VER}</button>
+          ${podeEditarLicencas ? `<button class="btn-acao btn-acao-edit" onclick="editarLicenca('${l._id}')" title="Editar">${ICON_EDITAR}</button>
+          <button class="btn-acao btn-acao-del" onclick="deletarLicenca('${l._id}')" title="Excluir">${ICON_EXCLUIR}</button>` : ''}
+          </div>
         </td>
       </tr>`;
     }).join('');
@@ -630,8 +804,8 @@
           <div class="renov-item-meta">Registrado em ${r.registradoEm ? new Date(r.registradoEm).toLocaleDateString('pt-BR') : '—'}${r.registradoPor ? ' · ' + r.registradoPor : ''}</div>
         </div>
         <div style="display:flex;gap:4px;flex-shrink:0">
-          <button class="btn-acao btn-acao-edit" onclick="iniciarEditRenovacao('${licId}','${r._id}','${r.inicio}','${r.fim}')" title="Editar">✏️</button>
-          <button class="btn-acao btn-acao-del" onclick="removerRenovacao('${licId}','${r._id}')" title="Remover">🗑️</button>
+          <button class="btn-acao btn-acao-edit" onclick="iniciarEditRenovacao('${licId}','${r._id}','${r.inicio}','${r.fim}')" title="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg></button>
+          <button class="btn-acao btn-acao-del" onclick="removerRenovacao('${licId}','${r._id}')" title="Remover"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg></button>
         </div>
       </div>`).join('');
   }
@@ -801,30 +975,29 @@
       document.getElementById('detConteudo').innerHTML = `
         <div class="det-grid">
           <div class="det-item"><label>Nome</label><span>${l.nome}</span></div>
-          <div class="det-item"><label>Categoria</label><span>${CAT_ICON[l.categoria]||'📄'} ${l.categoria||'—'}</span></div>
+          <div class="det-item"><label>Categoria</label><span>${l.categoria||'—'}</span></div>
           <div class="det-item"><label>Fornecedor</label><span>${l.fornecedor||'—'}</span></div>
           <div class="det-item"><label>Unidade / Filial</label><span>${l.unidade||'—'}</span></div>
           <div class="det-item"><label>Quantidade</label><span>${l.quantidade||'—'}</span></div>
           <div class="det-item"><label>Data de Emissão</label><span>${fmtData(l.dataEmissao)}</span></div>
           <div class="det-item"><label>Data de Validade</label><span>${fmtData(getValidadeEfetiva(l))}</span></div>
-          <div class="det-item"><label>Status</label><span class="status-badge ${STATUS_CLASS[getStatusEfetivo(l)]||''}">${STATUS_ICON[getStatusEfetivo(l)]||''} ${getStatusEfetivo(l)||'—'}</span></div>
+          <div class="det-item"><label>Status</label><span class="status-badge ${STATUS_CLASS[getStatusEfetivo(l)]||''}">${getStatusEfetivo(l)||'—'}</span></div>
           <div class="det-item"><label>Custo Unitário</label><span>${detCustoUnit ? fmtMoeda(detCustoUnit) : '—'}</span></div>
           <div class="det-item"><label>Custo Total</label><span>${detCustoTotal ? fmtMoeda(detCustoTotal) : '—'}</span></div>
           <div class="det-item"><label>Frequência</label><span>${detFreq}</span></div>
-          <div class="det-item"><label>Penalidade</label><span>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${PEN_ICON[l.penalidade]||''} ${l.penalidade}</span>` : '—'}</span></div>
+          <div class="det-item"><label>Penalidade</label><span>${l.penalidade ? `<span class="pen-badge ${PEN_CLASS[l.penalidade]||''}">${l.penalidade}</span>` : '—'}</span></div>
           <div class="det-item"><label>Responsável</label><span>${l.responsavel||'—'}</span></div>
           <div class="det-item"><label>Email Responsável</label><span>${l.responsavelEmail||'—'}</span></div>
           ${l.observacoes ? `<div class="det-item" style="grid-column:1/-1"><label>Observações</label><span>${l.observacoes}</span></div>` : ''}
         </div>`;
       const docs = l.documentos || [];
       document.getElementById('detDocumentos').innerHTML = docs.length === 0
-        ? '<div style="color:#a0aec0;font-size:12px">Nenhum documento anexado.</div>'
+        ? '<div style="color:#9CA0AC;font-size:12px">Nenhum documento anexado.</div>'
         : docs.map((doc, i) => `
           <div class="doc-item">
-            <span class="doc-icon">${doc.tipo && doc.tipo.includes('pdf') ? '📄' : doc.tipo && doc.tipo.includes('image') ? '🖼️' : '📎'}</span>
             <span class="doc-nome">${doc.nome}</span>
             <span class="doc-tam">${doc.tamanho ? (doc.tamanho/1024).toFixed(0)+' KB' : ''}</span>
-            <button class="btn-baixar" onclick="baixarDoc(${i}, '${l._id}')">⬇️ Baixar</button>
+            <button class="btn-baixar" onclick="baixarDoc(${i}, '${l._id}')">Baixar</button>
           </div>`).join('');
       document.getElementById('modalDetalhes').classList.add('aberto');
       document.getElementById('modalDetalhes').dataset.licId = l._id;
@@ -960,16 +1133,28 @@
       badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
     }
   }
+  const NOTIF_ICON = {
+    sucesso: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>', color:'#00754F'},
+    erro: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+    aviso: {svg:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', color:'#8A6200'},
+    info: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>', color:'var(--accent)'},
+    licenca_vencendo: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>', color:'#8A6200'},
+    licenca_vencida: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+  };
+  function _notifIconHtml(tipo) {
+    const cfg = NOTIF_ICON[tipo] || NOTIF_ICON.info;
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2">${cfg.svg}</svg>`;
+  }
   function renderNotificacoes(notifs) {
     const lista = document.getElementById('notifLista');
     if (!lista) return;
     if (!notifs || notifs.length === 0) {
-      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
+      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
       return;
     }
     lista.innerHTML = notifs.map(n => `
       <div class="notif-item ${!n.lida?'nao-lida':''} tipo-${n.tipo}" onclick="abrirNotif('${n._id}','${n.link||''}')">
-        <div class="notif-icone ${n.tipo}">${n.icone||'🔔'}</div>
+        <div class="notif-icone ${n.tipo}">${_notifIconHtml(n.tipo)}</div>
         <div class="notif-corpo">
           <div class="notif-titulo-item">${n.titulo}</div>
           <div class="notif-msg">${n.mensagem}</div>
@@ -1076,6 +1261,76 @@ function copiarPixBloqueio(codigo) {
 }
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
+
+  // ── Custom select: substitui a lista suspensa nativa do SO por um painel estilizado ──
+  function hocEnhanceSelect(sel) {
+    if (!sel || sel._hocEnhanced) return;
+    sel._hocEnhanced = true;
+    const originalStyle = sel.getAttribute('style') || '';
+    const originalClass = sel.className || '';
+
+    const wrap = document.createElement('span');
+    wrap.className = 'hoc-select-wrap';
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    sel.classList.add('hoc-select-native');
+    sel.tabIndex = -1;
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = ('hoc-select-trigger ' + originalClass).trim();
+    trigger.setAttribute('style', originalStyle);
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'hoc-select-trigger-label';
+    trigger.appendChild(labelSpan);
+    trigger.insertAdjacentHTML('beforeend', '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>');
+
+    const panel = document.createElement('div');
+    panel.className = 'hoc-select-panel';
+
+    wrap.appendChild(trigger);
+    wrap.appendChild(panel);
+
+    function syncLabel() {
+      const opt = sel.options[sel.selectedIndex];
+      labelSpan.textContent = opt ? opt.textContent : '';
+    }
+    function renderPanel() {
+      panel.innerHTML = '';
+      [...sel.options].forEach((opt, i) => {
+        const item = document.createElement('div');
+        item.className = 'hoc-select-item' + (i === sel.selectedIndex ? ' selected' : '');
+        item.textContent = opt.textContent;
+        item.onclick = () => {
+          sel.selectedIndex = i;
+          syncLabel();
+          panel.classList.remove('open');
+          trigger.classList.remove('open');
+          sel.dispatchEvent(new Event('change', {bubbles:true}));
+        };
+        panel.appendChild(item);
+      });
+    }
+    trigger.onclick = (e) => {
+      e.stopPropagation();
+      const willOpen = !panel.classList.contains('open');
+      document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+      if (willOpen) { renderPanel(); panel.classList.add('open'); trigger.classList.add('open'); }
+    };
+    syncLabel();
+
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    Object.defineProperty(sel, 'value', {
+      get() { return desc.get.call(sel); },
+      set(v) { desc.set.call(sel, v); syncLabel(); },
+      configurable: true
+    });
+    new MutationObserver(syncLabel).observe(sel, {childList:true, subtree:true});
+  }
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+  });
+  ['fCategoria','fStatus','fPenalidade'].forEach(id => hocEnhanceSelect(document.getElementById(id)));
 </script>
   <script src="/global.js"></script>
 <script src="perfil-modal.js"></script>

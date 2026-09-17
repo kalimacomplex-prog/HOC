@@ -5,220 +5,334 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HOC - Gestão de Resultados</title>
   <link rel="stylesheet" href="style-global.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
   <style>
-    .cards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
-    .meta-card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .meta-card-icon { font-size: 20px; margin-bottom: 6px; }
-    .meta-card-valor { font-size: 24px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
-    .meta-card-label { font-size: 12px; color: #718096; }
-    .tendencias-layout { display: grid; grid-template-columns: 1fr 300px; gap: 16px; margin-bottom: 20px; }
-    .grafico-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .grafico-titulo { font-size: 14px; font-weight: 700; color: #1e2a4a; margin-bottom: 16px; }
-    .rec-card { background: white; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 3px solid #e53e3e; margin-bottom: 10px; }
-    .rec-card.media { border-left-color: #d69e2e; }
-    .rec-card.baixa { border-left-color: #38a169; }
-    .rec-prioridade { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; display: inline-block; margin-bottom: 5px; }
-    .rec-prioridade.alta { background: #fff5f5; color: #e53e3e; }
-    .rec-prioridade.media { background: #fffaf0; color: #c05621; }
-    .rec-prioridade.baixa { background: #f0fff4; color: #276749; }
-    .rec-nome { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
-    .rec-desc { font-size: 11px; color: #718096; }
-    .rankings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-    .ranking-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .ranking-titulo { font-size: 14px; font-weight: 700; color: #1e2a4a; margin-bottom: 14px; }
-    .ranking-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .ranking-pos { font-size: 12px; font-weight: 700; color: #a0aec0; width: 20px; }
-    .ranking-info { flex: 1; }
-    .ranking-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; }
-    .ranking-dep { font-size: 11px; color: #718096; }
-    .ranking-barra-bg { height: 5px; background: #f0f2f5; border-radius: 3px; margin-top: 4px; }
-    .ranking-barra { height: 5px; border-radius: 3px; }
-    .ranking-pct { font-size: 12px; font-weight: 700; width: 36px; text-align: right; }
-    .badge-acao { font-size: 10px; font-weight: 700; padding: 2px 5px; background: #fff5f5; color: #e53e3e; border-radius: 3px; }
-    .destaques-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-    .destaque-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .destaque-titulo { font-size: 14px; font-weight: 700; color: #1e2a4a; margin-bottom: 14px; }
-    .dep-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .dep-nome { font-size: 12px; font-weight: 600; color: #1e2a4a; width: 90px; }
-    .dep-barra-bg { flex: 1; height: 6px; background: #f0f2f5; border-radius: 3px; }
-    .dep-barra { height: 6px; border-radius: 3px; }
-    .dep-pct { font-size: 12px; font-weight: 700; color: #1e2a4a; width: 36px; text-align: right; }
-    .cat-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: #f8fafc; border-radius: 8px; margin-bottom: 8px; }
-    .cat-icon { font-size: 18px; }
-    .cat-nome { font-size: 12px; font-weight: 700; color: #1e2a4a; }
-    .cat-pct { font-size: 11px; color: #718096; }
-    .filtros { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-    .filtro-select { padding: 7px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; color: #1e2a4a; outline: none; background: white; }
-    .filtro-select:focus { border-color: #2d1b69; }
-    .btn-exportar { padding: 7px 14px; background: #1e2a4a; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; margin-left: auto; }
-    .bowler-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-    .bowler-ano { display: flex; align-items: center; gap: 6px; }
-    .ano-btn { width: 26px; height: 26px; border: 1.5px solid #e2e8f0; border-radius: 5px; background: white; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
-    .ano-btn:hover { border-color: #2d1b69; color: #2d1b69; }
-    .ano-display { font-size: 15px; font-weight: 700; color: #1e2a4a; min-width: 50px; text-align: center; }
-    .bowler-acoes { margin-left: auto; display: flex; gap: 8px; }
-    .btn-modo { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #718096; }
-    .btn-modo:hover { border-color: #2d1b69; color: #2d1b69; }
-    .btn-modo.ativo { background: #2d1b69; color: white; border-color: #2d1b69; }
-    .btn-salvar-bowler { padding: 7px 14px; background: #38a169; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: none; }
-    .btn-cancelar-modo { padding: 7px 14px; background: #f0f2f5; color: #718096; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: none; }
-    .modo-aviso { padding: 8px 14px; background: #f5f0ff; border-radius: 6px; font-size: 12px; color: #2d1b69; font-weight: 500; margin-bottom: 14px; display: none; }
-    .modo-aviso.ativo { display: block; }
-    .bowler-wrap { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: auto; }
-    .bowler-table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 11px; }
-    .bowler-table th { padding: 8px 6px; text-align: center; background: #2d1b69; color: white; font-weight: 600; font-size: 10px; white-space: nowrap; border: 1px solid #3d2b89; }
-    .bowler-table th.col-info { text-align: left; min-width: 100px; }
-    .bowler-table th.mes-header { background: #3d2b89; min-width: 54px; }
-    .bowler-table td { padding: 5px 6px; border: 1px solid #e2e8f0; text-align: center; vertical-align: middle; }
-    .bowler-table td.col-info { text-align: left; padding: 6px 10px; font-size: 11px; }
-    .categoria-row td { background: #f5f0ff; font-weight: 700; color: #2d1b69; font-size: 11px; padding: 6px 10px; }
-    .row-label { font-size: 10px; font-weight: 700; white-space: nowrap; padding: 4px 8px !important; min-width: 64px; background: #f5f0ff !important; color: #5a3ea1; }
-    .cell-resultado { font-size: 10px !important; font-weight: 700; }
-    .cell-verde { background: #f0fff4 !important; color: #276749; font-weight: 700; }
-    .cell-amarelo { background: #fffaf0 !important; color: #c05621; font-weight: 700; }
-    .cell-vermelho { background: #fff5f5 !important; color: #c53030; font-weight: 700; }
-    .cell-input { width: 42px; border: 1px solid #2d1b69; border-radius: 3px; padding: 2px; text-align: center; font-size: 11px; background: white; }
-    .cell-edit { background: #faf5ff !important; }
-    .estrutura-input { width: 100%; border: 1px solid #2d1b69; border-radius: 3px; padding: 3px 5px; font-size: 11px; background: white; box-sizing: border-box; }
-    .bowler-legenda { display: flex; gap: 16px; padding: 10px 14px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 11px; }
-    .legenda-item { display: flex; align-items: center; gap: 5px; }
-    .legenda-cor { width: 10px; height: 10px; border-radius: 2px; }
-    .btn-add-indicador { padding: 7px 16px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: 0.02em; }
-    .btn-add-indicador:hover { background: #3d2b89; }
+    :root { --accent: #2F5CFF; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F6F7F9; overflow-x: hidden; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(11,11,15,0.35) transparent; }
+    ::-webkit-scrollbar { height: 10px; width: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(11,11,15,0.18); border-radius: 10px; border: 3px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(11,11,15,0.4); background-clip: padding-box; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar { width: max-content; min-width: 200px; max-width: 320px; background: #0B0B0F; padding: 0; transition: width 0.18s ease; overflow: hidden; }
+    .sidebar.recolhida { width: 68px; min-width: 68px; }
+    .sidebar-logo { height: 64px; padding: 0 20px; border-bottom: none; margin-bottom: 0; }
+    .sidebar-logo rect { fill: var(--accent); }
+    .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+    .sidebar.recolhida .logo-text, .sidebar.recolhida .side-label, .sidebar.recolhida .sidebar-sistema-label, .sidebar.recolhida .btn-sidebar-label { display: none; }
+    .sidebar-menu { display: flex; flex-direction: column; padding: 12px; gap: 3px; }
+    .menu-item { width: 100%; gap: 14px; padding: 9px 12px; border-radius: 9px; color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 600; margin-bottom: 0; white-space: nowrap; }
+    .menu-item:hover { background: rgba(255,255,255,0.08); color: white; }
+    .menu-item.active { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; }
+    .menu-item svg { width: 18px; height: 18px; opacity: 1; stroke-width: 2; }
+    .sidebar-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); position: relative; }
+    .sidebar-sistema { position: relative; margin-bottom: 4px; }
+    .sidebar-sistema > summary { border-radius: 9px; padding: 9px 12px; gap: 10px; background: transparent; color: rgba(255,255,255,0.65); font-size: 12.5px; font-weight: 600; }
+    .sidebar-sistema > summary:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sidebar-sistema > summary svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-sistema-items { position: absolute; bottom: calc(100% + 8px); left: 0; width: 190px; background: #17171A; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 8px; z-index: 50; border: none; }
+    .sidebar-sistema-items .menu-item { font-size: 12px; padding: 8px 12px; width: 100%; border: none; background: transparent; font-family: inherit; text-align: left; cursor: pointer; }
+    .btn-sair { border-radius: 6px; padding: 8px 12px; font-size: 12px; background: transparent; }
+    .btn-sair:hover { background: rgba(255,255,255,0.08); }
+    .btn-recolher { width: 100%; height: 38px; border-radius: 9px; background: transparent; border: none; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+    .btn-recolher:hover { background: rgba(255,255,255,0.08); color: white; }
+    .color-picker-back { display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 4px; }
+    .color-picker-back:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-family: inherit; }
+    .color-swatch:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+    .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
+    .color-hex-input { width: 100%; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
+
+    /* ===== MAIN (impede que tabelas largas empurrem a página inteira e a sidebar) ===== */
+    .main { min-width: 0; }
+
+    /* ===== TOPBAR (com abas centralizadas) ===== */
+    .header { padding: 0 24px; height: 56px; box-shadow: none; border-bottom: 1px solid #ECEDF0; }
+    .header-lado { flex: 1; display: flex; }
+    .header-lado.direita { justify-content: flex-end; }
+    .header-right { gap: 14px; }
+    .header-user { gap: 10px; cursor: pointer; padding: 6px 10px 6px 6px; border-radius: 10px; }
+    .header-user:hover { background: #F1F2F5; }
+    .user-info { text-align: left; line-height: 1.25; }
+    .user-nome { font-size: 12.5px; font-weight: 700; color: #0B0B0F; }
+    .user-perfil { font-size: 11px; color: #9CA0AC; }
+    .user-avatar { width: 32px; height: 32px; background: #0B0B0F; font-size: 12px; font-weight: 700; }
+    .notif-btn { width: 34px; height: 34px; border-radius: 8px; background: transparent; }
+    .notif-btn:hover { background: #F1F2F5; }
+    .notif-btn svg { color: var(--accent); }
+    .notif-badge.cinza { background: var(--accent); }
+    .notif-btn.amarelo svg { color: #c05621; }
+    .notif-btn.vermelho svg { color: #c53030; }
+
+    .tabs-central { display: inline-flex; align-items: center; background: #F1F2F5; border-radius: 10px; padding: 3px; gap: 2px; }
+    .tabs { border-bottom: none; margin-bottom: 0; gap: 4px; }
+    .tab { height: 32px; padding: 0 16px; border-radius: 8px; background: transparent; color: #6B7080; font-size: 12.5px; font-weight: 700; border: none; margin-bottom: 0; }
+    .tab:hover { color: #33363F; }
+    .tab.active { background: white; color: #0B0B0F; box-shadow: 0 1px 3px rgba(11,11,15,0.1); border-color: transparent; }
+
+    /* ===== CONTENT ===== */
+    .content { padding: 24px 40px 32px; max-width: 1520px; width: 100%; margin: 0 auto; }
+
+    /* ===== TENDÊNCIAS ===== */
+    .periodo-filtro-wrap { position: relative; flex-shrink: 0; }
+    .periodo-filtro-btn { height: 38px; padding: 0 16px; border-radius: 9px; border: 1.5px solid #E5E7EB; background: white; color: #33363F; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .periodo-filtro-btn:hover { border-color: #0B0B0F; }
+    .periodo-filtro-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); padding: 6px; min-width: 180px; z-index: 50; }
+    .periodo-filtro-item { padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
+    .periodo-filtro-item:hover { background: #F1F2F5; }
+    .periodo-filtro-item.selecionado { background: color-mix(in srgb, var(--accent) 10%, white); color: var(--accent); }
+    .pct-geral-pill { display: flex; align-items: center; gap: 10px; background: #0B0B0F; border-radius: 12px; padding: 10px 20px; }
+    .pct-geral-valor { font-size: 22px; font-weight: 800; color: white; line-height: 1; }
+    .pct-geral-info { display: flex; flex-direction: column; }
+    .pct-geral-label { font-size: 12px; color: rgba(255,255,255,0.65); font-weight: 600; }
+    .pct-geral-sub { font-size: 10px; color: rgba(255,255,255,0.45); font-weight: 600; margin-top: 1px; }
+
+    .highlights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .meta-card { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 18px; }
+    .meta-card-titulo { font-size: 12.5px; font-weight: 700; color: #0B0B0F; margin-bottom: 12px; text-align: center; }
+    .hl-sublabel-best { font-size: 10.5px; color: #00B37E; font-weight: 700; margin-bottom: 6px; }
+    .hl-sublabel-worst { font-size: 10.5px; color: #FF2E4D; font-weight: 700; margin: 10px 0 6px; }
+    .hl-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #F2F3F5; font-size: 12px; color: #33363F; }
+    .hl-item span:first-child { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .filtro-multi-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .grafico-card { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 22px; }
+    .grafico-card + .grafico-card { margin-top: 16px; }
+    .grafico-titulo { font-size: 13.5px; font-weight: 700; color: #0B0B0F; margin-bottom: 16px; }
+
     .filtro-multi-wrap { position: relative; }
-    .filtro-multi-btn { padding: 7px 12px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; color: #1e2a4a; background: white; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-    .filtro-multi-btn:hover { border-color: #2d1b69; }
-    .filtro-multi-drop { position: absolute; top: calc(100% + 4px); left: 0; background: white; border: 1.5px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); min-width: 200px; max-height: 240px; overflow-y: auto; z-index: 200; }
-    .filtro-multi-item { padding: 6px 12px; font-size: 12px; color: #1e2a4a; }
-    .filtro-multi-item label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .filtro-multi-item:hover { background: #f5f0ff; }
-    .filtro-multi-item.all-item { border-bottom: 1px solid #e2e8f0; font-weight: 600; }
-    .highlights-grid { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 12px; margin-bottom: 20px; }
-    .hl-sublabel-best { font-size: 10px; color: #38a169; font-weight: 700; margin-bottom: 4px; }
-    .hl-sublabel-worst { font-size: 10px; color: #e53e3e; font-weight: 700; margin: 8px 0 4px; }
-    .filtro-uni-secao-hdr { display: flex; align-items: center; gap: 8px; padding: 7px 12px; background: #f8fafc; cursor: pointer; font-size: 12px; font-weight: 600; color: #1e2a4a; border-bottom: 1px solid #f0f2f5; user-select: none; }
-    .filtro-uni-secao-hdr:hover { background: #eee8ff; }
-    .filtro-uni-secao-hdr.ativa { background: #ede9ff; color: #2d1b69; }
-    .filtro-uni-items { max-height: 150px; overflow-y: auto; }
-    .filtro-uni-items.inativo { opacity: 0.35; pointer-events: none; }
+    .filtro-multi-btn { height: 38px; padding: 0 14px; border-radius: 9px; border: 1.5px solid #E5E7EB; font-size: 12.5px; font-weight: 600; color: #33363F; background: white; cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .filtro-multi-btn:hover { border-color: #0B0B0F; }
+    .filtro-multi-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); min-width: 230px; z-index: 200; padding: 6px; }
+    .filtro-drop-limpar { display: block; width: 100%; padding: 9px 12px; margin-bottom: 4px; border-radius: 8px; border: none; border-bottom: 1px solid #F2F3F5; background: transparent; font-size: 12px; font-weight: 700; color: var(--accent); cursor: pointer; text-align: left; font-family: inherit; }
+    .filtro-drop-limpar:hover { background: color-mix(in srgb, var(--accent) 8%, white); }
+    .filtro-drop-tipo-item { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 12px; border-radius: 9px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: #33363F; cursor: pointer; text-align: left; font-family: inherit; }
+    .filtro-drop-tipo-item:hover { background: #F1F2F5; }
+    .filtro-drop-tipo-item svg { color: #9CA0AC; flex-shrink: 0; }
+    .filtro-drop-voltar { display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 10px; border-radius: 8px; border: none; background: transparent; font-size: 12.5px; font-weight: 700; color: #33363F; cursor: pointer; text-align: left; font-family: inherit; margin-bottom: 4px; }
+    .filtro-drop-voltar:hover { background: #F1F2F5; }
+    .filtro-drop-voltar svg { color: #9CA0AC; flex-shrink: 0; }
+    .filtro-drop-lista { max-height: 220px; overflow-y: auto; }
+    .filtro-drop-item { padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
+    .filtro-drop-item:hover { background: #F1F2F5; }
+    .filtro-drop-item.selecionado { background: color-mix(in srgb, var(--accent) 10%, white); color: var(--accent); }
+
+    /* ===== ÍCONE INFORMATIVO (i) ===== */
+    .info-icon-wrap { position: relative; display: inline-flex; vertical-align: middle; }
+    .info-icon-btn { width: 19px; height: 19px; border: none; background: transparent; color: #9CA0AC; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .info-icon-btn svg { width: 19px; height: 19px; }
+    .info-icon-btn:hover { color: var(--accent); }
+    .info-popover { position: absolute; top: calc(100% + 8px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.14); padding: 14px 16px; font-size: 12px; color: #33363F; line-height: 1.7; z-index: 300; min-width: 280px; max-width: 340px; }
+    .info-popover div + div { margin-top: 2px; }
+
+    /* ===== BOWLER ===== */
+    .bowler-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .bowler-ano { display: flex; align-items: center; gap: 8px; }
+    .colunas-filtro-wrap { position: relative; }
+    .colunas-filtro-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); min-width: 210px; z-index: 200; padding: 6px; }
+    .colunas-filtro-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
+    .colunas-filtro-item:hover { background: #F1F2F5; }
+    .colunas-filtro-item.travado { color: #9CA0AC; cursor: default; }
+    .colunas-filtro-item.travado:hover { background: transparent; }
+    .ano-btn { width: 30px; height: 30px; border: 1.5px solid #E5E7EB; border-radius: 8px; background: white; cursor: pointer; font-size: 15px; color: #33363F; display: flex; align-items: center; justify-content: center; }
+    .ano-btn:hover { border-color: #0B0B0F; }
+    .ano-display { font-size: 15px; font-weight: 800; color: #0B0B0F; min-width: 44px; text-align: center; }
+    .bowler-acoes { margin-left: auto; display: flex; gap: 10px; }
+    .btn-modo { height: 38px; padding: 0 16px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid #E5E7EB; background: white; color: #33363F; }
+    .btn-modo:hover { border-color: #0B0B0F; }
+    .btn-modo.ativo { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border-color: transparent; }
+    .btn-salvar-bowler { height: 38px; padding: 0 16px; border-radius: 9px; background: #00B37E; border: none; color: white; font-size: 12.5px; font-weight: 700; cursor: pointer; display: none; }
+    .btn-cancelar-modo { height: 38px; padding: 0 16px; border-radius: 9px; background: #F1F2F5; border: none; color: #4A4E5A; font-size: 12.5px; font-weight: 700; cursor: pointer; display: none; }
+    .modo-aviso { padding: 10px 16px; background: color-mix(in srgb, var(--accent) 8%, white); border-radius: 10px; font-size: 12.5px; color: var(--accent); font-weight: 600; margin-bottom: 14px; display: none; }
+    .modo-aviso.ativo { display: block; }
+    .bowler-wrap { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow-x: auto; overflow-y: hidden; }
+    .bowler-table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; min-width: 1360px; font-size: 11px; }
+    .bowler-table th { padding: 12px 8px; text-align: center; background: #0B0B0F; color: white; font-weight: 700; font-size: 11px; white-space: normal; border: 1px solid rgba(255,255,255,0.08); }
+    .bowler-table th.col-info { text-align: center; }
+    .bowler-table th.mes-header { background: #0B0B0F; width: 60px; }
+    .bowler-table td { padding: 6px 8px; border-bottom: 1px solid #F2F3F5; text-align: center; vertical-align: middle; background: white; }
+    .bowler-table td.col-info { text-align: center; padding: 10px 12px; font-size: 12.5px; font-weight: 400; color: #0B0B0F; }
+    .categoria-row td { background: color-mix(in srgb, var(--accent) 8%, white); font-weight: 700; color: #0B0B0F; font-size: 12px; padding: 8px 14px; text-align: left; }
+    .categoria-row-fixa { position: sticky; left: 0; z-index: 2; box-shadow: 2px 0 6px rgba(11,11,15,0.06); }
+    .row-label { font-size: 11px; font-weight: 700; white-space: nowrap; padding: 6px 8px !important; background: white !important; color: #0B0B0F; box-shadow: 2px 0 6px rgba(11,11,15,0.06); }
+
+    /* Colunas fixas (não rolam com os meses) */
+    .bowler-table .sticky-col { position: sticky; z-index: 2; }
+    .bowler-table th.sticky-col { background: #0B0B0F; z-index: 3; }
+    .bowler-table td.sticky-col { background: white; }
+    .bowler-table td.cell-edit.sticky-col { background: color-mix(in srgb, var(--accent) 6%, white); }
+    .bowler-table .col-indicador { font-weight: 700 !important; }
+    .cell-resultado { font-size: 11px !important; font-weight: 700; color: #0B0B0F; }
+    .cell-verde { color: #00B37E !important; font-weight: 700; }
+    .cell-amarelo { color: #FFAE00 !important; font-weight: 700; }
+    .cell-vermelho { color: #FF2E4D !important; font-weight: 700; }
+    .cell-input { width: 46px; border: 1.5px solid #E5E7EB; border-radius: 6px; padding: 3px; text-align: center; font-size: 11px; background: white; font-family: inherit; }
+    .cell-input:focus { border-color: var(--accent); outline: none; }
+    .cell-edit { background: color-mix(in srgb, var(--accent) 6%, white) !important; }
+    .estrutura-input { width: 100%; border: 1.5px solid #E5E7EB; border-radius: 6px; padding: 4px 6px; font-size: 11px; background: white; box-sizing: border-box; font-family: inherit; }
+    .estrutura-input:focus { border-color: var(--accent); outline: none; }
+    .bowler-legenda { display: flex; gap: 16px; padding: 12px 16px; background: #F6F7F9; border-top: 1px solid #ECEDF0; font-size: 11.5px; color: #6B7080; }
+    .legenda-item { display: flex; align-items: center; gap: 6px; }
+    .legenda-cor { width: 10px; height: 10px; border-radius: 3px; }
+    .btn-add-indicador { height: 38px; padding: 0 16px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border: none; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+
+    .empty-state { text-align: center; padding: 60px; color: #9CA0AC; }
+    .modal { border-radius: 16px; box-shadow: 0 8px 32px rgba(11,11,15,0.12); border: 1px solid #ECEDF0; padding: 24px 28px; }
+    .modal-overlay { background: rgba(11,11,15,0.45); }
+    .modal-titulo { font-size: 17px; font-weight: 800; color: #0B0B0F; }
+    .btn-fechar { width: 34px; height: 34px; border-radius: 9px; background: #F1F2F5; color: #4A4E5A; font-size: 16px; border: none; cursor: pointer; }
+    .btn-fechar:hover { background: #E5E7EB; }
+    label { font-size: 12px; font-weight: 600; color: #4A4E5A; }
+    input[type="text"], input[type="email"], input[type="date"], input[type="number"], input[type="password"], select, textarea { border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13.5px; color: #0B0B0F; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-cancelar { flex: 1; padding: 10px; background: white; color: #33363F; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-cancelar:hover { background: #F1F2F5; }
+    .btn-confirmar { flex: 2; padding: 10px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); border: none; color: white; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
   </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
-    <span class="logo-text">Business Manager</span>
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8"/><text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="800">H</text></svg>
+    <span class="logo-text side-label">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
-    <a class="menu-item active" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
-    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
-    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
+    <a class="menu-item active" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
+    <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
+    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
     <details class="sidebar-sistema" id="sistemaMenu">
-      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
-      <div class="sidebar-sistema-items">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="side-label sidebar-sistema-label">Sistema</span><svg class="sidebar-sistema-chevron side-label" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items" id="sistemaItemsWrap">
+        <button class="menu-item" onclick="mostrarCorSistemaNoMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Cor do Sistema</button>
         <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
         <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
         <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
       </div>
     </details>
+    <button class="btn-recolher" id="btnRecolher" onclick="toggleSidebarRecolhida()" title="Recolher/Expandir">
+      <svg id="iconRecolher" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      <span class="side-label btn-sidebar-label" id="lblRecolher">Recolher</span>
+    </button>
   </div>
 </div>
 
 <div class="main">
-  <div class="header" style="justify-content:flex-end">
-    <div class="header-right">
-      <div class="notif-wrap" id="notifWrap">
-        <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
-          <span class="notif-badge cinza" id="notifBadge" style="display:none"></span>
-        </button>
-        <div class="notif-dropdown" id="notifDropdown">
-          <div class="notif-drop-header">
-            <span class="notif-drop-titulo">🔔 Notificações</span>
-            <div class="notif-drop-acoes">
-              <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar notificações</button>
+  <div class="header">
+    <div class="header-lado"></div>
+    <div class="tabs-central tabs">
+      <button class="tab active" onclick="mudarTab('tendencias',this)">Resumo de Tendências</button>
+      <button class="tab" onclick="mudarTab('bowler',this)">Bowler Chart</button>
+    </div>
+    <div class="header-lado direita">
+      <div class="header-right">
+        <div class="header-user">
+          <div class="user-info">
+            <div class="user-nome" id="userNome">-</div>
+            <div class="user-perfil" id="userPerfil">-</div>
+          </div>
+          <div class="user-avatar" id="userAvatar">?</div>
+        </div>
+
+        <div class="notif-wrap" id="notifWrap">
+          <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="notif-badge cinza" id="notifBadge" style="display:none"></span>
+          </button>
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-drop-header">
+              <span class="notif-drop-titulo" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Notificações</span>
+              <div class="notif-drop-acoes">
+                <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar</button>
+              </div>
+            </div>
+            <div class="notif-lista" id="notifLista">
+              <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
             </div>
           </div>
-          <div class="notif-lista" id="notifLista">
-            <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
-          </div>
         </div>
-      </div>
-      <div class="header-user">
-        <div class="user-info">
-          <div class="user-nome" id="userNome">-</div>
-          <div class="user-perfil" id="userPerfil">-</div>
-        </div>
-        <div class="user-avatar" id="userAvatar">?</div>
       </div>
     </div>
   </div>
 
   <div class="content">
-    <div class="page-title">GESTÃO DE RESULTADOS</div>
-
-    <div class="tabs">
-      <button class="tab active" onclick="mudarTab('tendencias',this)">Resumo de Tendências</button>
-      <button class="tab" onclick="mudarTab('bowler',this)">Bowler Chart</button>
-    </div>
 
     <!-- TENDÊNCIAS -->
     <div id="tab-tendencias">
 
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-        <select class="filtro-select" id="filtroPeriodo" onchange="atualizarTendencias()">
-          <option value="3">Últimos 3 meses</option>
-          <option value="6">Últimos 6 meses</option>
-          <option value="12">Ano atual</option>
-          <option value="24">Último ano</option>
-        </select>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+        <div class="periodo-filtro-wrap">
+          <button class="periodo-filtro-btn" onclick="togglePeriodoFiltro()">
+            <span id="lblPeriodo">Últimos 3 meses</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="periodo-filtro-drop" id="dropPeriodo" style="display:none"></div>
+        </div>
+        <div class="pct-geral-pill" style="margin-left:auto">
+          <span class="pct-geral-valor" id="cardPctGeral">—</span>
+          <div class="pct-geral-info">
+            <span class="pct-geral-label">Metas Atingidas</span>
+            <span class="pct-geral-sub" id="cardPctGeralSub"></span>
+          </div>
+        </div>
       </div>
 
-      <!-- Destaques: top 3 melhores/piores por área, categoria, indicador + % geral -->
-      <div style="font-size:11px;color:#718096;margin-bottom:8px">
-        Ranking por <strong>desvio médio % em relação à meta</strong> no período selecionado — melhores = maior superação, piores = maior déficit. Indicadores positivos: (resultado − meta) / meta · Negativos: (meta − resultado) / meta.
-      </div>
+      <!-- Destaques: top 3 melhores/piores por área, categoria, indicador -->
       <div class="highlights-grid">
         <div class="meta-card">
-          <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:10px">🏢 Áreas</div>
+          <div class="meta-card-titulo">Áreas</div>
           <div class="hl-sublabel-best">▲ Melhores</div>
           <div id="cardDeptosMelhores"></div>
           <div class="hl-sublabel-worst">▼ Piores</div>
           <div id="cardDeptosPiores"></div>
         </div>
         <div class="meta-card">
-          <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:10px">📂 Categorias</div>
+          <div class="meta-card-titulo">Categorias</div>
           <div class="hl-sublabel-best">▲ Melhores</div>
           <div id="cardCatsMelhores"></div>
           <div class="hl-sublabel-worst">▼ Piores</div>
           <div id="cardCatsPiores"></div>
         </div>
         <div class="meta-card">
-          <div style="font-size:12px;font-weight:700;color:#1e2a4a;margin-bottom:10px">📊 Indicadores</div>
+          <div class="meta-card-titulo">Indicadores</div>
           <div class="hl-sublabel-best">▲ Melhores</div>
           <div id="cardIndsMelhores"></div>
           <div class="hl-sublabel-worst">▼ Piores</div>
           <div id="cardIndsPiores"></div>
         </div>
-        <div class="meta-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-width:130px">
-          <div style="font-size:28px;margin-bottom:6px">🎯</div>
-          <div style="font-size:32px;font-weight:700;color:#1e2a4a;line-height:1" id="cardPctGeral">—</div>
-          <div style="font-size:11px;color:#718096;margin-top:6px">Metas Atingidas</div>
-          <div style="font-size:10px;color:#a0aec0;margin-top:2px" id="cardPctGeralSub"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:10px;margin-bottom:20px">
+        <span style="font-size:11px;font-weight:700;color:#33363F">Itens rankeados por desvio médio % em relação à meta</span>
+        <div class="info-icon-wrap">
+          <button class="info-icon-btn" onclick="toggleInfoPopover('infoRanking',event)" title="Mais informações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </button>
+          <div class="info-popover" id="infoRanking" style="display:none">
+            <div>Ranking por desvio médio % em relação à meta no período selecionado</div>
+            <div>Melhores = maior superação</div>
+            <div>Piores = maior déficit</div>
+            <div>Indicadores positivos: (resultado − meta) / meta</div>
+            <div>Indicadores negativos: (meta − resultado) / meta</div>
+          </div>
         </div>
       </div>
 
-      <!-- Gráfico com filtros multi-seleção -->
+      <!-- Gráfico com filtro por área, categoria ou indicador -->
       <div style="margin-bottom:20px">
-        <div style="display:flex;align-items:center;gap:8px;padding:10px 16px;background:#f4f6f9;border-radius:8px 8px 0 0;border:1px solid #e2e8f0;border-bottom:none;flex-wrap:wrap">
-          <span style="font-size:11px;font-weight:700;color:#718096;margin-right:4px;white-space:nowrap">Filtro —</span>
+        <div class="filtro-multi-bar">
           <div class="filtro-multi-wrap">
             <button class="filtro-multi-btn" onclick="toggleFiltroUnif()"><span id="lblFiltroUnif">Todos os dados</span> <span style="font-size:9px">▾</span></button>
             <div class="filtro-multi-drop" id="dropFiltroUnif" style="display:none;min-width:240px"></div>
@@ -226,17 +340,14 @@
         </div>
 
         <!-- Gráfico de Desvio % (primeiro) -->
-        <div class="grafico-card" style="border-radius:0;border-top:1px solid #f0f2f5;margin-bottom:0">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <span class="grafico-titulo" style="margin-bottom:0">Desvio % em relação à Meta</span>
-            <span style="font-size:11px;color:#718096">▲ acima da meta &nbsp;·&nbsp; ▼ abaixo da meta</span>
-          </div>
+        <div class="grafico-card">
+          <div class="grafico-titulo">Desvio % em Relação à Meta</div>
           <canvas id="graficoDesvio" height="80"></canvas>
         </div>
 
         <!-- Curva dos Indicadores (segundo) -->
-        <div class="grafico-card" style="border-radius:0 0 10px 10px;border-top:1px solid #f0f2f5">
-          <div style="margin-bottom:12px">
+        <div class="grafico-card">
+          <div style="margin-bottom:16px">
             <span class="grafico-titulo" style="margin-bottom:0">Curva dos Indicadores</span>
           </div>
           <canvas id="graficoEvolucao" height="80"></canvas>
@@ -253,17 +364,25 @@
           <span class="ano-display" id="anoDisplay">2026</span>
           <button class="ano-btn" onclick="mudarAno(1)">›</button>
         </div>
+        <div class="colunas-filtro-wrap">
+          <button class="btn-modo" onclick="toggleColunasDrop()">Colunas</button>
+          <div class="colunas-filtro-drop" id="dropColunas" style="display:none"></div>
+        </div>
         <div class="bowler-acoes">
-          <button class="btn-modo" id="btnEditarResultados" onclick="ativarModo('resultados')">✏️ Edição de Resultados</button>
-          <button class="btn-modo" id="btnEditarEstrutura" onclick="ativarModo('estrutura')">⚙️ Edição de Estrutura</button>
+          <button class="btn-modo" id="btnEditarResultados" onclick="ativarModo('resultados')">Edição de Resultados</button>
+          <button class="btn-modo" id="btnEditarEstrutura" onclick="ativarModo('estrutura')">Edição de Estrutura</button>
           <button class="btn-add-indicador" id="btnAddLinha" style="display:none" onclick="abrirModalLinha()">+ Novo Indicador</button>
-          <button class="btn-salvar-bowler" id="btnSalvar" onclick="salvarBowler()">💾 Salvar</button>
-          <button class="btn-cancelar-modo" id="btnCancelar" onclick="cancelarModo()">✕ Cancelar</button>
+          <button class="btn-salvar-bowler" id="btnSalvar" onclick="salvarBowler()">Salvar</button>
+          <button class="btn-cancelar-modo" id="btnCancelar" onclick="cancelarModo()">Cancelar</button>
         </div>
       </div>
       <div class="modo-aviso" id="modoAviso"></div>
       <div class="bowler-wrap">
         <table class="bowler-table" id="bowlerTable"></table>
+      </div>
+      <div class="bowler-legenda">
+        <div class="legenda-item"><span class="legenda-cor" style="background:#00B37E"></span>Meta atingida</div>
+        <div class="legenda-item"><span class="legenda-cor" style="background:#FF2E4D"></span>Abaixo da meta</div>
       </div>
     </div>
   </div>
@@ -278,7 +397,7 @@
     </div>
     <div class="form-group">
       <label>Categoria *</label>
-      <input list="listaCategorias" id="novaCategoria" placeholder="Selecione ou digite nova categoria" style="width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none">
+      <input list="listaCategorias" id="novaCategoria" placeholder="Selecione ou digite nova categoria" style="width:100%;height:42px;padding:0 14px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;font-family:inherit;color:#0B0B0F">
       <datalist id="listaCategorias"></datalist>
     </div>
     <div class="form-group"><label>Nome do Indicador *</label><input type="text" id="novoIndicador" placeholder="Ex: Taxa de Conversão"></div>
@@ -307,7 +426,7 @@
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600">
         <input type="checkbox" id="novoIsPercentual"> Valores em percentual (%)
       </label>
-      <div style="font-size:11px;color:#718096;margin-top:3px">Ativa exibição de "%" automático nos valores de meta e resultado</div>
+      <div style="font-size:11px;color:#6B7080;margin-top:3px">Ativa exibição de "%" automático nos valores de meta e resultado</div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalLinha')">Cancelar</button>
@@ -336,6 +455,75 @@
   document.getElementById('userNome').textContent = usuario.nome || '-';
   document.getElementById('userPerfil').textContent = usuario.perfil || '-';
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
+
+  // ===== TEMA: sidebar recolhida + cor de destaque =====
+  const CORES_SISTEMA = [
+    { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
+    { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
+    { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
+    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
+  ];
+  function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
+  function setAccentColor(hex) {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+    if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
+  }
+  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+
+  const sidebarEl = document.getElementById('sidebarEl');
+  function aplicarSidebarRecolhida(recolhida) {
+    sidebarEl.classList.toggle('recolhida', recolhida);
+    document.getElementById('iconRecolher').innerHTML = recolhida
+      ? '<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>'
+      : '<polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>';
+    const lbl = document.getElementById('lblRecolher');
+    if (lbl) lbl.textContent = recolhida ? 'Expandir' : 'Recolher';
+  }
+  function toggleSidebarRecolhida() {
+    const recolhida = !sidebarEl.classList.contains('recolhida');
+    localStorage.setItem('sidebarRecolhida', recolhida ? '1' : '0');
+    aplicarSidebarRecolhida(recolhida);
+  }
+  aplicarSidebarRecolhida(localStorage.getItem('sidebarRecolhida') === '1');
+
+  const SISTEMA_ITEMS_HTML = document.getElementById('sistemaItemsWrap').innerHTML;
+  function mostrarCorSistemaNoMenu() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = 'cor';
+    const atual = (localStorage.getItem('accentColor') || '#2F5CFF').toLowerCase();
+    wrap.innerHTML = `
+      <button class="color-picker-back" onclick="voltarMenuSistema()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Cor do Sistema
+      </button>
+      ${CORES_SISTEMA.map(c => `
+        <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
+          <span class="color-swatch-rect" style="background:${c.hex}"></span>
+          <span class="color-swatch-label">${c.nome}</span>
+        </button>`).join('')}
+      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+  }
+  function voltarMenuSistema() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = '';
+    wrap.innerHTML = SISTEMA_ITEMS_HTML;
+  }
+  document.getElementById('sistemaMenu').addEventListener('toggle', (e) => { if (!e.target.open) voltarMenuSistema(); });
+
+  // ===== ÍCONE INFORMATIVO (i) =====
+  function toggleInfoPopover(id, e) {
+    if (e) e.stopPropagation();
+    document.querySelectorAll('.info-popover').forEach(p => { if (p.id !== id) p.style.display = 'none'; });
+    const el = document.getElementById(id);
+    if (el) el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('.info-icon-wrap')) document.querySelectorAll('.info-popover').forEach(p => p.style.display = 'none'); });
+
+  Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+  Chart.defaults.color = '#6B7080';
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
   let podeEditarMetas = usuario.perfil === 'Admin';
@@ -368,6 +556,39 @@
   let anoAtual = new Date().getFullYear();
   let modoEdicao = null;
   let bowlerData = getDadosPadrao();
+
+  let colunasVisiveis = { formula: true, area: true, periodicidade: false };
+  try {
+    const salvo = JSON.parse(localStorage.getItem('gm_colunasVisiveis') || 'null');
+    if (salvo) colunasVisiveis = { ...colunasVisiveis, ...salvo };
+  } catch(e) {}
+
+  function toggleColunaBowler(key) {
+    colunasVisiveis[key] = !colunasVisiveis[key];
+    try { localStorage.setItem('gm_colunasVisiveis', JSON.stringify(colunasVisiveis)); } catch(e) {}
+    renderColunasDrop();
+    renderBowler();
+  }
+  function renderColunasDrop() {
+    const drop = document.getElementById('dropColunas');
+    if (!drop) return;
+    const opcoes = [
+      { key: 'formula', label: 'Fórmula/Fonte' },
+      { key: 'area', label: 'Área Responsável' },
+      { key: 'periodicidade', label: 'Periodicidade' },
+    ];
+    drop.innerHTML = `
+      <label class="colunas-filtro-item travado"><input type="checkbox" checked disabled> Indicador</label>
+      ${opcoes.map(o => `<label class="colunas-filtro-item"><input type="checkbox" ${colunasVisiveis[o.key]?'checked':''} onchange="toggleColunaBowler('${o.key}')"> ${o.label}</label>`).join('')}
+    `;
+  }
+  function toggleColunasDrop() {
+    const d = document.getElementById('dropColunas');
+    const abrir = d.style.display !== 'block';
+    if (abrir) renderColunasDrop();
+    d.style.display = abrir ? 'block' : 'none';
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('.colunas-filtro-wrap')) document.getElementById('dropColunas').style.display='none'; });
 
   function getDadosPadrao() {
     return [
@@ -441,39 +662,59 @@
     }
   }
 
+  function _colsFixasBowler() {
+    const defs = [
+      { key: 'indicador', label: 'Indicador', width: 150, sempre: true },
+      { key: 'formula', label: 'Fórmula/Fonte', width: 140 },
+      { key: 'area', label: 'Área Responsável', width: 120 },
+      { key: 'periodicidade', label: 'Periodicidade', width: 150 },
+    ];
+    const visiveis = defs.filter(d => d.sempre || colunasVisiveis[d.key]);
+    visiveis.push({ key: 'label', label: '', width: 74, sempre: true });
+    let acc = 0;
+    visiveis.forEach(c => { c.left = acc; acc += c.width; });
+    return visiveis;
+  }
+  function _colStyle(c) { return `left:${c.left}px;width:${c.width}px;min-width:${c.width}px;max-width:${c.width}px`; }
+
   function renderBowler() {
     const table = document.getElementById('bowlerTable');
     const cats = [...new Set(bowlerData.map(r => r.categoria))];
-    const totalCols = 4 + 1 + MESES.length;
+    const cols = _colsFixasBowler();
+    const temFormula = colunasVisiveis.formula, temArea = colunasVisiveis.area, temPeriod = colunasVisiveis.periodicidade;
+    const larguraFixa = cols[cols.length - 1].left + cols[cols.length - 1].width;
+    table.style.minWidth = (larguraFixa + MESES.length * 60) + 'px';
+
     let html = `<thead><tr>
-      <th class="col-info" rowspan="2">Indicador</th>
-      <th class="col-info" rowspan="2">Fórmula/Fonte</th>
-      <th class="col-info" rowspan="2">Área responsável</th>
-      <th class="col-info" rowspan="2">Period.</th>
-      <th rowspan="2" style="min-width:68px;background:#2d1b69;border:1px solid #3d2b89"></th>
+      <th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='indicador'))}">Indicador</th>
+      ${temFormula ? `<th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='formula'))}">Fórmula/Fonte</th>` : ''}
+      ${temArea ? `<th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='area'))}">Área Responsável</th>` : ''}
+      ${temPeriod ? `<th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='periodicidade'))}">Periodicidade</th>` : ''}
+      <th class="sticky-col" style="${_colStyle(cols.find(c=>c.key==='label'))}"></th>
       ${MESES.map(m=>`<th class="mes-header">${m}</th>`).join('')}
     </tr></thead><tbody>`;
 
     cats.forEach(cat => {
-      if (modoEdicao === 'estrutura') {
-        html += `<tr class="categoria-row"><td colspan="${totalCols}">Categoria:&nbsp;
-          <input class="estrutura-input" style="width:200px;display:inline-block" value="${cat}"
-            onblur="renomearCategoria('${cat}', this.value)">
-        </td></tr>`;
-      } else {
-        html += `<tr class="categoria-row"><td colspan="${totalCols}">Categoria: ${cat}</td></tr>`;
-      }
+      const catCatCell = modoEdicao === 'estrutura'
+        ? `Categoria:&nbsp;<input class="estrutura-input" style="width:180px;display:inline-block" value="${cat}" onblur="renomearCategoria('${cat}', this.value)">`
+        : `Categoria: ${cat}`;
+      html += `<tr class="categoria-row"><td class="categoria-row-fixa" style="left:0;width:${larguraFixa}px;min-width:${larguraFixa}px;max-width:${larguraFixa}px" colspan="${cols.length}">${catCatCell}</td><td colspan="${MESES.length}"></td></tr>`;
 
       bowlerData.filter(r => r.categoria === cat).forEach(row => {
         const gi = bowlerData.indexOf(row);
         const sentido = row.sentidoMeta || 'positiva';
+        const styleInd = _colStyle(cols.find(c=>c.key==='indicador'));
+        const styleFormula = temFormula ? _colStyle(cols.find(c=>c.key==='formula')) : '';
+        const styleArea = temArea ? _colStyle(cols.find(c=>c.key==='area')) : '';
+        const stylePeriod = temPeriod ? _colStyle(cols.find(c=>c.key==='periodicidade')) : '';
+        const styleLabel = _colStyle(cols.find(c=>c.key==='label'));
 
         if (modoEdicao === 'estrutura') {
           html += `<tr>
-            <td class="col-info cell-edit" rowspan="2"><input class="estrutura-input" value="${row.indicador}" onchange="bowlerData[${gi}].indicador=this.value"></td>
-            <td class="col-info cell-edit" rowspan="2"><input class="estrutura-input" value="${row.formula}" onchange="bowlerData[${gi}].formula=this.value"></td>
-            <td class="col-info cell-edit" rowspan="2"><input class="estrutura-input" value="${row.area}" onchange="bowlerData[${gi}].area=this.value"></td>
-            <td class="col-info cell-edit" rowspan="2" style="min-width:110px">
+            <td class="col-info col-indicador cell-edit sticky-col" style="${styleInd}" rowspan="2"><input class="estrutura-input" value="${row.indicador}" onchange="bowlerData[${gi}].indicador=this.value"></td>
+            ${temFormula ? `<td class="col-info cell-edit sticky-col" style="${styleFormula}" rowspan="2"><input class="estrutura-input" value="${row.formula}" onchange="bowlerData[${gi}].formula=this.value"></td>` : ''}
+            ${temArea ? `<td class="col-info cell-edit sticky-col" style="${styleArea}" rowspan="2"><input class="estrutura-input" value="${row.area}" onchange="bowlerData[${gi}].area=this.value"></td>` : ''}
+            ${temPeriod ? `<td class="col-info cell-edit sticky-col" style="${stylePeriod}" rowspan="2">
               <select class="estrutura-input" onchange="bowlerData[${gi}].periodicidade=this.value">
                 ${['Mensal','Trimestral','Semestral','Anual'].map(p=>`<option${p===row.periodicidade?' selected':''}>${p}</option>`).join('')}
               </select>
@@ -484,42 +725,42 @@
               <label style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;cursor:pointer;font-weight:600">
                 <input type="checkbox" ${row.isPercentual?'checked':''} onchange="bowlerData[${gi}].isPercentual=this.checked;renderBowler()"> Valores em %
               </label>
-              <button onclick="limparMetasFuturas(${gi})" style="margin-top:5px;width:100%;background:#fffbeb;border:1px solid #f6d860;border-radius:4px;cursor:pointer;padding:3px 0;color:#b7791f;font-size:10px;font-weight:600">🧹 Limpar metas futuras</button>
-              <button onclick="removerLinha(${gi})" style="margin-top:4px;width:100%;background:#fff5f5;border:1px solid #fca5a5;border-radius:4px;cursor:pointer;padding:3px 0;color:#c53030;font-size:10px;font-weight:600">✕ Remover</button>
-            </td>
-            <td class="row-label">Meta</td>
-            ${row.meses.map((m,mi)=>`<td class="cell-edit" style="background:#f5f0ff"><input class="cell-input" value="${m.plan||''}" onchange="bowlerData[${gi}].meses[${mi}].plan=this.value"></td>`).join('')}
+              <button onclick="limparMetasFuturas(${gi})" style="margin-top:6px;width:100%;background:color-mix(in srgb, #FFAE00 12%, white);border:1px solid color-mix(in srgb, #FFAE00 35%, white);border-radius:6px;cursor:pointer;padding:4px 0;color:#966000;font-size:10.5px;font-weight:600">Limpar metas futuras</button>
+              <button onclick="removerLinha(${gi})" style="margin-top:5px;width:100%;background:#FFE9EC;border:1px solid #FFC2CA;border-radius:6px;cursor:pointer;padding:4px 0;color:#c53030;font-size:10.5px;font-weight:600">Remover</button>
+            </td>` : ''}
+            <td class="row-label sticky-col" style="${styleLabel}">Meta</td>
+            ${row.meses.map((m,mi)=>`<td class="cell-edit"><input class="cell-input" value="${m.plan||''}" onchange="bowlerData[${gi}].meses[${mi}].plan=this.value"></td>`).join('')}
           </tr><tr>
-            <td class="row-label">Resultado</td>
-            ${row.meses.map(m=>`<td class="cell-resultado" style="text-align:center;color:#718096">${m.act||''}</td>`).join('')}
+            <td class="row-label sticky-col" style="${styleLabel}">Resultado</td>
+            ${row.meses.map(m=>`<td class="cell-resultado" style="text-align:center;color:#6B7080">${m.act||''}</td>`).join('')}
           </tr>`;
         } else if (modoEdicao === 'resultados') {
           const suf = row.isPercentual ? '%' : '';
           html += `<tr>
-            <td class="col-info" rowspan="2">${row.indicador}${row.isPercentual?' <span style="font-size:9px;color:#718096">(%)</span>':''}</td>
-            <td class="col-info" rowspan="2">${formatFormula(row.formula)}</td>
-            <td class="col-info" rowspan="2">${row.area}</td>
-            <td class="col-info" rowspan="2">${row.periodicidade}</td>
-            <td class="row-label">Meta</td>
-            ${row.meses.map((m,mi)=>`<td style="background:#f5f0ff;font-size:10px;color:#5a3ea1;text-align:center">${m.plan!=null&&m.plan!==''?m.plan+suf:'—'}</td>`).join('')}
+            <td class="col-info col-indicador sticky-col" style="${styleInd}" rowspan="2">${row.indicador}${row.isPercentual?' <span style="font-size:9px;color:#6B7080">(%)</span>':''}</td>
+            ${temFormula ? `<td class="col-info sticky-col" style="${styleFormula}" rowspan="2">${formatFormula(row.formula)}</td>` : ''}
+            ${temArea ? `<td class="col-info sticky-col" style="${styleArea}" rowspan="2">${row.area}</td>` : ''}
+            ${temPeriod ? `<td class="col-info sticky-col" style="${stylePeriod}" rowspan="2">${row.periodicidade}</td>` : ''}
+            <td class="row-label sticky-col" style="${styleLabel}">Meta</td>
+            ${row.meses.map((m,mi)=>`<td style="font-size:11px;font-weight:700;color:#0B0B0F;text-align:center">${m.plan!=null&&m.plan!==''?m.plan+suf:'—'}</td>`).join('')}
           </tr><tr>
-            <td class="row-label">Resultado</td>
+            <td class="row-label sticky-col" style="${styleLabel}">Resultado</td>
             ${row.meses.map((m,mi)=>`<td class="cell-edit cell-resultado ${getCor(row,m.plan,m.act)}" style="position:relative">
-              <input class="cell-input" value="${m.act||''}" onchange="bowlerData[${gi}].meses[${mi}].act=this.value" style="padding-right:${suf?'14px':'2px'}">
-              ${suf?`<span style="position:absolute;right:3px;top:50%;transform:translateY(-50%);font-size:9px;color:#718096;pointer-events:none">%</span>`:''}
+              <input class="cell-input" value="${m.act||''}" onchange="bowlerData[${gi}].meses[${mi}].act=this.value" style="padding-right:${suf?'14px':'2px'};color:inherit;font-weight:700">
+              ${suf?`<span style="position:absolute;right:3px;top:50%;transform:translateY(-50%);font-size:9px;color:#6B7080;pointer-events:none">%</span>`:''}
             </td>`).join('')}
           </tr>`;
         } else {
           const suf = row.isPercentual ? '%' : '';
           html += `<tr>
-            <td class="col-info" rowspan="2">${row.indicador}${row.isPercentual?' <span style="font-size:9px;color:#718096">(%)</span>':''}</td>
-            <td class="col-info" rowspan="2">${formatFormula(row.formula)}</td>
-            <td class="col-info" rowspan="2">${row.area}</td>
-            <td class="col-info" rowspan="2">${row.periodicidade}</td>
-            <td class="row-label">Meta</td>
-            ${row.meses.map(m=>`<td style="background:#f9f7ff;font-size:10px;color:#7c5cbf;text-align:center">${m.plan!=null&&m.plan!==''?m.plan+suf:'—'}</td>`).join('')}
+            <td class="col-info col-indicador sticky-col" style="${styleInd}" rowspan="2">${row.indicador}${row.isPercentual?' <span style="font-size:9px;color:#6B7080">(%)</span>':''}</td>
+            ${temFormula ? `<td class="col-info sticky-col" style="${styleFormula}" rowspan="2">${formatFormula(row.formula)}</td>` : ''}
+            ${temArea ? `<td class="col-info sticky-col" style="${styleArea}" rowspan="2">${row.area}</td>` : ''}
+            ${temPeriod ? `<td class="col-info sticky-col" style="${stylePeriod}" rowspan="2">${row.periodicidade}</td>` : ''}
+            <td class="row-label sticky-col" style="${styleLabel}">Meta</td>
+            ${row.meses.map(m=>`<td style="font-size:11px;font-weight:700;color:#0B0B0F;text-align:center">${m.plan!=null&&m.plan!==''?m.plan+suf:'—'}</td>`).join('')}
           </tr><tr>
-            <td class="row-label">Resultado</td>
+            <td class="row-label sticky-col" style="${styleLabel}">Resultado</td>
             ${row.meses.map(m=>`<td class="cell-resultado ${getCor(row,m.plan,m.act)}" style="text-align:center">${m.act!=null&&m.act!==''?m.act+suf:''}</td>`).join('')}
           </tr>`;
         }
@@ -532,7 +773,7 @@
   function formatFormula(val) {
     if (!val) return '';
     if (/^https?:\/\//i.test(val.trim())) {
-      return `<a href="${val.trim()}" target="_blank" rel="noopener" style="color:#2d1b69;font-size:11px;text-decoration:underline;font-weight:600">🔗 Abrir link</a>`;
+      return `<a href="${val.trim()}" target="_blank" rel="noopener" style="color:var(--accent);font-size:11px;text-decoration:underline;font-weight:600">Abrir link</a>`;
     }
     return val;
   }
@@ -557,8 +798,25 @@
     document.getElementById('btnCancelar').style.display = 'inline-block';
     document.getElementById('btnAddLinha').style.display = modo==='estrutura' ? 'block' : 'none';
     const aviso = document.getElementById('modoAviso');
-    aviso.classList.add('ativo');
-    aviso.textContent = modo==='resultados' ? '✏️ Modo Edição de Resultados: edite os valores realizados de cada mês' : '⚙️ Modo Estrutura: edite nome, fórmula, área, categoria e sentido do indicador. Use "+ Novo Indicador" para adicionar.';
+    if (modo === 'estrutura') {
+      aviso.classList.add('ativo');
+      aviso.innerHTML = `
+        <div style="display:flex;align-items:center;gap:6px">
+          <span>Sentido do indicador</span>
+          <div class="info-icon-wrap">
+            <button class="info-icon-btn" onclick="toggleInfoPopover('infoEstrutura',event)" title="Mais informações">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
+            </button>
+            <div class="info-popover" id="infoEstrutura" style="display:none">
+              <div>Indicador positivo: quanto maior o resultado em relação à meta, melhor.</div>
+              <div>Indicador negativo: quanto menor o resultado em relação à meta, melhor.</div>
+            </div>
+          </div>
+        </div>`;
+    } else {
+      aviso.classList.remove('ativo');
+      aviso.innerHTML = '';
+    }
     renderBowler();
   }
 
@@ -569,7 +827,9 @@
     document.getElementById('btnSalvar').style.display = 'none';
     document.getElementById('btnCancelar').style.display = 'none';
     document.getElementById('btnAddLinha').style.display = 'none';
-    document.getElementById('modoAviso').classList.remove('ativo');
+    const aviso = document.getElementById('modoAviso');
+    aviso.classList.remove('ativo');
+    aviso.innerHTML = '';
     renderBowler();
   }
 
@@ -631,18 +891,43 @@
 
   let graficoChart = null;
   let graficoDesvioChart = null;
-  let filtroSecaoAtiva = null; // 'area' | 'categ' | 'ind'
-  let filtroSelecionados = new Set();
+  let filtroSecaoAtiva = null; // 'area' | 'categ' | 'ind' | null
+  let filtroValorSelecionado = null; // valor específico escolhido, ou null = "Todos" dentro do tipo
   let bowlerDataByAno = {}; // cache: ano -> rows
+
+  const PERIODO_OPCOES = [
+    { value: 3, label: 'Últimos 3 meses' },
+    { value: 6, label: 'Últimos 6 meses' },
+    { value: 12, label: 'Ano atual' },
+    { value: 24, label: 'Último ano' },
+  ];
+  let filtroPeriodoValor = 3;
+  function renderPeriodoDrop() {
+    document.getElementById('dropPeriodo').innerHTML = PERIODO_OPCOES.map(o => `
+      <div class="periodo-filtro-item${o.value===filtroPeriodoValor?' selecionado':''}" onclick="selecionarPeriodo(${o.value})">${o.label}</div>
+    `).join('');
+  }
+  function togglePeriodoFiltro() {
+    const d = document.getElementById('dropPeriodo');
+    const abrir = d.style.display !== 'block';
+    if (abrir) renderPeriodoDrop();
+    d.style.display = abrir ? 'block' : 'none';
+  }
+  function selecionarPeriodo(v) {
+    filtroPeriodoValor = v;
+    document.getElementById('lblPeriodo').textContent = PERIODO_OPCOES.find(o => o.value === v).label;
+    document.getElementById('dropPeriodo').style.display = 'none';
+    atualizarTendencias();
+  }
 
   function _salvarFiltroSS() {
     sessionStorage.setItem('gm_filtroSecao', filtroSecaoAtiva || '');
-    sessionStorage.setItem('gm_filtroSels', JSON.stringify([...filtroSelecionados]));
+    sessionStorage.setItem('gm_filtroValor', filtroValorSelecionado || '');
   }
   function _restaurarFiltroSS() {
     const secao = sessionStorage.getItem('gm_filtroSecao');
-    const sels  = JSON.parse(sessionStorage.getItem('gm_filtroSels') || '[]');
-    if (secao) { filtroSecaoAtiva = secao; filtroSelecionados = new Set(sels); }
+    const valor = sessionStorage.getItem('gm_filtroValor') || '';
+    if (secao) { filtroSecaoAtiva = secao; filtroValorSelecionado = valor || null; }
   }
   _restaurarFiltroSS();
 
@@ -655,7 +940,7 @@
 
   // Retorna [{ano, mi}] — ano real de cada mês (pode cruzar anos)
   function getMesesIdx() {
-    const fPeriodo = parseInt(document.getElementById('filtroPeriodo')?.value || '12');
+    const fPeriodo = filtroPeriodoValor;
     const hoje = new Date();
     const mesHoje = hoje.getMonth(); // 0-11
     const anoHoje = hoje.getFullYear();
@@ -728,13 +1013,13 @@
 
   function getDadosFiltrados() {
     const mesesIdx = getMesesIdx();
-    // Sem filtro ativo é "Todos os dados" (rótulo do próprio filtro) — não é pra ficar vazio.
-    if (!filtroSecaoAtiva || !filtroSelecionados.size) return { rows: bowlerData, mesesIdx };
+    // Sem filtro ativo, ou tipo escolhido mas "Todos" dentro dele, é "Todos os dados" — não é pra ficar vazio.
+    if (!filtroSecaoAtiva || !filtroValorSelecionado) return { rows: bowlerData, mesesIdx };
     const rows = bowlerData.filter(r => {
-      if (filtroSecaoAtiva === 'area')  return filtroSelecionados.has(r.area);
-      if (filtroSecaoAtiva === 'categ') return filtroSelecionados.has(r.categoria);
-      if (filtroSecaoAtiva === 'ind')   return filtroSelecionados.has(r.indicador);
-      return false;
+      if (filtroSecaoAtiva === 'area')  return r.area === filtroValorSelecionado;
+      if (filtroSecaoAtiva === 'categ') return r.categoria === filtroValorSelecionado;
+      if (filtroSecaoAtiva === 'ind')   return r.indicador === filtroValorSelecionado;
+      return true;
     });
     return { rows, mesesIdx };
   }
@@ -742,12 +1027,17 @@
   function renderMiniLista(containerId, items) {
     const el = document.getElementById(containerId);
     if (!el) return;
-    if (!items.length) { el.innerHTML = '<div style="color:#a0aec0;font-size:11px">Sem dados</div>'; return; }
-    el.innerHTML = items.map((item, i) => `
-      <div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #f0f2f5">
-        <span style="font-size:10px;color:#a0aec0;min-width:18px">#${i+1}</span>
-        <span style="flex:1;font-size:11px;color:#1e2a4a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.nome}">${item.nome}</span>
-      </div>`).join('');
+    if (!items.length) { el.innerHTML = '<div style="color:#9CA0AC;font-size:11px">Sem dados</div>'; return; }
+    el.innerHTML = items.map(item => {
+      const v = item.desvioMedio;
+      const cor = v >= 0 ? '#00B37E' : '#FF2E4D';
+      const valorTxt = (v > 0 ? '+' : '') + v.toFixed(0) + '%';
+      return `
+      <div class="hl-item">
+        <span title="${item.nome}">${item.nome}</span>
+        <span style="font-weight:700;color:${cor}">${valorTxt}</span>
+      </div>`;
+    }).join('');
   }
 
   async function atualizarTendencias() {
@@ -758,7 +1048,7 @@
     atualizarFiltros();
     const { todos } = getDadosGerais();
 
-    const setEmpty = id => { const el = document.getElementById(id); if (el) el.innerHTML = '<div style="color:#a0aec0;font-size:11px">Sem dados</div>'; };
+    const setEmpty = id => { const el = document.getElementById(id); if (el) el.innerHTML = '<div style="color:#9CA0AC;font-size:11px">Sem dados</div>'; };
 
     if (todos.length === 0) {
       ['cardDeptosMelhores','cardDeptosPiores','cardCatsMelhores','cardCatsPiores','cardIndsMelhores','cardIndsPiores'].forEach(setEmpty);
@@ -816,89 +1106,97 @@
     renderGrafico();
   }
 
+  const FILTRO_TIPOS = [
+    { tipo: 'area',  label: 'Área' },
+    { tipo: 'categ', label: 'Categoria' },
+    { tipo: 'ind',   label: 'Indicador' },
+  ];
+  let _filtroDropEtapa = 'tipo'; // 'tipo' | 'valor'
+
   function atualizarFiltros() {
-    const areas = [...new Set(bowlerData.map(r => r.area))].sort();
-    const cats  = [...new Set(bowlerData.map(r => r.categoria))].sort();
-    const inds  = [...new Set(bowlerData.map(r => r.indicador))].sort();
-    _renderFiltroUnif(areas, cats, inds);
     _updateLblFiltroUnif();
   }
 
-  function _renderFiltroUnif(areas, cats, inds) {
+  function toggleFiltroUnif() {
+    const d = document.getElementById('dropFiltroUnif');
+    const abrir = d.style.display !== 'block';
+    if (abrir) {
+      _filtroDropEtapa = filtroSecaoAtiva ? 'valor' : 'tipo';
+      _renderFiltroUnifDrop();
+    }
+    d.style.display = abrir ? 'block' : 'none';
+  }
+
+  function _itensDoTipo(tipo) {
+    const campo = tipo === 'area' ? 'area' : tipo === 'categ' ? 'categoria' : 'indicador';
+    return [...new Set(bowlerData.map(r => r[campo]))].sort();
+  }
+
+  function _renderFiltroUnifDrop() {
     const drop = document.getElementById('dropFiltroUnif');
     if (!drop) return;
-    const secoes = [
-      { tipo: 'area',  icon: '🏢', label: 'Áreas',       items: areas },
-      { tipo: 'categ', icon: '📂', label: 'Categorias',   items: cats  },
-      { tipo: 'ind',   icon: '📊', label: 'Indicadores',  items: inds  },
-    ];
-    drop.innerHTML = secoes.map(s => {
-      const ativa = filtroSecaoAtiva === s.tipo;
-      const todosMarcados = !ativa || filtroSelecionados.size === 0;
-      const itemsHtml = s.items.map(item => {
-        const safe  = item.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-        const jsVal = item.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-        return `<div class="filtro-multi-item"><label>
-          <input type="checkbox" ${ativa && filtroSelecionados.has(item) ? 'checked' : ''} onchange="_onUnifItem('${s.tipo}','${jsVal}',this)"> ${safe}
-        </label></div>`;
-      }).join('');
-      return `
-        <div class="filtro-uni-secao-hdr${ativa ? ' ativa' : ''}" onclick="_ativarSecao('${s.tipo}')">
-          ${s.icon} ${s.label}
-          ${ativa ? '<span style="margin-left:auto;font-size:9px;color:#2d1b69">▲</span>' : '<span style="margin-left:auto;font-size:9px;color:#a0aec0">▼</span>'}
-        </div>
-        <div class="filtro-uni-items${ativa ? '' : ' inativo'}">
-          <div class="filtro-multi-item all-item">
-            <label><input type="checkbox" ${todosMarcados ? 'checked' : ''} onchange="_onUnifAll('${s.tipo}',this)"> Todos</label>
-          </div>
-          ${itemsHtml}
-        </div>`;
-    }).join('');
-  }
 
-  function _ativarSecao(tipo) {
-    if (filtroSecaoAtiva === tipo) {
-      filtroSecaoAtiva = null; filtroSelecionados.clear();
-    } else {
-      filtroSecaoAtiva = tipo; filtroSelecionados.clear();
+    if (_filtroDropEtapa === 'tipo') {
+      drop.innerHTML = `
+        ${filtroSecaoAtiva ? `<button class="filtro-drop-limpar" onclick="_limparFiltroGrafico(event)">Ver todos os dados</button>` : ''}
+        ${FILTRO_TIPOS.map(t => `
+          <button class="filtro-drop-tipo-item" onclick="_escolherTipoFiltro('${t.tipo}',event)">
+            ${t.label}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>`).join('')}
+      `;
+      return;
     }
-    atualizarFiltros(); _salvarFiltroSS(); renderGrafico();
+
+    const nomes = { area: 'Área', categ: 'Categoria', ind: 'Indicador' };
+    const itens = _itensDoTipo(filtroSecaoAtiva);
+    drop.innerHTML = `
+      <button class="filtro-drop-voltar" onclick="_voltarTipoFiltro(event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        ${nomes[filtroSecaoAtiva]}
+      </button>
+      <div class="filtro-drop-lista">
+        <div class="filtro-drop-item${!filtroValorSelecionado ? ' selecionado' : ''}" onclick="_escolherValorFiltro(null,event)">Todos</div>
+        ${itens.map(v => `<div class="filtro-drop-item${filtroValorSelecionado===v ? ' selecionado' : ''}" onclick="_escolherValorFiltro('${v.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}',event)">${v.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>`).join('')}
+      </div>`;
   }
 
-  function _onUnifAll(tipo, cb) {
-    if (!cb.checked) { cb.checked = true; return; }
-    filtroSelecionados.clear();
-    document.querySelectorAll('#dropFiltroUnif .filtro-uni-items:not(.inativo) input[type=checkbox]')
-      .forEach(c => { if (c !== cb) c.checked = false; });
+  function _escolherTipoFiltro(tipo, e) {
+    if (e) e.stopPropagation();
+    filtroSecaoAtiva = tipo;
+    filtroValorSelecionado = null;
+    _filtroDropEtapa = 'valor';
+    _renderFiltroUnifDrop();
     _updateLblFiltroUnif(); _salvarFiltroSS(); renderGrafico();
   }
 
-  function _onUnifItem(tipo, val, cb) {
-    if (filtroSecaoAtiva !== tipo) { filtroSecaoAtiva = tipo; filtroSelecionados.clear(); atualizarFiltros(); }
-    const allCb = cb.closest('.filtro-uni-items')?.querySelector('.all-item input');
-    if (cb.checked) {
-      filtroSelecionados.add(val);
-      if (allCb) allCb.checked = false;
-    } else {
-      filtroSelecionados.delete(val);
-      if (!filtroSelecionados.size && allCb) allCb.checked = true;
-    }
+  function _voltarTipoFiltro(e) {
+    if (e) e.stopPropagation();
+    _filtroDropEtapa = 'tipo';
+    _renderFiltroUnifDrop();
+  }
+
+  function _limparFiltroGrafico(e) {
+    if (e) e.stopPropagation();
+    filtroSecaoAtiva = null;
+    filtroValorSelecionado = null;
+    document.getElementById('dropFiltroUnif').style.display = 'none';
+    _updateLblFiltroUnif(); _salvarFiltroSS(); renderGrafico();
+  }
+
+  function _escolherValorFiltro(val, e) {
+    if (e) e.stopPropagation();
+    filtroValorSelecionado = val;
+    document.getElementById('dropFiltroUnif').style.display = 'none';
     _updateLblFiltroUnif(); _salvarFiltroSS(); renderGrafico();
   }
 
   function _updateLblFiltroUnif() {
     const lbl = document.getElementById('lblFiltroUnif');
     if (!lbl) return;
-    if (!filtroSecaoAtiva || !filtroSelecionados.size) { lbl.textContent = 'Todos os dados'; return; }
+    if (!filtroSecaoAtiva) { lbl.textContent = 'Todos os dados'; return; }
     const nomes = { area: 'Área', categ: 'Categoria', ind: 'Indicador' };
-    lbl.textContent = filtroSelecionados.size === 1
-      ? [...filtroSelecionados][0]
-      : `${filtroSelecionados.size} ${nomes[filtroSecaoAtiva]}s`;
-  }
-
-  function toggleFiltroUnif() {
-    const d = document.getElementById('dropFiltroUnif');
-    d.style.display = d.style.display === 'none' ? 'block' : 'none';
+    lbl.textContent = filtroValorSelecionado ? filtroValorSelecionado : `Todas as ${nomes[filtroSecaoAtiva] === 'Área' ? 'áreas' : nomes[filtroSecaoAtiva] === 'Categoria' ? 'categorias' : 'indicadores'}`;
   }
 
   function renderRecomendacoes(todos) {
@@ -967,13 +1265,13 @@
         label: `Meta: ${row.indicador}`,
         data: mesesIdx.map(({ ano, mi }) => { const m = getMesDataRow(row, ano, mi); const v = parseFloat(m?.plan ?? ''); return isNaN(v) ? null : v; }),
         borderColor: c, borderDash: [6, 4], borderWidth: 1.5,
-        pointRadius: 3, pointBackgroundColor: c, tension: 0.4, spanGaps: false, fill: false
+        pointRadius: 2.5, pointStyle: 'rect', pointBackgroundColor: c, tension: 0.4, spanGaps: false, fill: false
       });
       datasets.push({
         label: row.indicador,
         data: mesesIdx.map(({ ano, mi }) => { const m = getMesDataRow(row, ano, mi); const v = parseFloat(m?.act ?? ''); return isNaN(v) ? null : v; }),
         borderColor: c, backgroundColor: c + '18', borderWidth: 2.5,
-        pointRadius: 4, pointBackgroundColor: c, tension: 0.4, spanGaps: true, fill: false
+        pointRadius: 3, pointStyle: 'rect', pointBackgroundColor: c, tension: 0.4, spanGaps: true, fill: false
       });
     });
 
@@ -987,18 +1285,20 @@
           legend: {
             position: 'bottom',
             labels: {
-              font: { size: 11 }, usePointStyle: true, padding: 14,
+              font: { size: 11, weight: 600 }, color: '#6B7080', usePointStyle: true, pointStyle: 'rect', boxWidth: 8, boxHeight: 8, padding: 14,
               filter: item => !item.text.startsWith('Meta: ')
             }
           },
           tooltip: {
+            backgroundColor: '#0B0B0F', titleColor: '#fff', bodyColor: 'rgba(255,255,255,0.85)',
+            titleFont: { weight: 700 }, cornerRadius: 8, padding: 10, displayColors: true,
             callbacks: {
               label: c => `${c.dataset.label}: ${c.parsed.y != null ? c.parsed.y.toFixed(1) : '—'}`
             }
           }
         },
         scales: {
-          y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { size: 11 } } },
+          y: { beginAtZero: false, grid: { color: '#F2F3F5' }, ticks: { font: { size: 11 } } },
           x: { grid: { display: false }, ticks: { font: { size: 11 } } }
         }
       }
@@ -1043,7 +1343,7 @@
         datasets.push({
           label: nome, data,
           borderColor: c, backgroundColor: c + '18', borderWidth: 2.5,
-          pointRadius: 4, pointBackgroundColor: c, tension: 0.3, spanGaps: false, fill: false
+          pointRadius: 3, pointStyle: 'rect', pointBackgroundColor: c, tension: 0.3, spanGaps: false, fill: false
         });
       });
     } else {
@@ -1053,7 +1353,7 @@
           label: row.indicador,
           data: mesesIdx.map(({ ano, mi }) => calcDesvioRow(row, ano, mi)),
           borderColor: c, backgroundColor: c + '18', borderWidth: 2.5,
-          pointRadius: 4, pointBackgroundColor: c, tension: 0.3, spanGaps: false, fill: false
+          pointRadius: 3, pointStyle: 'rect', pointBackgroundColor: c, tension: 0.3, spanGaps: false, fill: false
         });
       });
     }
@@ -1065,15 +1365,19 @@
         responsive: true,
         interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { position: 'bottom', labels: { font: { size: 11 }, usePointStyle: true, padding: 14 } },
-          tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y != null ? c.parsed.y.toFixed(1) + '%' : '—'}` } }
+          legend: { position: 'bottom', labels: { font: { size: 11, weight: 600 }, color: '#6B7080', usePointStyle: true, pointStyle: 'rect', boxWidth: 8, boxHeight: 8, padding: 14 } },
+          tooltip: {
+            backgroundColor: '#0B0B0F', titleColor: '#fff', bodyColor: 'rgba(255,255,255,0.85)',
+            titleFont: { weight: 700 }, cornerRadius: 8, padding: 10, displayColors: true,
+            callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y != null ? c.parsed.y.toFixed(1) + '%' : '—'}` }
+          }
         },
         scales: {
           y: {
             beginAtZero: false,
             ticks: { font: { size: 11 }, callback: v => v + '%' },
             grid: {
-              color: ctx2 => ctx2.tick.value === 0 ? '#718096' : 'rgba(0,0,0,0.04)',
+              color: ctx2 => ctx2.tick.value === 0 ? '#9CA0AC' : '#F2F3F5',
               lineWidth: ctx2 => ctx2.tick.value === 0 ? 2 : 1
             }
           },
@@ -1156,6 +1460,7 @@
   function fecharModal(id) { document.getElementById(id).classList.remove('aberto'); }
   document.querySelectorAll('.modal-overlay').forEach(m=>{ m.addEventListener('click',e=>{ if(e.target===m)m.classList.remove('aberto'); }); });
   document.addEventListener('click', e => { if (!e.target.closest('.filtro-multi-wrap')) document.getElementById('dropFiltroUnif').style.display='none'; });
+  document.addEventListener('click', e => { if (!e.target.closest('.periodo-filtro-wrap')) document.getElementById('dropPeriodo').style.display='none'; });
   function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href='/'; }
 
   // INIT — carrega do banco
@@ -1236,16 +1541,28 @@
       badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
     }
   }
+  const NOTIF_ICON = {
+    sucesso: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>', color:'#00754F'},
+    erro: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+    aviso: {svg:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', color:'#8A6200'},
+    info: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>', color:'var(--accent)'},
+    licenca_vencendo: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>', color:'#8A6200'},
+    licenca_vencida: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+  };
+  function _notifIconHtml(tipo) {
+    const cfg = NOTIF_ICON[tipo] || NOTIF_ICON.info;
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2">${cfg.svg}</svg>`;
+  }
   function renderNotificacoes(notifs) {
     const lista = document.getElementById('notifLista');
     if (!lista) return;
     if (!notifs || notifs.length === 0) {
-      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
+      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
       return;
     }
     lista.innerHTML = notifs.map(n => `
       <div class="notif-item ${!n.lida?'nao-lida':''} tipo-${n.tipo}" onclick="abrirNotif('${n._id}','${n.link||''}')">
-        <div class="notif-icone ${n.tipo}">${n.icone||'🔔'}</div>
+        <div class="notif-icone ${n.tipo}">${_notifIconHtml(n.tipo)}</div>
         <div class="notif-corpo">
           <div class="notif-titulo-item">${n.titulo}</div>
           <div class="notif-msg">${n.mensagem}</div>

@@ -47,6 +47,18 @@ const RB_ACOES = [
   { tipo: 'run_command', label: 'Rodar comando', icone: '>_', cor: '#1a202c', cat: 'Sistema (na máquina)' },
   { tipo: 'browser_flow', label: 'Fluxo de navegador', icone: '🌐', cor: '#c53030', cat: 'Browser (na máquina)' },
 
+  // ---- Sessão de browser persistente entre steps ----
+  { tipo: 'browser_open', label: 'Abrir sessão de navegador', icone: '🌐+', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target', 'headless', 'browser_profile'], agente: true },
+  { tipo: 'browser_click', label: 'Clicar (sessão)', icone: '👆', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target'], agente: true },
+  { tipo: 'browser_type', label: 'Digitar (sessão)', icone: '⌨', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target', 'value'], agente: true },
+  { tipo: 'browser_extract', label: 'Extrair texto (sessão)', icone: '📋', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target'], agente: true },
+  { tipo: 'browser_wait', label: 'Aguardar elemento (sessão)', icone: '⏳', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target', 'seconds', 'timeout_seconds'], agente: true },
+  { tipo: 'browser_screenshot', label: 'Screenshot (sessão)', icone: '📸', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target'], agente: true },
+  { tipo: 'browser_close', label: 'Fechar sessão de navegador', icone: '🌐✕', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name'], agente: true },
+  { tipo: 'browser_captcha_detect', label: 'Captcha foi resolvido?', icone: '🤖', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name'], agente: true },
+  { tipo: 'browser_captcha_wait', label: 'Aguardar resolução de captcha', icone: '🤖⏳', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'timeout_seconds'], agente: true },
+  { tipo: 'browser_captcha_solve_image', label: 'Capturar imagem do captcha', icone: '🤖📸', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target'], agente: true },
+
   // ---- Expansão (formulário genérico por metadados de campo, ver RB_FIELD_META) ----
   { tipo: 'calculate', label: 'Calcular expressão', icone: 'ƒx', cor: '#3b5bdb', cat: 'Variáveis', fields: ['expression'] },
 
@@ -255,6 +267,10 @@ const RB_FIELD_META = {
   format: { label: 'Formato', type: 'text', placeholder: 'DD/MM/YYYY HH:mm' },
   provedor: { label: 'Voz/provedor', type: 'text' },
   seconds: { label: 'Segundos', type: 'text' },
+  timeout_seconds: { label: 'Timeout (segundos)', type: 'text' },
+  session_name: { label: 'Nome da sessão', type: 'text', placeholder: 'principal', hint: 'Mesmo nome usado em "Abrir sessão" — identifica qual navegador esse step controla.' },
+  browser_profile: { label: 'Pasta de perfil persistente (opcional)', type: 'text', hint: 'Preenche pra manter login/cookies entre execuções (força janela visível, não headless).' },
+  headless: { label: 'Sem interface visível (headless)', type: 'checkbox' },
 };
 
 function rbGenericFields(step) {

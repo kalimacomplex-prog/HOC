@@ -3152,7 +3152,13 @@ app.post('/api/maquinas/heartbeat', async (req, res) => {
         { new: true, sort: { criadoEm: 1 } }
       );
       if (!disp) break;
-      automacaoSteps.push({ dispatchId: disp._id, step: disp.step, ctx: disp.ctxSnapshot });
+      automacaoSteps.push({
+        dispatchId: disp._id, step: disp.step,
+        // run_id separa sessões de browser concorrentes na mesma máquina
+        // (ver hoc_step_executor.py::_session_key) — sem isso, duas
+        // automações usando o mesmo nome de sessão colidiriam.
+        ctx: { ...disp.ctxSnapshot, run_id: String(disp.runId) },
+      });
     }
 
     res.json({ ok: true, status, commands, automacaoSteps });

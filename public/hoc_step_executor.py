@@ -1,18 +1,32 @@
 """
 hoc_step_executor.py — implementa os steps do builder de automação de Robôs
-que precisam rodar na máquina do tenant (read_file, write_file, run_command,
-browser_flow), shipado junto no pacote do Agent e chamado por agent.py
-quando o heartbeat retorna algo em `automacaoSteps`.
+que precisam rodar na máquina do tenant, shipado junto no pacote do Agent e
+chamado por agent.py quando o heartbeat retorna algo em `automacaoSteps`.
 
-Modelo de browser deliberadamente simples nesta fase (ver plano em
-C:\\Users\\novai\\.claude\\plans\\enchanted-gathering-pearl.md): uma lista de
-ações compiladas e rodadas de uma vez num único browser, sem sessão
-persistente entre steps (isso fica pra uma fase posterior).
+Dois modelos de browser coexistem:
+- `browser_flow`: lista de ações compiladas e rodadas de uma vez num único
+  browser (abre, faz tudo, fecha) — mais simples, sem estado entre steps.
+- `browser_open`/`browser_click`/.../`browser_close`: sessão persistente
+  entre steps separados do builder. Mais simples de implementar aqui do que
+  no HAC porque o agent.py do HOC já é um processo de longa duração (não um
+  script novo por job) — não precisamos do truque do HAC de subprocesso
+  destacado + reconexão via porta CDP a cada ação só pra sobreviver entre
+  processos; aqui um dicionário no nível do módulo já é suficiente, porque
+  as threads que tratam cada step do heartbeat rodam todas dentro do MESMO
+  processo do agente. O que ainda reconecta via CDP a cada ação (em vez de
+  guardar o objeto Python do Playwright) é só porque a API síncrona do
+  Playwright não é thread-safe entre chamadas — cada ação abre sua própria
+  instância curta do driver, conecta no Chrome já rodando via CDP, faz UMA
+  coisa, e desconecta (sem matar o processo real do Chrome).
 """
+import base64
 import json
 import os
 import re
+import socket
 import subprocess
+import threading
+import time
 
 
 def _sub(text, ctx):
@@ -78,7 +92,218 @@ def executar_step(step, ctx):
     if tipo in ('transcode_media', 'extract_audio', 'trim_media', 'extract_video_frame'):
         return _executar_midia(tipo, cfg, ctx)
 
+    if tipo in _BROWSER_SESSION_STEPS:
+        return _BROWSER_SESSION_STEPS[tipo](cfg, ctx)
+
     raise ValueError(f'Tipo de step não suportado no agente: {tipo}')
+
+
+# ==================== Sessão de browser persistente entre steps ====================
+
+# Chave = "{run_id}:{session_name}" — separa por run pra duas automações
+# concorrentes na mesma máquina não colidirem usando o mesmo nome de sessão.
+_sessions = {}
+_sessions_lock = threading.Lock()
+_SESSION_TTL_SECONDS = 30 * 60
+
+
+def _session_key(cfg, ctx):
+    nome = cfg.get('session_name') or 'default'
+    run_id = ctx.get('run_id') or ''
+    return f'{run_id}:{nome}'
+
+
+def _chromium_path():
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        return p.chromium.executable_path
+
+
+def _iniciar_watchdog(session_key):
+    def _watch():
+        time.sleep(_SESSION_TTL_SECONDS)
+        with _sessions_lock:
+            sess = _sessions.pop(session_key, None)
+        if sess:
+            _matar_processo(sess['pid'])
+    threading.Thread(target=_watch, daemon=True).start()
+
+
+def _matar_processo(pid):
+    # Mata a árvore inteira (processo + filhos) — o Chrome sobe vários
+    # processos filhos (renderer, GPU etc.) e matar só o PID principal pode
+    # deixar órfãos, mesmo binding funcionando na maioria dos casos simples.
+    try:
+        import psutil
+        pai = psutil.Process(pid)
+        for filho in pai.children(recursive=True):
+            try:
+                filho.kill()
+            except Exception:
+                pass
+        pai.kill()
+    except Exception:
+        try:
+            os.kill(pid, 9)
+        except Exception:
+            pass
+
+
+def _browser_open(cfg, ctx):
+    try:
+        from playwright.sync_api import sync_playwright  # noqa: F401 (só valida que está instalado)
+    except ImportError:
+        raise RuntimeError(
+            'Playwright não instalado nesta máquina. Rode: '
+            'pip install playwright && playwright install chromium'
+        )
+
+    key = _session_key(cfg, ctx)
+    with _sessions_lock:
+        if key in _sessions:
+            return f'Sessão "{cfg.get("session_name") or "default"}" já estava aberta.'
+
+    with socket.socket() as s:
+        s.bind(('127.0.0.1', 0))
+        porta = s.getsockname()[1]
+
+    perfil = _sub(cfg.get('browser_profile', ''), ctx)
+    # Perfil persistente (extensões pagas de captcha, sessão de login salva)
+    # só faz sentido com janela visível — headless nesse caso é ignorado de
+    # propósito, mesmo comportamento documentado no HAC.
+    headless = bool(cfg.get('headless', True)) and not perfil
+
+    args = [
+        _chromium_path(),
+        f'--remote-debugging-port={porta}',
+        '--no-first-run',
+        '--no-default-browser-check',
+    ]
+    if perfil:
+        args.append(f'--user-data-dir={perfil}')
+    if headless:
+        args.append('--headless=new')
+    args.append(_sub(cfg.get('target') or cfg.get('url') or 'about:blank', ctx))
+
+    processo = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    with _sessions_lock:
+        _sessions[key] = {'porta': porta, 'pid': processo.pid, 'aberto_em': time.time()}
+    _iniciar_watchdog(key)
+    time.sleep(1.5)  # dá tempo do Chrome subir e o debug port responder
+    return f'Sessão aberta (porta {porta}).'
+
+
+def _com_pagina(cfg, ctx, fn):
+    """Reconecta via CDP na sessão já aberta, roda `fn(page)`, desconecta
+    (sem matar o processo real do Chrome — só solta a conexão CDP)."""
+    key = _session_key(cfg, ctx)
+    with _sessions_lock:
+        sess = _sessions.get(key)
+    if not sess:
+        nome = cfg.get('session_name') or 'default'
+        raise RuntimeError(f'Sessão de navegador "{nome}" não está aberta. Use "Abrir sessão de navegador" antes.')
+
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as p:
+        browser = p.chromium.connect_over_cdp(f'http://127.0.0.1:{sess["porta"]}')
+        try:
+            contexto = browser.contexts[0] if browser.contexts else browser.new_context()
+            pagina = contexto.pages[0] if contexto.pages else contexto.new_page()
+            return fn(pagina)
+        finally:
+            browser.close()
+
+
+def _browser_click(cfg, ctx):
+    alvo = _sub(cfg.get('target', ''), ctx)
+    return _com_pagina(cfg, ctx, lambda p: (p.click(alvo), 'ok')[1])
+
+
+def _browser_type(cfg, ctx):
+    alvo = _sub(cfg.get('target', ''), ctx)
+    valor = _sub(cfg.get('value', ''), ctx)
+    return _com_pagina(cfg, ctx, lambda p: (p.fill(alvo, valor), 'ok')[1])
+
+
+def _browser_extract(cfg, ctx):
+    alvo = _sub(cfg.get('target', ''), ctx)
+    return _com_pagina(cfg, ctx, lambda p: p.inner_text(alvo))
+
+
+def _browser_wait(cfg, ctx):
+    alvo = _sub(cfg.get('target', ''), ctx)
+    if alvo:
+        return _com_pagina(cfg, ctx, lambda p: (p.wait_for_selector(alvo, timeout=float(cfg.get('timeout_seconds') or 30) * 1000), 'ok')[1])
+    time.sleep(float(cfg.get('seconds') or 1))
+    return 'ok'
+
+
+def _browser_screenshot(cfg, ctx):
+    alvo = _sub(cfg.get('target', ''), ctx)
+
+    def _fn(p):
+        img_bytes = p.locator(alvo).screenshot() if alvo else p.screenshot()
+        return base64.b64encode(img_bytes).decode('ascii')
+    return _com_pagina(cfg, ctx, _fn)
+
+
+def _browser_close(cfg, ctx):
+    key = _session_key(cfg, ctx)
+    with _sessions_lock:
+        sess = _sessions.pop(key, None)
+    if not sess:
+        return 'Sessão já estava fechada.'
+    _matar_processo(sess['pid'])
+    return 'Sessão fechada.'
+
+
+_CAPTCHA_JS = """() => {
+    const el = document.querySelector('textarea[name="g-recaptcha-response"], textarea[name="h-captcha-response"]');
+    return !!(el && el.value);
+}"""
+
+
+def _browser_captcha_detect(cfg, ctx):
+    resolvido = _com_pagina(cfg, ctx, lambda p: p.evaluate(_CAPTCHA_JS))
+    return 'true' if resolvido else 'false'
+
+
+def _browser_captcha_wait(cfg, ctx):
+    prazo = time.time() + float(cfg.get('timeout_seconds') or 120)
+    while time.time() < prazo:
+        if _browser_captcha_detect(cfg, ctx) == 'true':
+            return 'Captcha resolvido.'
+        time.sleep(2)
+    raise RuntimeError('Timeout esperando o captcha ser resolvido manualmente na janela do navegador.')
+
+
+def _browser_captcha_solve_image(cfg, ctx):
+    # Só captura o elemento do captcha como imagem (base64) — a leitura em
+    # si reaproveita o step "OCR de imagem" (server-side, ver
+    # lib/stepLibrary.js::ocr_image) encadeado logo depois no builder, em
+    # vez de duplicar um motor de OCR aqui no agente.
+    alvo = _sub(cfg.get('target', ''), ctx)
+
+    def _fn(p):
+        elemento = p.query_selector(alvo)
+        if not elemento:
+            raise RuntimeError(f'Elemento do captcha não encontrado: {alvo}')
+        return base64.b64encode(elemento.screenshot()).decode('ascii')
+    return _com_pagina(cfg, ctx, _fn)
+
+
+_BROWSER_SESSION_STEPS = {
+    'browser_open': _browser_open,
+    'browser_click': _browser_click,
+    'browser_type': _browser_type,
+    'browser_extract': _browser_extract,
+    'browser_wait': _browser_wait,
+    'browser_screenshot': _browser_screenshot,
+    'browser_close': _browser_close,
+    'browser_captcha_detect': _browser_captcha_detect,
+    'browser_captcha_wait': _browser_captcha_wait,
+    'browser_captcha_solve_image': _browser_captcha_solve_image,
+}
 
 
 # ==================== Arquivos/pastas (por caminho na máquina) ====================

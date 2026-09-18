@@ -69,7 +69,187 @@ def executar_step(step, ctx):
     if tipo == 'browser_flow':
         return _executar_browser_flow(cfg, ctx)
 
+    if tipo in _FILE_STEPS:
+        return _FILE_STEPS[tipo](cfg, ctx)
+
+    if tipo in ('system_stats', 'list_processes'):
+        return _executar_sistema(tipo, cfg, ctx)
+
+    if tipo in ('transcode_media', 'extract_audio', 'trim_media', 'extract_video_frame'):
+        return _executar_midia(tipo, cfg, ctx)
+
     raise ValueError(f'Tipo de step não suportado no agente: {tipo}')
+
+
+# ==================== Arquivos/pastas (por caminho na máquina) ====================
+
+def _fs_list_files(cfg, ctx):
+    pasta = _sub(cfg.get('directory', ''), ctx)
+    padrao = cfg.get('pattern') or '*'
+    import glob
+    arquivos = glob.glob(os.path.join(pasta, padrao))
+    return json.dumps(arquivos)
+
+
+def _fs_delete_file(cfg, ctx):
+    caminho = _sub(cfg.get('file_path', ''), ctx)
+    os.remove(caminho)
+    return f'Removido: {caminho}'
+
+
+def _fs_copy_file(cfg, ctx):
+    import shutil
+    origem = _sub(cfg.get('source_path', ''), ctx)
+    destino = _sub(cfg.get('dest_path', ''), ctx)
+    shutil.copy2(origem, destino)
+    return f'Copiado: {origem} -> {destino}'
+
+
+def _fs_move_file(cfg, ctx):
+    import shutil
+    origem = _sub(cfg.get('source_path', ''), ctx)
+    destino = _sub(cfg.get('dest_path', ''), ctx)
+    shutil.move(origem, destino)
+    return f'Movido: {origem} -> {destino}'
+
+
+def _fs_file_hash(cfg, ctx):
+    import hashlib
+    caminho = _sub(cfg.get('file_path', ''), ctx)
+    algo = cfg.get('hash_algo') or 'sha256'
+    h = hashlib.new(algo)
+    with open(caminho, 'rb') as f:
+        for bloco in iter(lambda: f.read(65536), b''):
+            h.update(bloco)
+    return h.hexdigest()
+
+
+def _fs_file_info(cfg, ctx):
+    caminho = _sub(cfg.get('file_path', ''), ctx)
+    st = os.stat(caminho)
+    return json.dumps({
+        'tamanho': st.st_size,
+        'modificado': st.st_mtime,
+        'existe': True,
+        'e_diretorio': os.path.isdir(caminho),
+    })
+
+
+def _fs_search_in_files(cfg, ctx):
+    pasta = _sub(cfg.get('directory', ''), ctx)
+    padrao = cfg.get('pattern') or '*'
+    termo = _sub(cfg.get('value', ''), ctx)
+    import glob
+    achados = []
+    for caminho in glob.glob(os.path.join(pasta, '**', padrao), recursive=True):
+        if not os.path.isfile(caminho):
+            continue
+        try:
+            with open(caminho, 'r', encoding='utf-8', errors='ignore') as f:
+                if termo in f.read():
+                    achados.append(caminho)
+        except Exception:
+            continue
+    return json.dumps(achados)
+
+
+def _fs_convert_encoding(cfg, ctx):
+    caminho = _sub(cfg.get('file_path', ''), ctx)
+    de = cfg.get('encoding_from') or 'latin-1'
+    para = cfg.get('encoding_to') or 'utf-8'
+    with open(caminho, 'r', encoding=de) as f:
+        conteudo = f.read()
+    with open(caminho, 'w', encoding=para) as f:
+        f.write(conteudo)
+    return f'Convertido {de} -> {para}: {caminho}'
+
+
+def _fs_delete_folder(cfg, ctx):
+    import shutil
+    pasta = _sub(cfg.get('directory', ''), ctx)
+    shutil.rmtree(pasta, ignore_errors=True)
+    return f'Pasta removida: {pasta}'
+
+
+def _fs_ensure_dir(cfg, ctx):
+    pasta = _sub(cfg.get('directory', ''), ctx)
+    os.makedirs(pasta, exist_ok=True)
+    return f'Pasta garantida: {pasta}'
+
+
+def _fs_backup_folder(cfg, ctx):
+    import shutil
+    from datetime import datetime
+    pasta = _sub(cfg.get('directory', ''), ctx)
+    destino = f"{pasta}_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    shutil.copytree(pasta, destino)
+    return destino
+
+
+_FILE_STEPS = {
+    'list_files': _fs_list_files,
+    'delete_file': _fs_delete_file,
+    'copy_file': _fs_copy_file,
+    'move_file': _fs_move_file,
+    'file_hash': _fs_file_hash,
+    'file_info': _fs_file_info,
+    'search_in_files': _fs_search_in_files,
+    'convert_encoding': _fs_convert_encoding,
+    'delete_folder': _fs_delete_folder,
+    'ensure_dir': _fs_ensure_dir,
+    'backup_folder': _fs_backup_folder,
+}
+
+
+# ==================== Sistema (da máquina do tenant) ====================
+
+def _executar_sistema(tipo, cfg, ctx):
+    try:
+        import psutil
+    except ImportError:
+        raise RuntimeError('psutil não instalado nesta máquina. Rode: pip install psutil')
+
+    if tipo == 'system_stats':
+        return json.dumps({
+            'cpu_percent': psutil.cpu_percent(interval=1),
+            'ram_percent': psutil.virtual_memory().percent,
+            'disco_percent': psutil.disk_usage('/').percent,
+        })
+
+    if tipo == 'list_processes':
+        procs = [{'pid': p.pid, 'nome': p.info.get('name')} for p in psutil.process_iter(['name'])]
+        return json.dumps(procs[:200])
+
+
+# ==================== Mídia (precisa do binário ffmpeg instalado) ====================
+
+def _executar_midia(tipo, cfg, ctx):
+    try:
+        import ffmpeg
+    except ImportError:
+        raise RuntimeError('ffmpeg-python não instalado nesta máquina. Rode: pip install ffmpeg-python (precisa também do binário ffmpeg no PATH)')
+
+    origem = _sub(cfg.get('source_path') or cfg.get('file_path', ''), ctx)
+    destino = _sub(cfg.get('dest_path', ''), ctx)
+
+    if tipo == 'transcode_media':
+        ffmpeg.input(origem).output(destino).overwrite_output().run(quiet=True)
+        return destino
+
+    if tipo == 'extract_audio':
+        ffmpeg.input(origem).output(destino, vn=None, acodec='libmp3lame').overwrite_output().run(quiet=True)
+        return destino
+
+    if tipo == 'trim_media':
+        inicio = _sub(str(cfg.get('value') or '0'), ctx)
+        duracao = _sub(str(cfg.get('seconds') or '10'), ctx)
+        ffmpeg.input(origem, ss=inicio, t=duracao).output(destino).overwrite_output().run(quiet=True)
+        return destino
+
+    if tipo == 'extract_video_frame':
+        tempo = _sub(str(cfg.get('value') or '0'), ctx)
+        ffmpeg.input(origem, ss=tempo).output(destino, vframes=1).overwrite_output().run(quiet=True)
+        return destino
 
 
 def _executar_browser_flow(cfg, ctx):

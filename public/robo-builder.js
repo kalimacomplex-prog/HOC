@@ -46,8 +46,221 @@ const RB_ACOES = [
   { tipo: 'write_file', label: 'Escrever arquivo', icone: '📝', cor: '#276749', cat: 'Arquivos (na máquina)' },
   { tipo: 'run_command', label: 'Rodar comando', icone: '>_', cor: '#1a202c', cat: 'Sistema (na máquina)' },
   { tipo: 'browser_flow', label: 'Fluxo de navegador', icone: '🌐', cor: '#c53030', cat: 'Browser (na máquina)' },
+
+  // ---- Expansão (formulário genérico por metadados de campo, ver RB_FIELD_META) ----
+  { tipo: 'calculate', label: 'Calcular expressão', icone: 'ƒx', cor: '#3b5bdb', cat: 'Variáveis', fields: ['expression'] },
+
+  { tipo: 'date_diff', label: 'Diferença entre datas', icone: '📅', cor: '#718096', cat: 'Data/hora', fields: ['date_from', 'date_to', 'unit'] },
+  { tipo: 'date_add', label: 'Somar/subtrair data', icone: '📅', cor: '#718096', cat: 'Data/hora', fields: ['date', 'date_amount', 'unit'] },
+  { tipo: 'timezone_convert', label: 'Converter fuso horário', icone: '🕐', cor: '#718096', cat: 'Data/hora', fields: ['date', 'to_timezone'] },
+  { tipo: 'is_business_day', label: 'É dia útil?', icone: '📅', cor: '#718096', cat: 'Data/hora', fields: ['date'] },
+  { tipo: 'format_date', label: 'Formatar data', icone: '📅', cor: '#718096', cat: 'Data/hora', fields: ['date', 'format'] },
+
+  { tipo: 'list_files', label: 'Listar arquivos', icone: '📁', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['directory', 'pattern'], agente: true },
+  { tipo: 'delete_file', label: 'Excluir arquivo', icone: '🗑', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['file_path'], agente: true },
+  { tipo: 'copy_file', label: 'Copiar arquivo', icone: '📋', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['source_path', 'dest_path'], agente: true },
+  { tipo: 'move_file', label: 'Mover arquivo', icone: '➡', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['source_path', 'dest_path'], agente: true },
+  { tipo: 'file_hash', label: 'Hash de arquivo', icone: '#', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['file_path', 'hash_algo'], agente: true },
+  { tipo: 'file_info', label: 'Info do arquivo', icone: 'ℹ', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['file_path'], agente: true },
+  { tipo: 'search_in_files', label: 'Buscar em arquivos', icone: '🔍', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['directory', 'pattern', 'value'], agente: true },
+  { tipo: 'convert_encoding', label: 'Converter encoding', icone: '🔤', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['file_path', 'encoding_from', 'encoding_to'], agente: true },
+  { tipo: 'delete_folder', label: 'Excluir pasta', icone: '🗑', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['directory'], agente: true },
+  { tipo: 'ensure_dir', label: 'Garantir pasta', icone: '📁', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['directory'], agente: true },
+  { tipo: 'backup_folder', label: 'Backup de pasta', icone: '💾', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['directory'], agente: true },
+  { tipo: 'zip_files', label: 'Compactar (zip)', icone: '🗜', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['data_input'] },
+  { tipo: 'unzip_file', label: 'Descompactar (zip)', icone: '🗜', cor: '#276749', cat: 'Arquivos (na máquina)', fields: ['file_base64'] },
+
+  { tipo: 'read_excel', label: 'Ler Excel', icone: '📊', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['file_base64', 'sheet_name'] },
+  { tipo: 'write_excel', label: 'Escrever Excel', icone: '📊', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'sheet_name'] },
+  { tipo: 'read_csv', label: 'Ler CSV', icone: '📊', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['file_base64', 'delimiter'] },
+  { tipo: 'write_csv', label: 'Escrever CSV', icone: '📊', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'delimiter'] },
+  { tipo: 'write_row', label: 'Adicionar linha', icone: '➕', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'value'] },
+  { tipo: 'write_cell', label: 'Escrever célula', icone: '✏', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'row_index', 'cell_ref', 'value'] },
+  { tipo: 'remove_row', label: 'Remover linha', icone: '➖', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'row_index'] },
+  { tipo: 'remove_cell', label: 'Remover célula', icone: '➖', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'row_index', 'cell_ref'] },
+  { tipo: 'filter_data', label: 'Filtrar dados', icone: '🔽', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'cell_ref', 'operator', 'value'] },
+  { tipo: 'merge_data', label: 'Combinar dados', icone: '🔗', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'data_input2', 'merge_key'] },
+  { tipo: 'dedupe_data', label: 'Remover duplicados', icone: '🧹', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'cell_ref'] },
+  { tipo: 'sort_group_data', label: 'Ordenar dados', icone: '↕', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'sort_key'] },
+  { tipo: 'sql_on_data', label: 'SQL sobre dados', icone: '🗄', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['data_input', 'sql_query'] },
+  { tipo: 'generate_fake_data', label: 'Gerar dados fake', icone: '🎲', cor: '#2f7a3d', cat: 'Planilhas/dados', fields: ['fake_type', 'fake_count'] },
+
+  { tipo: 'pdf_extract_text', label: 'Extrair texto de PDF', icone: '📕', cor: '#c53030', cat: 'PDF', fields: ['file_base64'] },
+  { tipo: 'pdf_extract_tables', label: 'Extrair tabelas de PDF', icone: '📕', cor: '#c53030', cat: 'PDF', fields: ['file_base64'] },
+  { tipo: 'pdf_merge', label: 'Juntar PDFs', icone: '📕', cor: '#c53030', cat: 'PDF', fields: ['data_input'] },
+  { tipo: 'pdf_split', label: 'Separar PDF', icone: '📕', cor: '#c53030', cat: 'PDF', fields: ['file_base64'] },
+  { tipo: 'pdf_generate', label: 'Gerar PDF', icone: '📕', cor: '#c53030', cat: 'PDF', fields: ['content'] },
+  { tipo: 'pdf_fill_form', label: 'Preencher formulário PDF', icone: '📕', cor: '#c53030', cat: 'PDF', fields: ['file_base64', 'data_input'] },
+
+  { tipo: 'validate_json_schema', label: 'Validar JSON Schema', icone: '✔', cor: '#805ad5', cat: 'ETL/formatos', fields: ['data_input', 'schema_input'] },
+  { tipo: 'convert_data_format', label: 'Converter formato de dados', icone: '🔄', cor: '#805ad5', cat: 'ETL/formatos', fields: ['data_input', 'format_from', 'format_to'] },
+  { tipo: 'html_extract', label: 'Extrair de HTML', icone: '🌐', cor: '#805ad5', cat: 'ETL/formatos', fields: ['data_input', 'css_selector'] },
+
+  { tipo: 'validate_cpf_cnpj', label: 'Validar CPF/CNPJ', icone: '🇧🇷', cor: '#2f855a', cat: 'Validação BR', fields: ['value'] },
+  { tipo: 'validate_email', label: 'Validar e-mail', icone: '🇧🇷', cor: '#2f855a', cat: 'Validação BR', fields: ['value'] },
+  { tipo: 'validate_phone', label: 'Validar telefone', icone: '🇧🇷', cor: '#2f855a', cat: 'Validação BR', fields: ['value'] },
+  { tipo: 'lookup_cep', label: 'Consultar CEP', icone: '🇧🇷', cor: '#2f855a', cat: 'Validação BR', fields: ['value'] },
+  { tipo: 'format_currency', label: 'Formatar moeda', icone: '🇧🇷', cor: '#2f855a', cat: 'Validação BR', fields: ['value', 'currency'] },
+
+  { tipo: 'encrypt_text', label: 'Criptografar texto', icone: '🔒', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['value', 'secret_key'] },
+  { tipo: 'decrypt_text', label: 'Descriptografar texto', icone: '🔓', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['value', 'secret_key'] },
+  { tipo: 'generate_jwt', label: 'Gerar JWT', icone: '🔑', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['data_input', 'secret_key', 'expires_in'] },
+  { tipo: 'verify_jwt', label: 'Verificar JWT', icone: '🔑', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['value', 'secret_key'] },
+  { tipo: 'hash_password', label: 'Hash de senha', icone: '🔑', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['value'] },
+  { tipo: 'verify_password', label: 'Verificar senha', icone: '🔑', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['value', 'password_hash'] },
+  { tipo: 'generate_otp', label: 'Gerar código OTP', icone: '🔢', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['secret_key'] },
+  { tipo: 'verify_otp', label: 'Verificar código OTP', icone: '🔢', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['value', 'secret_key'] },
+  { tipo: 'generate_secure_password', label: 'Gerar senha segura', icone: '🔑', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['password_length'] },
+  { tipo: 'check_ssl_cert', label: 'Checar certificado SSL', icone: '🔒', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['url'] },
+  { tipo: 'hmac_sign', label: 'Assinar HMAC', icone: '🔑', cor: '#1a202c', cat: 'Segurança/cripto', fields: ['value', 'secret_key'] },
+
+  { tipo: 'send_telegram', label: 'Enviar Telegram', icone: '✈', cor: '#2b6cb0', cat: 'Comunicação', fields: ['api_key', 'to', 'email_body'] },
+  { tipo: 'send_slack', label: 'Enviar Slack', icone: '💬', cor: '#2b6cb0', cat: 'Comunicação', fields: ['url', 'email_body'] },
+  { tipo: 'send_discord', label: 'Enviar Discord', icone: '💬', cor: '#2b6cb0', cat: 'Comunicação', fields: ['url', 'email_body'] },
+  { tipo: 'send_sms', label: 'Enviar SMS', icone: '📱', cor: '#2b6cb0', cat: 'Comunicação', fields: ['api_key', 'api_secret', 'from_number', 'to', 'email_body'] },
+  { tipo: 'send_whatsapp', label: 'Enviar WhatsApp', icone: '📱', cor: '#2b6cb0', cat: 'Comunicação', fields: ['api_key', 'api_secret', 'from_number', 'to', 'email_body'] },
+  { tipo: 'read_email_imap', label: 'Ler e-mails (IMAP)', icone: '📧', cor: '#2b6cb0', cat: 'Comunicação', fields: ['host', 'port', 'api_key', 'secret_key'] },
+  { tipo: 'send_push_notification', label: 'Enviar push notification', icone: '🔔', cor: '#2b6cb0', cat: 'Comunicação', fields: ['api_key', 'api_secret', 'to', 'email_body'] },
+  { tipo: 'create_incident', label: 'Criar incidente (PagerDuty)', icone: '🚨', cor: '#2b6cb0', cat: 'Comunicação', fields: ['api_key', 'email_body'] },
+
+  { tipo: 'asaas_create_charge', label: 'Criar cobrança (Asaas)', icone: '💳', cor: '#dd6b20', cat: 'Pagamentos', fields: ['api_key', 'data_input'] },
+  { tipo: 'asaas_check_payment', label: 'Checar pagamento (Asaas)', icone: '💳', cor: '#dd6b20', cat: 'Pagamentos', fields: ['api_key', 'value'] },
+  { tipo: 'generate_pix_qr', label: 'Gerar QR Pix', icone: '💠', cor: '#dd6b20', cat: 'Pagamentos', fields: ['pix_key', 'merchant_name', 'merchant_city', 'amount'] },
+  { tipo: 'get_currency_rate', label: 'Cotação de moeda', icone: '💱', cor: '#dd6b20', cat: 'Pagamentos', fields: ['value'] },
+  { tipo: 'get_crypto_price', label: 'Preço de criptomoeda', icone: '₿', cor: '#dd6b20', cat: 'Pagamentos', fields: ['value'] },
+
+  { tipo: 'get_weather', label: 'Consultar clima', icone: '🌤', cor: '#3182ce', cat: 'APIs externas', fields: ['api_key', 'value'] },
+  { tipo: 'geocode_address', label: 'Geocodificar endereço', icone: '📍', cor: '#3182ce', cat: 'APIs externas', fields: ['value'] },
+  { tipo: 'calculate_distance', label: 'Calcular distância', icone: '📏', cor: '#3182ce', cat: 'APIs externas', fields: ['coord_from', 'coord_to'] },
+  { tipo: 'shorten_url', label: 'Encurtar URL', icone: '🔗', cor: '#3182ce', cat: 'APIs externas', fields: ['url'] },
+  { tipo: 'lookup_cnpj', label: 'Consultar CNPJ', icone: '🏢', cor: '#3182ce', cat: 'APIs externas', fields: ['value'] },
+  { tipo: 'get_holidays', label: 'Feriados (BR)', icone: '📅', cor: '#3182ce', cat: 'APIs externas', fields: ['value'] },
+  { tipo: 'translate_text', label: 'Traduzir texto', icone: '🌍', cor: '#3182ce', cat: 'APIs externas', fields: ['api_key', 'value', 'target_lang'] },
+
+  { tipo: 'download_file', label: 'Baixar arquivo', icone: '⬇', cor: '#3182ce', cat: 'Web/scraping', fields: ['url'] },
+  { tipo: 'upload_file', label: 'Enviar arquivo', icone: '⬆', cor: '#3182ce', cat: 'Web/scraping', fields: ['url', 'file_base64'] },
+  { tipo: 'scrape_html_table', label: 'Extrair tabela HTML', icone: '📋', cor: '#3182ce', cat: 'Web/scraping', fields: ['data_input', 'css_selector'] },
+  { tipo: 'read_rss_feed', label: 'Ler feed RSS', icone: '📡', cor: '#3182ce', cat: 'Web/scraping', fields: ['url'] },
+
+  { tipo: 'detect_language', label: 'Detectar idioma', icone: '🌍', cor: '#6b46c1', cat: 'Texto/NLP', fields: ['value'] },
+  { tipo: 'count_tokens', label: 'Contar tokens', icone: '🔢', cor: '#6b46c1', cat: 'Texto/NLP', fields: ['value'] },
+  { tipo: 'compare_texts', label: 'Comparar textos', icone: '⚖', cor: '#6b46c1', cat: 'Texto/NLP', fields: ['data_input', 'data_input2'] },
+
+  { tipo: 'generate_embedding', label: 'Gerar embedding', icone: '✨', cor: '#6b46c1', cat: 'Inteligência Artificial', fields: ['api_key', 'value'] },
+  { tipo: 'semantic_search', label: 'Busca semântica', icone: '✨', cor: '#6b46c1', cat: 'Inteligência Artificial', fields: ['value', 'data_input'] },
+  { tipo: 'moderate_content', label: 'Moderar conteúdo', icone: '✨', cor: '#6b46c1', cat: 'Inteligência Artificial', fields: ['api_key', 'value'] },
+  { tipo: 'generate_ai_image', label: 'Gerar imagem IA', icone: '🎨', cor: '#6b46c1', cat: 'Inteligência Artificial', fields: ['api_key', 'value'] },
+  { tipo: 'transcribe_audio', label: 'Transcrever áudio', icone: '🎙', cor: '#6b46c1', cat: 'Inteligência Artificial', fields: ['api_key', 'file_base64'] },
+  { tipo: 'text_to_speech', label: 'Texto pra fala', icone: '🔊', cor: '#6b46c1', cat: 'Inteligência Artificial', fields: ['api_key', 'value', 'provedor'] },
+
+  { tipo: 'check_port_open', label: 'Checar porta aberta', icone: '🔌', cor: '#1a202c', cat: 'Sistema/rede', fields: ['target', 'value'] },
+  { tipo: 'dns_lookup', label: 'Consultar DNS', icone: '🌐', cor: '#1a202c', cat: 'Sistema/rede', fields: ['target'] },
+  { tipo: 'whois_lookup', label: 'Consultar WHOIS', icone: '🌐', cor: '#1a202c', cat: 'Sistema/rede', fields: ['value'] },
+  { tipo: 'ssh_execute', label: 'Executar via SSH', icone: '🖥', cor: '#1a202c', cat: 'Sistema/rede', fields: ['target', 'port', 'api_key', 'secret_key', 'command'] },
+  { tipo: 'read_env_var', label: 'Ler variável de ambiente', icone: '⚙', cor: '#1a202c', cat: 'Sistema/rede', fields: ['value'] },
+  { tipo: 'check_url_uptime', label: 'Checar disponibilidade (URL)', icone: '📶', cor: '#1a202c', cat: 'Sistema/rede', fields: ['url'] },
+  { tipo: 'system_stats', label: 'Estatísticas do sistema', icone: '📊', cor: '#1a202c', cat: 'Sistema (na máquina)', fields: [], agente: true },
+  { tipo: 'list_processes', label: 'Listar processos', icone: '📋', cor: '#1a202c', cat: 'Sistema (na máquina)', fields: [], agente: true },
+
+  { tipo: 'redis_get', label: 'Redis: ler chave', icone: '🗄', cor: '#805ad5', cat: 'Banco/fila', fields: ['url', 'value'] },
+  { tipo: 'redis_set', label: 'Redis: gravar chave', icone: '🗄', cor: '#805ad5', cat: 'Banco/fila', fields: ['url', 'cell_ref', 'content'] },
+  { tipo: 'queue_push', label: 'Fila: empilhar', icone: '📥', cor: '#805ad5', cat: 'Banco/fila', fields: ['url', 'value', 'content'] },
+  { tipo: 'queue_pop', label: 'Fila: desempilhar', icone: '📤', cor: '#805ad5', cat: 'Banco/fila', fields: ['url', 'value'] },
+  { tipo: 'sql_query_external', label: 'SQL externo (Postgres)', icone: '🗄', cor: '#805ad5', cat: 'Banco/fila', fields: ['api_key', 'sql_query'] },
+
+  { tipo: 'render_template', label: 'Renderizar template', icone: '📄', cor: '#dd6b20', cat: 'Templates/documentos', fields: ['content'] },
+  { tipo: 'generate_word_doc', label: 'Gerar documento Word', icone: '📄', cor: '#dd6b20', cat: 'Templates/documentos', fields: ['content'] },
+  { tipo: 'generate_pptx', label: 'Gerar apresentação PPTX', icone: '📊', cor: '#dd6b20', cat: 'Templates/documentos', fields: ['content'] },
+
+  { tipo: 'resize_image', label: 'Redimensionar imagem', icone: '🖼', cor: '#c53030', cat: 'Imagens', fields: ['file_base64', 'width', 'height'] },
+  { tipo: 'convert_image_format', label: 'Converter formato de imagem', icone: '🖼', cor: '#c53030', cat: 'Imagens', fields: ['file_base64', 'format_to'] },
+  { tipo: 'add_watermark', label: 'Adicionar marca d\'água', icone: '🖼', cor: '#c53030', cat: 'Imagens', fields: ['file_base64', 'value'] },
+  { tipo: 'generate_thumbnail', label: 'Gerar miniatura', icone: '🖼', cor: '#c53030', cat: 'Imagens', fields: ['file_base64', 'width', 'height'] },
+  { tipo: 'generate_qrcode', label: 'Gerar QR code', icone: '⬛', cor: '#c53030', cat: 'Imagens', fields: ['value'] },
+  { tipo: 'read_qrcode', label: 'Ler QR code', icone: '⬛', cor: '#c53030', cat: 'Imagens', fields: ['file_base64'] },
+  { tipo: 'compare_images', label: 'Comparar imagens', icone: '🖼', cor: '#c53030', cat: 'Imagens', fields: ['data_input', 'data_input2'] },
+  { tipo: 'ocr_image', label: 'OCR de imagem', icone: '🔤', cor: '#c53030', cat: 'Imagens', fields: ['file_base64', 'ocr_lang'] },
+
+  { tipo: 'transcode_media', label: 'Converter mídia', icone: '🎬', cor: '#805ad5', cat: 'Áudio/vídeo (na máquina)', fields: ['source_path', 'dest_path'], agente: true },
+  { tipo: 'extract_audio', label: 'Extrair áudio de vídeo', icone: '🎵', cor: '#805ad5', cat: 'Áudio/vídeo (na máquina)', fields: ['source_path', 'dest_path'], agente: true },
+  { tipo: 'trim_media', label: 'Cortar mídia', icone: '✂', cor: '#805ad5', cat: 'Áudio/vídeo (na máquina)', fields: ['source_path', 'dest_path', 'value', 'seconds'], agente: true },
+  { tipo: 'extract_video_frame', label: 'Extrair frame de vídeo', icone: '🎬', cor: '#805ad5', cat: 'Áudio/vídeo (na máquina)', fields: ['source_path', 'dest_path', 'value'], agente: true },
 ];
 const RB_ACOES_MAP = Object.fromEntries(RB_ACOES.map((a) => [a.tipo, a]));
+
+// Metadados de campo pro formulário genérico (usado pelos steps de expansão
+// acima, que têm `fields: [...]` em vez de um formulário escrito à mão).
+const RB_FIELD_META = {
+  value: { label: 'Valor', type: 'text', hint: 'Pode usar {output} ou {variavel}.' },
+  expression: { label: 'Expressão', type: 'text', hint: 'Ex: {x} * 2 + Math.sqrt(9)' },
+  data_input: { label: 'Dados (JSON)', type: 'textarea' },
+  data_input2: { label: 'Dados 2 (JSON)', type: 'textarea' },
+  file_base64: { label: 'Conteúdo (base64)', type: 'textarea', hint: 'Geralmente {output} de um step anterior (baixar arquivo, ler arquivo, etc.)' },
+  file_path: { label: 'Caminho do arquivo', type: 'text' },
+  directory: { label: 'Pasta', type: 'text' },
+  source_path: { label: 'Caminho de origem', type: 'text' },
+  dest_path: { label: 'Caminho de destino', type: 'text' },
+  pattern: { label: 'Padrão de nome', type: 'text', placeholder: '*.txt' },
+  url: { label: 'URL', type: 'text' },
+  api_key: { label: 'API Key / usuário', type: 'text' },
+  api_secret: { label: 'API Secret / senha', type: 'text' },
+  secret_key: { label: 'Chave secreta', type: 'text' },
+  to: { label: 'Destinatário', type: 'text' },
+  from_number: { label: 'Número de origem', type: 'text' },
+  subject: { label: 'Assunto', type: 'text' },
+  email_body: { label: 'Mensagem', type: 'textarea' },
+  content: { label: 'Conteúdo', type: 'textarea' },
+  target: { label: 'Alvo (host/URL)', type: 'text' },
+  host: { label: 'Host', type: 'text' },
+  port: { label: 'Porta', type: 'text' },
+  command: { label: 'Comando', type: 'text' },
+  sql_query: { label: 'Consulta SQL', type: 'textarea' },
+  schema_input: { label: 'Schema (JSON)', type: 'textarea' },
+  css_selector: { label: 'Seletor CSS', type: 'text' },
+  merge_key: { label: 'Campo-chave', type: 'text' },
+  sort_key: { label: 'Campo de ordenação', type: 'text' },
+  cell_ref: { label: 'Campo/célula', type: 'text' },
+  row_index: { label: 'Índice da linha', type: 'text' },
+  operator: { label: 'Operador', type: 'select', options: [['equals', 'igual a'], ['not_equals', 'diferente de'], ['contains', 'contém'], ['greater_than', 'maior que'], ['less_than', 'menor que']] },
+  sheet_name: { label: 'Nome da planilha', type: 'text' },
+  delimiter: { label: 'Delimitador', type: 'text', placeholder: ',' },
+  format_from: { label: 'Formato de origem', type: 'select', options: [['json', 'JSON'], ['yaml', 'YAML'], ['xml', 'XML'], ['csv', 'CSV']] },
+  format_to: { label: 'Formato de destino', type: 'select', options: [['json', 'JSON'], ['yaml', 'YAML'], ['xml', 'XML'], ['csv', 'CSV'], ['jpg', 'JPG'], ['png', 'PNG']] },
+  encoding_from: { label: 'Encoding de origem', type: 'text', placeholder: 'latin-1' },
+  encoding_to: { label: 'Encoding de destino', type: 'text', placeholder: 'utf-8' },
+  fake_type: { label: 'Tipo de dado', type: 'select', options: [['name', 'Nome'], ['email', 'E-mail'], ['phone', 'Telefone'], ['address', 'Endereço'], ['company', 'Empresa'], ['cpf', 'CPF'], ['uuid', 'UUID'], ['number', 'Número'], ['date', 'Data']] },
+  fake_count: { label: 'Quantidade', type: 'text', placeholder: '1' },
+  hash_algo: { label: 'Algoritmo de hash', type: 'select', options: [['sha256', 'SHA-256'], ['md5', 'MD5'], ['sha1', 'SHA-1']] },
+  password_length: { label: 'Tamanho da senha', type: 'text', placeholder: '16' },
+  password_hash: { label: 'Hash pra comparar', type: 'text' },
+  expires_in: { label: 'Expira em', type: 'text', placeholder: '1h' },
+  currency: { label: 'Moeda', type: 'text', placeholder: 'BRL' },
+  target_lang: { label: 'Idioma de destino', type: 'text', placeholder: 'EN' },
+  pix_key: { label: 'Chave Pix', type: 'text' },
+  merchant_name: { label: 'Nome do recebedor', type: 'text' },
+  merchant_city: { label: 'Cidade', type: 'text' },
+  amount: { label: 'Valor (R$)', type: 'text' },
+  width: { label: 'Largura (px)', type: 'text' },
+  height: { label: 'Altura (px)', type: 'text' },
+  coord_from: { label: 'Coordenada de origem (lat,lon)', type: 'text' },
+  coord_to: { label: 'Coordenada de destino (lat,lon)', type: 'text' },
+  ocr_lang: { label: 'Idioma do OCR', type: 'text', placeholder: 'por' },
+  max_iterations: { label: 'Máximo', type: 'text' },
+  date: { label: 'Data', type: 'text', placeholder: 'AAAA-MM-DD ou {output}' },
+  date_from: { label: 'Data inicial', type: 'text' },
+  date_to: { label: 'Data final', type: 'text' },
+  unit: { label: 'Unidade', type: 'select', options: [['days', 'dias'], ['hours', 'horas'], ['minutes', 'minutos'], ['seconds', 'segundos']] },
+  date_amount: { label: 'Quantidade', type: 'text', hint: 'Positivo soma, negativo subtrai.' },
+  to_timezone: { label: 'Fuso horário', type: 'text', placeholder: 'America/Sao_Paulo' },
+  format: { label: 'Formato', type: 'text', placeholder: 'DD/MM/YYYY HH:mm' },
+  provedor: { label: 'Voz/provedor', type: 'text' },
+  seconds: { label: 'Segundos', type: 'text' },
+};
+
+function rbGenericFields(step) {
+  const acao = RB_ACOES_MAP[step.type];
+  return acao?.fields || [];
+}
 
 function rbNovoId() {
   return (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random())).replace(/-/g, '').slice(0, 12);
@@ -257,7 +470,15 @@ function rbResumoStep(step) {
     case 'write_file': return c.file_path || '';
     case 'run_command': return c.command || '';
     case 'browser_flow': return `${(c.actions || []).length} ações`;
-    default: return '';
+    default: {
+      // Steps de expansão: mostra o primeiro campo preenchido (mais
+      // curto que listar tudo, e já dá uma pista do que o step faz).
+      const acao = RB_ACOES_MAP[step.type];
+      for (const campo of (acao?.fields || [])) {
+        if (c[campo]) return String(c[campo]).slice(0, 60);
+      }
+      return '';
+    }
   }
 }
 
@@ -361,6 +582,22 @@ function rbRenderProps() {
     form += `<div class="rb-hint">Roda na máquina do tenant, um browser por execução (sem sessão persistente entre steps nesta versão).</div>`;
   } else if (step.type === 'comment') {
     form += rbField('Anotação', ta('text'));
+  } else {
+    // Steps de expansão (fora do MVP original) — formulário genérico
+    // gerado a partir de `acao.fields` + RB_FIELD_META, em vez de um
+    // formulário escrito à mão pra cada um dos ~100 tipos.
+    for (const campo of (acao.fields || [])) {
+      const meta = RB_FIELD_META[campo];
+      if (!meta) continue;
+      let campoHtml;
+      if (meta.type === 'select') campoHtml = sel(campo, meta.options);
+      else if (meta.type === 'textarea') campoHtml = ta(campo, meta.placeholder);
+      else if (meta.type === 'checkbox') campoHtml = chk(campo, meta.label);
+      else campoHtml = inp(campo, meta.placeholder);
+      form += meta.type === 'checkbox' ? `<div class="rb-field">${campoHtml}</div>` : rbField(meta.label, campoHtml, meta.hint);
+    }
+    form += rbField('Salvar resultado na variável', inp('variable_name'));
+    if (acao.agente) form += `<div class="rb-hint">Roda na máquina do tenant (precisa de um agente online).</div>`;
   }
 
   el.innerHTML = `<div class="rb-props-titulo"><span class="rb-step-icone" style="background:${acao.cor}22;color:${acao.cor}">${acao.icone}</span> ${escapeHtmlRb(acao.label)}</div>${form}`;

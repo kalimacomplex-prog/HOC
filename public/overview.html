@@ -48,24 +48,26 @@
     .dep-btn:hover { border-color: var(--accent); color: var(--accent); }
     .dep-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
     .time-acoes { display: flex; gap: 8px; }
-    .org-container { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 24px; min-height: 480px; position: relative; overflow: hidden; width: 100%; min-width: 0; box-sizing: border-box; }
-    .org-canvas { position: relative; width: 100%; height: 480px; }
-    .org-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-    .org-node { position: absolute; width: 180px; background: white; border-radius: 10px; padding: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); border: 2px solid #ECEDF0; cursor: move; user-select: none; transition: box-shadow 0.2s; }
-    .org-node:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
-    .org-node.dragging { box-shadow: 0 8px 28px rgba(45,27,105,0.25); border-color: var(--accent); z-index: 1000; }
-    .org-node-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .org-node-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
-    .org-node-actions { display: flex; gap: 3px; opacity: 0; transition: opacity 0.2s; }
-    .org-node:hover .org-node-actions { opacity: 1; }
-    .org-node-btn { width: 22px; height: 22px; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
-    .org-node-btn.edit { background: #F1F2F5; color: var(--accent); }
-    .org-node-btn.del { background: color-mix(in srgb,#FF2E4D 8%,white); color: #FF2E4D; }
-    .org-node-btn.link { background: color-mix(in srgb,#00B37E 10%,white); color: #00754F; }
-    .org-node-nome { font-size: 13px; font-weight: 700; color: #0B0B0F; margin-bottom: 3px; }
-    .org-node-cargo { font-size: 11px; color: var(--accent); font-weight: 600; margin-bottom: 3px; }
-    .org-node-area { font-size: 11px; color: #6B7080; margin-bottom: 3px; }
-    .org-node-email { font-size: 10px; color: #9CA0AC; }
+    .org-container { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 36px 24px; min-height: 480px; overflow-x: auto; overflow-y: visible; width: 100%; min-width: 0; box-sizing: border-box; }
+    .org-canvas { display: flex; flex-direction: column; align-items: center; width: max-content; min-width: 100%; }
+    .org-tree-nivel { display: flex; flex-direction: column; align-items: center; }
+    .org-conector-v { width: 2px; height: 16px; background: #AEB3BD; flex-shrink: 0; }
+    .org-conector-v.pequeno { height: 12px; }
+    .org-nivel-row { display: flex; justify-content: center; gap: 28px; position: relative; padding-bottom: 16px; }
+    .org-linha-h { position: absolute; top: 0; height: 2px; background: #AEB3BD; }
+    .org-card-wrap { display: flex; flex-direction: column; align-items: center; }
+    .org-card { position: relative; background: #FAFBFC; border: none; border-radius: 12px; padding: 14px; text-align: center; cursor: pointer; user-select: none; transition: background .15s; }
+    .org-card:hover { background: #F1F2F5; }
+    .org-card-avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; flex-shrink: 0; margin: 0 auto 8px; }
+    .org-card-nome { font-weight: 800; color: #0B0B0F; margin-bottom: 6px; }
+    .org-card-cargo { font-weight: 600; }
+    .org-card-email { display: none; font-size: 10.5px; color: #6B7080; margin-top: 8px; padding-top: 8px; border-top: 1px solid #ECEDF0; word-break: break-all; }
+    .org-card-wrap.aberto .org-card-email { display: block; }
+    .org-card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+    .org-card:hover .org-card-actions { opacity: 1; }
+    .org-card-btn { width: 22px; height: 22px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .org-card-btn.edit { background: white; color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .org-card-btn.del { background: white; color: #FF2E4D; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
     .org-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: #9CA0AC; gap: 12px; }
     .dep-cor-0 { background: var(--accent); border-color: var(--accent); }
     .dep-cor-1 { background: #00B37E; border-color: #00B37E; }
@@ -73,10 +75,6 @@
     .dep-cor-3 { background: #e53e3e; border-color: #e53e3e; }
     .dep-cor-4 { background: #d69e2e; border-color: #d69e2e; }
     .dep-cor-5 { background: #00b5d8; border-color: #00b5d8; }
-    .modo-conexao-aviso { padding: 8px 14px; background: color-mix(in srgb,#00B37E 10%,white); border-radius: 6px; font-size: 12px; color: #00754F; display: none; margin-bottom: 12px; }
-    .modo-conexao-aviso.ativo { display: block; }
-    .org-node.selecionado-conexao { border-color: #00B37E; box-shadow: 0 0 0 3px rgba(56,161,105,0.3); }
-    .conn-del-btn { opacity: 0; transition: opacity 0.15s; }
     .bib-header { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 24px; }
     .bib-header .hoc-select-wrap { width: auto; flex-shrink: 0; }
     .bib-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
@@ -85,13 +83,13 @@
     .pasta-sidebar-btn:hover .pasta-acoes { opacity: 1; }
     .pasta-sidebar-btn.active { background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); font-weight: 700; }
     .pasta-acoes { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
-    .pasta-acao-btn { background: none; border: none; cursor: pointer; padding: 1px 3px; border-radius: 3px; font-size: 10px; color: #9CA0AC; line-height: 1; }
+    .pasta-acao-btn { background: none; border: none; cursor: pointer; padding: 3px; border-radius: 4px; color: #9CA0AC; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
     .pasta-acao-btn:hover { background: #ECEDF0; color: #33363F; }
     .pasta-children { padding-left: 12px; border-left: 1.5px solid #ECEDF0; margin-left: 10px; }
     .bib-search { flex: 1; min-width: 200px; padding: 8px 14px; border: 1.5px solid #ECEDF0; border-radius: 6px; font-size: 13px; outline: none; }
     .bib-search:focus { border-color: var(--accent); }
-    .upload-drop-zone { border: 2px dashed #ECEDF0; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; color: #9CA0AC; font-size: 13px; }
-    .upload-drop-zone:hover, .upload-drop-zone.drag-over { border-color: var(--accent); background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); }
+    .upload-drop-zone { border: 2px dashed #E5E7EB; border-radius: 12px; padding: 22px; text-align: center; cursor: pointer; transition: all 0.15s; background: white; }
+    .upload-drop-zone:hover, .upload-drop-zone.drag-over { border-color: var(--accent); background: #F7F9FF; }
     .bib-explorer { padding: 8px; }
     .bib-breadcrumb { display: flex; align-items: center; gap: 4px; padding: 8px 10px; font-size: 11px; color: #6B7080; flex-wrap: wrap; border-bottom: 1px solid #F1F2F5; margin-bottom: 6px; }
     .bib-breadcrumb span { cursor: pointer; color: var(--accent); font-weight: 600; }
@@ -101,14 +99,13 @@
     .pasta-explorer-item:hover { background: #FAFBFC; color: #0B0B0F; }
     .pasta-explorer-item:hover .pasta-acoes { opacity: 1; }
     .pasta-explorer-item.active { background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); font-weight: 700; }
-    .versao-historia { background: #FAFBFC; border-radius: 8px; border: 1.5px solid #ECEDF0; overflow: hidden; display: none; width: 280px; flex-shrink: 0; align-self: flex-start; max-height: calc(100vh - 220px); overflow-y: auto; }
-    .versao-historia.aberto { display: block; }
-    .versao-historia-header { padding: 10px 14px; font-size: 12px; font-weight: 700; color: #0B0B0F; border-bottom: 1px solid #ECEDF0; display: flex; align-items: center; justify-content: space-between; }
-    .versao-historia-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #F1F2F5; font-size: 12px; color: #33363F; }
-    .versao-historia-item:last-child { border-bottom: none; }
-    .versao-historia-item.atual { background: color-mix(in srgb,#00B37E 10%,white); }
-    .editor-area[contenteditable="false"] { background: #FAFBFC; color: #6B7080; cursor: not-allowed; }
-    .toolbar-select { padding: 4px 6px; border: 1px solid #ECEDF0; border-radius: 4px; font-size: 12px; color: #33363F; background: white; cursor: pointer; outline: none; }
+    .versao-historia { background: #FAFBFC; border-radius: 10px; border: 1.5px solid #ECEDF0; overflow: hidden; display: none; width: 300px; flex-shrink: 0; align-self: flex-start; max-height: calc(100vh - 220px); flex-direction: column; }
+    .versao-historia.aberto { display: flex; }
+    .versao-historia-header { padding: 12px 16px; font-size: 12px; font-weight: 700; color: #0B0B0F; border-bottom: 1px solid #ECEDF0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .versao-historia-body { padding: 12px; overflow-y: auto; }
+    .versao-historia-item { border: 1.5px solid #ECEDF0; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+    .versao-historia-item.atual { border-color: color-mix(in srgb,#00B37E 40%,#ECEDF0); background: color-mix(in srgb,#00B37E 6%,white); }
+    .toolbar-select { width: auto; min-width: 74px; padding: 4px 6px; border: 1px solid #ECEDF0; border-radius: 4px; font-size: 12px; color: #33363F; background: white; cursor: pointer; outline: none; }
     .toolbar-sep { width: 1px; background: #ECEDF0; margin: 0 2px; align-self: stretch; }
     .wiki-table { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow: hidden; }
     .wiki-table table { width: 100%; border-collapse: collapse; }
@@ -120,13 +117,12 @@
     .versao-badge { display: inline-block; padding: 2px 7px; background: #F1F2F5; color: #33363F; border-radius: 4px; font-size: 11px; font-weight: 600; }
     .wiki-editor { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: none; }
     .wiki-editor.active { display: block; }
-    .editor-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #F1F2F5; }
-    .editor-titulo-input { font-size: 18px; font-weight: 700; color: #0B0B0F; border: none; outline: none; flex: 1; margin-right: 16px; font-family: inherit; }
-    .editor-toolbar { display: flex; gap: 3px; padding: 6px; background: #FAFBFC; border-radius: 6px; border: 1.5px solid #ECEDF0; flex-wrap: wrap; margin-bottom: 8px; }
+    .editor-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #F1F2F5; }
+    .editor-toolbar { display: flex; align-items: center; gap: 3px; padding: 6px; background: #FAFBFC; border-radius: 6px; border: 1.5px solid #ECEDF0; flex-wrap: wrap; margin-bottom: 8px; }
     .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 4px; cursor: pointer; font-size: 12px; color: #33363F; }
     .toolbar-btn:hover { background: #ECEDF0; }
-    .editor-wrap { background: #dde3e8; padding: 24px 20px; border-radius: 6px; min-height: 400px; overflow-y: auto; }
-    .editor-area { min-height: 600px; padding: 56px 72px; border: none; outline: none; font-size: 13px; line-height: 1.8; color: #0B0B0F; background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.12); width: 100%; max-width: 720px; margin: 0 auto; display: block; }
+    .editor-wrap { padding: 20px 0 40px; border-radius: 6px; min-height: 400px; overflow-y: auto; }
+    .editor-area { min-height: 600px; padding: 56px 72px; border: none; outline: none; font-size: 13px; line-height: 1.8; color: #0B0B0F; background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.12); width: 100%; max-width: 1040px; margin: 0 auto; display: block; box-sizing: border-box; }
     .editor-area:focus { outline: none; }
     .editor-area[contenteditable="false"] { cursor: default; }
     .editor-area ul, .editor-area ol { padding-left: 24px; margin: 4px 0; }
@@ -140,7 +136,7 @@
     .editor-area h4 { font-size: 14px; font-weight: 700; margin: 12px 0 4px; color: #0B0B0F; }
     .editor-area p { margin: 0 0 8px; }
     .editor-area pre { background: #FAFBFC; border: 1px solid #ECEDF0; border-radius: 4px; padding: 10px 14px; font-size: 12px; overflow-x: auto; }
-    .editor-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .editor-meta { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; margin-top: 14px; }
     .oraculo-wrap { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .oraculo-hero { text-align: center; margin-bottom: 28px; }
     .oraculo-icon { font-size: 40px; margin-bottom: 10px; }
@@ -203,8 +199,6 @@
     .dep-sidebar-row:hover .dep-row-acoes { opacity:1; }
     .dep-sidebar-row.active { background:color-mix(in srgb,var(--accent) 8%,white); }
     .dep-row-acoes { display:flex; gap:2px; opacity:0; transition:opacity 0.2s; flex-shrink:0; }
-    .conn-handle { position:absolute; width:12px; height:12px; background:white; border:2px solid; border-radius:50%; cursor:crosshair; opacity:0; transition:opacity 0.15s; z-index:10; }
-    .org-node:hover .conn-handle { opacity:1; }
     .org-container { overflow-x:auto !important; overflow-y:visible !important; }
     .org-nome-wrap { position:relative; }
     .secao-tbl { border-radius:8px; border:1px solid #ECEDF0; overflow:hidden; }
@@ -300,7 +294,7 @@
     .tab { height: 32px; padding: 0 16px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; border: none; background: transparent; color: #6B7080; margin-bottom: 0; }
     .tab:hover { color: #33363F; }
     .tab.active { background: white; color: #0B0B0F; box-shadow: 0 1px 3px rgba(11,11,15,0.1); border-color: transparent; }
-    .btn-primary { height: 38px; padding: 0 16px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: none; }
+    .btn-primary { height: 38px; padding: 0 16px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
     .btn-primary:hover { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); }
     .btn-secondary { height: 38px; padding: 0 16px; background: #F1F2F5; color: #4A4E5A; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
     label { font-size: 11px; font-weight: 600; color: #6B7080; }
@@ -317,6 +311,11 @@
     .btn-cancelar { flex: 1; padding: 10px 16px; font-size: 13px; cursor: pointer; background: white; border: 1.5px solid #E5E7EB; border-radius: 9px; color: #33363F; font-weight: 600; }
     .btn-cancelar:hover { background: #F1F2F5; }
     .btn-confirmar { flex: 1; padding: 10px 16px; font-size: 13px; cursor: pointer; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); border: none; border-radius: 9px; color: white; font-weight: 700; }
+    .modal-user-lista { overflow-y: auto; overflow-x: hidden; border: 1.5px solid #ECEDF0; border-radius: 10px; max-height: 320px; padding: 5px; }
+    .modal-user-item { display: flex; align-items: center; gap: 10px; padding: 9px 11px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
+    .modal-user-item:hover { background: #FAFBFC; }
+    .modal-user-item.selecionado { background: color-mix(in srgb,var(--accent) 8%,white); border: 1.5px solid var(--accent); padding: 7.5px 9.5px; }
+    .modal-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
     .colunas-filtro-wrap { position: relative; }
     .colunas-filtro-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border: 1px solid #ECEDF0; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); min-width: 210px; z-index: 200; padding: 6px; }
     .colunas-filtro-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
@@ -416,7 +415,7 @@
       <div class="edit-barra-global">
         <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()">Editar</button>
         <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none">Salvar</button>
-        <button class="btn-secondary" id="btnNovaSecao" onclick="abrirModalNovaSecao()" style="display:none">+ Nova Seção</button>
+        <button id="btnNovaSecao" onclick="abrirModalNovaSecao()" style="display:none;height:38px;padding:0 16px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Seção</button>
       </div>
       <!-- ===== FLUXO DE VALOR (gerenciado por renderSecoes) ===== -->
       <div id="fvSecaoWrap" style="display:none;margin-bottom:24px">
@@ -547,13 +546,11 @@
         </div>
         <!-- Canvas -->
         <div class="org-container">
-          <div class="org-canvas" id="orgCanvas">
-            <svg class="org-svg" id="orgSvg"></svg>
-            <div class="org-empty" id="orgEmpty" style="display:flex">
-              <div style="font-size:40px">👥</div>
-              <div style="font-size:14px;color:#9CA0AC">Nenhum membro adicionado ainda</div>
-              <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px">+ Adicionar Membro</button>
-            </div>
+          <div class="org-canvas" id="orgCanvas"></div>
+          <div class="org-empty" id="orgEmpty" style="display:flex">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#C4C8D0" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.418 3.582-8 8-8s8 3.582 8 8"/></svg>
+            <div style="font-size:14px;color:#9CA0AC">Nenhum membro adicionado ainda</div>
+            <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12px">+ Adicionar Membro</button>
           </div>
         </div>
       </div>
@@ -599,7 +596,6 @@
             <table>
               <thead><tr>
                 <th style="width:30%">Nome</th>
-                <th data-col="pasta">Pasta</th>
                 <th data-col="tags">Tags</th>
                 <th data-col="responsavel">Responsável</th>
                 <th data-col="status">Status</th>
@@ -607,7 +603,7 @@
                 <th data-col="atualizado">Atualizado</th>
                 <th>Ações</th>
               </tr></thead>
-              <tbody id="wikisBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:#9CA0AC">Carregando wikis...</td></tr></tbody>
+              <tbody id="wikisBody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA0AC">Carregando wikis...</td></tr></tbody>
             </table>
             </div>
           </div>
@@ -615,24 +611,24 @@
       </div>
       <div class="wiki-editor" id="wikiEditor">
         <div class="editor-header">
-          <input class="editor-titulo-input" id="editorTitulo" type="text" placeholder="Título do Wiki...">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <button class="btn-secondary" onclick="fecharEditor()" style="font-size:12px">← Voltar</button>
-            <button class="btn-secondary" id="btnHistorico" onclick="toggleHistorico()" style="font-size:12px">🕐 Versões</button>
-            <button class="btn-secondary" id="btnNovaVersao" onclick="novaVersaoWiki()" style="font-size:12px;display:none">+ Nova Versão</button>
-            <button class="btn-secondary" onclick="exportarPDF()" style="font-size:12px">📄 PDF</button>
+          <button class="btn-fechar" onclick="fecharEditor()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <span id="editorTituloView" style="display:none;font-size:16px;font-weight:800;color:#0B0B0F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:auto"></span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-left:auto">
             <span id="autoSaveIndicator" style="font-size:11px;color:#9CA0AC;min-width:60px;text-align:right"></span>
-            <button class="btn-secondary" id="btnSolicitarAprovWiki" onclick="abrirModalSolicitarAprovWiki()" style="font-size:12px;display:none">📨 Solicitar Aprovação</button>
-            <button class="btn-primary" id="btnAprovarWiki" onclick="aprovarWiki()" style="background:#00B37E;font-size:12px;display:none">✓ Aprovar</button>
+            <button class="btn-secondary" id="btnHistorico" onclick="toggleHistorico()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>Versões</button>
+            <button class="btn-secondary" onclick="exportarPDF()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</button>
+            <button class="btn-primary" id="btnSolicitarAprovWiki" onclick="abrirModalSolicitarAprovWiki()" style="background:#00B37E;display:none">Enviar para Aprovação</button>
+            <button class="btn-primary" id="btnAprovarWiki" onclick="aprovarWiki()" style="background:#00B37E;display:none;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Aprovar</button>
           </div>
         </div>
-        <div class="editor-meta">
+        <div class="editor-meta" id="editorMetaRow">
+          <div><label>Título</label><input type="text" id="editorTitulo" placeholder="Título do Wiki..."></div>
           <div><label>Tags</label><input type="text" id="editorTags" placeholder="Ex: RH, Políticas"></div>
           <div><label>Responsável</label><input type="text" id="editorResponsavel" placeholder="Nome do responsável"></div>
         </div>
         <div style="display:flex;gap:16px;margin-top:14px;align-items:flex-start">
           <div style="flex:1;min-width:0">
-            <div class="editor-toolbar">
+            <div class="editor-toolbar" id="editorToolbarBar">
               <select class="toolbar-select" onmousedown="salvarSelecao()" onchange="fmtFontSize(this.value)" title="Tamanho da fonte">
                 <option value="">Tamanho</option>
                 <option value="10px">10</option>
@@ -660,10 +656,11 @@
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('underline')" title="Sublinhado"><u>U</u></button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('strikeThrough')" title="Tachado" style="text-decoration:line-through">S</button>
               <div class="toolbar-sep"></div>
-              <label title="Cor do texto" style="display:flex;align-items:center;cursor:pointer;padding:2px 4px;border-radius:4px">
-                <span style="font-size:11px;margin-right:3px;color:#33363F">A</span>
-                <input type="color" id="editorColor" value="#000000" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;background:none" onchange="fmt('foreColor',this.value)" title="Cor do texto">
-              </label>
+              <button type="button" class="toolbar-btn" onclick="document.getElementById('editorColor').click()" title="Cor do texto" style="display:flex;align-items:center;gap:3px">
+                <span style="font-weight:800;font-size:13px;line-height:1">A</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c1-4 3-6 6-7l8-8 3 3-8 8c-1 3-3 5-7 6z"/><path d="M14 6l4 4"/></svg>
+              </button>
+              <input type="color" id="editorColor" value="#000000" onchange="fmt('foreColor',this.value)" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none">
               <div class="toolbar-sep"></div>
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('insertUnorderedList')" title="Lista com marcadores">• Lista</button>
               <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('insertOrderedList')" title="Lista numerada">1. Lista</button>
@@ -683,7 +680,7 @@
               <span>Histórico de Versões</span>
               <button onclick="toggleHistorico()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#9CA0AC">×</button>
             </div>
-            <div id="versaoHistoriaBody"></div>
+            <div class="versao-historia-body" id="versaoHistoriaBody"></div>
           </div>
         </div>
       </div>
@@ -721,10 +718,13 @@
 <!-- Modal Timeline -->
 <div class="modal-overlay" id="modalSolicitarAprovWiki">
   <div class="modal" style="max-width:420px">
-    <div class="modal-header"><span class="modal-titulo">📨 Solicitar Aprovação</span><button class="btn-fechar" onclick="fecharModal('modalSolicitarAprovWiki')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-    <p style="font-size:13px;color:#33363F;margin:0 0 12px">Selecione quem deve ser notificado — a lista mostra só quem tem permissão de aprovar wikis:</p>
-    <div id="solicitarAprovWikiUserList" style="max-height:320px;overflow-y:auto"></div>
-    <div class="modal-footer" style="margin-top:12px"><button class="btn-cancelar" onclick="fecharModal('modalSolicitarAprovWiki')">Cancelar</button><button class="btn-confirmar" onclick="_enviarSolicitacaoAprovWiki()">📨 Enviar</button></div>
+    <div class="modal-header">
+      <span class="modal-titulo">Enviar para Aprovação</span>
+      <button class="btn-fechar" onclick="fecharModal('modalSolicitarAprovWiki')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <p style="font-size:12px;color:#9CA0AC;margin:0 0 14px">Selecione quem deve ser notificado.<br>A lista mostra apenas quem tem permissão para aprovar wikis.</p>
+    <div class="modal-user-lista" id="solicitarAprovWikiUserList"></div>
+    <div class="modal-footer" style="margin-top:14px"><button class="btn-cancelar" onclick="fecharModal('modalSolicitarAprovWiki')">Cancelar</button><button class="btn-confirmar" onclick="_enviarSolicitacaoAprovWiki()">Enviar</button></div>
   </div>
 </div>
 
@@ -754,7 +754,8 @@
     <div style="display:flex;gap:10px;align-items:flex-end">
       <div class="form-group" style="width:72px;margin-bottom:0">
         <label>Ícone</label>
-        <input type="text" id="novaSecaoEmoji" maxlength="2" placeholder="📋" style="text-align:center;font-size:20px;padding:6px">
+        <button type="button" id="novaSecaoIconePreview" data-sec-icon-trigger onclick="abrirSecIconPicker('novaSecaoIcone','novaSecaoIconePreview')" style="width:100%;height:38px;border-radius:9px;border:1.5px solid #E5E7EB;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center">📋</button>
+        <input type="hidden" id="novaSecaoIcone" value="">
       </div>
       <div class="form-group" style="flex:1;margin-bottom:0">
         <label>Nome da Seção</label>
@@ -773,7 +774,8 @@
     <div style="display:flex;gap:10px;align-items:flex-end">
       <div class="form-group" style="width:72px;margin-bottom:0">
         <label>Ícone</label>
-        <input type="text" id="editSecaoEmoji" maxlength="2" style="text-align:center;font-size:20px;padding:6px">
+        <button type="button" id="editSecaoIconePreview" data-sec-icon-trigger onclick="abrirSecIconPicker('editSecaoIcone','editSecaoIconePreview')" style="width:100%;height:38px;border-radius:9px;border:1.5px solid #E5E7EB;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center">📋</button>
+        <input type="hidden" id="editSecaoIcone" value="">
       </div>
       <div class="form-group" style="flex:1;margin-bottom:0">
         <label>Nome</label>
@@ -805,7 +807,8 @@
     </div>
     <div class="form-group"><label>Cargo / Função *</label><input type="text" id="membroCargo" placeholder="Ex: Desenvolvedor Sênior"></div>
     <div class="form-group"><label>Email</label><input type="email" id="membroEmail" placeholder="email@empresa.com"></div>
-    <div class="form-group"><label>Time</label><select id="membroDep"></select></div>
+    <div class="form-group"><label>Time</label><select id="membroDep" onchange="atualizarChefeDropdown()" style="width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;color:#0B0B0F"></select></div>
+    <div class="form-group"><label>Abaixo de</label><select id="membroChefe" style="width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;color:#0B0B0F"></select></div>
     <input type="hidden" id="membroEditId">
     <div class="modal-footer"><button class="btn-cancelar" onclick="fecharModal('modalMembro')">Cancelar</button><button class="btn-confirmar" onclick="salvarMembro()">Salvar</button></div>
   </div>
@@ -826,7 +829,7 @@
 <div class="modal-overlay" id="modalNovaPasta">
   <div class="modal" style="max-width:400px">
     <div class="modal-header">
-      <span class="modal-titulo">📁 Nova Pasta</span>
+      <span class="modal-titulo" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Nova Pasta</span>
       <button class="btn-fechar" onclick="fecharModal('modalNovaPasta')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="form-group">
@@ -835,13 +838,13 @@
     </div>
     <div class="form-group">
       <label>Pasta pai (opcional)</label>
-      <select id="novaPastaParent" style="width:100%;padding:8px 12px;border:1.5px solid #ECEDF0;border-radius:6px;font-size:13px;outline:none;background:white">
+      <select id="novaPastaParent" style="width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;color:#0B0B0F">
         <option value="">— Raiz (sem pasta pai) —</option>
       </select>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalNovaPasta')">Cancelar</button>
-      <button class="btn-confirmar" onclick="confirmarNovaPasta()">✓ Criar Pasta</button>
+      <button class="btn-confirmar" onclick="confirmarNovaPasta()">Criar Pasta</button>
     </div>
   </div>
 </div>
@@ -850,7 +853,7 @@
 <div class="modal-overlay" id="modalEditPasta">
   <div class="modal" style="max-width:400px">
     <div class="modal-header">
-      <span class="modal-titulo">✏️ Editar Pasta</span>
+      <span class="modal-titulo" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Editar Pasta</span>
       <button class="btn-fechar" onclick="fecharModal('modalEditPasta')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <input type="hidden" id="editPastaId">
@@ -860,13 +863,13 @@
     </div>
     <div class="form-group">
       <label>Mover para dentro de</label>
-      <select id="editPastaParent" style="width:100%;padding:8px 12px;border:1.5px solid #ECEDF0;border-radius:6px;font-size:13px;outline:none;background:white">
+      <select id="editPastaParent" style="width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;color:#0B0B0F">
         <option value="">— Raiz —</option>
       </select>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalEditPasta')">Cancelar</button>
-      <button class="btn-confirmar" onclick="confirmarEditPasta()">✓ Salvar</button>
+      <button class="btn-confirmar" onclick="confirmarEditPasta()">Salvar</button>
     </div>
   </div>
 </div>
@@ -875,7 +878,7 @@
 <div class="modal-overlay" id="modalDocExterno">
   <div class="modal" style="max-width:460px">
     <div class="modal-header">
-      <span class="modal-titulo">📎 Adicionar Documento</span>
+      <span class="modal-titulo" style="display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Adicionar Documento</span>
       <button class="btn-fechar" onclick="fecharModal('modalDocExterno')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="form-group">
@@ -885,13 +888,17 @@
     <div class="form-group">
       <label>Arquivo *</label>
       <div class="upload-drop-zone" id="docUploadZone" onclick="document.getElementById('docExternoArquivo').click()">
-        <div id="docUploadLabel">Clique para selecionar ou arraste o arquivo aqui<br><span style="font-size:11px;margin-top:4px;display:block">PDF, DOCX, XLSX, PNG, JPG — até 30 MB</span></div>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="2" style="margin-bottom:8px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <div id="docUploadLabel">
+          <div style="font-size:13px;font-weight:600;color:#33363F">Clique para selecionar ou arraste o arquivo aqui</div>
+          <div style="font-size:11px;color:#9CA0AC;margin-top:4px">PDF, DOCX, XLSX, PNG, JPG — até 30 MB</div>
+        </div>
       </div>
       <input type="file" id="docExternoArquivo" style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.txt,.csv,.zip" onchange="atualizarLabelArquivo()">
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalDocExterno')">Cancelar</button>
-      <button class="btn-confirmar" id="btnConfirmarDoc" onclick="confirmarDocExterno()">✓ Adicionar</button>
+      <button class="btn-confirmar" id="btnConfirmarDoc" onclick="confirmarDocExterno()">Adicionar</button>
     </div>
   </div>
 </div>
@@ -1064,6 +1071,7 @@
   document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
   document.getElementById('tab-visao-geral').style.display = 'block';
   hocEnhanceSelect(document.getElementById('filtroStatus'));
+  hocEnhanceSelects(['membroDep', 'membroChefe', 'novaPastaParent', 'editPastaParent']);
   function mudarTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1151,7 +1159,7 @@
     modoEdicao = !modoEdicao;
     document.getElementById('btnEditar').style.display    = modoEdicao?'none':'inline-block';
     document.getElementById('btnSalvar').style.display    = modoEdicao?'inline-block':'none';
-    document.getElementById('btnNovaSecao').style.display = modoEdicao?'inline-block':'none';
+    document.getElementById('btnNovaSecao').style.display = modoEdicao?'inline-flex':'none';
     renderSecoes();
   }
 
@@ -1263,13 +1271,52 @@
     historia: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
     highlights: '<path d="M11 20A7 7 0 019.8 6.1C15.5 5 17 4.5 19 3c.4 2 .6 5-1 7-1.4 1.7-3.9 2.9-6.6 3.9"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/>',
     'fluxo-valor': '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l7-.5M7.5 8.3L11 16M16.5 8.3L13 16"/>',
+    lista: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+    estrela: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    grafico: '<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>',
+    pessoas: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    bandeira: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+    livro: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+    config: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+    pasta: '<path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>',
+    documento: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+    checklist: '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1" ry="1"/><path d="M9 14l2 2 4-4"/>',
   };
+  const _SEC_ICON_PICKER = ['lista','estrela','grafico','pessoas','bandeira','livro','config','pasta','documento','checklist'];
   function _secIconHtml(s) {
-    const svg = _SEC_ICON_SVG[s.id];
+    const svg = _SEC_ICON_SVG[s.id] || _SEC_ICON_SVG[s.icone];
     return svg
       ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svg}</svg>`
       : (s.emoji || '📋');
   }
+  function _secIconPreviewHtml(key) {
+    const svg = _SEC_ICON_SVG[key];
+    return svg ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${svg}</svg>` : '📋';
+  }
+  function abrirSecIconPicker(hiddenId, previewBtnId) {
+    let pop = document.getElementById('secIconPickerPop');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.id = 'secIconPickerPop';
+      pop.className = 'colunas-filtro-drop';
+      pop.style.cssText = 'position:fixed;display:none;grid-template-columns:repeat(5,1fr);gap:4px;width:190px;z-index:2000';
+      document.body.appendChild(pop);
+    }
+    if (pop._alvoHidden === hiddenId && pop.style.display === 'grid') { pop.style.display = 'none'; return; }
+    pop.innerHTML = _SEC_ICON_PICKER.map(k => `<button type="button" onclick="_secSelecionarIcone('${hiddenId}','${previewBtnId}','${k}')" title="${k}" style="width:34px;height:34px;border-radius:8px;border:none;background:#F1F2F5;cursor:pointer;display:flex;align-items:center;justify-content:center">${_secIconPreviewHtml(k)}</button>`).join('');
+    pop._alvoHidden = hiddenId;
+    const btn = document.getElementById(previewBtnId);
+    const rect = btn.getBoundingClientRect();
+    pop.style.display = 'grid';
+    pop.style.top = (rect.bottom + 4) + 'px';
+    pop.style.left = rect.left + 'px';
+  }
+  function _secSelecionarIcone(hiddenId, previewBtnId, key) {
+    document.getElementById(hiddenId).value = key;
+    document.getElementById(previewBtnId).innerHTML = _secIconPreviewHtml(key);
+    document.getElementById('secIconPickerPop').style.display = 'none';
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('#secIconPickerPop') && !e.target.closest('[data-sec-icon-trigger]')) { const p = document.getElementById('secIconPickerPop'); if (p) p.style.display = 'none'; } });
 
   function renderSecao(s, vi, ri, total) {
     const isE = modoEdicao;
@@ -1316,7 +1363,7 @@
     }).join('');
   }
 
-  const _labelInputStyle = 'flex:1;min-width:0;border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:11px;font-weight:700;color:#33363F;text-transform:uppercase;letter-spacing:0.5px;background:transparent;padding:0 0 1px 0;font-family:inherit';
+  const _labelInputStyle = 'flex:1;min-width:0;border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:11px;font-weight:700;color:#33363F;text-transform:uppercase;letter-spacing:0.5px;background:transparent;padding:3px 0 6px 7px;font-family:inherit';
 
   function _renderGrupoSimples(s, items, ri) {
     const html = items.map(({c,ci})=>{
@@ -1344,7 +1391,7 @@
       const labelLimpo = _stripLeadingEmoji(c.label);
       const del = modoEdicao ? `<button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};padding:1px 5px;float:right;margin-left:6px">✕</button>` : '';
       const titleEl = modoEdicao
-        ? `${del}<input type="text" value="${_esc(labelLimpo)}" oninput="secoesData[${ri}].campos[${ci}].label=this.value" style="border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:12px;font-weight:700;color:#0B0B0F;background:transparent;padding:0 0 2px 0;width:calc(100% - 36px);font-family:inherit">`
+        ? `${del}<input type="text" value="${_esc(labelLimpo)}" oninput="secoesData[${ri}].campos[${ci}].label=this.value" style="border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:12px;font-weight:700;color:#0B0B0F;background:transparent;padding:3px 0 6px 7px;width:calc(100% - 36px);font-family:inherit">`
         : labelLimpo;
       const tb = modoEdicao ? `<div style="display:flex;gap:3px;padding:5px;background:#FAFBFC;border-radius:6px 6px 0 0;border:1.5px solid #ECEDF0;border-bottom:none;flex-wrap:wrap;margin-top:8px">
         <button class="toolbar-btn" onmousedown="event.preventDefault();fmtRich('${eid}','bold')"><b>B</b></button>
@@ -1380,6 +1427,31 @@
     return addBtn+`<div class="timeline">${html}</div>`;
   }
 
+  const _iconBrushA = '<span style="font-weight:800;font-size:10px;line-height:1">A</span><svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c1-4 3-6 6-7l8-8 3 3-8 8c-1 3-3 5-7 6z"/><path d="M14 6l4 4"/></svg>';
+  const _iconDroplet = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>';
+  const _iconPlus = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  const _sTblAddBtn = 'width:24px;height:24px;border-radius:6px;border:none;background:color-mix(in srgb,var(--accent) 10%,white);color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0';
+  const _sTblDelBtn = _sBtnDel+';padding:1px 4px';
+  const _TBL_ALIGN_ICON = {
+    left:   '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>',
+    center: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>',
+    right:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>',
+  };
+  const _TBL_ALIGN_NEXT = {left:'center', center:'right', right:'left'};
+  function _tblCellAlignCycle(ri,ci,r,coli,btn) {
+    const camposArr = secoesData[ri].campos[ci].dados;
+    const row = camposArr.linhas[r] = camposArr.linhas[r] || [];
+    row[coli] = row[coli] || {valor:'',bgColor:'',textColor:''};
+    const atual = row[coli].align || 'left';
+    const prox = _TBL_ALIGN_NEXT[atual];
+    row[coli].align = prox;
+    const td = btn.closest('td');
+    const textarea = td.querySelector('textarea');
+    if (textarea) textarea.style.textAlign = prox;
+    btn.innerHTML = _TBL_ALIGN_ICON[prox];
+    btn.title = 'Alinhamento: '+prox;
+  }
+
   function _renderCampoTabela(s, c, ci, ri) {
     const d = c.dados||{colunas:[],linhas:[]};
     const cols = d.colunas||[], rows = d.linhas||[];
@@ -1388,32 +1460,42 @@
     const bs = 'border:1px solid #ECEDF0;padding:7px 10px;font-size:12px;word-break:break-word;vertical-align:top';
     const colgroup = `<colgroup>${cols.map(()=>`<col style="width:${colW}">`).join('')}${modoEdicao?'<col style="width:40px">':''}</colgroup>`;
     const thead = `<tr>
-      ${cols.map((col,coli)=>`<th style="${bs};font-weight:700;background:${col.bgColor||'#FAFBFC'};color:${col.textColor||'#0B0B0F'}">
+      ${cols.map((col,coli)=>{
+        const colBgId = `tblColBg-${ri}-${ci}-${coli}`;
+        return `<th style="${bs};font-weight:700;background:${col.bgColor||'#FAFBFC'};color:${col.textColor||'#0B0B0F'}">
         ${modoEdicao?`<div style="display:flex;gap:4px;align-items:center">
           <input type="text" value="${_esc(col.nome||'')}" oninput="secoesData[${ri}].campos[${ci}].dados.colunas[${coli}].nome=this.value" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-weight:700;font-size:12px;color:inherit;font-family:inherit">
-          <input type="color" title="Cor fundo" value="${col.bgColor||'#FAFBFC'}" onchange="_tblColCor(${ri},${ci},${coli},'bgColor',this.value,this.closest('th'))" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;flex-shrink:0">
-          <button onclick="removerColunaTabela(${ri},${ci},${coli})" style="${_sBtnDel};padding:1px 4px">✕</button>
+          <button type="button" onclick="document.getElementById('${colBgId}').click()" title="Cor de fundo" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;display:flex;flex-shrink:0">${_iconDroplet}</button>
+          <input type="color" id="${colBgId}" title="Cor de fundo" value="${col.bgColor||'#FAFBFC'}" onchange="_tblColCor(${ri},${ci},${coli},'bgColor',this.value,this.closest('th'))" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none">
+          <button onclick="removerColunaTabela(${ri},${ci},${coli})" style="${_sTblDelBtn}">✕</button>
         </div>`:(col.nome||'—')}
-      </th>`).join('')}
-      ${modoEdicao?`<th style="${bs};background:#FAFBFC"><button onclick="adicionarColunaTabela(${ri},${ci})" style="font-size:11px;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white);border:1.5px solid color-mix(in srgb,var(--accent) 40%,white);border-radius:4px;padding:3px 8px;cursor:pointer;font-weight:600">+Col</button></th>`:''}
+      </th>`;
+      }).join('')}
+      ${modoEdicao?`<th style="${bs};background:#FAFBFC;text-align:right"><button onclick="adicionarColunaTabela(${ri},${ci})" title="Adicionar coluna" style="${_sTblAddBtn}">${_iconPlus}</button></th>`:''}
     </tr>`;
     const tbody = rows.map((row,r)=>`<tr>
       ${cols.map((col,coli)=>{
         const cell=(row&&row[coli])||{valor:'',bgColor:'',textColor:''};
+        const textColorId = `tblTextColor-${ri}-${ci}-${r}-${coli}`;
+        const bgColorId = `tblBgColor-${ri}-${ci}-${r}-${coli}`;
+        const align = cell.align||'left';
         return `<td style="${bs};background:${cell.bgColor||'transparent'};color:${cell.textColor||'inherit'}">
-          ${modoEdicao?`<div style="display:flex;gap:3px;align-items:flex-start">
-            <textarea oninput="_tblCellVal(${ri},${ci},${r},${coli},this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-family:inherit;font-size:inherit;color:inherit;resize:none;overflow:hidden;line-height:1.4" rows="1">${_esc(cell.valor||'')}</textarea>
-            <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
-              <input type="color" title="Cor fundo" value="${cell.bgColor||'#ffffff'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'bgColor',this.value,this.closest('td'))" style="width:16px;height:16px;border:none;padding:0;cursor:pointer">
-              <input type="color" title="Cor texto" value="${cell.textColor||'#0B0B0F'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'textColor',this.value,this.closest('td'))" style="width:16px;height:16px;border:none;padding:0;cursor:pointer">
+          ${modoEdicao?`<div style="display:flex;gap:4px;align-items:flex-start">
+            <textarea oninput="_tblCellVal(${ri},${ci},${r},${coli},this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-family:inherit;font-size:inherit;color:inherit;resize:none;overflow:hidden;line-height:1.4;text-align:${align}" rows="1">${_esc(cell.valor||'')}</textarea>
+            <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;align-items:center">
+              <button type="button" onclick="document.getElementById('${textColorId}').click()" title="Cor do texto" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;display:flex;align-items:center;gap:1px">${_iconBrushA}</button>
+              <input type="color" id="${textColorId}" title="Cor do texto" value="${cell.textColor||'#0B0B0F'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'textColor',this.value,this.closest('td'))" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none">
+              <button type="button" onclick="document.getElementById('${bgColorId}').click()" title="Cor de fundo" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;display:flex">${_iconDroplet}</button>
+              <input type="color" id="${bgColorId}" title="Cor de fundo" value="${cell.bgColor||'#ffffff'}" onchange="_tblCellCor(${ri},${ci},${r},${coli},'bgColor',this.value,this.closest('td'))" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none">
+              <button type="button" onclick="_tblCellAlignCycle(${ri},${ci},${r},${coli},this)" title="Alinhamento: ${align}" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;display:flex">${_TBL_ALIGN_ICON[align]}</button>
             </div>
-          </div>`:(cell.valor||'—')}
+          </div>`:`<div style="text-align:${align}">${cell.valor||'—'}</div>`}
         </td>`;
       }).join('')}
-      ${modoEdicao?`<td style="${bs};background:color-mix(in srgb,#FF2E4D 8%,white)"><button onclick="removerLinhaTabela(${ri},${ci},${r})" style="${_sBtnDel};padding:1px 4px">✕</button></td>`:''}
+      ${modoEdicao?`<td style="${bs};text-align:center;vertical-align:middle"><button onclick="removerLinhaTabela(${ri},${ci},${r})" style="${_sTblDelBtn}">✕</button></td>`:''}
     </tr>`).join('');
     const delBtn = modoEdicao?`<div style="margin-bottom:8px"><button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel}">✕ Remover tabela</button></div>`:'';
-    const addRow = modoEdicao?`<div style="margin-top:8px"><button onclick="adicionarLinhaTabela(${ri},${ci})" style="font-size:12px;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white);border:1.5px solid color-mix(in srgb,var(--accent) 40%,white);border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:600">+ Linha</button></div>`:'';
+    const addRow = modoEdicao?`<div style="margin-top:8px"><button onclick="adicionarLinhaTabela(${ri},${ci})" title="Adicionar linha" style="${_sTblAddBtn}">${_iconPlus}</button></div>`:'';
     return `${delBtn}<div class="secao-tbl-wrap"><div class="secao-tbl"><table style="table-layout:fixed">${colgroup}<thead>${thead}</thead><tbody>${tbody}</tbody></table></div></div>${addRow}`;
   }
 
@@ -1437,10 +1519,10 @@
   // ===== CRUD SEÇÕES =====
   function removerSecao(ri){if(!confirm('Remover esta seção?'))return;coletarRichEditors();secoesData[ri].visivel=false;renderSecoes();}
   function moverSecao(ri,dir){coletarRichEditors();const vis=secoesData.map((s,i)=>({s,i})).filter(x=>x.s.visivel!==false).map(x=>x.i);const pos=vis.indexOf(ri),sp=pos+dir;if(sp<0||sp>=vis.length)return;[secoesData[ri],secoesData[vis[sp]]]=[secoesData[vis[sp]],secoesData[ri]];renderSecoes();}
-  function editarSecaoMeta(ri){const s=secoesData[ri];document.getElementById('editSecaoEmoji').value=s.emoji||'';document.getElementById('editSecaoNome').value=s.nome||'';document.getElementById('editSecaoIdx').value=ri;document.getElementById('modalEditSecao').classList.add('aberto');setTimeout(()=>document.getElementById('editSecaoNome').focus(),100);}
-  function confirmarEditSecao(){const ri=+document.getElementById('editSecaoIdx').value;secoesData[ri].emoji=document.getElementById('editSecaoEmoji').value.trim()||'📋';secoesData[ri].nome=document.getElementById('editSecaoNome').value.trim()||'Seção';fecharModal('modalEditSecao');renderSecoes();}
-  function abrirModalNovaSecao(){document.getElementById('novaSecaoEmoji').value='';document.getElementById('novaSecaoNome').value='';document.getElementById('modalNovaSecao').classList.add('aberto');setTimeout(()=>document.getElementById('novaSecaoNome').focus(),100);}
-  function confirmarNovaSecao(){const emoji=document.getElementById('novaSecaoEmoji').value.trim()||'📋';const nome=document.getElementById('novaSecaoNome').value.trim();if(!nome)return;coletarRichEditors();secoesData.push({id:'secao_'+Date.now(),emoji,nome,visivel:true,campos:[]});fecharModal('modalNovaSecao');renderSecoes();}
+  function editarSecaoMeta(ri){const s=secoesData[ri];const icone=s.icone||'lista';document.getElementById('editSecaoIcone').value=icone;document.getElementById('editSecaoIconePreview').innerHTML=_secIconPreviewHtml(icone);document.getElementById('editSecaoNome').value=s.nome||'';document.getElementById('editSecaoIdx').value=ri;document.getElementById('modalEditSecao').classList.add('aberto');setTimeout(()=>document.getElementById('editSecaoNome').focus(),100);}
+  function confirmarEditSecao(){const ri=+document.getElementById('editSecaoIdx').value;secoesData[ri].icone=document.getElementById('editSecaoIcone').value||'lista';secoesData[ri].nome=document.getElementById('editSecaoNome').value.trim()||'Seção';fecharModal('modalEditSecao');renderSecoes();}
+  function abrirModalNovaSecao(){document.getElementById('novaSecaoIcone').value='lista';document.getElementById('novaSecaoIconePreview').innerHTML=_secIconPreviewHtml('lista');document.getElementById('novaSecaoNome').value='';document.getElementById('modalNovaSecao').classList.add('aberto');setTimeout(()=>document.getElementById('novaSecaoNome').focus(),100);}
+  function confirmarNovaSecao(){const icone=document.getElementById('novaSecaoIcone').value||'lista';const nome=document.getElementById('novaSecaoNome').value.trim();if(!nome)return;coletarRichEditors();secoesData.push({id:'secao_'+Date.now(),icone,nome,visivel:true,campos:[]});fecharModal('modalNovaSecao');renderSecoes();}
 
   // ===== CRUD CAMPOS =====
   function addCampo(ri, tipo) {
@@ -1513,9 +1595,7 @@
 
   // ===== NOSSO TIME — API =====
   const DEP_CORES = ['var(--accent)','#00B37E','#3b5bdb','#e53e3e','#d69e2e','#00b5d8'];
-  let departamentos = [], membros = [], conexoes = [], depAtivo = null;
-  let dragging = null, dragOffset = { x:0, y:0 };
-  let conectandoDe = null; // { memberId, side }
+  let departamentos = [], membros = [], depAtivo = null;
   let usuariosCadastrados = [], usuariosFiltrados = [];
   let zoomNivel = 4;
   const ZOOM_NIVEIS = [60, 80, 100, 120, 140, 180];
@@ -1577,7 +1657,7 @@
       if (data && data.organograma) {
         departamentos = data.organograma.departamentos || [];
         membros = data.organograma.membros || [];
-        conexoes = data.organograma.conexoes || [];
+        if (depAtivo == null && departamentos.length) depAtivo = departamentos[0].id;
         renderDepSidebar();
         renderOrganograma();
       }
@@ -1586,7 +1666,7 @@
   }
 
   async function salvarOrg() {
-    try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ organograma: { departamentos, membros, conexoes } }) }); } catch(err) { console.error(err); }
+    try { await fetch('/api/overview', { method: 'PUT', headers: HEADERS, body: JSON.stringify({ organograma: { departamentos, membros } }) }); } catch(err) { console.error(err); }
   }
 
   // ===== DEPARTAMENTOS =====
@@ -1595,7 +1675,9 @@
   async function adicionarDep() {
     const nome = document.getElementById('depNome').value.trim();
     if (!nome) return;
-    departamentos.push({ id: Date.now(), nome });
+    const novo = { id: Date.now(), nome };
+    departamentos.push(novo);
+    if (depAtivo == null) { depAtivo = novo.id; renderOrganograma(); }
     renderDepSidebar();
     fecharModal('modalDep');
     await salvarOrg();
@@ -1626,14 +1708,14 @@
     if (!dep || !confirm(`Remover departamento "${dep.nome}"?\nOs membros não serão deletados.`)) return;
     departamentos = departamentos.filter(d => d.id != depId);
     membros.forEach(m => { if (m.depId == depId) m.depId = ''; });
-    if (depAtivo == depId) depAtivo = null;
+    if (depAtivo == depId) depAtivo = departamentos[0]?.id ?? null;
     await salvarOrg();
     renderDepSidebar();
     renderOrganograma();
   }
 
   function selecionarDepSidebar(depId) {
-    depAtivo = (depAtivo == depId) ? null : depId;
+    depAtivo = depId;
     renderDepSidebar();
     renderOrganograma();
   }
@@ -1658,6 +1740,28 @@
   }
 
   // ===== MEMBROS =====
+  function _descendentesDe(id) {
+    const result = new Set();
+    let fronteira = [id];
+    while (fronteira.length) {
+      const proximos = membros.filter(m => fronteira.includes(m.chefeId)).map(m => m.id);
+      proximos.forEach(p => result.add(p));
+      fronteira = proximos;
+    }
+    return result;
+  }
+
+  function atualizarChefeDropdown() {
+    const depId = document.getElementById('membroDep').value;
+    const editId = document.getElementById('membroEditId').value;
+    const chefeSel = document.getElementById('membroChefe');
+    const bloqueados = editId ? new Set([parseInt(editId), ..._descendentesDe(parseInt(editId))]) : new Set();
+    const valorAtual = chefeSel.value;
+    const candidatos = depId ? membros.filter(m => m.depId == depId && !bloqueados.has(m.id)) : [];
+    chefeSel.innerHTML = '<option value="">— Nenhum (topo da hierarquia) —</option>' + candidatos.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
+    chefeSel.value = candidatos.some(m => m.id == valorAtual) ? valorAtual : '';
+  }
+
   function abrirModalMembro(id) {
     if (!_podeEditarWiki) return;
     document.getElementById('modalMembroTitulo').textContent = id ? 'Editar Membro' : 'Novo Membro';
@@ -1673,6 +1777,8 @@
       // Se um time já está selecionado na barra lateral, o novo membro nasce vinculado a ele.
       depSel.value = depAtivo || '';
     }
+    atualizarChefeDropdown();
+    if (id) { const m = membros.find(m => m.id == id); document.getElementById('membroChefe').value = m?.chefeId || ''; }
     document.getElementById('modalMembro').classList.add('aberto');
   }
 
@@ -1683,10 +1789,10 @@
     // atribuído quando alguém tenta "recriar" uma pessoa que já está cadastrada.
     const _porNome = !id && nome ? membros.find(m => m.nome.trim().toLowerCase() === nome.toLowerCase()) : null;
     const idEfetivo = id || _porNome?.id;
-    const _existente = idEfetivo ? membros.find(m=>m.id==idEfetivo) : null;
-    const membro = { id:idEfetivo?parseInt(idEfetivo):Date.now(), nome, cargo:document.getElementById('membroCargo').value.trim(), depId:document.getElementById('membroDep').value||'', email:document.getElementById('membroEmail').value.trim(), x:Math.random()*400+50, y:Math.random()*200+50 };
+    const chefeVal = document.getElementById('membroChefe').value;
+    const membro = { id:idEfetivo?parseInt(idEfetivo):Date.now(), nome, cargo:document.getElementById('membroCargo').value.trim(), depId:document.getElementById('membroDep').value||'', email:document.getElementById('membroEmail').value.trim(), chefeId: chefeVal ? parseInt(chefeVal) : null };
     if (!membro.nome) return;
-    if (idEfetivo) { const idx=membros.findIndex(m=>m.id==idEfetivo); if(idx!==-1){membro.x=membros[idx].x;membro.y=membros[idx].y;membros[idx]=membro;} }
+    if (idEfetivo) { const idx=membros.findIndex(m=>m.id==idEfetivo); if(idx!==-1) membros[idx]=membro; }
     else membros.push(membro);
     await salvarOrg();
     renderOrganograma();
@@ -1696,287 +1802,83 @@
   async function deletarMembro(id) {
     if (!_podeEditarWiki) return;
     if (!confirm('Remover este membro?')) return;
+    membros.forEach(m => { if (m.chefeId == id) m.chefeId = null; });
     membros = membros.filter(m=>m.id!=id);
-    conexoes = conexoes.filter(c=>c.de!=id&&c.para!=id);
     await salvarOrg();
     renderOrganograma();
   }
 
-  // ===== CONEXÕES MIRO-STYLE (click-to-connect) =====
-  function getHandlePos(rect, canvasRect, side) {
-    const l = rect.left - canvasRect.left, t = rect.top - canvasRect.top;
-    const w = rect.width, h = rect.height;
-    switch(side) {
-      case 'top':    return { x: l + w/2, y: t };
-      case 'right':  return { x: l + w,   y: t + h/2 };
-      case 'bottom': return { x: l + w/2, y: t + h };
-      case 'left':   return { x: l,       y: t + h/2 };
-      default:       return { x: l + w/2, y: t + h/2 };
-    }
+  function toggleOrgCardEmail(id) {
+    document.getElementById('orgcard-' + id)?.classList.toggle('aberto');
   }
 
-  // Canvas-relative bounds using stored m.x/m.y — works even when canvas is hidden
-  function _nodeBounds(memberId) {
-    const m = membros.find(x => x.id == memberId);
-    if (!m) return null;
-    const W = getLarguraCard();
-    const el = document.getElementById('node-' + memberId);
-    const H = el && el.offsetHeight > 0 ? el.offsetHeight : 120;
-    return { l: m.x, t: m.y, w: W, h: H };
-  }
-  function _handleFromBounds(b, side) {
-    switch(side) {
-      case 'top':    return { x: b.l + b.w/2, y: b.t };
-      case 'right':  return { x: b.l + b.w,   y: b.t + b.h/2 };
-      case 'bottom': return { x: b.l + b.w/2, y: b.t + b.h };
-      case 'left':   return { x: b.l,          y: b.t + b.h/2 };
-      default:       return { x: b.l + b.w/2, y: b.t + b.h/2 };
-    }
-  }
-  function _autoEntryFromBounds(b, fromX, fromY) {
-    const cx = b.l + b.w/2, cy = b.t + b.h/2;
-    const dx = cx - fromX, dy = cy - fromY;
-    if (Math.abs(dy) >= Math.abs(dx)) {
-      return dy > 0 ? { x: cx, y: b.t, side: 'top' } : { x: cx, y: b.t + b.h, side: 'bottom' };
-    } else {
-      return dx > 0 ? { x: b.l, y: cy, side: 'left' } : { x: b.l + b.w, y: cy, side: 'right' };
-    }
+  function _iniciaisDe(nome) {
+    return nome.trim().split(/\s+/).filter(Boolean).slice(0, 2).map(p => p[0].toUpperCase()).join('');
   }
 
-  // L-bend quando eixos perpendiculares, Z-bend quando paralelos
-  function buildOrthogonalPath(x1, y1, fromSide, x2, y2, toSide) {
-    const r = 8;
-    const dx = x2 - x1, dy = y2 - y1;
-    if (Math.abs(dx) < 4 && Math.abs(dy) < 4) {
-      return { d: `M${x1},${y1} L${x2},${y2}`, mx: (x1+x2)/2, my: (y1+y2)/2 };
-    }
-    const isHorizExit = fromSide === 'left' || fromSide === 'right' ||
-                        (!fromSide && Math.abs(dx) >= Math.abs(dy));
-    const isHorizEntry = toSide === 'left' || toSide === 'right';
-    const isVertEntry  = toSide === 'top'  || toSide === 'bottom';
-
-    // Eixos perpendiculares → L-bend (1 curva)
-    if ((isHorizExit && isVertEntry) || (!isHorizExit && isHorizEntry)) {
-      if (isHorizExit) {
-        if (Math.abs(dy) < 4) return { d: `M${x1},${y1} H${x2}`, mx: (x1+x2)/2, my: y1 };
-        const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
-        const cr = Math.min(r, Math.abs(dx)/2, Math.abs(dy)/2);
-        const d = `M${x1},${y1} H${x2-signX*cr} Q${x2},${y1} ${x2},${y1+signY*cr} V${y2}`;
-        return { d, mx: x2, my: (y1+y2)/2 };
-      } else {
-        if (Math.abs(dx) < 4) return { d: `M${x1},${y1} V${y2}`, mx: x1, my: (y1+y2)/2 };
-        const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
-        const cr = Math.min(r, Math.abs(dy)/2, Math.abs(dx)/2);
-        const d = `M${x1},${y1} V${y2-signY*cr} Q${x1},${y2} ${x1+signX*cr},${y2} H${x2}`;
-        return { d, mx: (x1+x2)/2, my: y2 };
-      }
-    }
-
-    // Eixos paralelos → Z-bend (2 curvas)
-    if (isHorizExit) {
-      if (Math.abs(dy) < 4) return { d: `M${x1},${y1} H${x2}`, mx: (x1+x2)/2, my: y1 };
-      const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
-      const mid = fromSide === 'right' ? Math.max((x1+x2)/2, x1+28) :
-                  fromSide === 'left'  ? Math.min((x1+x2)/2, x1-28) : (x1+x2)/2;
-      const er = Math.min(r, Math.abs(mid-x1)/2, Math.abs(dy)/2);
-      const d = `M${x1},${y1} H${mid-signX*er} Q${mid},${y1} ${mid},${y1+signY*er} V${y2-signY*er} Q${mid},${y2} ${mid+signX*er},${y2} H${x2}`;
-      return { d, mx: mid, my: (y1+y2)/2 };
-    } else {
-      if (Math.abs(dx) < 4) return { d: `M${x1},${y1} V${y2}`, mx: x1, my: (y1+y2)/2 };
-      const signX = dx >= 0 ? 1 : -1, signY = dy >= 0 ? 1 : -1;
-      const mid = fromSide === 'bottom' ? Math.max((y1+y2)/2, y1+28) :
-                  fromSide === 'top'    ? Math.min((y1+y2)/2, y1-28) : (y1+y2)/2;
-      const er = Math.min(r, Math.abs(mid-y1)/2, Math.abs(dx)/2);
-      const d = `M${x1},${y1} V${mid-signY*er} Q${x1},${mid} ${x1+signX*er},${mid} H${x2-signX*er} Q${x2},${mid} ${x2},${mid+signY*er} V${y2}`;
-      return { d, mx: (x1+x2)/2, my: mid };
-    }
-  }
-
-  function getAutoEntryPoint(rPARA, canvasRect, fromX, fromY) {
-    const l = rPARA.left - canvasRect.left, t = rPARA.top - canvasRect.top;
-    const cx = l + rPARA.width/2, cy = t + rPARA.height/2;
-    const dx = cx - fromX, dy = cy - fromY;
-    if (Math.abs(dy) >= Math.abs(dx)) {
-      return dy > 0 ? { x: cx, y: t, side: 'top' } : { x: cx, y: t + rPARA.height, side: 'bottom' };
-    } else {
-      return dx > 0 ? { x: l, y: cy, side: 'left' } : { x: l + rPARA.width, y: cy, side: 'right' };
-    }
-  }
-
-  function iniciarConexaoHandle(memberId, side, e) {
-    e.stopPropagation();
-    if (!_podeEditarWiki) return;
-    if (conectandoDe) {
-      if (conectandoDe.memberId === memberId) {
-        // Cancel: clicked same source handle again
-        conectandoDe = null;
-        document.getElementById('conn-temp')?.remove();
-        document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
-      } else {
-        // Complete connection to this node
-        const { memberId: fromId, side: fromSide } = conectandoDe;
-        conectandoDe = null;
-        document.getElementById('conn-temp')?.remove();
-        document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
-        const jaExiste = conexoes.find(c => (c.de==fromId&&c.para==memberId)||(c.de==memberId&&c.para==fromId));
-        if (!jaExiste) {
-          conexoes.push({ de: fromId, para: memberId, fromSide, toSide: side });
-          salvarOrg().then(() => renderOrganograma());
-        }
-      }
-      return;
-    }
-    // Start new connection
-    conectandoDe = { memberId, side };
-    document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
-    document.getElementById('node-' + memberId)?.classList.add('selecionado-conexao');
-  }
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && conectandoDe) {
-      conectandoDe = null;
-      document.getElementById('conn-temp')?.remove();
-      document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
-    }
-  });
-
-  function renderConexoes() {
-    const svg = document.getElementById('orgSvg');
-    svg.innerHTML = '';
-    document.querySelectorAll('.conn-del-btn').forEach(el => el.remove());
-    const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
-    const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
-    marker.setAttribute('id','arrowhead'); marker.setAttribute('markerWidth','8'); marker.setAttribute('markerHeight','6');
-    marker.setAttribute('refX','7'); marker.setAttribute('refY','3'); marker.setAttribute('orient','auto');
-    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    poly.setAttribute('points','0 0, 8 3, 0 6'); poly.setAttribute('fill','var(--accent)');
-    marker.appendChild(poly); defs.appendChild(marker); svg.appendChild(defs);
-
-    const membrosVisiveis = depAtivo ? membros.filter(m => m.depId == depAtivo) : membros;
-    const idsVisiveis = new Set(membrosVisiveis.map(m => m.id));
-    const canvas = document.getElementById('orgCanvas');
-
-    conexoes.forEach(c => {
-      if (!idsVisiveis.has(c.de) || !idsVisiveis.has(c.para)) return;
-      const bDE = _nodeBounds(c.de), bPARA = _nodeBounds(c.para);
-      if (!bDE || !bPARA) return;
-      let x1, y1;
-      if (c.fromSide) {
-        const pos = _handleFromBounds(bDE, c.fromSide);
-        x1 = pos.x; y1 = pos.y;
-      } else {
-        const cx1=bDE.l+bDE.w/2, cy1=bDE.t+bDE.h/2, cx2=bPARA.l+bPARA.w/2, cy2=bPARA.t+bPARA.h/2;
-        const dx=cx2-cx1, dy=cy2-cy1;
-        if (Math.abs(dy)>=Math.abs(dx)) { x1=cx1; y1=dy>0?bDE.t+bDE.h:bDE.t; }
-        else { y1=cy1; x1=dx>0?bDE.l+bDE.w:bDE.l; }
-      }
-      let entry;
-      if (c.toSide) {
-        const pos = _handleFromBounds(bPARA, c.toSide);
-        entry = { x: pos.x, y: pos.y, side: c.toSide };
-      } else {
-        entry = _autoEntryFromBounds(bPARA, x1, y1);
-      }
-      const { d, mx, my } = buildOrthogonalPath(x1, y1, c.fromSide || null, entry.x, entry.y, entry.side);
-      const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d', d); path.setAttribute('fill','none');
-      path.setAttribute('stroke','var(--accent)'); path.setAttribute('stroke-width','1.5');
-      path.setAttribute('stroke-opacity','0.65'); path.setAttribute('marker-end','url(#arrowhead)');
-      svg.appendChild(path);
-
-      // Wide invisible hit-area for hover detection
-      const hitPath = document.createElementNS('http://www.w3.org/2000/svg','path');
-      hitPath.setAttribute('d', d); hitPath.setAttribute('fill','none');
-      hitPath.setAttribute('stroke','transparent'); hitPath.setAttribute('stroke-width','20');
-      hitPath.style.pointerEvents = 'stroke'; hitPath.style.cursor = 'pointer';
-      svg.appendChild(hitPath);
-
-      const btn = document.createElement('div');
-      btn.className = 'conn-del-btn';
-      btn.style.cssText = `position:absolute;left:${mx-9}px;top:${my-9}px;width:18px;height:18px;background:white;border:1.5px solid #ECEDF0;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:#FF2E4D;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,0.12);opacity:0;transition:opacity .15s;`;
-      btn.title = 'Remover conexão';
-      btn.textContent = '×';
-      btn.addEventListener('click', async ev => {
-        ev.stopPropagation();
-        if (!_podeEditarWiki) return;
-        conexoes = conexoes.filter(x => !(x.de == c.de && x.para == c.para));
-        await salvarOrg();
-        renderOrganograma();
-      });
-      canvas.appendChild(btn);
-
-      let _orgHt;
-      const showBtn = () => { clearTimeout(_orgHt); btn.style.opacity = '1'; };
-      const hideBtn = () => { _orgHt = setTimeout(() => { btn.style.opacity = '0'; }, 150); };
-      hitPath.addEventListener('mouseenter', showBtn);
-      hitPath.addEventListener('mouseleave', hideBtn);
-      btn.addEventListener('mouseenter', showBtn);
-      btn.addEventListener('mouseleave', hideBtn);
-    });
+  function _renderOrgCard(m, fScale, W, comRamo) {
+    const cor = getDepCor(m.depId);
+    const avatarSize = Math.round(44 * fScale);
+    const usuarioSistema = m.email ? usuariosCadastrados.find(u => u.email && u.email.toLowerCase() === m.email.toLowerCase()) : null;
+    const fotoUrl = m.foto || usuarioSistema?.foto || null;
+    const avatarHtml = fotoUrl
+      ? `<img src="${fotoUrl}" style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;margin:0 auto 8px;display:block">`
+      : `<div class="org-card-avatar" style="width:${avatarSize}px;height:${avatarSize}px;background:${cor};font-size:${Math.round(14*fScale)}px">${_iniciaisDe(m.nome)}</div>`;
+    return `<div class="org-card-wrap" id="orgcard-${m.id}">
+      ${comRamo ? '<div class="org-conector-v pequeno"></div>' : ''}
+      <div class="org-card" style="width:${W}px" onclick="toggleOrgCardEmail(${m.id})">
+        <div class="org-card-actions">
+          <button class="org-card-btn edit" onclick="event.stopPropagation();abrirModalMembro(${m.id})" title="Editar"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+          <button class="org-card-btn del" onclick="event.stopPropagation();deletarMembro(${m.id})" title="Remover"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg></button>
+        </div>
+        ${avatarHtml}
+        <div class="org-card-nome" data-fit data-fit-max="${Math.round(13*fScale)}" style="font-size:${Math.round(13*fScale)}px;white-space:nowrap;overflow:hidden">${m.nome}</div>
+        <div class="org-card-cargo" data-fit data-fit-max="${Math.round(10*fScale)}" style="font-size:${Math.round(10*fScale)}px;color:${cor};white-space:nowrap;overflow:hidden">${m.cargo}</div>
+        ${m.email ? `<div class="org-card-email">${m.email}</div>` : ''}
+      </div>
+    </div>`;
   }
 
   function renderOrganograma() {
     const canvas = document.getElementById('orgCanvas'), empty = document.getElementById('orgEmpty');
     const filtrados = depAtivo ? membros.filter(m => m.depId == depAtivo) : membros;
-    document.querySelectorAll('.org-node').forEach(n => n.remove());
-    if (filtrados.length === 0) { empty.style.display = 'flex'; renderConexoes(); return; }
+    if (filtrados.length === 0) { empty.style.display = 'flex'; canvas.innerHTML = ''; return; }
     empty.style.display = 'none';
-    const W = getLarguraCard(), fScale = getFontScale(), pad = fScale < 0.8 ? '8px' : '14px';
+    const W = getLarguraCard(), fScale = getFontScale();
 
+    const idsVisiveis = new Set(filtrados.map(m => m.id));
+    const filhosDe = new Map();
     filtrados.forEach(m => {
-      const cor = getDepCor(m.depId), dep = departamentos.find(d => d.id == m.depId);
-      const nomes = m.nome.trim().split(' ');
-      const primeiro = nomes[0], ultimo = nomes.length > 1 ? nomes[nomes.length-1] : '', meio = nomes.length > 2 ? nomes.slice(1,-1).join(' ') : '';
-      const nomeHtml = `<strong>${primeiro}</strong>${meio ? ' '+meio : ''}<strong>${ultimo ? ' '+ultimo : ''}</strong>`;
-      const avatarSize = Math.round(44 * fScale);
-      const avatarMb = fScale < 0.8 ? 3 : 6;
-      const usuarioSistema = m.email ? usuariosCadastrados.find(u => u.email && u.email.toLowerCase() === m.email.toLowerCase()) : null;
-      const fotoUrl = m.foto || usuarioSistema?.foto || null;
-      const fotoHtml = fotoUrl
-        ? `<img src="${fotoUrl}" style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;object-fit:cover;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:block">`
-        : `<div style="width:${avatarSize}px;height:${avatarSize}px;border-radius:50%;background:#edf2f7;border:2px solid ${cor};margin:0 auto ${avatarMb}px;display:flex;align-items:center;justify-content:center">
-            <svg viewBox="0 0 24 24" width="${Math.round(22*fScale)}" height="${Math.round(22*fScale)}" fill="none">
-              <circle cx="12" cy="8" r="4" fill="#9CA0AC"/>
-              <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" fill="#9CA0AC"/>
-            </svg>
-          </div>`;
-      const nomeFontSize = Math.round(13 * fScale);
-      const cargoFontSize = Math.round(11 * fScale);
-
-      const node = document.createElement('div');
-      node.className = 'org-node';
-      node.id = 'node-' + m.id;
-      node.style.cssText = `left:${m.x}px;top:${m.y}px;width:${W}px;border-color:${cor};text-align:center;padding:${pad};position:absolute`;
-
-      node.innerHTML = `
-        <div class="conn-handle" style="top:-6px;left:50%;transform:translateX(-50%);border-color:${cor}" onclick="iniciarConexaoHandle(${m.id},'top',event)" title="Conectar"></div>
-        <div class="conn-handle" style="right:-6px;top:50%;transform:translateY(-50%);border-color:${cor}" onclick="iniciarConexaoHandle(${m.id},'right',event)" title="Conectar"></div>
-        <div class="conn-handle" style="bottom:-6px;left:50%;transform:translateX(-50%);border-color:${cor}" onclick="iniciarConexaoHandle(${m.id},'bottom',event)" title="Conectar"></div>
-        <div class="conn-handle" style="left:-6px;top:50%;transform:translateY(-50%);border-color:${cor}" onclick="iniciarConexaoHandle(${m.id},'left',event)" title="Conectar"></div>
-        <div class="org-node-actions" style="position:absolute;top:5px;right:5px;display:flex;gap:2px;opacity:0;transition:opacity 0.2s">
-          <button class="org-node-btn edit" onclick="abrirModalMembro(${m.id});event.stopPropagation()" title="Editar">✏️</button>
-          <button class="org-node-btn del" onclick="deletarMembro(${m.id});event.stopPropagation()" title="Remover">🗑️</button>
-        </div>
-        ${fotoHtml}
-        <div data-fit data-fit-max="${nomeFontSize}" style="font-size:${nomeFontSize}px;font-weight:600;color:#0B0B0F;margin-bottom:2px;line-height:1.3;white-space:nowrap;overflow:hidden">${nomeHtml}</div>
-        <div data-fit data-fit-max="${cargoFontSize}" style="font-size:${cargoFontSize}px;color:${cor};font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden">${m.cargo}</div>
-        ${m.email && fScale >= 1.0 ? `<div data-fit data-fit-max="${Math.round(10*fScale)}" style="font-size:${Math.round(10*fScale)}px;color:#9CA0AC;margin-top:1px;white-space:nowrap;overflow:hidden">${m.email}</div>` : ''}
-      `;
-
-      node.addEventListener('mouseenter', () => { node.querySelector('.org-node-actions').style.opacity = '1'; });
-      node.addEventListener('mouseleave', () => { node.querySelector('.org-node-actions').style.opacity = '0'; });
-      node.addEventListener('mousedown', e => {
-        if (!_podeEditarWiki || e.target.classList.contains('conn-handle') || e.target.tagName === 'BUTTON' || conectandoDe) return;
-        dragging = { node, membro: m };
-        const rect = node.getBoundingClientRect();
-        dragOffset.x = e.clientX - rect.left;
-        dragOffset.y = e.clientY - rect.top;
-        node.classList.add('dragging');
-        e.preventDefault();
-      });
-      canvas.appendChild(node);
+      const chave = (m.chefeId && idsVisiveis.has(m.chefeId)) ? m.chefeId : null;
+      if (!filhosDe.has(chave)) filhosDe.set(chave, []);
+      filhosDe.get(chave).push(m);
     });
-    requestAnimationFrame(() => { fitOrgNodes(); renderConexoes(); });
+
+    const niveis = [];
+    let atual = filhosDe.get(null) || [];
+    while (atual.length) {
+      niveis.push(atual);
+      let proximo = [];
+      atual.forEach(m => { proximo = proximo.concat(filhosDe.get(m.id) || []); });
+      atual = proximo;
+    }
+    const alcancados = new Set(niveis.flat().map(m => m.id));
+    const orfaos = filtrados.filter(m => !alcancados.has(m.id));
+    if (orfaos.length) niveis.push(orfaos);
+
+    canvas.innerHTML = niveis.map((nivel, li) => {
+      const temTronco = li > 0;
+      const temLinha = temTronco && nivel.length > 1;
+      const cardsHtml = nivel.map(m => _renderOrgCard(m, fScale, W, temLinha)).join('');
+      const linhaH = temLinha
+        ? `<div class="org-linha-h" style="left:${W/2}px;right:${W/2}px"></div>` : '';
+      return `<div class="org-tree-nivel">
+        ${temTronco ? '<div class="org-conector-v"></div>' : ''}
+        <div class="org-nivel-row">${linhaH}${cardsHtml}</div>
+      </div>`;
+    }).join('');
+
+    requestAnimationFrame(fitOrgNodes);
   }
 
   function fitOrgNodes() {
@@ -1991,52 +1893,6 @@
       }
     });
   }
-
-  document.addEventListener('mousemove', e => {
-    if (conectandoDe) {
-      const canvas = document.getElementById('orgCanvas');
-      if (!canvas) return;
-      const r = canvas.getBoundingClientRect();
-      const curX = e.clientX - r.left, curY = e.clientY - r.top;
-      const fromNode = document.getElementById('node-' + conectandoDe.memberId);
-      if (fromNode) {
-        const fr = fromNode.getBoundingClientRect();
-        const { x: x1, y: y1 } = getHandlePos(fr, r, conectandoDe.side);
-        const svg = document.getElementById('orgSvg');
-        let temp = document.getElementById('conn-temp');
-        if (!temp) {
-          temp = document.createElementNS('http://www.w3.org/2000/svg','path');
-          temp.id = 'conn-temp';
-          temp.setAttribute('fill','none'); temp.setAttribute('stroke','var(--accent)');
-          temp.setAttribute('stroke-width','1.5'); temp.setAttribute('stroke-dasharray','5,3');
-          temp.setAttribute('stroke-opacity','0.5');
-          svg.appendChild(temp);
-        }
-        temp.setAttribute('d', buildOrthogonalPath(x1, y1, conectandoDe.side, curX, curY).d);
-      }
-    }
-    if (dragging) {
-      const r = document.getElementById('orgCanvas').getBoundingClientRect();
-      const x = Math.max(0, e.clientX - r.left - dragOffset.x);
-      const y = Math.max(0, e.clientY - r.top - dragOffset.y);
-      dragging.node.style.left = x + 'px'; dragging.node.style.top = y + 'px';
-      dragging.membro.x = x; dragging.membro.y = y;
-      requestAnimationFrame(() => renderConexoes());
-    }
-  });
-
-  document.addEventListener('mouseup', async e => {
-    if (dragging) { dragging.node.classList.remove('dragging'); await salvarOrg(); dragging = null; }
-  });
-
-  // Cancela conexão ao clicar fora dos cards
-  document.addEventListener('click', e => {
-    if (conectandoDe && !e.target.closest('.org-node')) {
-      conectandoDe = null;
-      document.getElementById('conn-temp')?.remove();
-      document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
-    }
-  }, true);
 
   // ===== PASTAS =====
   let pastas = [], pastaAtiva = null, caminhoNavegacao = [];
@@ -2141,8 +1997,8 @@
         <div class="pasta-explorer-item" onclick="navegarPasta(${p.id},'${p.nome.replace(/'/g,"\\'")}')">
           <span style="display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${_iconPasta}${p.nome}</span>
           <span class="pasta-acoes">
-            <span class="pasta-acao-btn" onclick="abrirEditPasta(${p.id},event)" title="Renomear / Mover">✏️</span>
-            <span class="pasta-acao-btn" onclick="removerPasta(${p.id},event)" title="Remover">×</span>
+            <span class="pasta-acao-btn" onclick="abrirEditPasta(${p.id},event)" title="Renomear / Mover"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
+            <span class="pasta-acao-btn" onclick="removerPasta(${p.id},event)" title="Remover"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg></span>
           </span>
         </div>`).join('');
     }
@@ -2243,22 +2099,29 @@
     const area = document.getElementById('editorArea');
     const btnAprovar = document.getElementById('btnAprovarWiki');
     const btnSolicitar = document.getElementById('btnSolicitarAprovWiki');
-    const btnNovaVersao = document.getElementById('btnNovaVersao');
+    const metaRow = document.getElementById('editorMetaRow');
+    const toolbarBar = document.getElementById('editorToolbarBar');
+    const tituloView = document.getElementById('editorTituloView');
     const _cabecalho = ['editorTitulo', 'editorTags', 'editorResponsavel'];
     if (aprovado) {
       area.contentEditable = 'false';
       _cabecalho.forEach(id => document.getElementById(id)?.setAttribute('disabled',''));
       if (btnAprovar) btnAprovar.style.display = 'none';
       if (btnSolicitar) btnSolicitar.style.display = 'none';
-      if (btnNovaVersao) btnNovaVersao.style.display = '';
+      metaRow.style.display = 'none';
+      toolbarBar.style.display = 'none';
+      tituloView.textContent = wiki.titulo;
+      tituloView.style.display = 'block';
     } else {
       const souAutor = wiki && wiki.criadoPor === (usuario.id || usuario._id);
       const podeEditarEste = _podeEditarWiki || souAutor;
       area.contentEditable = podeEditarEste ? 'true' : 'false';
       _cabecalho.forEach(id => { const el = document.getElementById(id); if (el) { if (podeEditarEste) el.removeAttribute('disabled'); else el.setAttribute('disabled',''); } });
-      if (btnAprovar) btnAprovar.style.display = (wiki && _podeAprovarWiki) ? '' : 'none';
-      if (btnSolicitar) btnSolicitar.style.display = (wiki && podeEditarEste) ? '' : 'none';
-      if (btnNovaVersao) btnNovaVersao.style.display = 'none';
+      if (btnAprovar) btnAprovar.style.display = (wiki && _podeAprovarWiki) ? 'inline-flex' : 'none';
+      if (btnSolicitar) btnSolicitar.style.display = (wiki && podeEditarEste) ? 'inline-flex' : 'none';
+      metaRow.style.display = 'grid';
+      toolbarBar.style.display = 'flex';
+      tituloView.style.display = 'none';
     }
   }
 
@@ -2293,10 +2156,11 @@
       <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('underline')" title="Sublinhado"><u>U</u></button>
       <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('strikeThrough')" title="Tachado" style="text-decoration:line-through">S</button>
       <div class="toolbar-sep"></div>
-      <label title="Cor do texto" style="display:flex;align-items:center;cursor:pointer;padding:2px 4px;border-radius:4px">
-        <span style="font-size:11px;margin-right:3px;color:#33363F">A</span>
-        <input type="color" id="editorColor" value="#000000" style="width:18px;height:18px;border:none;padding:0;cursor:pointer;background:none" onchange="fmt('foreColor',this.value)" title="Cor do texto">
-      </label>
+      <button type="button" class="toolbar-btn" onclick="document.getElementById('editorColor').click()" title="Cor do texto" style="display:flex;align-items:center;gap:3px">
+        <span style="font-weight:800;font-size:13px;line-height:1">A</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c1-4 3-6 6-7l8-8 3 3-8 8c-1 3-3 5-7 6z"/><path d="M14 6l4 4"/></svg>
+      </button>
+      <input type="color" id="editorColor" value="#000000" onchange="fmt('foreColor',this.value)" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none">
       <div class="toolbar-sep"></div>
       <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('insertUnorderedList')" title="Lista com marcadores">• Lista</button>
       <button class="toolbar-btn" onmousedown="event.preventDefault();fmt('insertOrderedList')" title="Lista numerada">1. Lista</button>
@@ -2401,48 +2265,54 @@
   async function aprovarWiki() {
     if (!_podeAprovarWiki) return;
     if (!wikiEditando) { alert('Salve primeiro.'); return; }
-    if (!confirm('Aprovar este wiki? Após aprovado ele ficará imutável.')) return;
     await fetch(`/api/wikis/${wikiEditando}`, { method:'PUT', headers:HEADERS, body:JSON.stringify({status:'Aprovado'}) });
     await carregarWikis();
     const wiki = wikis.find(w=>w._id===wikiEditando);
     _atualizarBotoesEditor(wiki || null);
+    if (document.getElementById('versaoHistoria').classList.contains('aberto')) await _carregarHistoricoWiki();
   }
 
   let _usuariosAprovWiki = [];
+  let _wikiAprovSelecionado = null;
   function abrirModalSolicitarAprovWiki() {
     if (!wikiEditando) { alert('Salve primeiro.'); return; }
+    _wikiAprovSelecionado = null;
     const lista = document.getElementById('solicitarAprovWikiUserList');
     lista.innerHTML = '<div style="padding:12px;color:#6B7080;font-size:12px">Carregando...</div>';
     document.getElementById('modalSolicitarAprovWiki').classList.add('aberto');
     fetch('/api/usuarios/com-permissao/overview/aprovar', { headers: HEADERS }).then(r=>r.json()).then(users=>{
       _usuariosAprovWiki = (users||[]).filter(u => u._id !== (usuario.id || usuario._id));
       if (!_usuariosAprovWiki.length) { lista.innerHTML = '<div style="padding:12px;color:#6B7080;font-size:12px">Nenhum usuário com permissão para aprovar wikis, além de você.</div>'; return; }
-      lista.innerHTML = _usuariosAprovWiki.map(u=>`
-        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #ECEDF0;border-radius:8px;cursor:pointer;margin-bottom:6px">
-          <input type="radio" name="wikiAprovUser" value="${u._id}" style="accent-color:var(--accent)">
-          <span style="font-size:13px;font-weight:600;color:#0B0B0F">${u.nome}</span>
-          <span style="font-size:11px;color:#6B7080;margin-left:auto">${u.email||''}</span>
-        </label>`).join('');
+      lista.innerHTML = _usuariosAprovWiki.map(u => `
+        <div class="modal-user-item" onclick="_selecionarUserAprovWiki('${u._id}',this)">
+          <div class="modal-avatar">${(u.nome||'?')[0].toUpperCase()}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#0B0B0F">${u.nome}</div>
+            <div style="font-size:11px;color:#6B7080">${u.email||''}</div>
+          </div>
+        </div>`).join('');
     }).catch(()=>{ lista.innerHTML = '<div style="padding:12px;color:#FF2E4D;font-size:12px">Erro ao carregar usuários.</div>'; });
   }
+  function _selecionarUserAprovWiki(id, el) {
+    document.querySelectorAll('#solicitarAprovWikiUserList .modal-user-item').forEach(i => i.classList.remove('selecionado'));
+    el.classList.add('selecionado');
+    _wikiAprovSelecionado = id;
+  }
   async function _enviarSolicitacaoAprovWiki() {
-    const sel = document.querySelector('input[name="wikiAprovUser"]:checked');
-    if (!sel) { alert('Selecione um usuário.'); return; }
+    if (!_wikiAprovSelecionado) { alert('Selecione um usuário.'); return; }
     const wiki = wikis.find(w=>w._id===wikiEditando);
     await fetch('/api/notificacoes', { method:'POST', headers: HEADERS, body: JSON.stringify({
-      titulo: `📄 Aprovação de wiki solicitada`,
+      titulo: `Aprovação de wiki solicitada`,
       mensagem: `O wiki "${wiki?.titulo||''}" aguarda sua aprovação.`,
-      tipo: 'aviso', icone: '📄', link: '/overview', destinatario: sel.value
+      tipo: 'aviso', icone: '', link: '/overview', destinatario: _wikiAprovSelecionado
     })});
     fecharModal('modalSolicitarAprovWiki');
-    alert('Solicitação de aprovação enviada!');
   }
 
   async function novaVersaoWiki(id) {
     const srcId = id || wikiEditando;
     const wiki = wikis.find(w=>w._id===srcId);
     if (!wiki) return;
-    if (!confirm(`Criar nova versão de "${wiki.titulo}"? A versão atual ficará preservada no histórico.`)) return;
     // Busca todas as versões para pegar o número mais alto real
     let ultimaNum = parseFloat(wiki.versao.replace('v','')) || 1;
     try {
@@ -2452,10 +2322,12 @@
         ultimaNum = versoes.reduce((max, v) => { const n = parseFloat(v.versao.replace('v',''))||0; return n > max ? n : max; }, 0);
       }
     } catch(e) {}
-    const novaVersao = 'v' + (ultimaNum + 1).toFixed(1);
+    const nomeEscolhido = document.getElementById('novaVersaoNome')?.value.trim();
+    const novaVersao = nomeEscolhido || ('v' + (ultimaNum + 1).toFixed(1));
     const dados = { titulo: wiki.titulo, conteudo: wiki.conteudo, tags: wiki.tags, responsavel: wiki.responsavel, status: 'Rascunho', versao: novaVersao, pastaId: wiki.pastaId, grupoId: wiki.grupoId || wiki._id };
     const res = await fetch('/api/wikis', { method:'POST', headers:HEADERS, body:JSON.stringify(dados) });
     const nova = await res.json();
+    await fetch(`/api/wikis/${nova._id}/ativar`, { method: 'PUT', headers: HEADERS });
     await carregarWikis();
     editarWiki(nova._id);
   }
@@ -2481,37 +2353,44 @@
   function _renderHistoricoBody(versoes) {
     const statusCor = { 'Aprovado':'#00754F', 'Rascunho':'#6B7080', 'Pendente':'#b7791f' };
     const statusBg  = { 'Aprovado':'color-mix(in srgb,#00B37E 10%,white)', 'Rascunho':'#F1F2F5', 'Pendente':'#fffbeb' };
-    const ativoVersao = versoes.find(v => v.ativo);
-    const ativoInfo = ativoVersao
-      ? `<div style="padding:8px 14px;background:color-mix(in srgb,#00B37E 10%,white);border-bottom:1px solid color-mix(in srgb,#00B37E 30%,white);font-size:11px;color:#00754F;font-weight:600;">✓ Versão ativa: ${ativoVersao.versao} — ${ativoVersao.responsavel||'—'}</div>`
-      : '';
-    document.getElementById('versaoHistoriaBody').innerHTML = ativoInfo + versoes.slice().reverse().map(v => {
+    const ordenadas = [...versoes].sort((a,b) => new Date(b.atualizadoEm||b.criadoEm) - new Date(a.atualizadoEm||a.criadoEm));
+    const ativoIdx = ordenadas.findIndex(v => v.ativo);
+    if (ativoIdx > 0) { const [at] = ordenadas.splice(ativoIdx,1); ordenadas.unshift(at); }
+    const listHtml = ordenadas.map(v => {
       const isAtual = v._id === wikiEditando;
       const isAtivo = !!v.ativo;
+      const data = new Date(v.atualizadoEm || v.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
       return `<div class="versao-historia-item${isAtivo?' atual':''}">
-        <span style="font-weight:700;color:var(--accent);min-width:36px">${v.versao}</span>
-        ${isAtivo ? '<span style="padding:1px 6px;background:color-mix(in srgb,#00B37E 30%,white);color:#00754F;border-radius:10px;font-size:10px;font-weight:700;flex-shrink:0">ATIVO</span>' : ''}
-        <span style="padding:2px 8px;border-radius:10px;font-size:11px;background:${statusBg[v.status]||'#F1F2F5'};color:${statusCor[v.status]||'#6B7080'}">${v.status}</span>
-        <span style="flex:1;color:#33363F">${v.responsavel||'—'}</span>
-        <span style="color:#9CA0AC;flex-shrink:0">${new Date(v.criadoEm).toLocaleDateString('pt-BR')}</span>
-        <div style="display:flex;gap:4px;flex-shrink:0">
-          ${!isAtual ? `<button onclick="editarWiki('${v._id}')" style="padding:2px 8px;background:#ebf0ff;color:var(--accent);border:none;border-radius:4px;cursor:pointer;font-size:11px">Abrir</button>` : ''}
-          ${!isAtivo ? `<button onclick="ativarVersao('${v._id}')" style="padding:2px 8px;background:color-mix(in srgb,#00B37E 10%,white);color:#00754F;border:none;border-radius:4px;cursor:pointer;font-size:11px">Ativar</button>` : ''}
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="display:inline-block;background:${isAtivo?'var(--accent)':'#9CA0AC'};color:white;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:800">${v.versao}</span>
+          ${isAtivo ? '<span style="font-size:10.5px;color:var(--accent);font-weight:800">ATIVO</span>' : ''}
+          <span style="margin-left:auto;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;background:${statusBg[v.status]||'#F1F2F5'};color:${statusCor[v.status]||'#6B7080'}">${v.status}</span>
         </div>
+        <div style="font-size:12px;color:#33363F;font-weight:600;margin-top:9px">${data}</div>
+        <div style="font-size:12px;color:#6B7080;font-weight:600">${v.responsavel||'—'}</div>
+        ${(!isAtual || !isAtivo) ? `<div style="display:flex;gap:6px;margin-top:9px">
+          ${!isAtual ? `<button onclick="editarWiki('${v._id}')" style="flex:1;padding:6px 8px;background:#F1F2F5;color:#33363F;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">Abrir</button>` : ''}
+          ${!isAtivo ? `<button onclick="ativarVersao('${v._id}')" style="flex:1;padding:6px 8px;background:color-mix(in srgb,#00B37E 10%,white);color:#00754F;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">Ativar</button>` : ''}
+        </div>` : ''}
       </div>`;
     }).join('');
+    const atualDoc = versoes.find(v => v._id === wikiEditando);
+    const proximaSugestao = 'v' + (versoes.reduce((max, v) => { const n = parseFloat((v.versao||'').replace('v',''))||0; return n > max ? n : max; }, 0) + 1).toFixed(1);
+    const novaVersaoArea = atualDoc?.status === 'Aprovado'
+      ? `<div style="margin-top:4px;padding-top:14px;border-top:1px solid #ECEDF0">
+          <div style="font-size:10.5px;font-weight:800;color:#9CA0AC;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px">Publicar Como</div>
+          <input type="text" id="novaVersaoNome" placeholder="ex: ${proximaSugestao}" style="width:100%;height:38px;padding:0 12px;border-radius:8px;border:1.5px solid #ECEDF0;font-size:12.5px;font-weight:700;box-sizing:border-box;margin-bottom:10px;color:#0B0B0F">
+          <button onclick="novaVersaoWiki()" style="width:100%;height:38px;background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 80%,black));box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 35%,transparent);color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:12.5px">Publicar Versão</button>
+        </div>`
+      : '';
+    document.getElementById('versaoHistoriaBody').innerHTML = listHtml + novaVersaoArea;
   }
 
-  async function toggleHistorico() {
-    const panel = document.getElementById('versaoHistoria');
-    if (panel.classList.contains('aberto')) { panel.classList.remove('aberto'); return; }
+  async function _carregarHistoricoWiki() {
     if (!wikiEditando) {
       document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#6B7080">Salve o documento antes de ver o histórico.</div>';
-      panel.classList.add('aberto');
       return;
     }
-    document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#6B7080">Carregando...</div>';
-    panel.classList.add('aberto');
     try {
       const res = await fetch(`/api/wikis/${wikiEditando}/versoes`, { headers: HEADERS });
       const data = await res.json();
@@ -2531,16 +2410,21 @@
     }
   }
 
+  async function toggleHistorico() {
+    const panel = document.getElementById('versaoHistoria');
+    if (panel.classList.contains('aberto')) { panel.classList.remove('aberto'); return; }
+    document.getElementById('versaoHistoriaBody').innerHTML = '<div style="padding:14px;font-size:12px;color:#6B7080">Carregando...</div>';
+    panel.classList.add('aberto');
+    await _carregarHistoricoWiki();
+  }
+
   async function ativarVersao(id) {
     try {
       const res = await fetch(`/api/wikis/${id}/ativar`, { method: 'PUT', headers: HEADERS });
       if (!res.ok) { const d = await res.json(); alert(d.erro || 'Erro ao ativar versão.'); return; }
       await carregarWikis();
-      if (!wikiEditando) return;
-      const res2 = await fetch(`/api/wikis/${wikiEditando}/versoes`, { headers: HEADERS });
-      const versoes = await res2.json();
-      if (Array.isArray(versoes) && versoes.length > 0) _renderHistoricoBody(versoes);
       document.getElementById('versaoHistoria').classList.add('aberto');
+      await _carregarHistoricoWiki();
     } catch(e) { console.error(e); }
   }
 
@@ -2561,7 +2445,7 @@
     return ids;
   }
 
-  let colunasVisiveisWiki = { pasta: true, tags: false, responsavel: true, status: true, versao: true, atualizado: true };
+  let colunasVisiveisWiki = { tags: false, responsavel: true, status: true, versao: true, atualizado: true };
   try {
     const salvoWiki = JSON.parse(localStorage.getItem('ov_colunasVisiveisWiki') || 'null');
     if (salvoWiki) colunasVisiveisWiki = { ...colunasVisiveisWiki, ...salvoWiki };
@@ -2577,7 +2461,6 @@
     const drop = document.getElementById('dropColunasWiki');
     if (!drop) return;
     const opcoes = [
-      { key: 'pasta', label: 'Pasta' },
       { key: 'tags', label: 'Tags' },
       { key: 'responsavel', label: 'Responsável' },
       { key: 'status', label: 'Status' },
@@ -2615,22 +2498,11 @@
       else if (!ex.ativo && new Date(w.criadoEm) > new Date(ex.criadoEm)) { grupos.set(gid, w); }
     });
     filtro = Array.from(grupos.values());
-    if (filtro.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#9CA0AC">Nenhum documento encontrado.</td></tr>'; aplicarColunasWiki(); return; }
+    if (filtro.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA0AC">Nenhum documento encontrado.</td></tr>'; aplicarColunasWiki(); return; }
     const statusCor = { 'Aprovado':'badge-verde', 'Rascunho':'badge-cinza', 'Pendente':'badge-amarelo' };
     tbody.innerHTML = filtro.map(w => {
-      const pasta = pastas.find(p => p.id === w.pastaId);
-      const pastaOpts = pastas.map(p => `<option value="${p.id}" ${w.pastaId===p.id?'selected':''}>${p.nome}</option>`).join('');
-      const linkDoc = w.urlExterno
-        ? `<a href="${w.urlExterno}" target="_blank" download="${w.nomeArquivo||''}" title="${w.nomeArquivo||'Abrir'}" style="font-size:11px;color:var(--accent);margin-left:4px">⬇</a>`
-        : '';
       return `<tr>
-        <td><strong>${w.titulo}</strong>${linkDoc}</td>
-        <td data-col="pasta">
-          <select onchange="moverWikiPasta('${w._id}',this.value)" ${_podeEditarWiki?'':'disabled'} style="font-size:11px;padding:2px 4px;border:1px solid #ECEDF0;border-radius:4px;color:#6B7080;background:white;cursor:pointer">
-            <option value="">Sem pasta</option>
-            ${pastaOpts}
-          </select>
-        </td>
+        <td><strong>${w.titulo}</strong></td>
         <td data-col="tags">${w.tags ? w.tags.split(',').map(t=>`<span class="wiki-tag">${t.trim()}</span>`).join('') : '—'}</td>
         <td data-col="responsavel">${w.responsavel||'—'}</td>
         <td data-col="status"><span class="badge ${statusCor[w.status]||'badge-cinza'}">${w.status}</span></td>
@@ -2638,7 +2510,10 @@
         <td data-col="atualizado">${new Date(w.atualizadoEm||w.criadoEm).toLocaleDateString('pt-BR')}</td>
         <td style="white-space:nowrap">
           <div style="display:inline-flex;gap:6px">
-            ${w.tipo !== 'externo' ? `<button onclick="editarWiki('${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></button>` : ''}
+            ${_podeEditarWiki ? `<button onclick="abrirMoverPastaMenu(event,'${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:#6B7080;cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Mover para pasta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></button>` : ''}
+            ${w.tipo === 'externo'
+              ? `<a href="${w.urlExterno}" download="${(w.nomeArquivo||'').replace(/"/g,'&quot;')}" title="Baixar" style="width:28px;height:28px;border-radius:7px;background:#F1F2F5;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>`
+              : `<button onclick="editarWiki('${w._id}')" title="${w.status==='Aprovado'?'Visualizar':'Editar'}" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center">${w.status==='Aprovado' ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>` : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>`}</button>`}
             <button onclick="deletarWiki('${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:#FF2E4D;cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
           </div>
         </td>
@@ -2646,6 +2521,29 @@
     }).join('');
     aplicarColunasWiki();
   }
+
+  function abrirMoverPastaMenu(e, id) {
+    e.stopPropagation();
+    const btn = e.currentTarget;
+    let pop = document.getElementById('moverPastaPop');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.id = 'moverPastaPop';
+      pop.className = 'colunas-filtro-drop';
+      pop.style.position = 'fixed';
+      document.body.appendChild(pop);
+    }
+    if (pop._paraId === id && pop.style.display === 'block') { pop.style.display = 'none'; return; }
+    const wiki = wikis.find(w => w._id === id);
+    const opcoes = [{ id: '', nome: 'Sem pasta' }, ...pastas];
+    pop.innerHTML = opcoes.map(p => `<div class="colunas-filtro-item" onclick="moverWikiPasta('${id}','${p.id}');document.getElementById('moverPastaPop').style.display='none'">${wiki && wiki.pastaId === (p.id || null) ? '<strong>' + p.nome + '</strong>' : p.nome}</div>`).join('');
+    pop._paraId = id;
+    const rect = btn.getBoundingClientRect();
+    pop.style.display = 'block';
+    pop.style.top = (rect.bottom + 4) + 'px';
+    pop.style.left = Math.max(8, rect.right - 190) + 'px';
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('#moverPastaPop')) { const p = document.getElementById('moverPastaPop'); if (p) p.style.display = 'none'; } });
 
   async function moverWikiPasta(id, pastaIdStr) {
     if (!_podeEditarWiki) return;
@@ -2661,15 +2559,8 @@
   function filtrarWikis() {
     const q = document.getElementById('searchWiki').value.toLowerCase();
     const st = document.getElementById('filtroStatus')?.value || '';
-    if (pastaAtiva === null && !q && !st) {
-      renderWikis([]);
-      const tbody = document.getElementById('wikisBody');
-      if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#9CA0AC">Selecione uma pasta para ver os documentos.</td></tr>';
-      return;
-    }
     renderWikis(wikis.filter(w => {
       if (pastaAtiva !== null && w.pastaId !== pastaAtiva) return false;
-      if (pastaAtiva === null && !q && !st) return false;
       if (q && !w.titulo.toLowerCase().includes(q) && !(w.tags||'').toLowerCase().includes(q) && !(w.responsavel||'').toLowerCase().includes(q)) return false;
       if (st && w.status !== st) return false;
       return true;
@@ -2680,7 +2571,7 @@
     if (!_podeEditarWiki) return;
     document.getElementById('docExternoTitulo').value = '';
     document.getElementById('docExternoArquivo').value = '';
-    document.getElementById('docUploadLabel').innerHTML = 'Clique para selecionar ou arraste o arquivo aqui<br><span style="font-size:11px;margin-top:4px;display:block">PDF, DOCX, XLSX, PNG, JPG — até 30 MB</span>';
+    document.getElementById('docUploadLabel').innerHTML = '<div style="font-size:13px;font-weight:600;color:#33363F">Clique para selecionar ou arraste o arquivo aqui</div><div style="font-size:11px;color:#9CA0AC;margin-top:4px">PDF, DOCX, XLSX, PNG, JPG — até 30 MB</div>';
     document.getElementById('docUploadZone').style.borderColor = '';
     document.getElementById('modalDocExterno').classList.add('aberto');
     setTimeout(() => document.getElementById('docExternoTitulo').focus(), 100);
@@ -2692,7 +2583,7 @@
     if (input.files && input.files[0]) {
       const f = input.files[0];
       const mb = (f.size / 1024 / 1024).toFixed(1);
-      label.innerHTML = `📄 <strong>${f.name}</strong><br><span style="font-size:11px">${mb} MB</span>`;
+      label.innerHTML = `<div style="font-size:13px;font-weight:600;color:#33363F">${f.name}</div><div style="font-size:11px;color:#9CA0AC;margin-top:4px">${mb} MB</div>`;
       document.getElementById('docUploadZone').style.borderColor = 'var(--accent)';
     }
   }
@@ -2715,7 +2606,7 @@
       fecharModal('modalDocExterno');
       carregarWikis();
     } catch(e) { alert('Erro ao adicionar documento.'); console.error(e); }
-    finally { btn.disabled = false; btn.textContent = '✓ Adicionar'; }
+    finally { btn.disabled = false; btn.textContent = 'Adicionar'; }
   }
 
   // Drag-and-drop na zona de upload
@@ -2902,29 +2793,6 @@
   carregarInfo();
   carregarOrg();
   carregarPastas();
-
-  // Canvas-level delegation for click-to-connect
-  document.getElementById('orgCanvas')?.addEventListener('click', async e => {
-    if (!conectandoDe) return;
-    if (e.target.classList.contains('conn-handle')) return;
-    if (e.target.classList.contains('conn-del-btn')) return;
-    if (e.target.closest('.org-node-actions')) return;
-    const targetNode = e.target.closest('.org-node');
-    if (!targetNode) return;
-    const toId = parseInt(targetNode.id.replace('node-', ''));
-    if (toId === conectandoDe.memberId) {
-      conectandoDe = null;
-      document.getElementById('conn-temp')?.remove();
-      document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
-      return;
-    }
-    const { memberId: fromId, side: fromSide } = conectandoDe;
-    conectandoDe = null;
-    document.getElementById('conn-temp')?.remove();
-    document.querySelectorAll('.org-node').forEach(n => n.classList.remove('selecionado-conexao'));
-    const jaExiste = conexoes.find(c => (c.de==fromId&&c.para==toId)||(c.de==toId&&c.para==fromId));
-    if (!jaExiste) { conexoes.push({ de: fromId, para: toId, fromSide }); await salvarOrg(); renderOrganograma(); }
-  });
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {

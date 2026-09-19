@@ -1097,7 +1097,7 @@ app.get('/api/confirmar-email/:token', async (req, res) => {
     await Usuario.findByIdAndUpdate(usuario._id, { emailConfirmado: true, status: 'Ativo', tokenConfirmacao: null });
     const assinatura = await Assinatura.findOne({ empresa: usuario.empresa });
     const diasTrial = assinatura ? Math.ceil((assinatura.trialFim - new Date()) / (1000 * 60 * 60 * 24)) : 30;
-    await criarNotificacao(usuario.empresa, 'Bem-vindo ao HOC System! 🎉', `Você tem ${diasTrial} dias gratuitos para explorar.`, 'sucesso', '🎉', '/dashboard');
+    await criarNotificacao(usuario.empresa, 'Bem-vindo ao HOC System!', `Você tem ${diasTrial} dias gratuitos para explorar.`, 'sucesso', '', '/dashboard');
     res.json({ mensagem: 'Email confirmado! Você já pode fazer login.' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1269,7 +1269,7 @@ app.post('/api/assinatura/checkout', authMiddleware, async (req, res) => {
     if (assinatura) { assinatura = await Assinatura.findOneAndUpdate({ empresa: req.usuario.empresa }, updateData, { new: true }); }
     else { assinatura = await Assinatura.create({ empresa: req.usuario.empresa, ...updateData }); }
 
-    await criarNotificacao(req.usuario.empresa, `💳 Cobrança gerada — Plano ${NOME_PLANO[plano]}`, `Cobrança gerada via ${formaPagamento}. Aguardando pagamento.`, 'aviso', '💳', '/plano-usuarios');
+    await notificarAdmins(req.usuario.empresa, `Cobrança gerada — Plano ${NOME_PLANO[plano]}`, `Cobrança gerada via ${formaPagamento}. Aguardando pagamento.`, 'aviso', '', '/plano-usuarios');
 
     res.json({ mensagem: 'Checkout iniciado! Realize o pagamento para ativar o plano.', formaPagamento, plano, pixCopiaECola, pixQrCodeBase64: pixQrCodeBase64 || null, boletoUrl, boletoLinhaDigitavel, asaasAssinaturaId: novaAssinaturaAsaas.id, cobrancaId });
   } catch (err) { console.error('Erro checkout Asaas:', err); res.status(500).json({ erro: err.message || 'Erro ao processar checkout.' }); }
@@ -1315,7 +1315,7 @@ app.post('/api/webhook/asaas', async (req, res) => {
         const vencimento = new Date(); vencimento.setDate(vencimento.getDate() + 30);
         const novaFatura = { plano, valor: payment?.value ? Math.round(payment.value * 100) : VALOR_PLANO_CENTAVOS[plano], vencimento, pagoEm: new Date(), confirmadoPor: 'asaas_webhook', asaasPaymentId: payment?.id };
         await Assinatura.findByIdAndUpdate(assinatura._id, { plano, status: 'ativa', vencimento, planoSolicitado: null, solicitadoEm: null, solicitadoPor: null, asaasCobrancaId: payment?.id || assinatura.asaasCobrancaId, atualizadoEm: new Date(), $push: { historicoFaturas: novaFatura } });
-        await criarNotificacao(assinatura.empresa, `✅ Pagamento confirmado — Plano ${NOME_PLANO[plano] || plano}`, 'Seu pagamento foi confirmado automaticamente. Acesso liberado!', 'sucesso', '✅', '/plano-usuarios');
+        await notificarAdmins(assinatura.empresa, `Pagamento confirmado — Plano ${NOME_PLANO[plano] || plano}`, 'Seu pagamento foi confirmado automaticamente. Acesso liberado!', 'sucesso', '', '/plano-usuarios');
         console.log('Assinatura ativada via webhook:', assinatura.empresa);
       }
     }
@@ -1323,7 +1323,7 @@ app.post('/api/webhook/asaas', async (req, res) => {
       const assinatura = await Assinatura.findOne({ $or: [{ asaasCobrancaId: payment?.id }, { asaasAssinaturaId: payment?.subscription }] });
       if (assinatura && assinatura.status === 'ativa') {
         await Assinatura.findByIdAndUpdate(assinatura._id, { status: 'inadimplente', vencimento: payment?.dueDate ? new Date(payment.dueDate) : new Date(), atualizadoEm: new Date() });
-        await criarNotificacao(assinatura.empresa, '⚠️ Pagamento em atraso', 'Identificamos um atraso no pagamento. Regularize para continuar usando o HOC System.', 'aviso', '⚠️', '/plano-usuarios');
+        await notificarAdmins(assinatura.empresa, 'Pagamento em atraso', 'Identificamos um atraso no pagamento. Regularize para continuar usando o HOC System.', 'aviso', '', '/plano-usuarios');
         console.log('Inadimplente via webhook:', assinatura.empresa);
       }
     }
@@ -1331,7 +1331,7 @@ app.post('/api/webhook/asaas', async (req, res) => {
       const assinatura = await Assinatura.findOne({ asaasAssinaturaId: subscription?.id });
       if (assinatura) {
         await Assinatura.findByIdAndUpdate(assinatura._id, { status: 'cancelada', atualizadoEm: new Date() });
-        await criarNotificacao(assinatura.empresa, '❌ Assinatura cancelada', 'Sua assinatura foi cancelada. Entre em contato para reativá-la.', 'erro', '❌', '/plano-usuarios');
+        await notificarAdmins(assinatura.empresa, 'Assinatura cancelada', 'Sua assinatura foi cancelada. Entre em contato para reativá-la.', 'erro', '', '/plano-usuarios');
         console.log('Cancelada via webhook:', assinatura.empresa);
       }
     }
@@ -1442,7 +1442,7 @@ app.post('/api/assinatura/checkout-cartao', authMiddleware, async (req, res) => 
     }
 
     if (planoAtivado) {
-      await criarNotificacao(req.usuario.empresa, `✅ Plano ${NOME_PLANO[plano]} ativado!`, 'Pagamento via cartão aprovado. Acesso liberado!', 'sucesso', '✅', '/plano-usuarios');
+      await notificarAdmins(req.usuario.empresa, `Plano ${NOME_PLANO[plano]} ativado!`, 'Pagamento via cartão aprovado. Acesso liberado!', 'sucesso', '', '/plano-usuarios');
     }
 
     res.json({ mensagem: planoAtivado ? 'Pagamento aprovado! Plano ativado.' : 'Processando pagamento...', aprovado: planoAtivado, asaasAssinaturaId: novaAssinaturaAsaas.id });
@@ -1469,7 +1469,7 @@ app.post('/api/assinatura/solicitar', authMiddleware, async (req, res) => {
     const updateData = { planoSolicitado: plano, solicitadoEm: new Date(), solicitadoPor: usuarioReq.nome, status: 'aguardando_confirmacao', atualizadoEm: new Date() };
     if (assinatura) { assinatura = await Assinatura.findOneAndUpdate({ empresa: req.usuario.empresa }, updateData, { new: true }); }
     else { assinatura = await Assinatura.create({ empresa: req.usuario.empresa, ...updateData }); }
-    await criarNotificacao(req.usuario.empresa, `💳 Pagamento aguardando confirmação`, `${usuarioReq.nome} solicitou o Plano ${NOME_PLANO[plano]}. Confirme o pagamento para liberar o acesso.`, 'aviso', '💳', '/plano-usuarios');
+    await notificarAdmins(req.usuario.empresa, `Pagamento aguardando confirmação`, `${usuarioReq.nome} solicitou o Plano ${NOME_PLANO[plano]}. Confirme o pagamento para liberar o acesso.`, 'aviso', '', '/plano-usuarios');
     try {
       const admin = await Usuario.findOne({ empresa: req.usuario.empresa, perfil: 'Admin' }).select('email nome');
       if (admin) await enviarEmail(req.usuario.empresa, admin.email, `💳 HOC System — Pagamento aguardando confirmação`, `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px"><h2 style="color:#2d1b69">Pagamento aguardando confirmação</h2><p>${usuarioReq.nome} realizou o pagamento e solicitou a ativação do <strong>Plano ${NOME_PLANO[plano]}</strong>.</p><a href="${process.env.APP_URL}/plano-usuarios" style="display:inline-block;margin-top:20px;padding:12px 24px;background:#2d1b69;color:white;border-radius:8px;text-decoration:none;font-weight:600">Confirmar Pagamento</a></div>`);
@@ -1513,7 +1513,7 @@ app.post('/api/admin/confirmar-pagamento', adminSecretMiddleware, async (req, re
     const valorPlano = { basico:4900, intermediario:14900, avancado:34900, enterprise:0 };
     const novaFatura = { plano, valor: valorPlano[plano], vencimento, pagoEm: new Date(), confirmadoPor: 'admin_manual' };
     await Assinatura.findOneAndUpdate({ empresa: empresaId }, { plano, status: 'ativa', vencimento, planoSolicitado: null, solicitadoEm: null, solicitadoPor: null, atualizadoEm: new Date(), $push: { historicoFaturas: novaFatura } });
-    await criarNotificacao(empresaId, `✅ Plano ${NOME_PLANO[plano]} ativado!`, 'Seu pagamento foi confirmado. O acesso completo está liberado.', 'sucesso', '✅', '/plano-usuarios');
+    await notificarAdmins(empresaId, `Plano ${NOME_PLANO[plano]} ativado!`, 'Seu pagamento foi confirmado. O acesso completo está liberado.', 'sucesso', '', '/plano-usuarios');
     res.json({ mensagem: `Plano ${NOME_PLANO[plano]} confirmado.` });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1526,7 +1526,7 @@ app.post('/api/admin/rejeitar-pagamento', adminSecretMiddleware, async (req, res
     if (!assinatura) return res.status(404).json({ erro: 'Nenhuma solicitação pendente.' });
     const statusAnterior = assinatura.vencimento ? 'inadimplente' : 'trial';
     await Assinatura.findOneAndUpdate({ empresa: empresaId }, { status: statusAnterior, planoSolicitado: null, solicitadoEm: null, solicitadoPor: null, atualizadoEm: new Date() });
-    await criarNotificacao(empresaId, `❌ Pagamento não confirmado`, motivo || 'Não foi possível confirmar o pagamento. Entre em contato.', 'erro', '❌', '/plano-usuarios');
+    await notificarAdmins(empresaId, `Pagamento não confirmado`, motivo || 'Não foi possível confirmar o pagamento. Entre em contato.', 'erro', '', '/plano-usuarios');
     res.json({ mensagem: 'Pagamento rejeitado.' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1579,7 +1579,7 @@ app.post('/api/admin/cancelar-conta', adminSecretMiddleware, async (req, res) =>
     const assinatura = await Assinatura.findOne({ empresa: empresaId });
     if (assinatura?.asaasAssinaturaId) { try { await asaasRequest('DELETE', `/subscriptions/${assinatura.asaasAssinaturaId}`); } catch (e) { console.log('Erro cancelar Asaas:', e.message); } }
     await Assinatura.findOneAndUpdate({ empresa: empresaId }, { status: 'cancelada', atualizadoEm: new Date() });
-    await criarNotificacao(empresaId, '❌ Assinatura cancelada', motivo||'Sua assinatura foi cancelada.', 'erro', '❌', '/plano-usuarios');
+    await notificarAdmins(empresaId, 'Assinatura cancelada', motivo||'Sua assinatura foi cancelada.', 'erro', '', '/plano-usuarios');
     res.json({ mensagem: 'Conta cancelada.' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1589,7 +1589,7 @@ app.post('/api/admin/marcar-inadimplente', adminSecretMiddleware, async (req, re
     const { empresaId } = req.body;
     if (!empresaId) return res.status(400).json({ erro: 'empresaId obrigatório.' });
     await Assinatura.findOneAndUpdate({ empresa: empresaId }, { status: 'inadimplente', vencimento: new Date(), atualizadoEm: new Date() });
-    await criarNotificacao(empresaId, '⚠️ Pagamento em atraso', 'Identificamos um atraso no pagamento. Regularize para continuar usando o HOC System.', 'aviso', '⚠️', '/plano-usuarios');
+    await notificarAdmins(empresaId, 'Pagamento em atraso', 'Identificamos um atraso no pagamento. Regularize para continuar usando o HOC System.', 'aviso', '', '/plano-usuarios');
     res.json({ mensagem: 'Conta marcada como inadimplente.' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1600,7 +1600,7 @@ app.post('/api/admin/reativar-conta', adminSecretMiddleware, async (req, res) =>
     if (!empresaId) return res.status(400).json({ erro: 'empresaId obrigatório.' });
     const vencimento = new Date(); vencimento.setDate(vencimento.getDate() + 30);
     await Assinatura.findOneAndUpdate({ empresa: empresaId }, { status: 'ativa', vencimento, atualizadoEm: new Date() });
-    await criarNotificacao(empresaId, '✅ Assinatura reativada!', 'Sua assinatura foi reativada. O acesso completo está liberado.', 'sucesso', '✅', '/plano-usuarios');
+    await notificarAdmins(empresaId, 'Assinatura reativada!', 'Sua assinatura foi reativada. O acesso completo está liberado.', 'sucesso', '', '/plano-usuarios');
     res.json({ mensagem: 'Conta reativada.' });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1612,7 +1612,7 @@ app.post('/api/admin/trocar-plano', adminSecretMiddleware, async (req, res) => {
     if (!['basico','intermediario','avancado','enterprise'].includes(plano)) return res.status(400).json({ erro: 'Plano inválido.' });
     const vencimento = new Date(); vencimento.setDate(vencimento.getDate() + 30);
     await Assinatura.findOneAndUpdate({ empresa: empresaId }, { plano, status: 'ativa', vencimento, atualizadoEm: new Date() });
-    await criarNotificacao(empresaId, `📦 Plano alterado para ${NOME_PLANO[plano]}`, `Seu plano foi atualizado para ${NOME_PLANO[plano]}.`, 'sucesso', '📦', '/plano-usuarios');
+    await notificarAdmins(empresaId, `Plano alterado para ${NOME_PLANO[plano]}`, `Seu plano foi atualizado para ${NOME_PLANO[plano]}.`, 'sucesso', '', '/plano-usuarios');
     res.json({ mensagem: `Plano alterado para ${NOME_PLANO[plano]}.` });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });

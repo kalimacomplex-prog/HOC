@@ -409,6 +409,41 @@ def run_webhook(exec_id, webhook_url, payload, robo_nome='Robô'):
             running_procs.pop(exec_id, None)
 
 
+# ── Steps do builder de automação (read_file/write_file/run_command/browser_flow) ──
+# Não usa `running_procs` (esse dict alimenta o robosAtivos reportado no
+# heartbeat, que já é incrementado à parte no servidor quando ele escolhe a
+# máquina pra um run de automação — contar aqui também dobraria a conta).
+# Só existe pra não reprocessar o mesmo dispatch em dois heartbeats seguidos
+# enquanto a thread ainda está rodando.
+running_automacao_steps = set()
+
+
+def post_automacao_resultado(dispatch_id, status, output, error):
+    try:
+        requests.post(
+            f"{SERVER}/api/automacoes/step-dispatch/{dispatch_id}/resultado",
+            json={'machineKey': MACHINE_KEY, 'status': status, 'output': output or '', 'error': error or ''},
+            timeout=15
+        )
+    except Exception as e:
+        log('WARN', f"Erro ao postar resultado do step {dispatch_id}: {e}")
+
+
+def run_automacao_step(dispatch_id, step, ctx):
+    dispatch_id = str(dispatch_id)
+    try:
+        import hoc_step_executor
+        saida = hoc_step_executor.executar_step(step, ctx)
+        post_automacao_resultado(dispatch_id, 'concluido', saida, '')
+        log('INFO', f"[automacao_step {dispatch_id}] concluído")
+    except Exception as e:
+        post_automacao_resultado(dispatch_id, 'erro', '', str(e))
+        log('WARN', f"[automacao_step {dispatch_id}] erro: {e}")
+    finally:
+        with _lock:
+            running_automacao_steps.discard(dispatch_id)
+
+
 # ── Heartbeat loop ────────────────────────────────────────────────────────────
 
 def heartbeat_loop():
@@ -485,6 +520,23 @@ def heartbeat_loop():
                     )
                 t.start()
                 log('INFO', f"Iniciando execução {exec_id} ({tipo}): {command or cmd.get('webhookUrl')}")
+
+            # Steps do builder de automação (ver run_automacao_step acima)
+            for item in data.get('automacaoSteps', []):
+                dispatch_id = str(item.get('dispatchId', ''))
+                if not dispatch_id:
+                    continue
+                with _lock:
+                    if dispatch_id in running_automacao_steps:
+                        continue
+                    running_automacao_steps.add(dispatch_id)
+                t2 = threading.Thread(
+                    target=run_automacao_step,
+                    args=(dispatch_id, item.get('step', {}), item.get('ctx', {})),
+                    daemon=True
+                )
+                t2.start()
+                log('INFO', f"Iniciando step de automação {dispatch_id} ({item.get('step',{}).get('type','?')})")
 
         except requests.exceptions.ConnectionError:
             log('WARN', f"Sem conexão com {SERVER} — tentando em 20s...")

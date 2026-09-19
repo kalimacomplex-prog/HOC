@@ -668,7 +668,12 @@ const robotSchema = new mongoose.Schema({
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now },
-  apiKey: { type: String, default: () => crypto.randomUUID() }
+  apiKey: { type: String, default: () => crypto.randomUUID() },
+  // 'comando': fluxo atual (comandoExecucao/webhookUrl). 'builder': robô criado pelo
+  // builder visual de automação — execução vai pro automationEngine em vez do
+  // dispatch local/webhook tradicional (ver /api/robos/:id/executar).
+  origem: { type: String, default: 'comando', enum: ['comando', 'builder'] },
+  automacaoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Automacao', default: null },
 }, { strict: false });
 const Robot = mongoose.model('Robot', robotSchema);
 
@@ -710,7 +715,11 @@ const execucaoRoboSchema = new mongoose.Schema({
   artifacts: { type: Array, default: [] }, // [{nome, tamanho, url}]
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
-  criadoEm: { type: Date, default: Date.now }
+  criadoEm: { type: Date, default: Date.now },
+  // Presente só quando a execução veio de um robô origem='builder' — liga pro
+  // detalhe step-a-step em AutomacaoRun (a aba Execuções continua mostrando só
+  // este registro normalmente; o detalhe fica um nível abaixo).
+  automacaoRunId: { type: mongoose.Schema.Types.ObjectId, ref: 'AutomacaoRun', default: null },
 }, { strict: false });
 const ExecucaoRobo = mongoose.model('ExecucaoRobo', execucaoRoboSchema);
 
@@ -747,6 +756,66 @@ const maquinaSchema = new mongoose.Schema({
   atualizadoEm:    { type: Date, default: Date.now }
 }, { strict: false });
 const Maquina = mongoose.model('Maquina', maquinaSchema);
+
+// ==================== AUTOMAÇÃO (builder visual de Robôs) ====================
+// Modelo de dados do motor de automação — porte do "HAC Studio" pro conceito de
+// Robô do HOC. `steps` é uma árvore recursiva (não uma lista plana): cada step
+// pode ter `children` (loop/foreach/while/parallel) ou `children_true`/
+// `children_false` (condition/try_catch). Deixado solto (Mixed/strict:false)
+// de propósito, no mesmo padrão já usado em Processo.elementos/Robot — brigar
+// com o Mongoose pra tipar uma árvore auto-referente não vale a pena aqui.
+const automacaoSchema = new mongoose.Schema({
+  nome: { type: String, required: true },
+  descricao: { type: String, default: '' },
+  roboId: { type: mongoose.Schema.Types.ObjectId, ref: 'Robot', default: null },
+  gatilho: {
+    tipo: { type: String, default: 'manual', enum: ['manual', 'cron', 'webhook'] },
+    cron: { type: String, default: '' },
+    webhookToken: { type: String, default: '' },
+  },
+  steps: { type: mongoose.Schema.Types.Mixed, default: [] },
+  ativo: { type: Boolean, default: true },
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  criadoPor: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
+  criadoEm: { type: Date, default: Date.now }, atualizadoEm: { type: Date, default: Date.now },
+}, { strict: false });
+automacaoSchema.index({ 'gatilho.webhookToken': 1 });
+const Automacao = mongoose.model('Automacao', automacaoSchema);
+
+const automacaoRunSchema = new mongoose.Schema({
+  automacaoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Automacao', required: true },
+  automacaoNome: { type: String, default: '' },
+  execucaoRoboId: { type: mongoose.Schema.Types.ObjectId, ref: 'ExecucaoRobo', default: null },
+  empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
+  gatilhoTipo: { type: String, default: 'manual', enum: ['manual', 'cron', 'webhook'] },
+  input: { type: String, default: '' },
+  stepsResult: { type: Array, default: [] }, // [{stepId, stepName, stepType, status, output, error, durationMs, conditionResult}]
+  output: { type: String, default: null },
+  status: { type: String, default: 'running', enum: ['running', 'success', 'failed', 'cancelled'] },
+  cancelRequested: { type: Boolean, default: false },
+  iniciadoEm: { type: Date, default: Date.now },
+  finalizadoEm: { type: Date, default: null },
+  duracaoMs: { type: Number, default: 0 },
+}, { strict: false });
+automacaoRunSchema.index({ automacaoId: 1 });
+automacaoRunSchema.index({ empresa: 1 });
+const AutomacaoRun = mongoose.model('AutomacaoRun', automacaoRunSchema);
+
+// Dispatch de UM step pra uma Maquina — fila leve consumida pelo heartbeat
+// (mesmo contrato de claim atômico que ExecucaoRobo já usa, ver
+// /api/maquinas/heartbeat). O motor de execução (lib/automationEngine.js) cria
+// uma entrada e faz polling nela até a máquina reportar o resultado.
+const automacaoStepDispatchSchema = new mongoose.Schema({
+  runId: { type: mongoose.Schema.Types.ObjectId, ref: 'AutomacaoRun', required: true },
+  maquinaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Maquina', required: true },
+  step: { type: mongoose.Schema.Types.Mixed, required: true }, // {id, type, config}
+  ctxSnapshot: { type: mongoose.Schema.Types.Mixed, default: {} }, // {input, output, vars}
+  status: { type: String, default: 'pendente', enum: ['pendente', 'enviado', 'concluido', 'erro'] },
+  resultado: { type: mongoose.Schema.Types.Mixed, default: null }, // {output, error}
+  criadoEm: { type: Date, default: Date.now },
+});
+automacaoStepDispatchSchema.index({ maquinaId: 1, status: 1 });
+const AutomacaoStepDispatch = mongoose.model('AutomacaoStepDispatch', automacaoStepDispatchSchema);
 
 const credencialSchema = new mongoose.Schema({
   nome:         { type: String, required: true },
@@ -978,6 +1047,7 @@ app.get('/repositorio-templates', _noCache, (req, res) => res.sendFile(path.join
 app.get('/gestao-licencas', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'gestao-licencas.html'), _SF_OPTS));
 app.get('/operacoes', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'operacoes.html'), _SF_OPTS));
 app.get('/robos', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'robos.html'), _SF_OPTS));
+app.get('/robo-builder', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'robo-builder.html'), _SF_OPTS));
 app.get('/aceitar-convite', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'aceitar-convite.html'), _SF_OPTS));
 app.get('/plano-usuarios', _noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'plano-usuarios.html'), _SF_OPTS));
 
@@ -2372,83 +2442,89 @@ app.delete('/api/processos/:id', authMiddleware, verificarAssinatura, permOperac
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Resolve provedor+credencial (override do chamador OU default da empresa em
+// ConfigIA) e chama a API de IA correspondente. Extraído da rota abaixo pra
+// também ser reaproveitado pelo step `call_ai_agent` do automationEngine —
+// mesma lógica, dois chamadores, sem duplicar as três integrações de provider.
+async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq, formatoSaida, camposJson }) {
+  if (!userMessage) throw new Error('Mensagem do usuário não informada');
+
+  let provedor = provedorReq, credNome = credNomeReq, campo = campoReq;
+  if (!provedor || provedor === 'empresa') {
+    const cfgIA = await ConfigIA.findOne({ empresa }).lean();
+    provedor = cfgIA?.provedor || 'claude-sonnet';
+    if (!credNome) credNome = cfgIA?.credencialNome;
+    if (!campo)   campo   = cfgIA?.campoCred || 'api_key';
+  }
+  const cred = await Credencial.findOne({ nome: credNome, empresa }).lean();
+  const apiKey = cred?.campos?.[campo || 'api_key'] || '';
+  if (!apiKey) throw new Error('Credencial de API não encontrada. Configure em Configurações → IA ou informe uma credencial na action.');
+
+  let finalUserMsg = userMessage;
+  if (formatoSaida === 'json' && camposJson?.length) {
+    const schema = '{' + camposJson.map(f => `"${f.nome}": <${f.tipo||'string'}>`).join(', ') + '}';
+    finalUserMsg += `\n\nResponda APENAS com um JSON válido, sem texto adicional, no formato exato:\n${schema}`;
+  }
+
+  let resposta = '';
+
+  if (provedor === 'claude-sonnet' || provedor === 'claude-haiku') {
+    const modelId = provedor === 'claude-sonnet' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
+    const body = { model: modelId, max_tokens: 2048, messages: [{ role: 'user', content: finalUserMsg }] };
+    if (systemMessage) body.system = systemMessage;
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Erro na API Anthropic');
+    resposta = d.content?.[0]?.text || '';
+
+  } else if (provedor === 'gpt-4o' || provedor === 'gpt-4') {
+    const messages = [];
+    if (systemMessage) messages.push({ role: 'system', content: systemMessage });
+    messages.push({ role: 'user', content: finalUserMsg });
+    const body = { model: provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4', messages };
+    if (formatoSaida === 'json') body.response_format = { type: 'json_object' };
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Erro na API OpenAI');
+    resposta = d.choices?.[0]?.message?.content || '';
+
+  } else if (provedor === 'gemini') {
+    const body = { contents: [{ parts: [{ text: finalUserMsg }] }] };
+    if (systemMessage) body.systemInstruction = { parts: [{ text: systemMessage }] };
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Erro na API Gemini');
+    resposta = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+  } else {
+    throw new Error('Provedor não suportado: ' + (provedor||'?'));
+  }
+
+  let campos = null;
+  if (formatoSaida === 'json') {
+    try {
+      const match = resposta.match(/\{[\s\S]*\}/);
+      campos = JSON.parse(match ? match[0] : resposta);
+    } catch(e) { campos = null; }
+  }
+
+  return { resposta, campos };
+}
+
 app.post('/api/processos/ia/executar', authMiddleware, verificarAssinatura, async (req, res) => {
   try {
-    const { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq,
-            formatoSaida, camposJson, varSaida, execId } = req.body;
-    if (!userMessage) return res.status(400).json({ erro: 'Mensagem do usuário não informada' });
-
-    // Resolve provider + credential: agent override OR company default
-    let provedor = provedorReq, credNome = credNomeReq, campo = campoReq;
-    if (!provedor || provedor === 'empresa') {
-      const cfgIA = await ConfigIA.findOne({ empresa: req.usuario.empresa }).lean();
-      provedor = cfgIA?.provedor || 'claude-sonnet';
-      if (!credNome) credNome = cfgIA?.credencialNome;
-      if (!campo)   campo   = cfgIA?.campoCred || 'api_key';
-    }
-    const cred = await Credencial.findOne({ nome: credNome, empresa: req.usuario.empresa }).lean();
-    const apiKey = cred?.campos?.[campo || 'api_key'] || '';
-    if (!apiKey) return res.status(400).json({ erro: 'Credencial de API não encontrada. Configure em Configurações → IA ou informe uma credencial na action.' });
-
-    // Build user message — append JSON schema instruction if structured output
-    let finalUserMsg = userMessage;
-    if (formatoSaida === 'json' && camposJson?.length) {
-      const schema = '{' + camposJson.map(f => `"${f.nome}": <${f.tipo||'string'}>`).join(', ') + '}';
-      finalUserMsg += `\n\nResponda APENAS com um JSON válido, sem texto adicional, no formato exato:\n${schema}`;
-    }
-
-    let resposta = '';
-
-    if (provedor === 'claude-sonnet' || provedor === 'claude-haiku') {
-      const modelId = provedor === 'claude-sonnet' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
-      const body = { model: modelId, max_tokens: 2048, messages: [{ role: 'user', content: finalUserMsg }] };
-      if (systemMessage) body.system = systemMessage;
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const d = await r.json();
-      if (!r.ok) return res.status(400).json({ erro: d.error?.message || 'Erro na API Anthropic' });
-      resposta = d.content?.[0]?.text || '';
-
-    } else if (provedor === 'gpt-4o' || provedor === 'gpt-4') {
-      const messages = [];
-      if (systemMessage) messages.push({ role: 'system', content: systemMessage });
-      messages.push({ role: 'user', content: finalUserMsg });
-      const body = { model: provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4', messages };
-      if (formatoSaida === 'json') body.response_format = { type: 'json_object' };
-      const r = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const d = await r.json();
-      if (!r.ok) return res.status(400).json({ erro: d.error?.message || 'Erro na API OpenAI' });
-      resposta = d.choices?.[0]?.message?.content || '';
-
-    } else if (provedor === 'gemini') {
-      const body = { contents: [{ parts: [{ text: finalUserMsg }] }] };
-      if (systemMessage) body.systemInstruction = { parts: [{ text: systemMessage }] };
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-      });
-      const d = await r.json();
-      if (!r.ok) return res.status(400).json({ erro: d.error?.message || 'Erro na API Gemini' });
-      resposta = d.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    } else {
-      return res.status(400).json({ erro: 'Provedor não suportado: ' + (provedor||'?') });
-    }
-
-    // Parse JSON structured output
-    let campos = null;
-    if (formatoSaida === 'json') {
-      try {
-        const match = resposta.match(/\{[\s\S]*\}/);
-        campos = JSON.parse(match ? match[0] : resposta);
-      } catch(e) { campos = null; }
-    }
+    const { systemMessage, userMessage, provedor, credencialNome, campoCred, formatoSaida, camposJson, varSaida, execId } = req.body;
+    const { resposta, campos } = await resolverEChamarIA(req.usuario.empresa, { systemMessage, userMessage, provedor, credencialNome, campoCred, formatoSaida, camposJson });
 
     // Store results in process variables
     if (execId) {
@@ -2465,7 +2541,7 @@ app.post('/api/processos/ia/executar', authMiddleware, verificarAssinatura, asyn
     }
 
     res.json({ ok: true, resposta, campos });
-  } catch (err) { res.status(500).json({ erro: err.message }); }
+  } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
 // Execuções de processo
@@ -2698,6 +2774,28 @@ app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOpe
     const robo = await Robot.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
     if (!robo) return res.status(404).json({ erro: 'Robô não encontrado' });
 
+    // Robô criado pelo builder visual de automação: motor próprio
+    // (automationEngine), não o dispatch local/webhook tradicional abaixo.
+    if (robo.origem === 'builder') {
+      if (!robo.automacaoId) return res.status(400).json({ erro: 'Robô do builder sem automação vinculada' });
+      const exec = await ExecucaoRobo.create({
+        roboId: robo._id, roboNome: robo.nome, status: 'em_execucao', maquina: '',
+        gatilho: req.body.gatilho || 'manual', prioridade: robo.prioridade || 'Media',
+        iniciadoEm: new Date(), empresa: req.usuario.empresa, criadoPor: req.usuario.id,
+      });
+      const run = await automationEngine.iniciarRunEmBackground({
+        automacaoId: robo.automacaoId, input: req.body.input || '', gatilhoTipo: 'manual',
+        empresa: req.usuario.empresa, roboId: robo._id, execucaoRoboId: exec._id,
+      });
+      await ExecucaoRobo.findByIdAndUpdate(exec._id, { automacaoRunId: run._id });
+      // Quando o run terminar, reflete o resultado no registro público
+      // (ExecucaoRobo) que a aba Execuções já sabe mostrar — sem isso, a
+      // execução ficaria "em_execucao" pra sempre nessa tela.
+      _espelharRunNaExecucao(run._id, exec._id).catch((err) => console.error('Erro ao espelhar run na execução:', err));
+      res.status(201).json({ ...exec.toObject(), status: exec.status });
+      return;
+    }
+
     // Busca máquina alvo: primeiro a vinculada ao robô, senão qualquer online com slot livre
     let maquina = null;
     if (robo.maquinaId) {
@@ -2735,6 +2833,17 @@ app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOpe
 // Interromper execução
 app.post('/api/robos/execucoes/:id/interromper', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
+    const atual = await ExecucaoRobo.findOne({ _id: req.params.id, empresa: req.usuario.empresa, status: 'em_execucao' });
+    if (!atual) return res.status(404).json({ erro: 'Execução não encontrada ou já finalizada' });
+
+    // Execução vinda do builder: cancelamento é cooperativo (cancelRequested no
+    // AutomacaoRun) — não marca "interrompido" aqui na hora, quem faz isso é o
+    // _espelharRunNaExecucao quando o motor efetivamente parar (ver acima).
+    if (atual.automacaoRunId) {
+      await AutomacaoRun.findByIdAndUpdate(atual.automacaoRunId, { cancelRequested: true });
+      return res.json(atual);
+    }
+
     const exec = await ExecucaoRobo.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa, status: 'em_execucao' },
       { status: 'interrompido', motivoInterrupcao: req.body.motivo || 'Interrupção manual', finalizadoEm: new Date() },
@@ -2951,6 +3060,7 @@ app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatu
     const files = [
       { name: 'config.json', data: Buffer.from(JSON.stringify(config, null, 2), 'utf8') },
       { name: 'agent.py', data: fs.readFileSync(path.join(__dirname, 'public', 'agent.py')) },
+      { name: 'hoc_step_executor.py', data: fs.readFileSync(path.join(__dirname, 'public', 'hoc_step_executor.py')) },
       { name: 'iniciar.vbs', data: fs.readFileSync(path.join(__dirname, 'public', 'iniciar.vbs')) },
     ];
     const zipBuf = buildZip(files);
@@ -3030,7 +3140,28 @@ app.post('/api/maquinas/heartbeat', async (req, res) => {
         apiKey:           robo.apiKey || ''
       };
     });
-    res.json({ ok: true, status, commands });
+    // Dispatches de step do builder de automação pendentes pra essa máquina —
+    // mesmo claim atômico dos comandos de robô acima, array separado porque o
+    // formato não tem nada a ver com os campos de Robot (ver
+    // lib/automationEngine.js::dispatchStepToAgent e hoc_step_executor.py).
+    const automacaoSteps = [];
+    for (let i = 0; i < 3; i++) {
+      const disp = await AutomacaoStepDispatch.findOneAndUpdate(
+        { maquinaId: maquina._id, status: 'pendente' },
+        { $set: { status: 'enviado' } },
+        { new: true, sort: { criadoEm: 1 } }
+      );
+      if (!disp) break;
+      automacaoSteps.push({
+        dispatchId: disp._id, step: disp.step,
+        // run_id separa sessões de browser concorrentes na mesma máquina
+        // (ver hoc_step_executor.py::_session_key) — sem isso, duas
+        // automações usando o mesmo nome de sessão colidiriam.
+        ctx: { ...disp.ctxSnapshot, run_id: String(disp.runId) },
+      });
+    }
+
+    res.json({ ok: true, status, commands, automacaoSteps });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
@@ -3277,6 +3408,171 @@ app.put('/api/credenciais/:id', authMiddleware, verificarAssinatura, permOperaco
 app.delete('/api/credenciais/:id', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try { await Credencial.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa }); res.json({ mensagem: 'Credencial deletada!' }); }
   catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ==================== AUTOMAÇÃO (builder visual de Robôs) ====================
+// Ver C:\Users\novai\.claude\plans\enchanted-gathering-pearl.md — porte
+// reduzido (MVP) do "HAC Studio" pro conceito de Robô do HOC.
+
+const automationEngine = require('./lib/automationEngine');
+automationEngine.init({
+  Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina,
+  enviarEmail, resolverEChamarIA, fetch,
+});
+
+const AUTOMACAO_STATUS_PARA_EXECUCAO = { success: 'concluido', failed: 'erro', cancelled: 'interrompido' };
+
+// Poll simples (não é chamado com alta frequência — 1 por execução de robô
+// origem='builder') até o AutomacaoRun sair de "running", e espelha o
+// resultado no ExecucaoRobo público (aba Execuções já existente).
+async function _espelharRunNaExecucao(runId, execId) {
+  const deadline = Date.now() + 60 * 60 * 1000; // 1h de teto de segurança
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 1000));
+    const run = await AutomacaoRun.findById(runId).lean();
+    if (!run || run.status === 'running') continue;
+    const statusExec = AUTOMACAO_STATUS_PARA_EXECUCAO[run.status] || 'erro';
+    const resumo = (run.stepsResult || []).map((s) => ({
+      message: `${s.stepName} (${s.stepType}): ${s.status}${s.error ? ' — ' + s.error : ''}`,
+      status: s.status === 'failed' ? 'error' : s.status === 'success' ? 'success' : 'info',
+      time: new Date(),
+    }));
+    await ExecucaoRobo.findByIdAndUpdate(execId, {
+      status: statusExec,
+      finalizadoEm: run.finalizadoEm || new Date(),
+      duracao: Math.round((run.duracaoMs || 0) / 1000),
+      $push: { logs: { $each: resumo } },
+      ...(run.status !== 'cancelled' ? {} : { motivoInterrupcao: 'Interrompido pelo usuário' }),
+    });
+    return;
+  }
+}
+
+app.post('/api/automacoes', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const { nome, descricao, gatilho, steps, ativo } = req.body;
+    if (!nome) return res.status(400).json({ erro: 'Nome obrigatório' });
+    const doc = { nome, descricao: descricao || '', steps: steps || [], ativo: ativo !== false, empresa: req.usuario.empresa, criadoPor: req.usuario.id };
+    doc.gatilho = { tipo: gatilho?.tipo || 'manual', cron: gatilho?.cron || '', webhookToken: '' };
+    if (doc.gatilho.tipo === 'webhook') doc.gatilho.webhookToken = crypto.randomBytes(20).toString('base64url');
+    const automacao = await Automacao.create(doc);
+    res.status(201).json(automacao);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.get('/api/automacoes', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try { res.json(await Automacao.find({ empresa: req.usuario.empresa }).sort({ criadoEm: -1 })); }
+  catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.get('/api/automacoes/:id', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const automacao = await Automacao.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!automacao) return res.status(404).json({ erro: 'Automação não encontrada' });
+    res.json(automacao);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.patch('/api/automacoes/:id', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const atual = await Automacao.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
+    if (!atual) return res.status(404).json({ erro: 'Automação não encontrada' });
+    const { nome, descricao, gatilho, steps, ativo, roboId } = req.body;
+    const updates = { atualizadoEm: new Date() };
+    if (nome !== undefined) updates.nome = nome;
+    if (descricao !== undefined) updates.descricao = descricao;
+    if (steps !== undefined) updates.steps = steps;
+    if (ativo !== undefined) updates.ativo = ativo;
+    if (roboId !== undefined) updates.roboId = roboId;
+    if (gatilho !== undefined) {
+      // Preserva o webhookToken existente se o gatilho continuar sendo webhook
+      // (senão cada save trocaria a URL do webhook debaixo do usuário).
+      const manterToken = gatilho.tipo === 'webhook' && atual.gatilho?.tipo === 'webhook';
+      updates.gatilho = {
+        tipo: gatilho.tipo || 'manual', cron: gatilho.cron || '',
+        webhookToken: manterToken ? atual.gatilho.webhookToken : (gatilho.tipo === 'webhook' ? crypto.randomBytes(20).toString('base64url') : ''),
+      };
+    }
+    const automacao = await Automacao.findOneAndUpdate({ _id: req.params.id, empresa: req.usuario.empresa }, updates, { new: true });
+    res.json(automacao);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.delete('/api/automacoes/:id', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    await Automacao.findOneAndDelete({ _id: req.params.id, empresa: req.usuario.empresa });
+    res.json({ mensagem: 'Automação deletada!' });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Roda em background e responde 202 na hora — cliente acompanha via polling em
+// GET /api/automacoes/:id/runs/:runId (mesmo padrão do HAC Studio).
+app.post('/api/automacoes/:id/run', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const run = await automationEngine.iniciarRunEmBackground({
+      automacaoId: req.params.id, input: req.body?.input || '', gatilhoTipo: 'manual',
+      empresa: req.usuario.empresa,
+    });
+    res.status(202).json(run);
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+app.get('/api/automacoes/:id/runs', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const runs = await AutomacaoRun.find({ automacaoId: req.params.id, empresa: req.usuario.empresa }).sort({ iniciadoEm: -1 }).limit(20);
+    res.json(runs);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.get('/api/automacoes/:id/runs/:runId', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const run = await AutomacaoRun.findOne({ _id: req.params.runId, automacaoId: req.params.id, empresa: req.usuario.empresa });
+    if (!run) return res.status(404).json({ erro: 'Execução não encontrada' });
+    res.json(run);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.post('/api/automacoes/:id/runs/:runId/cancel', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const run = await AutomacaoRun.findOneAndUpdate(
+      { _id: req.params.runId, automacaoId: req.params.id, empresa: req.usuario.empresa, status: 'running' },
+      { cancelRequested: true }, { new: true }
+    );
+    if (!run) return res.status(404).json({ erro: 'Execução não encontrada ou já finalizada' });
+    res.json({ ok: true });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Webhook — sem auth de usuário, o token na URL é a credencial (mesmo modelo
+// do HAC Studio). Executa síncrono: a chamada só responde quando terminar.
+app.post('/api/automacoes/webhook/:token', async (req, res) => {
+  try {
+    const automacao = await Automacao.findOne({ 'gatilho.webhookToken': req.params.token, ativo: true });
+    if (!automacao) return res.status(404).json({ erro: 'Automação não encontrada ou inativa' });
+    const input = typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {});
+    const run = await automationEngine.executarESperar({
+      automacaoId: automacao._id, input, gatilhoTipo: 'webhook', empresa: automacao.empresa,
+    });
+    res.json({ runId: run._id, status: run.status, output: run.output });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
+// Resultado de um step dispatchado pra máquina — reporta pelo agent.py,
+// autenticado por machineKey (mesmo padrão de /api/robos/execucoes/:id/logs).
+app.post('/api/automacoes/step-dispatch/:id/resultado', async (req, res) => {
+  try {
+    const { machineKey, status, output, error } = req.body;
+    if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
+    const maquina = await Maquina.findOne({ machineKey, ativo: true });
+    if (!maquina) return res.status(401).json({ erro: 'Chave inválida' });
+    const dispatch = await AutomacaoStepDispatch.findOneAndUpdate(
+      { _id: req.params.id, maquinaId: maquina._id },
+      { status: status === 'erro' ? 'erro' : 'concluido', resultado: { output: output || '', error: error || '' } },
+      { new: true }
+    );
+    if (!dispatch) return res.status(404).json({ erro: 'Dispatch não encontrado' });
+    res.json({ ok: true });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
 // ==================== SERVIDOR ====================

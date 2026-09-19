@@ -1514,7 +1514,7 @@
             <div class="form-group"><label>Ambiente</label>
               <select class="form-control" id="rAmbiente" onchange="atualizarCamposRobo()" style="width:100%;height:38px;padding:0 12px">
                 <option value="local">Local (máquina com Agent)</option>
-                <option value="nuvem">Nuvem (webhook)</option>
+                <option value="nuvem">Nuvem (GitHub Actions)</option>
               </select>
             </div>
             <div class="form-group" id="rGrupoMaquinaWrap"><label>Máquina</label>
@@ -1524,6 +1524,10 @@
               <div class="form-group"><label>Timeout máx. (min)</label><input type="number" class="form-control" id="rTimeout" value="30" min="1"></div>
               <div class="form-group"><label>Duração estimada (min)</label><input type="number" class="form-control" id="rDuracaoEstimada" value="15" min="1" placeholder="ex: 15"></div>
             </div>
+          </div>
+
+          <div id="rNotaNuvem" style="display:none;margin:-2px 0 12px;padding:9px 12px;background:#EEF6FF;border:1px solid #CFE3FA;border-radius:7px;font-size:11px;color:#2B4C7E;line-height:1.5">
+            Ao executar, o HOC sobe um runner temporário no <b>GitHub Actions</b> (Linux, Python 3.11, Chrome), roda o robô e o desliga ao terminar. Não precisa de máquina sua ligada.
           </div>
 
           <!-- Local: fonte do código -->
@@ -1713,7 +1717,7 @@
                   <div class="form-group"><label>Ambiente</label>
                     <select class="form-control" id="dpAmbiente" onchange="dpAtualizarAmbiente()" style="width:100%;height:38px;padding:0 12px">
                       <option value="local">Local (máquina com Agent)</option>
-                      <option value="nuvem">Nuvem (webhook)</option>
+                      <option value="nuvem">Nuvem (GitHub Actions)</option>
                     </select>
                   </div>
                   <div class="form-group" id="dpGrupoMaquinaWrap"><label>Máquina</label>
@@ -1723,6 +1727,9 @@
                   <div class="form-group"><label>Duração estimada (min)</label><input type="number" class="form-control" id="dpDuracaoEstimada" value="15" min="1"></div>
                 </div>
 
+                <div id="dpNotaNuvem" style="display:none;margin:0 0 10px;padding:8px 11px;background:#EEF6FF;border:1px solid #CFE3FA;border-radius:7px;font-size:11px;color:#2B4C7E;line-height:1.5">
+                  Ao executar, o HOC sobe um runner temporário no <b>GitHub Actions</b> (Linux, Python 3.11, Chrome), roda o robô e o desliga ao terminar. Não precisa de máquina sua ligada.
+                </div>
                 <div id="dpSecaoLocal">
                   <div class="rdp-subsecao">Fonte do Código</div>
                   <div class="form-row" style="margin-bottom:6px">
@@ -8933,6 +8940,7 @@ senha = campos.get('senha', '')</pre>
     set('dpPacotesPip', (r.pacotesPip||[]).join('\n'));
     set('dpPreComando', r.preComando);
     set('dpWebhookUrl', r.webhookUrl);
+    dpAtualizarAmbiente(); // de novo: a seção de webhook legado depende do valor acima
 
     const sch = r.schedule || {};
     setChk('dpScheduleAtivo', sch.ativo);
@@ -8978,9 +8986,14 @@ senha = campos.get('senha', '')</pre>
     const local = document.getElementById('dpSecaoLocal');
     const nuvem = document.getElementById('dpSecaoNuvem');
     const maqW  = document.getElementById('dpGrupoMaquinaWrap');
-    if (local) local.style.display = v === 'local' ? '' : 'none';
-    if (nuvem) nuvem.style.display = v === 'nuvem' ? '' : 'none';
+    // Nuvem = runner efêmero do GitHub Actions: mesma fonte de código (Git/ZIP) do
+    // Local; a seção de webhook só aparece pra robôs antigos que já tinham URL.
+    const webhookLegado = !!document.getElementById('dpWebhookUrl')?.value.trim();
+    if (local) local.style.display = '';
+    if (nuvem) nuvem.style.display = (v === 'nuvem' && webhookLegado) ? '' : 'none';
     if (maqW)  maqW.style.display  = v === 'local' ? '' : 'none';
+    const nota = document.getElementById('dpNotaNuvem');
+    if (nota) nota.style.display = v === 'nuvem' ? '' : 'none';
   }
 
   function dpAtualizarVinculo() {
@@ -9405,9 +9418,13 @@ senha = campos.get('senha', '')</pre>
 
   function atualizarCamposRobo() {
     const amb = document.getElementById('rAmbiente').value;
-    document.getElementById('rSecaoLocal').style.display  = amb==='local'  ? '' : 'none';
-    document.getElementById('rSecaoNuvem').style.display  = amb==='nuvem'  ? '' : 'none';
+    // Nuvem = runner efêmero do GitHub Actions: usa a mesma fonte de código (Git/ZIP)
+    // do Local; a seção de webhook só aparece pra robôs antigos que já tinham URL.
+    const webhookLegado = !!document.getElementById('rWebhookUrl').value.trim();
+    document.getElementById('rSecaoLocal').style.display  = '';
+    document.getElementById('rSecaoNuvem').style.display  = (amb==='nuvem' && webhookLegado) ? '' : 'none';
     document.getElementById('rGrupoMaquinaWrap').style.display = amb==='local' ? '' : 'none';
+    document.getElementById('rNotaNuvem').style.display = amb==='nuvem' ? '' : 'none';
   }
 
   function atualizarVinculo() {
@@ -9535,7 +9552,7 @@ senha = campos.get('senha', '')</pre>
       prioridade:         document.getElementById('rPrioridade').value,
       departamento:       document.getElementById('rDepartamento').value,
       ambiente:           amb,
-      vinculoTipo:        amb==='local' ? vt : 'webhook',
+      vinculoTipo:        vt,
       maquinaId:          amb==='local' ? document.getElementById('rMaquina').value : '',
       arquivoPrincipal:   document.getElementById('rArquivoPrincipal').value.trim(),
       comandoExecucao:    document.getElementById('rComando').value.trim(),

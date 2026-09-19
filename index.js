@@ -2772,6 +2772,37 @@ app.get('/api/robos/:id/auditoria', authMiddleware, permOperacoes('acessar'), as
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Robô "Nuvem" roda num runner efêmero do GitHub Actions. Robôs legados com
+// webhookUrl preenchido continuam no fluxo antigo (o agent local dispara o webhook).
+function roboRodaNoGithub(robo) {
+  return robo.ambiente === 'nuvem' && !robo.webhookUrl;
+}
+
+// Decide onde a execução de um robô (não-builder) vai rodar. Nuvem: sobe um
+// runner efêmero (Maquina temporária + workflow_dispatch) que faz heartbeat e
+// pega o comando como um agent normal. Local: máquina vinculada, senão qualquer
+// online com slot livre.
+async function alocarMaquinaDoRobo(robo, empresa) {
+  if (roboRodaNoGithub(robo)) {
+    try {
+      return { maquina: await automationEngine.criarMaquinaEfemera(empresa), motivo: '' };
+    } catch (e) {
+      return { maquina: null, motivo: `Não foi possível iniciar o runner no GitHub Actions: ${e.message}` };
+    }
+  }
+  let maquina = null;
+  if (robo.maquinaId) {
+    maquina = await Maquina.findOne({ _id: robo.maquinaId, empresa, status: { $in: ['online','busy'] }, ativo: true });
+  }
+  if (!maquina) {
+    maquina = await Maquina.findOne({
+      empresa, status: 'online', ativo: true,
+      $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
+    }).sort({ robosAtivos: 1 });
+  }
+  return { maquina, motivo: maquina ? '' : 'Nenhuma máquina online disponível' };
+}
+
 // Executar robô manualmente
 app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
@@ -2800,23 +2831,13 @@ app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOpe
       return;
     }
 
-    // Busca máquina alvo: primeiro a vinculada ao robô, senão qualquer online com slot livre
-    let maquina = null;
-    if (robo.maquinaId) {
-      maquina = await Maquina.findOne({ _id: robo.maquinaId, empresa: req.usuario.empresa, status: { $in: ['online','busy'] }, ativo: true });
-    }
-    if (!maquina) {
-      maquina = await Maquina.findOne({
-        empresa: req.usuario.empresa, status: 'online', ativo: true,
-        $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
-      }).sort({ robosAtivos: 1 });
-    }
+    const { maquina, motivo } = await alocarMaquinaDoRobo(robo, req.usuario.empresa);
 
     const exec = await ExecucaoRobo.create({
       roboId:    robo._id,
       roboNome:  robo.nome,
       status:    maquina ? 'em_execucao' : 'nao_disparado',
-      motivoInterrupcao: maquina ? '' : 'Nenhuma máquina online disponível',
+      motivoInterrupcao: maquina ? '' : motivo,
       maquina:   maquina ? maquina.machineId : '',
       maquinaId: maquina ? maquina._id : null,
       gatilho:   req.body.gatilho || 'manual',
@@ -3079,6 +3100,19 @@ app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatu
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Runner efêmero avisa que terminou o(s) comando(s) dele — apaga a Maquina temporária
+// (o próximo heartbeat volta 401 e o runner encerra sozinho, poupando minutos do
+// Actions). Só age em Maquina efemera:true; agent de máquina real recebe 404.
+app.post('/api/maquinas/efemera/encerrar', async (req, res) => {
+  try {
+    const { machineKey } = req.body;
+    if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
+    const maquina = await Maquina.findOneAndDelete({ machineKey, efemera: true });
+    if (!maquina) return res.status(404).json({ erro: 'Máquina efêmera não encontrada' });
+    res.json({ ok: true });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
+});
+
 // Heartbeat — chamado pelo agent.py a cada 20s (autenticado por machineKey no body)
 app.post('/api/maquinas/heartbeat', async (req, res) => {
   try {
@@ -3138,7 +3172,9 @@ app.post('/api/maquinas/heartbeat', async (req, res) => {
         webhookPayload:   robo.webhookPayload || {},
         gitUrl:           robo.gitUrl || '',
         gitBranch:        robo.gitBranch || 'main',
-        pacotesPip:       robo.pacotesPip || '',
+        // O painel de detalhes salva como array, o modal de criação como string —
+        // o agent espera string (usa .splitlines()).
+        pacotesPip:       Array.isArray(robo.pacotesPip) ? robo.pacotesPip.join('\n') : (robo.pacotesPip || ''),
         preComando:       robo.preComando || '',
         timeout:          robo.timeout || 30,
         apiKey:           robo.apiKey || ''
@@ -3262,6 +3298,31 @@ setInterval(async () => {
   } catch (e) { /* silent */ }
 }, 30000);
 
+// Job: faxina de runners efêmeros órfãos (roda a cada 60s). Cobre o runner que
+// nunca subiu (fila/erro no GitHub, workflow inexistente) ou que morreu no meio
+// sem chamar /api/maquinas/efemera/encerrar (servidor reiniciou, timeout do job).
+// Sem isso a Maquina temporária e a execução ficariam "em andamento" pra sempre.
+setInterval(async () => {
+  try {
+    const nuncaSubiu = new Date(Date.now() - 10 * 60 * 1000);
+    const sumiu = new Date(Date.now() - 3 * 60 * 1000);
+    const orfas = await Maquina.find({
+      efemera: true,
+      $or: [
+        { ultimoHeartbeat: null, criadoEm: { $lt: nuncaSubiu } },
+        { ultimoHeartbeat: { $lt: sumiu } },
+      ],
+    });
+    for (const m of orfas) {
+      await ExecucaoRobo.updateMany(
+        { maquinaId: m._id, status: 'em_execucao' },
+        { status: 'erro', finalizadoEm: new Date(), motivoInterrupcao: m.ultimoHeartbeat ? 'Runner do GitHub Actions parou de responder' : 'Runner do GitHub Actions não iniciou a tempo' }
+      );
+      await Maquina.findByIdAndDelete(m._id);
+    }
+  } catch (e) { /* silent */ }
+}, 60000);
+
 function calcularProximaExec(schedule) {
   const { frequencia, horario, diasSemana, diaMes, intervaloValor, intervaloUnidade, inicio, dataUnica } = schedule || {};
   const now = new Date();
@@ -3302,20 +3363,11 @@ setInterval(async () => {
     const now = new Date();
     const agendados = await Robot.find({ 'schedule.ativo': true, 'schedule.proximaExec': { $lte: now }, ativo: true });
     for (const robo of agendados) {
-      let maquina = null;
-      if (robo.maquinaId) {
-        maquina = await Maquina.findOne({ _id: robo.maquinaId, status: { $in: ['online','busy'] }, ativo: true });
-      }
-      if (!maquina) {
-        maquina = await Maquina.findOne({
-          empresa: robo.empresa, status: 'online', ativo: true,
-          $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
-        }).sort({ robosAtivos: 1 });
-      }
+      const { maquina, motivo } = await alocarMaquinaDoRobo(robo, robo.empresa);
       await ExecucaoRobo.create({
         roboId: robo._id, roboNome: robo.nome,
         status: maquina ? 'em_execucao' : 'nao_disparado',
-        motivoInterrupcao: maquina ? '' : 'Nenhuma máquina disponível',
+        motivoInterrupcao: maquina ? '' : motivo,
         maquina: maquina ? maquina.machineId : '',
         maquinaId: maquina ? maquina._id : null,
         gatilho: 'schedule', prioridade: robo.prioridade || 'Media',

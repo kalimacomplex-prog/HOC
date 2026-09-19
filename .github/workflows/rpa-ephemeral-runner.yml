@@ -6,6 +6,7 @@ name: HOC RPA Ephemeral Runner
 # online. Esse runner se registra como uma Máquina temporária via
 # heartbeat (mesmo protocolo de um agente normal) e processa os steps
 # desse run até acabar ou ficar ocioso — ver public/hoc_ephemeral_runner.py.
+# Também roda robôs Git/ZIP configurados como "Nuvem (GitHub Actions)".
 on:
   workflow_dispatch:
     inputs:
@@ -19,13 +20,14 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
             public/hoc_step_executor.py
             public/hoc_ephemeral_runner.py
+            public/agent.py
           sparse-checkout-cone-mode: false
 
       - uses: actions/setup-python@v5

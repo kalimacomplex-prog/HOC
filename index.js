@@ -10,6 +10,11 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const fs = require('fs');
 
+// URL pública deste servidor (e-mails de tracking, config.json do Agent, runner efêmero do
+// GitHub Actions). BASE_URL manda; no Render, RENDER_EXTERNAL_URL vem preenchida sozinha —
+// sem esse fallback o runner tentava falar com localhost:3000 de dentro do GitHub.
+const PUBLIC_URL = (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000').replace(/\/+$/, '');
+
 // ==================== ZIP builder (sem dependência externa) ====================
 // Usado só pra empacotar o pacote do Agent (config.json + agent.py + iniciar.vbs)
 // num único .zip — evita o usuário ter que gerenciar 3 downloads separados
@@ -226,7 +231,7 @@ async function enviarEmailTarefa(tarefaId, empresa, assinaturaHtml) {
   }
   if (!contatos.length) throw new Error('Nenhum contato associado.');
   const anexos = tarefa.anexos || [];
-  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  const baseUrl = PUBLIC_URL;
   // Generate tracking tokens per doc
   const tokens = [];
   for (let i = 0; i < anexos.length; i++) {
@@ -3061,7 +3066,7 @@ app.get('/api/maquinas/:id/agent-config', authMiddleware, verificarAssinatura, p
     const maquina = await Maquina.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
     if (!maquina) return res.status(404).json({ erro: 'Máquina não encontrada' });
     res.json({
-      server: process.env.BASE_URL || 'http://localhost:3000',
+      server: PUBLIC_URL,
       workspace: req.usuario.empresa.toString(),
       machineKey: maquina.machineKey,
       machineId: maquina.machineId
@@ -3077,7 +3082,7 @@ app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatu
     const maquina = await Maquina.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
     if (!maquina) return res.status(404).json({ erro: 'Máquina não encontrada' });
     const config = {
-      server: process.env.BASE_URL || 'http://localhost:3000',
+      server: PUBLIC_URL,
       workspace: req.usuario.empresa.toString(),
       machineKey: maquina.machineKey,
       machineId: maquina.machineId
@@ -3484,7 +3489,7 @@ const automationEngine = require('./lib/automationEngine');
 automationEngine.init({
   Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina,
   enviarEmail, resolverEChamarIA, fetch, githubActions,
-  hocApiUrl: process.env.BASE_URL || 'http://localhost:3000',
+  hocApiUrl: PUBLIC_URL,
 });
 
 const AUTOMACAO_STATUS_PARA_EXECUCAO = { success: 'concluido', failed: 'erro', cancelled: 'interrompido' };

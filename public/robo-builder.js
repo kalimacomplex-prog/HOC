@@ -126,6 +126,8 @@ let rbSelectedId = null;
 let rbDraggedId = null;
 let rbBusca = '';
 let rbPollTimer = null;
+let rbCredenciais = []; // cofre da empresa (só nome + chaves dos campos são usados aqui)
+let rbConfigIA = {};    // padrão da empresa (Configurações → IA)
 
 const RB_ACOES = [
   { tipo: 'comment', label: 'Comentário', icone: 'message', cor: '#a0aec0', cat: 'Anotação' },
@@ -139,6 +141,9 @@ const RB_ACOES = [
   { tipo: 'http_request_retry', label: 'HTTP com retry', icone: 'clock-repeat', cor: '#2b6cb0', cat: 'HTTP' },
   { tipo: 'send_email', label: 'Enviar e-mail', icone: 'mail', cor: '#2b6cb0', cat: 'Comunicação' },
   { tipo: 'call_ai_agent', label: 'Chamar IA', icone: 'sparkles', cor: '#6b46c1', cat: 'Inteligência Artificial' },
+  { tipo: 'ai_open', label: 'Abrir sessão de IA', icone: 'key', cor: '#6b46c1', cat: 'Inteligência Artificial' },
+  { tipo: 'ai_chat', label: 'Enviar mensagem (sessão)', icone: 'message', cor: '#6b46c1', cat: 'Inteligência Artificial' },
+  { tipo: 'ai_close', label: 'Fechar sessão de IA', icone: 'x', cor: '#6b46c1', cat: 'Inteligência Artificial' },
   { tipo: 'read_file', label: 'Ler arquivo', icone: 'file-text', cor: '#276749', cat: 'Arquivos (na máquina)' },
   { tipo: 'write_file', label: 'Escrever arquivo', icone: 'edit', cor: '#276749', cat: 'Arquivos (na máquina)' },
   { tipo: 'run_command', label: 'Rodar comando', icone: 'terminal', cor: '#1a202c', cat: 'Sistema (na máquina)' },
@@ -579,6 +584,9 @@ function rbResumoStep(step) {
     case 'http_request': case 'http_request_retry': return `${(c.method || 'GET')} ${c.url || ''}`;
     case 'send_email': return `pra ${c.to || '?'}`;
     case 'call_ai_agent': return c.input_template || '{output}';
+    case 'ai_open': return `"${c.session_name || '?'}" (${rbAiProvedorEfetivo(c)})${c.keep_history === false ? '' : ' com memória'}`;
+    case 'ai_chat': return `"${(c.input_template || '{output}').substring(0, 30)}" → sessão "${c.session_name || '?'}"`;
+    case 'ai_close': return `sessão "${c.session_name || '?'}"`;
     case 'read_file': return c.file_path || '';
     case 'write_file': return c.file_path || '';
     case 'run_command': return c.command || '';
@@ -623,6 +631,108 @@ function rbUpdateName(stepId, value) {
 
 function rbField(label, inputHtml, hint) {
   return `<div class="rb-field"><label>${escapeHtmlRb(label)}</label>${inputHtml}${hint ? `<div class="rb-hint">${hint}</div>` : ''}</div>`;
+}
+
+// ==================== Sessão de IA (mesmo modelo da sessão de navegador) ====================
+// Abrir sessão (token + configurações) → usar pelo nome → fechar. Ver lib/automationEngine.js.
+
+const RB_AI_PROVEDORES = [['claude-sonnet', 'Claude Sonnet'], ['claude-haiku', 'Claude Haiku'], ['gpt-4o', 'GPT-4o'], ['gpt-4', 'GPT-4'], ['gemini', 'Gemini']];
+const RB_AI_OPENAI_TYPES = new Set(['generate_embedding', 'moderate_content', 'generate_ai_image', 'transcribe_audio', 'text_to_speech']);
+
+async function rbCarregarDadosIA() {
+  try { rbCredenciais = await rbApi('GET', '/api/credenciais'); } catch { rbCredenciais = []; }
+  try { rbConfigIA = (await rbApi('GET', '/api/config-ia')) || {}; } catch { rbConfigIA = {}; }
+  if (rbSelectedId) rbRenderProps(); // redesenha o painel aberto com a lista de credenciais já carregada
+}
+
+// Provedor efetivo: o escolhido no step ou, se "Padrão da empresa", o de Configurações → IA.
+function rbAiProvedorEfetivo(c) {
+  return c.provedor || rbConfigIA.provedor || 'claude-sonnet';
+}
+
+function rbFindAiOpen(name, list = rbSteps) {
+  if (!name) return null;
+  for (const s of list) {
+    if (s.type === 'ai_open' && ((s.config || {}).session_name || '').trim() === name) return s;
+    for (const [, arr] of rbBranches(s)) {
+      const found = rbFindAiOpen(name, arr);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+// Aviso nos steps que usam uma sessão: confirma qual "Abrir sessão de IA" é o dono do
+// nome e o provedor que será usado (ou avisa que não achou / que o provedor não serve).
+function rbAiSessionNotice(sessionName, exigeOpenAI) {
+  const name = (sessionName || '').trim();
+  const open = rbFindAiOpen(name);
+  if (!open) {
+    return `<div class="rb-hint">${_rbIcon('alert-triangle', 12)} Nenhum step "Abrir sessão de IA" chamado "${escapeHtmlRb(name || '...')}" foi encontrado neste robô ainda. Adicione um (antes deste step) para usar o token e as configurações dele.</div>`;
+  }
+  const prov = rbAiProvedorEfetivo(open.config || {});
+  if (exigeOpenAI && !['gpt-4o', 'gpt-4'].includes(prov)) {
+    return `<div class="rb-hint">${_rbIcon('alert-triangle', 12)} A sessão "${escapeHtmlRb(name)}" usa o provedor <strong>${escapeHtmlRb(prov)}</strong>, mas esta ação só funciona com uma sessão OpenAI (GPT-4o / GPT-4).</div>`;
+  }
+  return `<div class="rb-hint">Usa a sessão "<strong>${escapeHtmlRb(name)}</strong>" (${escapeHtmlRb(prov)}), com o token e as configurações do step "Abrir sessão de IA".</div>`;
+}
+
+// Campo das ações OpenAI: sessão de IA (nome) OU token digitado no próprio step.
+function rbAiKeyOrSession(id, c) {
+  const name = (c.session_name || '').trim();
+  let html = rbField('Sessão de IA (opcional)',
+    `<input value="${escapeHtmlRb(c.session_name || '')}" placeholder="ex: openai — mesmo nome do step 'Abrir sessão de IA'" onchange="rbUpdateConfig('${id}','session_name',this.value);rbRenderProps()">`);
+  if (name) return html + rbAiSessionNotice(name, true);
+  html += rbField('API Key / usuário', `<input value="${escapeHtmlRb(c.api_key || '')}" oninput="rbUpdateConfig('${id}','api_key',this.value)">`,
+    'Ou informe acima o nome de uma sessão de IA (OpenAI) para reutilizar o token dela em vários steps, sem colar a chave em cada um.');
+  return html;
+}
+
+function rbRenderAiOpenForm(step, c) {
+  const id = step.id;
+  const inp = (key, ph) => `<input value="${escapeHtmlRb(c[key] || '')}" placeholder="${ph || ''}" oninput="rbUpdateConfig('${id}','${key}',this.value)">`;
+  let form = rbField('Nome da sessão', inp('session_name', 'ex: assistente'),
+    'Use o mesmo nome nos steps "Enviar mensagem" e nas ações OpenAI (embedding, moderação, imagem, Whisper, voz) para reaproveitar o mesmo token e as mesmas configurações. Existe só durante a execução.');
+
+  form += rbField('Provedor', `<select onchange="rbUpdateConfig('${id}','provedor',this.value);rbRenderProps()">
+    <option value="" ${!c.provedor ? 'selected' : ''}>Padrão da empresa${rbConfigIA.provedor ? ' (' + escapeHtmlRb(rbConfigIA.provedor) + ')' : ''}</option>
+    ${RB_AI_PROVEDORES.map((p) => `<option value="${p[0]}" ${c.provedor === p[0] ? 'selected' : ''}>${p[1]}</option>`).join('')}
+  </select>`);
+
+  const cred = rbCredenciais.find((x) => x.nome === c.credencial_nome);
+  form += rbField('Token — credencial do cofre (recomendado)', `<select onchange="rbUpdateConfig('${id}','credencial_nome',this.value);rbRenderProps()">
+    <option value="">${!c.provedor ? 'Padrão da empresa / digitar token' : 'Digitar o token abaixo'}</option>
+    ${c.credencial_nome && !cred ? `<option value="${escapeHtmlRb(c.credencial_nome)}" selected>${escapeHtmlRb(c.credencial_nome)} (não encontrada)</option>` : ''}
+    ${rbCredenciais.map((x) => `<option value="${escapeHtmlRb(x.nome)}" ${x.nome === c.credencial_nome ? 'selected' : ''}>${escapeHtmlRb(x.nome)}</option>`).join('')}
+  </select>`, 'O token fica guardado no cofre (Operações → Credenciais), não dentro do robô.');
+  if (c.credencial_nome) {
+    const campos = Object.keys((cred && cred.campos) || {});
+    if (!campos.includes(c.campo_cred || 'api_key')) campos.unshift(c.campo_cred || 'api_key');
+    form += rbField('Campo da credencial', `<select onchange="rbUpdateConfig('${id}','campo_cred',this.value)">
+      ${campos.map((k) => `<option value="${escapeHtmlRb(k)}" ${k === (c.campo_cred || 'api_key') ? 'selected' : ''}>${escapeHtmlRb(k)}</option>`).join('')}
+    </select>`);
+  } else {
+    form += rbField('Token (chave de API)', `<input type="password" autocomplete="new-password" value="${escapeHtmlRb(c.api_key || '')}" placeholder="vazio = usar o padrão da empresa" oninput="rbUpdateConfig('${id}','api_key',this.value)">`,
+      'Digitado aqui, o token fica gravado dentro do robô. Prefira uma credencial do cofre. Também aceita {variavel}.');
+  }
+
+  form += rbField('Mensagem de sistema (opcional)', `<textarea rows="3" placeholder="Você é um assistente que..." oninput="rbUpdateConfig('${id}','system_message',this.value)">${escapeHtmlRb(c.system_message || '')}</textarea>`);
+
+  // A Anthropic (Claude) não recebe temperatura (o backend não a envia): campo desabilitado com esse provedor.
+  const claude = rbAiProvedorEfetivo(c).startsWith('claude');
+  form += rbField('Temperatura (opcional)',
+    `<input type="number" min="0" max="2" step="0.1" value="${escapeHtmlRb(c.temperature ?? '')}" placeholder="${claude ? 'não usada' : '0.7'}" ${claude ? 'disabled title="A Anthropic (Claude) não usa temperatura." style="opacity:.5;cursor:not-allowed"' : ''} oninput="rbUpdateConfig('${id}','temperature',this.value)">`,
+    claude ? 'Desabilitada: a Anthropic (Claude) não usa temperatura. Vale para GPT e Gemini.' : 'Não é usada pela Anthropic (Claude) — só por GPT e Gemini.');
+  form += rbField('Máximo de tokens na resposta (opcional)', `<input type="number" min="1" step="1" value="${escapeHtmlRb(c.max_tokens ?? '')}" placeholder="2048" oninput="rbUpdateConfig('${id}','max_tokens',this.value)">`);
+
+  const memoria = c.keep_history !== false;
+  form += `<div class="rb-field"><label class="rb-check"><input type="checkbox" ${memoria ? 'checked' : ''} onchange="rbUpdateConfig('${id}','keep_history',this.checked);rbRenderProps()"> Lembrar as mensagens anteriores da sessão</label>
+    <div class="rb-hint">${memoria
+      ? 'Cada "Enviar mensagem" nesta sessão vê as anteriores (como um chat). As mais antigas são descartadas ao passar do máximo, para limitar o custo em tokens.'
+      : 'Cada "Enviar mensagem" é independente — a IA não vê as anteriores.'}</div></div>`;
+  if (memoria) form += rbField('Máximo de mensagens lembradas', `<input type="number" min="2" step="2" value="${escapeHtmlRb(c.max_history_messages ?? 20)}" oninput="rbUpdateConfig('${id}','max_history_messages',this.value)">`);
+  form += rbField('Salvar resultado na variável', inp('variable_name', 'opcional'));
+  return form;
 }
 
 function rbRenderProps() {
@@ -675,6 +785,17 @@ function rbRenderProps() {
     form += rbField('Mensagem de sistema (opcional)', ta('system_message', '', 2));
     form += rbField('Provedor (vazio = padrão da empresa)', sel('provedor', [['','Padrão da empresa'],['claude-sonnet','Claude Sonnet'],['claude-haiku','Claude Haiku'],['gpt-4o','GPT-4o'],['gpt-4','GPT-4'],['gemini','Gemini']]));
     form += rbField('Salvar resposta na variável', inp('variable_name'));
+  } else if (step.type === 'ai_open') {
+    form += rbRenderAiOpenForm(step, c);
+  } else if (step.type === 'ai_chat') {
+    form += rbField('Nome da sessão', inp('session_name', 'ex: assistente'));
+    form += rbAiSessionNotice(c.session_name, false);
+    form += rbField('Mensagem (template)', ta('input_template', '{output}', 4), 'Use {output} (resultado do step anterior), {input} ou {variavel}.');
+    form += rbField('Salvar resposta na variável', inp('variable_name'));
+  } else if (step.type === 'ai_close') {
+    form += rbField('Nome da sessão', inp('session_name', 'ex: assistente'));
+    form += rbAiSessionNotice(c.session_name, false);
+    form += `<div class="rb-hint">Descarta o token e a memória da conversa desta sessão. Opcional: ao terminar a execução, toda sessão de IA aberta é descartada sozinha.</div>`;
   } else if (step.type === 'read_file') {
     form += rbField('Caminho do arquivo', inp('file_path', 'C:\\pasta\\arquivo.txt'));
     form += rbField('Salvar conteúdo na variável', inp('variable_name'));
@@ -700,6 +821,8 @@ function rbRenderProps() {
     // gerado a partir de `acao.fields` + RB_FIELD_META, em vez de um
     // formulário escrito à mão pra cada um dos ~100 tipos.
     for (const campo of (acao.fields || [])) {
+      // Ações OpenAI: o campo de chave vira "sessão de IA (nome) OU token digitado".
+      if (campo === 'api_key' && RB_AI_OPENAI_TYPES.has(step.type)) { form += rbAiKeyOrSession(id, c); continue; }
       const meta = RB_FIELD_META[campo];
       if (!meta) continue;
       let campoHtml;
@@ -841,6 +964,7 @@ function rbParamsUrl() {
 }
 
 async function rbCarregar() {
+  rbCarregarDadosIA(); // em paralelo — só alimenta os seletores de credencial/provedor da sessão de IA
   const params = rbParamsUrl();
   rbAutomacaoId = params.get('automacaoId');
   rbRoboId = params.get('roboId');

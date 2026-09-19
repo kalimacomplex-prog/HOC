@@ -2455,8 +2455,13 @@ app.delete('/api/processos/:id', authMiddleware, verificarAssinatura, permOperac
 // ConfigIA) e chama a API de IA correspondente. Extraído da rota abaixo pra
 // também ser reaproveitado pelo step `call_ai_agent` do automationEngine —
 // mesma lógica, dois chamadores, sem duplicar as três integrações de provider.
-async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq, formatoSaida, camposJson }) {
+// Extras usados pelas sessões de IA do builder (ver lib/automationEngine.js::aiChat):
+// `apiKey` já resolvida (pula a busca no cofre), `history` (conversa anterior:
+// [{role:'user'|'assistant', content}]), `temperature` e `maxTokens`. A temperatura
+// NÃO é enviada à Anthropic (Claude) — só a OpenAI e ao Gemini.
+async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq, formatoSaida, camposJson, apiKey: apiKeyDireta, history, temperature, maxTokens }) {
   if (!userMessage) throw new Error('Mensagem do usuário não informada');
+  const hist = Array.isArray(history) ? history : [];
 
   let provedor = provedorReq, credNome = credNomeReq, campo = campoReq;
   if (!provedor || provedor === 'empresa') {
@@ -2465,8 +2470,11 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
     if (!credNome) credNome = cfgIA?.credencialNome;
     if (!campo)   campo   = cfgIA?.campoCred || 'api_key';
   }
-  const cred = await Credencial.findOne({ nome: credNome, empresa }).lean();
-  const apiKey = cred?.campos?.[campo || 'api_key'] || '';
+  let apiKey = apiKeyDireta || '';
+  if (!apiKey) {
+    const cred = await Credencial.findOne({ nome: credNome, empresa }).lean();
+    apiKey = cred?.campos?.[campo || 'api_key'] || '';
+  }
   if (!apiKey) throw new Error('Credencial de API não encontrada. Configure em Configurações → IA ou informe uma credencial na action.');
 
   let finalUserMsg = userMessage;
@@ -2479,7 +2487,7 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
 
   if (provedor === 'claude-sonnet' || provedor === 'claude-haiku') {
     const modelId = provedor === 'claude-sonnet' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
-    const body = { model: modelId, max_tokens: 2048, messages: [{ role: 'user', content: finalUserMsg }] };
+    const body = { model: modelId, max_tokens: maxTokens || 2048, messages: [...hist, { role: 'user', content: finalUserMsg }] };
     if (systemMessage) body.system = systemMessage;
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -2493,8 +2501,10 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
   } else if (provedor === 'gpt-4o' || provedor === 'gpt-4') {
     const messages = [];
     if (systemMessage) messages.push({ role: 'system', content: systemMessage });
-    messages.push({ role: 'user', content: finalUserMsg });
+    messages.push(...hist, { role: 'user', content: finalUserMsg });
     const body = { model: provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4', messages };
+    if (typeof temperature === 'number') body.temperature = temperature;
+    if (maxTokens) body.max_tokens = maxTokens;
     if (formatoSaida === 'json') body.response_format = { type: 'json_object' };
     const r = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -2506,7 +2516,12 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
     resposta = d.choices?.[0]?.message?.content || '';
 
   } else if (provedor === 'gemini') {
-    const body = { contents: [{ parts: [{ text: finalUserMsg }] }] };
+    // Gemini chama o papel do assistente de "model".
+    const body = { contents: [...hist.map(h => ({ role: h.role === 'assistant' ? 'model' : 'user', parts: [{ text: h.content }] })), { role: 'user', parts: [{ text: finalUserMsg }] }] };
+    const genCfg = {};
+    if (typeof temperature === 'number') genCfg.temperature = temperature;
+    if (maxTokens) genCfg.maxOutputTokens = maxTokens;
+    if (Object.keys(genCfg).length) body.generationConfig = genCfg;
     if (systemMessage) body.systemInstruction = { parts: [{ text: systemMessage }] };
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
@@ -3487,7 +3502,7 @@ githubActions.init({
 
 const automationEngine = require('./lib/automationEngine');
 automationEngine.init({
-  Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina,
+  Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina, ConfigIA, Credencial,
   enviarEmail, resolverEChamarIA, fetch, githubActions,
   hocApiUrl: PUBLIC_URL,
 });

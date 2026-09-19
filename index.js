@@ -750,6 +750,10 @@ const maquinaSchema = new mongoose.Schema({
   ultimoHeartbeat: { type: Date, default: null },
   maintenanceMode: { type: Boolean, default: false },
   ativo:           { type: Boolean, default: true },
+  // Runner do GitHub Actions criado sob demanda pelo automationEngine
+  // quando não tem máquina física do tenant online (ver lib/automationEngine.js
+  // ::criarMaquinaEfemera) — some sozinha quando o run termina.
+  efemera:         { type: Boolean, default: false },
   empresa:         { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor:       { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm:        { type: Date, default: Date.now },
@@ -3414,10 +3418,21 @@ app.delete('/api/credenciais/:id', authMiddleware, verificarAssinatura, permOper
 // Ver C:\Users\novai\.claude\plans\enchanted-gathering-pearl.md — porte
 // reduzido (MVP) do "HAC Studio" pro conceito de Robô do HOC.
 
+const githubActions = require('./lib/githubActions');
+githubActions.init({
+  fetch,
+  token: process.env.GITHUB_TOKEN || '',
+  owner: process.env.GITHUB_OWNER || 'kalimacomplex-prog',
+  repo: process.env.GITHUB_REPO || 'HOC',
+  workflowFile: process.env.GITHUB_WORKFLOW_FILE || 'rpa-ephemeral-runner.yml',
+  ref: process.env.GITHUB_REF || 'main',
+});
+
 const automationEngine = require('./lib/automationEngine');
 automationEngine.init({
   Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina,
-  enviarEmail, resolverEChamarIA, fetch,
+  enviarEmail, resolverEChamarIA, fetch, githubActions,
+  hocApiUrl: process.env.BASE_URL || 'http://localhost:3000',
 });
 
 const AUTOMACAO_STATUS_PARA_EXECUCAO = { success: 'concluido', failed: 'erro', cancelled: 'interrompido' };

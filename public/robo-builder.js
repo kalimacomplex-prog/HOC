@@ -638,7 +638,26 @@ function rbField(label, inputHtml, hint) {
 
 const RB_AI_PROVEDORES = [['claude-sonnet', 'Claude Sonnet'], ['claude-haiku', 'Claude Haiku'], ['gpt-4o', 'GPT-4o'], ['gpt-4', 'GPT-4'], ['gemini', 'Gemini'], ['groq', 'Groq (Llama)']];
 // Modelo padrão de cada provedor (o campo "Modelo" da sessão, se preenchido, sobrepõe).
-const RB_AI_MODELO_PADRAO = { 'claude-sonnet': 'claude-sonnet-4-6', 'claude-haiku': 'claude-haiku-4-5-20251001', 'gpt-4o': 'gpt-4o', 'gpt-4': 'gpt-4', gemini: 'gemini-1.5-pro', groq: 'llama-3.3-70b-versatile' };
+const RB_AI_MODELO_PADRAO = { 'claude-sonnet': 'claude-sonnet-4-6', 'claude-haiku': 'claude-haiku-4-5-20251001', 'gpt-4o': 'gpt-4o', 'gpt-4': 'gpt-4', gemini: 'gemini-1.5-pro', groq: 'openai/gpt-oss-20b' };
+
+// Modelos oferecidos na lista de escolha da sessão, por provedor. Quem escolhe o modelo é o
+// usuário; "Outro" permite digitar qualquer id. A disponibilidade varia por conta/chave
+// (ex.: na Groq, alguns Llama não existem mais em certas contas) — se a API responder
+// "modelo não existe", é só escolher outro.
+const RB_AI_ANTHROPIC_MODELOS = [
+  ['claude-fable-5-1', 'Claude Fable 5.1'], ['claude-opus-5', 'Claude Opus 5'], ['claude-opus-4-7', 'Claude Opus 4.7'],
+  ['claude-sonnet-5', 'Claude Sonnet 5'], ['claude-sonnet-4-6', 'Claude Sonnet 4.6'], ['claude-haiku-4-5-20251001', 'Claude Haiku 4.5'],
+];
+const RB_AI_OPENAI_MODELOS = [['gpt-4o', 'GPT-4o'], ['gpt-4o-mini', 'GPT-4o Mini'], ['gpt-4-turbo', 'GPT-4 Turbo'], ['gpt-4', 'GPT-4']];
+const RB_AI_MODELOS = {
+  'claude-sonnet': RB_AI_ANTHROPIC_MODELOS,
+  'claude-haiku': RB_AI_ANTHROPIC_MODELOS,
+  'gpt-4o': RB_AI_OPENAI_MODELOS,
+  'gpt-4': RB_AI_OPENAI_MODELOS,
+  gemini: [['gemini-2.5-pro', 'Gemini 2.5 Pro'], ['gemini-2.5-flash', 'Gemini 2.5 Flash'], ['gemini-2.0-flash', 'Gemini 2.0 Flash'], ['gemini-1.5-pro', 'Gemini 1.5 Pro'], ['gemini-1.5-flash', 'Gemini 1.5 Flash']],
+  groq: [['openai/gpt-oss-20b', 'GPT-OSS 20B'], ['openai/gpt-oss-120b', 'GPT-OSS 120B'], ['llama-3.3-70b-versatile', 'Llama 3.3 70B'], ['llama-3.1-8b-instant', 'Llama 3.1 8B']],
+};
+const RB_AI_MODELO_OUTRO = '__outro__';
 const RB_AI_OPENAI_TYPES = new Set(['generate_embedding', 'moderate_content', 'generate_ai_image', 'transcribe_audio', 'text_to_speech']);
 
 async function rbCarregarDadosIA() {
@@ -690,19 +709,60 @@ function rbAiKeyOrSession(id, c) {
   return html;
 }
 
+// Troca de provedor: se a lista de modelos muda (ex.: Groq -> GPT), o modelo escolhido antes
+// deixa de valer e volta ao padrão do novo provedor — senão seria enviado ao provedor errado.
+function rbAiEscolherProvedor(stepId, valor) {
+  const step = rbFindStep(stepId);
+  if (!step) return;
+  const c = (step.config = step.config || {});
+  const antes = RB_AI_MODELOS[rbAiProvedorEfetivo(c)];
+  c.provedor = valor;
+  if (antes !== RB_AI_MODELOS[rbAiProvedorEfetivo(c)]) { c.modelo = ''; c.modelo_outro = false; }
+  rbMarcarSujo();
+  rbRenderCanvas();
+  rbRenderProps();
+}
+
+// Escolha na lista de modelos: valor da lista, "" (padrão do provedor) ou "Outro" (mostra o campo de digitação).
+function rbAiEscolherModelo(stepId, valor) {
+  const step = rbFindStep(stepId);
+  if (!step) return;
+  step.config = step.config || {};
+  if (valor === RB_AI_MODELO_OUTRO) {
+    step.config.modelo_outro = true;
+    step.config.modelo = '';
+  } else {
+    step.config.modelo_outro = false;
+    step.config.modelo = valor;
+  }
+  rbMarcarSujo();
+  rbRenderCanvas();
+  rbRenderProps();
+}
+
 function rbRenderAiOpenForm(step, c) {
   const id = step.id;
   const inp = (key, ph) => `<input value="${escapeHtmlRb(c[key] || '')}" placeholder="${ph || ''}" oninput="rbUpdateConfig('${id}','${key}',this.value)">`;
   let form = rbField('Nome da sessão', inp('session_name', 'ex: assistente'),
     'Use o mesmo nome nos steps "Enviar mensagem" e nas ações OpenAI (embedding, moderação, imagem, Whisper, voz) para reaproveitar o mesmo token e as mesmas configurações. Existe só durante a execução.');
 
-  form += rbField('Provedor', `<select onchange="rbUpdateConfig('${id}','provedor',this.value);rbRenderProps()">
+  form += rbField('Provedor', `<select onchange="rbAiEscolherProvedor('${id}',this.value)">
     <option value="" ${!c.provedor ? 'selected' : ''}>Padrão da empresa${rbConfigIA.provedor ? ' (' + escapeHtmlRb(rbConfigIA.provedor) + ')' : ''}</option>
     ${RB_AI_PROVEDORES.map((p) => `<option value="${p[0]}" ${c.provedor === p[0] ? 'selected' : ''}>${p[1]}</option>`).join('')}
   </select>`);
 
-  form += rbField('Modelo (opcional)', inp('modelo', RB_AI_MODELO_PADRAO[rbAiProvedorEfetivo(c)] || ''),
-    'Vazio = modelo padrão do provedor (mostrado no campo). Preencha para usar outro, ex.: um modelo mais novo.');
+  // Modelo: lista para o usuário escolher (por provedor) + "Outro" para digitar qualquer id.
+  const provEf = rbAiProvedorEfetivo(c);
+  const lista = RB_AI_MODELOS[provEf] || [];
+  const noLista = lista.some((m) => m[0] === c.modelo);
+  const outro = c.modelo_outro || (!!c.modelo && !noLista);
+  const padrao = RB_AI_MODELO_PADRAO[provEf] || '';
+  form += rbField('Modelo', `<select onchange="rbAiEscolherModelo('${id}',this.value)">
+    <option value="" ${!c.modelo && !outro ? 'selected' : ''}>Padrão do provedor${padrao ? ' (' + escapeHtmlRb(padrao) + ')' : ''}</option>
+    ${lista.map((m) => `<option value="${escapeHtmlRb(m[0])}" ${c.modelo === m[0] && !c.modelo_outro ? 'selected' : ''}>${escapeHtmlRb(m[1])}${m[0] === padrao ? ' — padrão' : ''}</option>`).join('')}
+    <option value="${RB_AI_MODELO_OUTRO}" ${outro ? 'selected' : ''}>Outro (digitar o id do modelo)…</option>
+  </select>${outro ? `<input style="margin-top:6px" value="${escapeHtmlRb(c.modelo || '')}" placeholder="ex.: id exato do modelo" oninput="rbUpdateConfig('${id}','modelo',this.value)">` : ''}`,
+    'A disponibilidade varia por conta/chave. Se a execução responder que o modelo não existe, escolha outro.');
 
   const cred = rbCredenciais.find((x) => x.nome === c.credencial_nome);
   form += rbField('Token — credencial do cofre (recomendado)', `<select onchange="rbUpdateConfig('${id}','credencial_nome',this.value);rbRenderProps()">

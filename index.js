@@ -2504,7 +2504,7 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
     const messages = [];
     if (systemMessage) messages.push({ role: 'system', content: systemMessage });
     messages.push(...hist, { role: 'user', content: finalUserMsg });
-    const body = { model: modeloReq || (ehGroq ? 'llama-3.3-70b-versatile' : provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4'), messages };
+    const body = { model: modeloReq || (ehGroq ? 'openai/gpt-oss-20b' : provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4'), messages };
     if (typeof temperature === 'number') body.temperature = temperature;
     if (maxTokens) body.max_tokens = maxTokens;
     if (formatoSaida === 'json') body.response_format = { type: 'json_object' };

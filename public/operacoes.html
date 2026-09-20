@@ -8835,6 +8835,14 @@ senha = campos.get('senha', '')</pre>
     renderRobos(lista);
   }
 
+  // Só robôs criados no Studio (origem 'builder') têm fluxo editável — os demais
+  // (comando/webhook) são editados no painel de detalhes.
+  function editarRoboNoStudio(id) {
+    const r = robos.find(x => x._id === id);
+    if (!r || r.origem !== 'builder' || !r.automacaoId) return;
+    location.href = `/robo-builder?automacaoId=${encodeURIComponent(r.automacaoId)}&roboId=${encodeURIComponent(r._id)}`;
+  }
+
   function renderRobos(lista) {
     const dados = lista || robos;
     if (dados.length === 0) {
@@ -8858,6 +8866,10 @@ senha = campos.get('senha', '')</pre>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
               Executar
             </button>
+            ${r.origem === 'builder' && r.automacaoId ? `<button title="Editar o fluxo no Studio" onclick="event.stopPropagation();editarRoboNoStudio('${r._id}')" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;background:#F1F2F5;color:#33363F;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              Editar
+            </button>` : ''}
             <label class="hoc-switch" title="${ativo?'Ativo':'Inativo'}" onclick="event.stopPropagation()" style="margin-left:auto">
               <input type="checkbox" ${ativo?'checked':''} onchange="ativarInativarRobo('${r._id}',this.checked)">
               <span class="hoc-switch-slider"></span>

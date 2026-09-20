@@ -1009,6 +1009,10 @@ async function rbSalvar() {
       rbRoboId = robo._id;
       await rbApi('PATCH', `/api/automacoes/${rbAutomacaoId}`, { roboId: rbRoboId }).catch(() => {});
       history.replaceState(null, '', `/robo-builder?automacaoId=${rbAutomacaoId}&roboId=${rbRoboId}`);
+    } else {
+      // Edição de um robô já existente: mantém nome/descrição do card (Robô) iguais aos do
+      // fluxo — senão renomear no Studio não apareceria na lista de Robôs.
+      await rbApi('PUT', `/api/robos/${rbRoboId}`, { nome, descricao }).catch(() => {});
     }
 
     rbEmpresaSteps = false;

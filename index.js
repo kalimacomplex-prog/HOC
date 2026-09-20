@@ -3514,6 +3514,28 @@ const AUTOMACAO_STATUS_PARA_EXECUCAO = { success: 'concluido', failed: 'erro', c
 // Poll simples (não é chamado com alta frequência — 1 por execução de robô
 // origem='builder') até o AutomacaoRun sair de "running", e espelha o
 // resultado no ExecucaoRobo público (aba Execuções já existente).
+// Texto do log de um step no histórico de Execuções: cabeçalho ("nome (tipo): status")
+// + a saída do step numa segunda linha — é onde fica, por exemplo, o texto que a IA escreveu.
+// Saída comprida é cortada (respostas de IA têm limite maior) e conteúdo que parece
+// base64 (imagem/áudio gerado, arquivo lido) vira só o tamanho, pra não poluir o log.
+const LOG_SAIDA_MAX = 500;
+const LOG_SAIDA_IA_MAX = 4000;
+function _formatarLogDoStep(s) {
+  let msg = `${s.stepName} (${s.stepType}): ${s.status}${s.error ? ' — ' + s.error : ''}`;
+  const saida = typeof s.output === 'string' ? s.output.trim() : '';
+  if (saida && s.status === 'success') {
+    let texto;
+    if (saida.length > 200 && /^[A-Za-z0-9+/=_-]+$/.test(saida)) {
+      texto = `(conteúdo de ${saida.length} caracteres)`;
+    } else {
+      const max = (s.stepType === 'ai_chat' || s.stepType === 'call_ai_agent') ? LOG_SAIDA_IA_MAX : LOG_SAIDA_MAX;
+      texto = saida.length > max ? `${saida.slice(0, max)}… (+${saida.length - max} caracteres)` : saida;
+    }
+    msg += `\n→ ${texto}`;
+  }
+  return msg;
+}
+
 async function _espelharRunNaExecucao(runId, execId) {
   const deadline = Date.now() + 60 * 60 * 1000; // 1h de teto de segurança
   while (Date.now() < deadline) {
@@ -3522,7 +3544,7 @@ async function _espelharRunNaExecucao(runId, execId) {
     if (!run || run.status === 'running') continue;
     const statusExec = AUTOMACAO_STATUS_PARA_EXECUCAO[run.status] || 'erro';
     const resumo = (run.stepsResult || []).map((s) => ({
-      message: `${s.stepName} (${s.stepType}): ${s.status}${s.error ? ' — ' + s.error : ''}`,
+      message: _formatarLogDoStep(s),
       status: s.status === 'failed' ? 'error' : s.status === 'success' ? 'success' : 'info',
       time: new Date(),
     }));

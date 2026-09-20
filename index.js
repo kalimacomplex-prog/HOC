@@ -2459,7 +2459,7 @@ app.delete('/api/processos/:id', authMiddleware, verificarAssinatura, permOperac
 // `apiKey` já resolvida (pula a busca no cofre), `history` (conversa anterior:
 // [{role:'user'|'assistant', content}]), `temperature` e `maxTokens`. A temperatura
 // NÃO é enviada à Anthropic (Claude) — só a OpenAI e ao Gemini.
-async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq, formatoSaida, camposJson, apiKey: apiKeyDireta, history, temperature, maxTokens }) {
+async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq, formatoSaida, camposJson, apiKey: apiKeyDireta, history, temperature, maxTokens, modelo: modeloReq }) {
   if (!userMessage) throw new Error('Mensagem do usuário não informada');
   const hist = Array.isArray(history) ? history : [];
 
@@ -2486,7 +2486,7 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
   let resposta = '';
 
   if (provedor === 'claude-sonnet' || provedor === 'claude-haiku') {
-    const modelId = provedor === 'claude-sonnet' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
+    const modelId = modeloReq || (provedor === 'claude-sonnet' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001');
     const body = { model: modelId, max_tokens: maxTokens || 2048, messages: [...hist, { role: 'user', content: finalUserMsg }] };
     if (systemMessage) body.system = systemMessage;
     const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -2498,21 +2498,23 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
     if (!r.ok) throw new Error(d.error?.message || 'Erro na API Anthropic');
     resposta = d.content?.[0]?.text || '';
 
-  } else if (provedor === 'gpt-4o' || provedor === 'gpt-4') {
+  } else if (provedor === 'gpt-4o' || provedor === 'gpt-4' || provedor === 'groq') {
+    // A Groq usa a mesma API da OpenAI (chat/completions), só muda a URL, a chave e o modelo.
+    const ehGroq = provedor === 'groq';
     const messages = [];
     if (systemMessage) messages.push({ role: 'system', content: systemMessage });
     messages.push(...hist, { role: 'user', content: finalUserMsg });
-    const body = { model: provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4', messages };
+    const body = { model: modeloReq || (ehGroq ? 'llama-3.3-70b-versatile' : provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4'), messages };
     if (typeof temperature === 'number') body.temperature = temperature;
     if (maxTokens) body.max_tokens = maxTokens;
     if (formatoSaida === 'json') body.response_format = { type: 'json_object' };
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    const r = await fetch(ehGroq ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.error?.message || 'Erro na API OpenAI');
+    if (!r.ok) throw new Error(d.error?.message || (ehGroq ? 'Erro na API Groq' : 'Erro na API OpenAI'));
     resposta = d.choices?.[0]?.message?.content || '';
 
   } else if (provedor === 'gemini') {
@@ -2523,7 +2525,7 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
     if (maxTokens) genCfg.maxOutputTokens = maxTokens;
     if (Object.keys(genCfg).length) body.generationConfig = genCfg;
     if (systemMessage) body.systemInstruction = { parts: [{ text: systemMessage }] };
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modeloReq || 'gemini-1.5-pro'}:generateContent?key=${apiKey}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     });
     const d = await r.json();

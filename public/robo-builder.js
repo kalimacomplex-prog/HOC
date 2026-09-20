@@ -584,7 +584,7 @@ function rbResumoStep(step) {
     case 'http_request': case 'http_request_retry': return `${(c.method || 'GET')} ${c.url || ''}`;
     case 'send_email': return `pra ${c.to || '?'}`;
     case 'call_ai_agent': return c.input_template || '{output}';
-    case 'ai_open': return `"${c.session_name || '?'}" (${rbAiProvedorEfetivo(c)})${c.keep_history === false ? '' : ' com memória'}`;
+    case 'ai_open': return `"${c.session_name || '?'}" (${rbAiProvedorEfetivo(c)}${c.modelo ? ' / ' + c.modelo : ''})${c.keep_history === false ? '' : ' com memória'}`;
     case 'ai_chat': return `"${(c.input_template || '{output}').substring(0, 30)}" → sessão "${c.session_name || '?'}"`;
     case 'ai_close': return `sessão "${c.session_name || '?'}"`;
     case 'read_file': return c.file_path || '';
@@ -636,7 +636,9 @@ function rbField(label, inputHtml, hint) {
 // ==================== Sessão de IA (mesmo modelo da sessão de navegador) ====================
 // Abrir sessão (token + configurações) → usar pelo nome → fechar. Ver lib/automationEngine.js.
 
-const RB_AI_PROVEDORES = [['claude-sonnet', 'Claude Sonnet'], ['claude-haiku', 'Claude Haiku'], ['gpt-4o', 'GPT-4o'], ['gpt-4', 'GPT-4'], ['gemini', 'Gemini']];
+const RB_AI_PROVEDORES = [['claude-sonnet', 'Claude Sonnet'], ['claude-haiku', 'Claude Haiku'], ['gpt-4o', 'GPT-4o'], ['gpt-4', 'GPT-4'], ['gemini', 'Gemini'], ['groq', 'Groq (Llama)']];
+// Modelo padrão de cada provedor (o campo "Modelo" da sessão, se preenchido, sobrepõe).
+const RB_AI_MODELO_PADRAO = { 'claude-sonnet': 'claude-sonnet-4-6', 'claude-haiku': 'claude-haiku-4-5-20251001', 'gpt-4o': 'gpt-4o', 'gpt-4': 'gpt-4', gemini: 'gemini-1.5-pro', groq: 'llama-3.3-70b-versatile' };
 const RB_AI_OPENAI_TYPES = new Set(['generate_embedding', 'moderate_content', 'generate_ai_image', 'transcribe_audio', 'text_to_speech']);
 
 async function rbCarregarDadosIA() {
@@ -698,6 +700,9 @@ function rbRenderAiOpenForm(step, c) {
     <option value="" ${!c.provedor ? 'selected' : ''}>Padrão da empresa${rbConfigIA.provedor ? ' (' + escapeHtmlRb(rbConfigIA.provedor) + ')' : ''}</option>
     ${RB_AI_PROVEDORES.map((p) => `<option value="${p[0]}" ${c.provedor === p[0] ? 'selected' : ''}>${p[1]}</option>`).join('')}
   </select>`);
+
+  form += rbField('Modelo (opcional)', inp('modelo', RB_AI_MODELO_PADRAO[rbAiProvedorEfetivo(c)] || ''),
+    'Vazio = modelo padrão do provedor (mostrado no campo). Preencha para usar outro, ex.: um modelo mais novo.');
 
   const cred = rbCredenciais.find((x) => x.nome === c.credencial_nome);
   form += rbField('Token — credencial do cofre (recomendado)', `<select onchange="rbUpdateConfig('${id}','credencial_nome',this.value);rbRenderProps()">

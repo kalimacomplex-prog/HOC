@@ -1899,7 +1899,10 @@
               Como usar uma credencial dentro de um robô
               <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1.5px solid #9CA0AC;color:#9CA0AC;font-size:10px;font-weight:700;flex-shrink:0">i</span>
             </button>
-            <button class="btn-lic btn-lic-add" onclick="abrirModalCredencial()">+ Nova Credencial</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn-lic" onclick="conectarGoogleDrive()" title="Autoriza os Robôs de Google Drive a usar a cota de armazenamento da sua conta (necessário pra enviar/atualizar arquivo — uma conta de serviço sozinha só lê/move/exclui)">Conectar Google Drive</button>
+              <button class="btn-lic btn-lic-add" onclick="abrirModalCredencial()">+ Nova Credencial</button>
+            </div>
           </div>
 
           <div id="credInfoBox" style="display:none;background:white;border:1px solid #ECEDF0;border-radius:14px;padding:18px 20px;margin-bottom:16px">
@@ -9717,6 +9720,11 @@ senha = campos.get('senha', '')</pre>
     return 'Válida';
   }
 
+  function conectarGoogleDrive() {
+    const token = localStorage.getItem('token');
+    window.location.href = '/api/integracoes/google/conectar?token=' + encodeURIComponent(token);
+  }
+
   function abrirModalCredencial(id) {
     document.getElementById('credEditId').value = id || '';
     document.getElementById('modalCredTitulo').textContent = id ? 'Editar Credencial' : 'Cadastrar Credencial';
@@ -10426,6 +10434,20 @@ function copiarPixBloqueio(codigo) {
   setInterval(carregarNotificacoes, 60000);
   // Pré-carrega dados do dashboard ao abrir a página
   carregarDashboard();
+
+  // Volta do fluxo "Conectar Google Drive" (redirect de página inteira, ver
+  // /api/integracoes/google/callback no servidor) — abre direto em Robôs →
+  // Credenciais e avisa se deu certo, depois limpa a URL.
+  (function tratarRetornoGoogleOAuth() {
+    const params = new URLSearchParams(window.location.search);
+    const google = params.get('google');
+    if (params.get('robosTab') !== 'credenciais' && !google) return;
+    mudarSecao('robos', document.querySelector(".op-mod-tab[onclick*=\"'robos'\"]"));
+    mudarRoboTab('credenciais', document.querySelector(".robo-subtab[onclick*=\"'credenciais'\"]"));
+    if (google === 'ok') hocToast('Google Drive conectado! Os Robôs já podem enviar/atualizar arquivo usando a cota da sua conta.', 'ok', 6000);
+    else if (google === 'erro') hocToast('Falha ao conectar o Google Drive: ' + (params.get('msg') || 'erro desconhecido'), 'erro', 6000);
+    window.history.replaceState({}, '', window.location.pathname);
+  })();
 
   // Substitui as listas suspensas nativas dos filtros por um painel estilizado
   hocEnhanceSelects([

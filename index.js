@@ -3488,6 +3488,57 @@ app.delete('/api/credenciais/:id', authMiddleware, verificarAssinatura, permOper
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// ---- OAuth do Google (Drive) — dá cota de armazenamento de verdade aos
+// Robôs de Google Drive (conta de serviço sozinha não consegue enviar/
+// atualizar arquivo, só ler/mover/excluir — ver lib/stepLibrary.js). Guarda
+// o refresh_token na credencial "google-drive" (cria se não existir), no
+// mesmo campo "campos" que as outras credenciais — os steps do builder
+// detectam sozinhos se o valor é um JSON de conta de serviço ou um
+// refresh_token do OAuth.
+const googleOAuth = require('./lib/googleOAuth');
+googleOAuth.init({
+  fetch,
+  clientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
+  clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
+  redirectUri: `${PUBLIC_URL}/api/integracoes/google/callback`,
+});
+const GOOGLE_OAUTH_CRED_NOME = 'google-drive';
+const GOOGLE_OAUTH_CAMPO = 'refresh_token';
+
+// Login inicia por navegação de página inteira (não dá pra usar fetch/XHR
+// num redirect pro Google), então não passa pelo authMiddleware normal —
+// recebe o JWT já emitido pela query string e o valida manualmente.
+app.get('/api/integracoes/google/conectar', async (req, res) => {
+  let decoded;
+  try { decoded = jwt.verify(String(req.query.token || ''), process.env.JWT_SECRET || 'segredo123'); }
+  catch { return res.status(401).send('Sessão inválida ou expirada — abra Operações → Credenciais e clique em "Conectar Google Drive" de novo.'); }
+  const state = jwt.sign({ empresa: decoded.empresa }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '10m' });
+  res.redirect(googleOAuth.buildAuthUrl(state));
+});
+
+app.get('/api/integracoes/google/callback', async (req, res) => {
+  const voltar = (qs) => res.redirect(`${PUBLIC_URL}/operacoes?robosTab=credenciais&${qs}`);
+  if (req.query.error) return voltar(`google=erro&msg=${encodeURIComponent(req.query.error)}`);
+  let state;
+  try { state = jwt.verify(String(req.query.state || ''), process.env.JWT_SECRET || 'segredo123'); }
+  catch { return voltar('google=erro&msg=' + encodeURIComponent('Link expirado, tente conectar de novo.')); }
+  try {
+    const tokens = await googleOAuth.exchangeCode(String(req.query.code || ''));
+    if (!tokens.refresh_token) throw new Error('O Google não devolveu um refresh_token (tente desconectar o app em myaccount.google.com/permissions e conectar de novo).');
+    const cred = await Credencial.findOne({ nome: GOOGLE_OAUTH_CRED_NOME, empresa: state.empresa });
+    if (cred) {
+      cred.campos = { ...(cred.campos || {}), [GOOGLE_OAUTH_CAMPO]: tokens.refresh_token };
+      cred.atualizadoEm = new Date();
+      await cred.save();
+    } else {
+      await Credencial.create({ nome: GOOGLE_OAUTH_CRED_NOME, empresa: state.empresa, campos: { [GOOGLE_OAUTH_CAMPO]: tokens.refresh_token } });
+    }
+    voltar('google=ok');
+  } catch (err) {
+    voltar('google=erro&msg=' + encodeURIComponent(err.message));
+  }
+});
+
 // ==================== AUTOMAÇÃO (builder visual de Robôs) ====================
 // Ver C:\Users\novai\.claude\plans\enchanted-gathering-pearl.md — porte
 // reduzido (MVP) do "HAC Studio" pro conceito de Robô do HOC.
@@ -3506,6 +3557,8 @@ const automationEngine = require('./lib/automationEngine');
 automationEngine.init({
   Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina, ConfigIA, Credencial,
   enviarEmail, resolverEChamarIA, fetch, githubActions,
+  googleOAuthClientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
+  googleOAuthClientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
   hocApiUrl: PUBLIC_URL,
 });
 

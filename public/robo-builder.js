@@ -299,6 +299,18 @@ const RB_ACOES = [
   { tipo: 'extract_audio', label: 'Extrair áudio de vídeo', icone: 'music', cor: '#805ad5', cat: 'Áudio/vídeo (na máquina)', fields: ['source_path', 'dest_path'], agente: true },
   { tipo: 'trim_media', label: 'Cortar mídia', icone: 'scissors', cor: '#805ad5', cat: 'Áudio/vídeo (na máquina)', fields: ['source_path', 'dest_path', 'value', 'seconds'], agente: true },
   { tipo: 'extract_video_frame', label: 'Extrair frame de vídeo', icone: 'camera', cor: '#805ad5', cat: 'Áudio/vídeo (na máquina)', fields: ['source_path', 'dest_path', 'value'], agente: true },
+
+  { tipo: 'gdrive_create_folder', label: 'Criar pasta (Google Drive)', icone: 'folder', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_name', 'gdrive_parent_id', 'api_key'] },
+  { tipo: 'gdrive_upload_file', label: 'Enviar arquivo (Google Drive)', icone: 'arrow-up', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_name', 'gdrive_parent_id', 'gdrive_mime_type', 'file_base64', 'api_key'] },
+  { tipo: 'gdrive_update_file_content', label: 'Atualizar conteúdo (Google Drive)', icone: 'edit', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_mime_type', 'file_base64', 'api_key'] },
+  { tipo: 'gdrive_download_file', label: 'Baixar arquivo (Google Drive)', icone: 'arrow-down', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'api_key'] },
+  { tipo: 'gdrive_delete_file', label: 'Excluir arquivo/pasta (Google Drive)', icone: 'trash', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'api_key'] },
+  { tipo: 'gdrive_list_files', label: 'Listar arquivos (Google Drive)', icone: 'list', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_parent_id', 'gdrive_query', 'api_key'] },
+  { tipo: 'gdrive_rename_file', label: 'Renomear arquivo/pasta (Google Drive)', icone: 'pencil', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_file_name', 'api_key'] },
+  { tipo: 'gdrive_move_file', label: 'Mover arquivo (Google Drive)', icone: 'arrow-right', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_new_parent_id', 'api_key'] },
+  { tipo: 'gdrive_copy_file', label: 'Copiar arquivo (Google Drive)', icone: 'copy', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_file_name', 'gdrive_parent_id', 'api_key'] },
+  { tipo: 'gdrive_share_file', label: 'Compartilhar arquivo/pasta (Google Drive)', icone: 'link', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_share_email', 'gdrive_share_role', 'api_key'] },
+  { tipo: 'gdrive_file_info', label: 'Info do arquivo/pasta (Google Drive)', icone: 'info', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'api_key'] },
 ];
 const RB_ACOES_MAP = Object.fromEntries(RB_ACOES.map((a) => [a.tipo, a]));
 
@@ -373,6 +385,14 @@ const RB_FIELD_META = {
   session_name: { label: 'Nome da sessão', type: 'text', placeholder: 'principal', hint: 'Mesmo nome usado em "Abrir sessão" — identifica qual navegador esse step controla.' },
   browser_profile: { label: 'Pasta de perfil persistente (opcional)', type: 'text', hint: 'Preenche pra manter login/cookies entre execuções (força janela visível, não headless).' },
   headless: { label: 'Sem interface visível (headless)', type: 'checkbox' },
+  gdrive_file_id: { label: 'ID do arquivo/pasta', type: 'text', hint: 'Copie da URL do Drive (depois de "/d/" ou "/folders/"). Aceita {output} ou {variavel}.' },
+  gdrive_parent_id: { label: 'ID da pasta (opcional)', type: 'text', hint: 'Vazio = raiz do Drive compartilhado com a conta de serviço.' },
+  gdrive_new_parent_id: { label: 'ID da pasta de destino', type: 'text' },
+  gdrive_file_name: { label: 'Nome do arquivo/pasta', type: 'text' },
+  gdrive_mime_type: { label: 'Tipo (MIME, opcional)', type: 'text', placeholder: 'application/pdf' },
+  gdrive_query: { label: 'Filtro extra (opcional)', type: 'text', placeholder: "name contains 'relatorio'", hint: 'Sintaxe de busca do Google Drive (campo "q" da API).' },
+  gdrive_share_email: { label: 'E-mail para compartilhar (opcional)', type: 'text', hint: 'Vazio = compartilha com "qualquer pessoa com o link".' },
+  gdrive_share_role: { label: 'Permissão', type: 'select', options: [['reader', 'Leitor'], ['writer', 'Editor'], ['commenter', 'Comentarista']] },
 };
 
 function rbGenericFields(step) {
@@ -659,6 +679,7 @@ const RB_AI_MODELOS = {
 };
 const RB_AI_MODELO_OUTRO = '__outro__';
 const RB_AI_OPENAI_TYPES = new Set(['generate_embedding', 'moderate_content', 'generate_ai_image', 'transcribe_audio', 'text_to_speech']);
+const RB_GDRIVE_TYPES = new Set(['gdrive_create_folder', 'gdrive_upload_file', 'gdrive_update_file_content', 'gdrive_download_file', 'gdrive_delete_file', 'gdrive_list_files', 'gdrive_rename_file', 'gdrive_move_file', 'gdrive_copy_file', 'gdrive_share_file', 'gdrive_file_info']);
 
 async function rbCarregarDadosIA() {
   try { rbCredenciais = await rbApi('GET', '/api/credenciais'); } catch { rbCredenciais = []; }
@@ -706,6 +727,30 @@ function rbAiKeyOrSession(id, c) {
   if (name) return html + rbAiSessionNotice(name, true);
   html += rbField('API Key / usuário', `<input value="${escapeHtmlRb(c.api_key || '')}" oninput="rbUpdateConfig('${id}','api_key',this.value)">`,
     'Ou informe acima o nome de uma sessão de IA (OpenAI) para reutilizar o token dela em vários steps, sem colar a chave em cada um.');
+  return html;
+}
+
+// Campo de credencial das ações do Google Drive: conta de serviço do Google (JSON) —
+// escolhida do cofre (recomendado) ou colada direto no step. Mesmo padrão do
+// "Token" da sessão de IA (ver rbRenderAiOpenForm), mas sem sessão: cada step
+// resolve a credencial e o token de acesso na hora, sem precisar "abrir" nada antes.
+function rbGDriveCredField(id, c) {
+  const cred = rbCredenciais.find((x) => x.nome === c.credencial_nome);
+  let html = rbField('Conta de serviço do Google — credencial do cofre (recomendado)', `<select onchange="rbUpdateConfig('${id}','credencial_nome',this.value);rbRenderProps()">
+    <option value="">Colar o JSON abaixo</option>
+    ${c.credencial_nome && !cred ? `<option value="${escapeHtmlRb(c.credencial_nome)}" selected>${escapeHtmlRb(c.credencial_nome)} (não encontrada)</option>` : ''}
+    ${rbCredenciais.map((x) => `<option value="${escapeHtmlRb(x.nome)}" ${x.nome === c.credencial_nome ? 'selected' : ''}>${escapeHtmlRb(x.nome)}</option>`).join('')}
+  </select>`, 'O JSON da conta de serviço fica guardado no cofre (Operações → Credenciais), não dentro do robô. Compartilhe a pasta do Drive com o "client_email" dessa conta de serviço.');
+  if (c.credencial_nome) {
+    const campos = Object.keys((cred && cred.campos) || {});
+    if (!campos.includes(c.campo_cred || 'service_account_json')) campos.unshift(c.campo_cred || 'service_account_json');
+    html += rbField('Campo da credencial', `<select onchange="rbUpdateConfig('${id}','campo_cred',this.value)">
+      ${campos.map((k) => `<option value="${escapeHtmlRb(k)}" ${k === (c.campo_cred || 'service_account_json') ? 'selected' : ''}>${escapeHtmlRb(k)}</option>`).join('')}
+    </select>`);
+  } else {
+    html += rbField('JSON da conta de serviço', `<textarea rows="4" placeholder='{"client_email":"...","private_key":"..."}' oninput="rbUpdateConfig('${id}','api_key',this.value)">${escapeHtmlRb(c.api_key || '')}</textarea>`,
+      'Cole aqui o arquivo de chave JSON (Google Cloud → IAM e admin → Contas de serviço → Chaves). Prefira uma credencial do cofre.');
+  }
   return html;
 }
 
@@ -888,6 +933,7 @@ function rbRenderProps() {
     for (const campo of (acao.fields || [])) {
       // Ações OpenAI: o campo de chave vira "sessão de IA (nome) OU token digitado".
       if (campo === 'api_key' && RB_AI_OPENAI_TYPES.has(step.type)) { form += rbAiKeyOrSession(id, c); continue; }
+      if (campo === 'api_key' && RB_GDRIVE_TYPES.has(step.type)) { form += rbGDriveCredField(id, c); continue; }
       const meta = RB_FIELD_META[campo];
       if (!meta) continue;
       let campoHtml;

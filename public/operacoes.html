@@ -269,18 +269,15 @@
     .hoc-switch input:checked + .hoc-switch-slider { background:var(--accent); }
     .hoc-switch input:checked + .hoc-switch-slider:before { transform:translateX(15px); }
 
-    /* Painel de detalhes — full-screen após sidebar (200px) */
-    .rdp-backdrop { position:fixed;inset:0;background:rgba(11,11,15,0.45);z-index:398;display:none; }
-    .robo-detalhe-painel { position:fixed;top:10px;left:216px;right:10px;bottom:10px;z-index:399;background:white;border-radius:16px;box-shadow:0 24px 64px rgba(11,11,15,0.2);border:1px solid #ECEDF0;display:none;flex-direction:column;overflow:hidden; }
-    .rdp-header { display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid #ECEDF0;flex-shrink:0; }
-    .rdp-header-left { display:flex;flex-direction:column;gap:2px; }
+    /* Painel de detalhes — inline, mesmo padrão visual do roboFormPane (Cadastrar Robô) */
+    .robo-detalhe-painel { display:none; }
+    .rdp-header-left { flex:1;min-width:0; }
     .rdp-titulo { font-size:16px;font-weight:800;color:#0B0B0F; }
     .rdp-subtitulo { font-size:11px;color:#9CA0AC; }
     .rdp-secao-titulo { font-size:11px;font-weight:800;color:#0B0B0F;padding:6px 0;border-bottom:1.5px solid #ECEDF0;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.6px; }
-    .rdp-subsecao { font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:0.5px;margin:14px 0 6px; }
     .versao-hist-item { display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #F2F3F5;font-size:11px; }
     .versao-hist-item:last-child { border-bottom:none; }
-    .rdp-body { flex:1;overflow-y:auto;min-height:0;padding:20px 24px; }
+    .rdp-body { background:white;border:1px solid #ECEDF0;border-radius:14px;padding:24px;max-width:900px;margin:0 auto;width:100%; }
     .fila-tbl { width:100%;border-collapse:collapse;font-size:12px; }
     .fila-tbl th { text-align:left;padding:6px 8px;font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;border-bottom:1.5px solid #ECEDF0; }
     .fila-tbl td { padding:7px 8px;border-bottom:1px solid #F2F3F5;vertical-align:middle; }
@@ -1673,24 +1670,19 @@
           </div>
         </div><!-- /roboFormPane -->
 
-            <!-- Backdrop + Painel de Detalhes full-screen -->
-            <div id="rdpBackdrop" class="rdp-backdrop" onclick="fecharDetalheRobo()"></div>
+            <!-- Painel de Detalhes do Robô (inline, mesmo padrão do roboFormPane) -->
             <div id="roboDetalhePainel" class="robo-detalhe-painel">
-              <div class="rdp-header">
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                <button onclick="fecharDetalheRobo()" style="width:34px;height:34px;border-radius:9px;background:#F1F2F5;border:none;color:#33363F;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                 <div class="rdp-header-left">
                   <div class="rdp-titulo" id="rdpTitulo">Detalhes</div>
                   <div class="rdp-subtitulo" id="rdpSubtitulo"></div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:center">
-                  <button onclick="dpSalvarConfigs()" class="btn-lic btn-lic-add">Salvar</button>
-                  <button class="btn-fechar" onclick="fecharDetalheRobo()" style="font-size:20px;width:32px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-                </div>
+                <button onclick="dpSalvarConfigs()" class="btn-lic btn-lic-add">Salvar</button>
               </div>
               <div class="rdp-body">
 
                 <!-- ── SEÇÃO 1: CONFIGURAÇÕES ── -->
-                <div class="rdp-secao-titulo">Configurações</div>
-
                 <div style="background:#FAFBFC;border:1px solid #ECEDF0;border-radius:9px;padding:11px 14px;margin-bottom:14px">
                   <div style="font-size:10px;font-weight:700;color:#6B7080;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Chave da API (x-robot-key)</div>
                   <div style="display:flex;gap:8px;align-items:center">
@@ -1700,7 +1692,7 @@
                   <div style="font-size:10px;color:#9CA0AC;margin-top:5px">Header: <code style="background:#e8e8e8;padding:1px 5px;border-radius:3px">x-robot-key: &lt;chave&gt;</code></div>
                 </div>
 
-                <div class="rdp-subsecao">Identificação</div>
+                <div class="rdp-secao-titulo">Identificação</div>
                 <div class="form-row" style="margin-bottom:8px">
                   <div class="form-group" style="flex:2"><label>Nome *</label><input type="text" class="form-control" id="dpNome" placeholder="Ex: Validador Fiscal"></div>
                   <div class="form-group"><label>Tipo</label><select class="form-control" id="dpTipo" style="width:100%;height:38px;padding:0 12px"><option value="Background">Background (sem tela)</option><option value="Interface">Interface (com tela)</option></select></div>
@@ -1708,7 +1700,7 @@
                   <div class="form-group"><label>Departamento</label><input type="text" class="form-control" id="dpDepartamento"></div>
                 </div>
 
-                <div class="rdp-subsecao">Onde Rodar</div>
+                <div class="rdp-secao-titulo" style="margin-top:20px">Onde Rodar</div>
                 <div class="form-row" style="margin-bottom:8px">
                   <div class="form-group"><label>Ambiente</label>
                     <select class="form-control" id="dpAmbiente" onchange="dpAtualizarAmbiente()" style="width:100%;height:38px;padding:0 12px">
@@ -1724,7 +1716,7 @@
                 </div>
 
                 <div id="dpSecaoLocal">
-                  <div class="rdp-subsecao">Fonte do Código</div>
+                  <div class="rdp-secao-titulo" style="margin-top:20px">Fonte do Código</div>
                   <div class="form-row" style="margin-bottom:6px">
                     <div class="form-group form-full">
                       <div style="display:flex;gap:8px">
@@ -1757,7 +1749,7 @@
                     <div class="form-group" style="flex:1"><label>Comando</label><input type="text" class="form-control" id="dpComando" placeholder="Auto" style="font-family:monospace;font-size:11px"></div>
                   </div>
 
-                  <div class="rdp-subsecao">Dependências</div>
+                  <div class="rdp-secao-titulo" style="margin-top:20px">Dependências</div>
                   <div class="form-row" style="margin-bottom:8px">
                     <div class="form-group form-full"><label>Pacotes pip (um por linha)</label>
                       <textarea class="form-control" id="dpPacotesPip" rows="2" placeholder="requests&#10;pandas==2.0" style="font-family:monospace;font-size:11px"></textarea>
@@ -1769,13 +1761,13 @@
                 </div>
 
                 <div id="dpSecaoNuvem" style="display:none">
-                  <div class="rdp-subsecao">Webhook (Nuvem)</div>
+                  <div class="rdp-secao-titulo" style="margin-top:20px">Webhook (Nuvem)</div>
                   <div class="form-row" style="margin-bottom:8px">
                     <div class="form-group form-full"><label>URL do Webhook</label><input type="text" class="form-control" id="dpWebhookUrl" placeholder="https://..."></div>
                   </div>
                 </div>
 
-                <div class="rdp-subsecao">Agendamento</div>
+                <div class="rdp-secao-titulo" style="margin-top:20px">Agendamento</div>
                 <div class="form-row" style="margin-bottom:8px">
                   <div class="form-group form-full">
                     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px">
@@ -1830,7 +1822,7 @@
                   </div>
                 </div>
 
-                <div class="rdp-subsecao">Métricas</div>
+                <div class="rdp-secao-titulo" style="margin-top:20px">Métricas</div>
                 <div class="form-row" style="margin-bottom:8px">
                   <div class="form-group"><label>Tempo de Execução Humana (min) *</label><input type="number" class="form-control" id="dpTempoHumano" value="0" min="1" required></div>
                   <div class="form-group"><label>Lead Time (min) *</label><input type="number" class="form-control" id="dpSla" value="0" min="1" required></div>
@@ -8881,11 +8873,9 @@ senha = campos.get('senha', '')</pre>
     const maqNome = maquinasData.find(m => m._id === r.maquinaId)?.nome || 'Qualquer máquina';
     document.getElementById('rdpSubtitulo').textContent = `${tipoLabel} · ${maqNome}`;
 
-    // Mostra backdrop + painel
-    document.getElementById('rdpBackdrop').style.display = 'block';
-    const painel = document.getElementById('roboDetalhePainel');
-    painel.style.display = 'flex';
-    painel.style.flexDirection = 'column';
+    // Troca pro painel de detalhes (mesmo padrão inline do roboFormPane)
+    document.getElementById('roboListPane').style.display = 'none';
+    document.getElementById('roboDetalhePainel').style.display = 'block';
 
     dpCarregarConfigs(r);
     document.getElementById('dpApiKey').textContent = r.apiKey || '—';
@@ -8896,8 +8886,8 @@ senha = campos.get('senha', '')</pre>
 
   function fecharDetalheRobo() {
     document.getElementById('roboDetalhePainel').style.display = 'none';
-    document.getElementById('rdpBackdrop').style.display = 'none';
-    document.querySelectorAll('#robosLista tr[id^="robo-row-"]').forEach(el => el.classList.remove('ativo-detalhe'));
+    document.getElementById('roboListPane').style.display = 'block';
+    document.querySelectorAll('#robosLista [id^="robo-row-"]').forEach(el => el.classList.remove('ativo-detalhe'));
     detalheRoboAtual = null;
   }
 
@@ -9510,7 +9500,11 @@ senha = campos.get('senha', '')</pre>
     document.getElementById('roboFormPane').style.display = 'none';
     document.getElementById('roboListPane').style.display = 'block';
   }
-  function editarRobo(id) { abrirModalRobo(id); }
+  function editarRobo(id) {
+    const r = robos.find(x => x._id === id);
+    if (r && r.origem === 'builder') { location.href = `/robo-builder?automacaoId=${r.automacaoId}&roboId=${r._id}`; return; }
+    abrirModalRobo(id);
+  }
 
   async function salvarRobo() {
     const nome = document.getElementById('rNome').value.trim();

@@ -5,126 +5,244 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HOC - Gestão de Projetos</title>
   <link rel="stylesheet" href="style-global.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-    .header-acoes { display: flex; gap: 8px; }
+    :root { --accent: #2F5CFF; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F6F7F9; overflow-x: hidden; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(11,11,15,0.35) transparent; }
+    ::-webkit-scrollbar { height: 10px; width: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(11,11,15,0.18); border-radius: 10px; border: 3px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(11,11,15,0.4); background-clip: padding-box; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar { width: max-content; min-width: 200px; max-width: 320px; background: #0B0B0F; padding: 0; transition: width 0.18s ease; overflow: hidden; }
+    .sidebar.recolhida { width: 68px; min-width: 68px; }
+    .sidebar-logo { height: 64px; padding: 0 20px; border-bottom: none; margin-bottom: 0; }
+    .sidebar-logo rect { fill: var(--accent); }
+    .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+    .sidebar.recolhida .logo-text, .sidebar.recolhida .side-label, .sidebar.recolhida .sidebar-sistema-label, .sidebar.recolhida .btn-sidebar-label { display: none; }
+    .sidebar-menu { display: flex; flex-direction: column; padding: 12px; gap: 3px; }
+    .menu-item { width: 100%; gap: 14px; padding: 9px 12px; border-radius: 9px; color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 600; margin-bottom: 0; white-space: nowrap; }
+    .menu-item:hover { background: rgba(255,255,255,0.08); color: white; }
+    .menu-item.active { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; }
+    .menu-item svg { width: 18px; height: 18px; opacity: 1; stroke-width: 2; }
+    .sidebar-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); position: relative; }
+    .sidebar-sistema { position: relative; margin-bottom: 4px; }
+    .sidebar-sistema > summary { border-radius: 9px; padding: 9px 12px; gap: 10px; background: transparent; color: rgba(255,255,255,0.65); font-size: 12.5px; font-weight: 600; }
+    .sidebar-sistema > summary:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sidebar-sistema > summary svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-sistema-items { position: absolute; bottom: calc(100% + 8px); left: 0; width: 190px; background: #17171A; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 8px; z-index: 50; border: none; }
+    .sidebar-sistema-items .menu-item { font-size: 12px; padding: 8px 12px; width: 100%; border: none; background: transparent; font-family: inherit; text-align: left; cursor: pointer; }
+    .btn-sair { border-radius: 6px; padding: 8px 12px; font-size: 12px; background: transparent; }
+    .btn-sair:hover { background: rgba(255,255,255,0.08); }
+    .btn-recolher { width: 100%; height: 38px; border-radius: 9px; background: transparent; border: none; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+    .btn-recolher:hover { background: rgba(255,255,255,0.08); color: white; }
+    .color-picker-back { display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 4px; }
+    .color-picker-back:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-family: inherit; }
+    .color-swatch:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+    .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
+    .color-hex-input { width: 100%; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
+
+    .main { min-width: 0; }
+
+    /* ===== TOPBAR ===== */
+    .header { padding: 0 24px; height: 56px; box-shadow: none; border-bottom: 1px solid #ECEDF0; justify-content: flex-end; }
+    .header-right { gap: 14px; }
+    .header-user { cursor: pointer; padding: 6px 10px 6px 6px; border-radius: 10px; gap: 10px; }
+    .header-user:hover { background: #F1F2F5; }
+    .user-info { text-align: left; line-height: 1.25; }
+    .user-nome { font-size: 12.5px; font-weight: 700; color: #0B0B0F; }
+    .user-perfil { font-size: 11px; color: #9CA0AC; }
+    .user-avatar { width: 32px; height: 32px; background: #0B0B0F; font-size: 12px; font-weight: 700; }
+    .notif-btn { width: 34px; height: 34px; border-radius: 8px; background: transparent; }
+    .notif-btn:hover { background: #F1F2F5; }
+    .notif-btn svg { color: var(--accent); }
+    .notif-badge.cinza { background: var(--accent); }
+    .notif-btn.amarelo svg { color: #c05621; }
+    .notif-btn.vermelho svg { color: #c53030; }
+
+    /* ===== CONTENT ===== */
+    .content { padding: 24px 40px 32px; max-width: 1440px; width: 100%; margin: 0 auto; }
 
     /* Cards resumo */
     .resumo-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
-    .resumo-card { background: white; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .resumo-label { font-size: 11px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
-    .resumo-valor { font-size: 26px; font-weight: 700; color: #1e2a4a; }
+    .resumo-card { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 18px; box-shadow: none; text-align: center; }
+    .resumo-label { font-size: 12px; font-weight: 600; color: #6B7080; margin-bottom: 10px; }
+    .resumo-valor { font-size: 26px; font-weight: 800; color: #0B0B0F; letter-spacing: -0.02em; }
 
-    /* Filtros */
-    .search-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    .search-bar { flex: 1; padding: 8px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; outline: none; }
-    .search-bar:focus { border-color: #2d1b69; }
-    .btn-filtros { padding: 8px 14px; background: white; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: #4a5568; white-space: nowrap; }
-    .btn-filtros:hover { border-color: #2d1b69; color: #2d1b69; }
-    .filtros-panel { background: white; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 14px; display: none; }
+    /* Toolbar / filtros */
+    .search-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .search-bar { flex: 1; max-width: 320px; height: 38px; padding: 0 12px; border-radius: 9px; border: 1.5px solid #E5E7EB; font-size: 13px; outline: none; color: #0B0B0F; font-family: inherit; box-sizing: border-box; }
+    .search-bar:focus { border-color: var(--accent); }
+    .btn-filtros { height: 38px; padding: 0 14px; background: white; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; color: #33363F; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .btn-filtros:hover { border-color: #0B0B0F; }
+    .btn-modo { height: 38px; padding: 0 16px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid #E5E7EB; background: white; color: #33363F; }
+    .btn-modo:hover { border-color: #0B0B0F; }
+    .colunas-filtro-wrap { position: relative; }
+    .colunas-filtro-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border: 1px solid #ECEDF0; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); min-width: 210px; z-index: 200; padding: 6px; }
+    .colunas-filtro-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
+    .colunas-filtro-item:hover { background: #F1F2F5; }
+    .colunas-filtro-item.travado { color: #9CA0AC; cursor: default; }
+    .colunas-filtro-item.travado:hover { background: transparent; }
+    .header-acoes { margin-left: auto; display: flex; gap: 10px; }
+    .btn-lic { height: 38px; padding: 0 16px; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .btn-lic-add { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; }
+    .filtros-panel { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 18px; box-shadow: none; margin-bottom: 16px; display: none; }
     .filtros-panel.aberto { display: block; }
     .filtros-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; align-items: end; }
-    .filtro-group label { display: block; font-size: 11px; font-weight: 600; color: #718096; margin-bottom: 4px; }
-    .filtro-select { width: 100%; padding: 7px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; outline: none; background: white; }
-    .filtro-select:focus { border-color: #2d1b69; }
-    .filtro-text { width: 100%; padding: 7px 10px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 12px; outline: none; background: white; }
-    .filtro-text:focus { border-color: #2d1b69; }
+    .filtro-group label { display: block; font-size: 11px; font-weight: 600; color: #6B7080; margin-bottom: 4px; }
+    .filtro-select { width: 100%; height: 36px; padding: 0 10px; border: 1.5px solid #E5E7EB; border-radius: 8px; font-size: 12.5px; outline: none; background: white; font-family: inherit; color: #0B0B0F; box-sizing: border-box; }
+    .filtro-select:focus { border-color: var(--accent); }
+    .filtro-text { width: 100%; height: 36px; padding: 0 10px; border: 1.5px solid #E5E7EB; border-radius: 8px; font-size: 12.5px; outline: none; background: white; font-family: inherit; color: #0B0B0F; box-sizing: border-box; }
+    .filtro-text:focus { border-color: var(--accent); }
 
     /* Lista de projetos */
-    .projeto-tipo { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; white-space: nowrap; }
-    .tipo-tradicional { background: #ebf0ff; color: #3b5bdb; }
-    .tipo-agil { background: #f0fff4; color: #276749; }
-    .projeto-status { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 3px; white-space: nowrap; }
-    .status-ativo { background: #f0fff4; color: #276749; }
-    .status-concluido { background: #ebf0ff; color: #3b5bdb; }
-    .status-atrasado { background: #fff5f5; color: #c53030; }
-    .status-pausado { background: #fffaf0; color: #c05621; }
-    .status-aguardando { background: #f5f0ff; color: #6b46c1; }
-    .status-cancelado { background: #f7fafc; color: #718096; }
+    .table-card { background: white; border: 1px solid #ECEDF0; border-radius: 14px; box-shadow: none; overflow: auto; }
+    .table-card table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1000px; }
+    .table-card th { padding: 13px 14px; text-align: center; background: #0B0B0F; border-bottom: none; font-size: 11.5px; font-weight: 700; color: white; text-transform: none; letter-spacing: normal; white-space: nowrap; }
+    .table-card td { padding: 12px 14px; border-bottom: 1px solid #F2F3F5; vertical-align: middle; text-align: center; }
+    .table-card tr:hover td { background: #FAFBFF; }
+    .table-card tr:last-child td { border-bottom: none; }
+    .projeto-tipo { display: inline-block; font-size: 12.5px; font-weight: 600; color: #0B0B0F; white-space: nowrap; }
+    .projeto-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; color: white; }
+    .status-ativo { background: #00B37E; }
+    .status-concluido { background: var(--accent); }
+    .status-atrasado { background: #FF2E4D; }
+    .status-pausado { background: #FFAE00; }
+    .status-aguardando { background: #8B5CF6; }
+    .status-cancelado { background: #6B7080; }
 
     /* Modal notificação */
-    .notif-user-list { max-height: 220px; overflow-y: auto; border: 1.5px solid #e2e8f0; border-radius: 8px; margin-top: 8px; }
-    .notif-user-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f2f5; transition: background .15s; }
-    .notif-user-item:last-child { border-bottom: none; }
-    .notif-user-item:hover { background: #f5f0ff; }
-    .notif-user-item.selecionado { background: #f0fff4; border-left: 3px solid #38a169; }
-    .notif-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #6b46c1; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
-    .notif-user-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; }
-    .notif-user-cargo { font-size: 11px; color: #718096; }
-    .btn-pause { background: #fffaf0; color: #c05621; border: 1px solid #fbd38d; padding: 3px 7px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; }
-    .btn-pause:hover { background: #fbd38d; }
-    .btn-cancel-proj { background: #f7fafc; color: #718096; border: 1px solid #e2e8f0; padding: 3px 7px; border-radius: 4px; font-size: 11px; cursor: pointer; font-weight: 600; }
-    .btn-cancel-proj:hover { background: #e2e8f0; }
-    .projeto-tag { font-size: 10px; padding: 2px 6px; background: #f0f2f5; color: #718096; border-radius: 10px; white-space: nowrap; }
-    .projeto-tags-cell { display: flex; gap: 3px; flex-wrap: wrap; }
+    .notif-user-list { max-height: 220px; overflow-y: auto; border: 1px solid #ECEDF0; border-radius: 10px; margin-top: 8px; padding: 6px; }
+    .notif-user-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; cursor: pointer; border-radius: 8px; }
+    .notif-user-item:hover { background: #F1F2F5; }
+    .notif-user-item.selecionado { background: color-mix(in srgb, #00B37E 10%, white); border-left: 3px solid #00B37E; }
+    .notif-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #0B0B0F; display: flex; align-items: center; justify-content: center; font-size: 12.5px; font-weight: 700; color: white; flex-shrink: 0; }
+    .notif-user-nome { font-size: 12.5px; font-weight: 700; color: #0B0B0F; }
+    .notif-user-cargo { font-size: 11px; color: #9CA0AC; }
+    .btn-pause { background: #F1F2F5; color: #FFAE00; border: none; width: 28px; height: 28px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .btn-pause:hover { background: #E5E7EB; }
+    .btn-cancel-proj { background: #F1F2F5; color: #6B7080; border: none; width: 28px; height: 28px; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .btn-cancel-proj:hover { background: #E5E7EB; }
+    .projeto-tag { font-size: 10.5px; padding: 3px 8px; background: #F1F2F5; color: #6B7080; border-radius: 999px; white-space: nowrap; }
+    .projeto-tags-cell { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
     .lista-row { cursor: pointer; }
-    .lista-row:hover td { background: #f5f0ff !important; }
-    .btn-acao { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
-    .btn-abrir { background: #2d1b69; color: white; }
-    .btn-abrir:hover { background: #3d2b89; }
-    .btn-del { background: #fff5f5; color: #c53030; }
-    .btn-del:hover { background: #fed7d7; }
-    .empty-state { text-align: center; padding: 60px; color: #a0aec0; }
+    .btn-acao { width: 28px; height: 28px; padding: 0; border: none; border-radius: 7px; cursor: pointer; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .btn-det { background: #F1F2F5; color: var(--accent); }
+    .btn-det:hover { background: #E5E7EB; }
+    .btn-del { background: #F1F2F5; color: #FF2E4D; }
+    .btn-del:hover { background: #E5E7EB; }
+    .btn-aprovar { width: auto; height: 28px; padding: 0 8px; background: color-mix(in srgb, #00B37E 14%, white); color: #00B37E; }
+    .btn-reprovar { width: auto; height: 28px; padding: 0 8px; background: color-mix(in srgb, #FF2E4D 14%, white); color: #FF2E4D; }
+    .btn-concluir { background: #F1F2F5; color: var(--accent); }
+    .btn-concluir:hover { background: #E5E7EB; }
+    .btn-reativar { background: color-mix(in srgb, #00B37E 14%, white); color: #00B37E; }
+    .empty-state { text-align: center; padding: 60px; color: #9CA0AC; }
 
     /* Modal tipo */
-    .tipo-escolha { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
-    .tipo-card { border: 2px solid #e2e8f0; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.2s; text-align: center; }
-    .tipo-card:hover { border-color: #2d1b69; background: #f5f0ff; }
-    .tipo-card.selecionado { border-color: #2d1b69; background: #f5f0ff; }
-    .tipo-card-icon { font-size: 32px; margin-bottom: 8px; }
-    .tipo-card-nome { font-size: 14px; font-weight: 700; color: #1e2a4a; margin-bottom: 4px; }
-    .tipo-card-desc { font-size: 11px; color: #718096; line-height: 1.4; }
+    .tipo-escolha { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 6px; }
+    .tipo-card { border: 2px solid #E5E7EB; border-radius: 12px; padding: 22px; cursor: pointer; transition: all 0.15s; text-align: center; }
+    .tipo-card:hover, .tipo-card.selecionado { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 5%, white); }
+    .tipo-card.tipo-card-agil:hover, .tipo-card.tipo-card-agil.selecionado { border-color: #00B37E; background: color-mix(in srgb, #00B37E 5%, white); }
+    .tipo-card-icon { width: 44px; height: 44px; border-radius: 11px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; background: color-mix(in srgb, var(--accent) 14%, white); color: var(--accent); }
+    .tipo-card-agil .tipo-card-icon { background: color-mix(in srgb, #00B37E 14%, white); color: #00B37E; }
+    .tipo-card-nome { font-size: 14px; font-weight: 800; color: #0B0B0F; margin-bottom: 6px; }
+    .tipo-card-desc { font-size: 11.5px; color: #6B7080; line-height: 1.5; }
 
     /* Modal novo projeto */
-    .modal-grande { max-width: 560px; }
-    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-grande { max-width: 600px; }
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .btn-outline-verde { background: white; color: #00B37E; border: 1.5px solid color-mix(in srgb, #00B37E 40%, white); }
+    .btn-outline-verde:hover { background: color-mix(in srgb, #00B37E 6%, white); }
+
+    /* ===== Drawer (Novo Projeto / Editar Projeto) ===== */
+    .proj-drawer-overlay { position: fixed; inset: 0; background: rgba(11,11,15,0.45); display: none; z-index: 1000; }
+    .proj-drawer-overlay.aberto { display: block; }
+    .proj-drawer { position: fixed; top: 0; right: 0; width: 520px; max-width: 94vw; height: 100vh; background: white; box-shadow: -4px 0 24px rgba(11,11,15,0.12); overflow-y: auto; padding: 0; z-index: 1001; transform: translateX(100%); transition: transform 0.3s; display: flex; flex-direction: column; }
+    .proj-drawer-overlay.aberto .proj-drawer { transform: translateX(0); }
+    .drawer-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 22px 24px; border-bottom: 1px solid #ECEDF0; flex-shrink: 0; }
+    .drawer-titulo { font-size: 16px; font-weight: 800; color: #0B0B0F; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 22px 24px; }
+    .sec-titulo { font-size: 11px; font-weight: 800; color: #0B0B0F; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #F1F2F5; }
+    .drawer-footer { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 24px; border-top: 1px solid #ECEDF0; flex-shrink: 0; }
+    .btn-cancelar-drawer { flex: 1; height: 40px; padding: 0 16px; background: white; border: 1.5px solid #E5E7EB; color: #33363F; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    .btn-cancelar-drawer:hover { background: #F1F2F5; }
+
+    /* Modal genérico */
+    .modal-overlay { background: rgba(11,11,15,0.45); }
+    .modal { border-radius: 16px; box-shadow: 0 8px 32px rgba(11,11,15,0.12); border: 1px solid #ECEDF0; padding: 24px 28px; }
+    .modal-titulo { font-size: 17px; font-weight: 800; color: #0B0B0F; }
+    .btn-fechar { width: 34px; height: 34px; box-sizing: border-box; border-radius: 9px; background: #F1F2F5; color: #4A4E5A; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+    .btn-fechar:hover { background: #E5E7EB; }
+    label { font-size: 12px; font-weight: 600; color: #4A4E5A; }
+    input[type="text"], input[type="email"], input[type="date"], input[type="number"], input[type="password"], select, textarea { border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13.5px; color: #0B0B0F; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-cancelar { flex: 1; padding: 10px; background: white; color: #33363F; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-cancelar:hover { background: #F1F2F5; }
+    .btn-confirmar { flex: 2; padding: 10px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); border: none; color: white; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .btn-secondary { background: white; border: 1.5px solid #E5E7EB; border-radius: 9px; color: #33363F; font-weight: 600; cursor: pointer; }
+    .btn-secondary:hover { background: #F1F2F5; }
 
     /* ===== MODAL PERFIL ===== */
-    .perfil-modal-avatar { width: 80px; height: 80px; border-radius: 50%; background: #6b46c1; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white; margin: 0 auto 16px; overflow: hidden; cursor: pointer; position: relative; border: 3px solid #e2e8f0; transition: all 0.2s; }
-    .perfil-modal-avatar:hover { border-color: #2d1b69; }
+    .perfil-modal-avatar { width: 80px; height: 80px; border-radius: 50%; background: #0B0B0F; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: white; margin: 0 auto 16px; overflow: hidden; cursor: pointer; position: relative; border: 3px solid #E5E7EB; transition: all 0.2s; }
+    .perfil-modal-avatar:hover { border-color: var(--accent); }
     .perfil-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .perfil-avatar-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; font-size: 20px; }
     .perfil-modal-avatar:hover .perfil-avatar-overlay { opacity: 1; }
-    .perfil-badge { display: inline-block; padding: 3px 10px; background: #f5f0ff; color: #2d1b69; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 16px; }
-    .perfil-tabs { display: flex; gap: 2px; border-bottom: 2px solid #f0f2f5; margin-bottom: 18px; }
-    .perfil-tab { padding: 8px 16px; font-size: 12px; font-weight: 500; color: #718096; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-    .perfil-tab.active { color: #2d1b69; border-bottom-color: #2d1b69; font-weight: 700; }
-    /* Header user clicável */
-    .header-user { cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background 0.2s; }
-    .header-user:hover { background: #f0f2f5; }
+    .perfil-badge { display: inline-block; padding: 3px 10px; background: color-mix(in srgb, var(--accent) 12%, white); color: var(--accent); border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 16px; }
+    .perfil-tabs { display: flex; gap: 2px; border-bottom: 2px solid #F1F2F5; margin-bottom: 18px; }
+    .perfil-tab { padding: 8px 16px; font-size: 12px; font-weight: 600; color: #6B7080; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .perfil-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
   </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
-    <span class="logo-text">Business Manager</span>
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8"/><text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="800">H</text></svg>
+    <span class="logo-text side-label">Business Manager</span>
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
-    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/ideias-livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg>Ideias Livres</a>
-    <a class="menu-item active" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Gestão de Projetos</a>
-    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
+    <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
+    <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
+    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
+    <a class="menu-item active" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
     <details class="sidebar-sistema" id="sistemaMenu">
-      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
-      <div class="sidebar-sistema-items">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="side-label sidebar-sistema-label">Sistema</span><svg class="sidebar-sistema-chevron side-label" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items" id="sistemaItemsWrap">
+        <button class="menu-item" onclick="mostrarCorSistemaNoMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Cor do Sistema</button>
         <a class="menu-item" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
         <a class="menu-item" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
         <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
       </div>
     </details>
+    <button class="btn-recolher" id="btnRecolher" onclick="toggleSidebarRecolhida()" title="Recolher/Expandir">
+      <svg id="iconRecolher" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      <span class="side-label btn-sidebar-label" id="lblRecolher">Recolher</span>
+    </button>
   </div>
 </div>
 
 <div class="main">
   <div id="bannerAssinatura" style="display:none"></div>
-  <div class="header" style="justify-content:flex-end">
+  <div class="header">
+    <div></div>
     <div class="header-right">
+      <div class="header-user" id="headerUser" title="Editar perfil">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -142,24 +260,10 @@
           </div>
         </div>
       </div>
-      <div class="header-user" id="headerUser" title="Editar perfil">
-        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
-        <div class="user-avatar" id="userAvatar">?</div>
-      </div>
     </div>
   </div>
 
   <div class="content">
-    <div class="page-header">
-      <div>
-        <div class="page-title">Gestão de Projetos</div>
-        <div class="breadcrumb">Gerencie e acompanhe todos os projetos da organização</div>
-      </div>
-      <div class="header-acoes">
-        <button class="btn-primary" onclick="abrirModalTipo()" style="font-size:12px;padding:8px 14px">+ Novo Projeto</button>
-      </div>
-    </div>
-
     <!-- Resumo -->
     <div class="resumo-grid">
       <div class="resumo-card">
@@ -183,7 +287,20 @@
     <!-- Busca + botão filtros -->
     <div class="search-row">
       <input class="search-bar" type="text" id="searchProjeto" placeholder="Buscar projetos..." oninput="filtrarProjetos()">
-      <button class="btn-filtros" onclick="toggleFiltros()">⚙️ Mais Filtros</button>
+      <button class="btn-filtros" onclick="toggleFiltros()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+        Filtros
+      </button>
+      <div class="colunas-filtro-wrap">
+        <button class="btn-modo" onclick="toggleColunasProjDrop()">Colunas</button>
+        <div class="colunas-filtro-drop" id="dropColunasProj" style="display:none"></div>
+      </div>
+      <div class="header-acoes">
+        <button class="btn-lic btn-lic-add" onclick="abrirModalTipo()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Projeto
+        </button>
+      </div>
     </div>
 
     <!-- Painel de filtros colapsável -->
@@ -195,17 +312,23 @@
         <div class="filtro-group"><label>Categoria</label><select class="filtro-select" id="filtroCategoria" onchange="filtrarProjetos()"><option value="">Todas</option><option>Resolução de Problemas</option><option>Melhoria Contínua</option><option>Transformação</option><option>Inovação</option><option>Outros</option></select></div>
         <div class="filtro-group"><label>Responsável</label><input class="filtro-text" type="text" id="filtroResponsavel" placeholder="Nome..." oninput="filtrarProjetos()"></div>
         <div class="filtro-group"><label>Tags</label><input class="filtro-text" type="text" id="filtroTags" placeholder="Ex: automação..." oninput="filtrarProjetos()"></div>
-        <div class="filtro-group"><label>Criação — De</label><input class="filtro-text" type="date" id="filtroCriacaoDe" oninput="filtrarProjetos()"></div>
-        <div class="filtro-group"><label>Criação — Até</label><input class="filtro-text" type="date" id="filtroCriacaoAte" oninput="filtrarProjetos()"></div>
-        <div class="filtro-group"><label>Prazo — De</label><input class="filtro-text" type="date" id="filtroPrazoDe" oninput="filtrarProjetos()"></div>
-        <div class="filtro-group"><label>Prazo — Até</label><input class="filtro-text" type="date" id="filtroPrazoAte" oninput="filtrarProjetos()"></div>
-        <div class="filtro-group" style="display:flex;align-items:flex-end"><button class="btn-secondary" onclick="limparFiltros()" style="font-size:12px;padding:7px 12px;width:100%">Limpar filtros</button></div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F1F2F5">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+          <div class="filtro-group"><label>Criação — De</label><input class="filtro-text" type="date" id="filtroCriacaoDe" oninput="filtrarProjetos()"></div>
+          <div class="filtro-group"><label>Criação — Até</label><input class="filtro-text" type="date" id="filtroCriacaoAte" oninput="filtrarProjetos()"></div>
+          <div class="filtro-group"><label>Prazo — De</label><input class="filtro-text" type="date" id="filtroPrazoDe" oninput="filtrarProjetos()"></div>
+          <div class="filtro-group"><label>Prazo — Até</label><input class="filtro-text" type="date" id="filtroPrazoAte" oninput="filtrarProjetos()"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn-secondary" onclick="limparFiltros()" style="font-size:12px;padding:6px 14px">Limpar</button>
       </div>
     </div>
 
     <!-- Lista Projetos -->
     <div class="table-card" id="projetosGrid">
-      <div class="empty-state"><div style="font-size:40px;margin-bottom:12px">📁</div><div>Nenhum projeto cadastrado ainda.</div><div style="font-size:12px;margin-top:8px">Clique em "+ Novo Projeto" para começar!</div></div>
+      <div class="empty-state"><div>Nenhum projeto cadastrado ainda.</div><div style="font-size:12px;margin-top:8px">Clique em "Novo Projeto" para começar!</div></div>
     </div>
   </div>
 </div>
@@ -219,58 +342,61 @@
     </div>
     <div class="tipo-escolha">
       <div class="tipo-card" id="cardTradicional" onclick="selecionarTipo('tradicional')">
-        <div class="tipo-card-icon">📋</div>
+        <div class="tipo-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
         <div class="tipo-card-nome">Projeto Tradicional</div>
-        <div class="tipo-card-desc">Quando você precisa seguir um plano mais a fundo, com etapas definidas e entregas finais. Ideal para projetos com objetivos claros e bem definidos.</div>
-        <div style="margin-top:10px"><button class="btn-primary" style="font-size:12px;padding:6px 14px">Selecionar →</button></div>
+        <div class="tipo-card-desc">Para planos com etapas definidas e entregas finais. Ideal para objetivos claros e bem definidos.</div>
       </div>
-      <div class="tipo-card" id="cardAgil" onclick="selecionarTipo('agil')">
-        <div class="tipo-card-icon">⚡</div>
+      <div class="tipo-card tipo-card-agil" id="cardAgil" onclick="selecionarTipo('agil')">
+        <div class="tipo-card-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
         <div class="tipo-card-nome">Projeto Ágil</div>
-        <div class="tipo-card-desc">Quando você quer flexibilidade e execução contínua. Ideal para projetos com muitas incertezas ou mudanças frequentes.</div>
-        <div style="margin-top:10px"><button class="btn-primary" style="background:#38a169;font-size:12px;padding:6px 14px">Selecionar →</button></div>
+        <div class="tipo-card-desc">Para flexibilidade e execução contínua. Ideal para incertezas ou mudanças frequentes.</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Modal Novo Projeto -->
-<div class="modal-overlay" id="modalNovoProjeto">
-  <div class="modal modal-grande" style="max-height:90vh;overflow-y:auto">
-    <div class="modal-header">
-      <span class="modal-titulo" id="modalNovoProjTitulo">Novo Projeto Tradicional</span>
-      <button class="btn-fechar" onclick="fecharModal('modalNovoProjeto')">×</button>
+<!-- Drawer Novo Projeto / Editar Projeto -->
+<div class="proj-drawer-overlay" id="projDrawerOverlay" onclick="fecharProjDrawerFora(event)">
+  <div class="proj-drawer" id="projDrawer">
+    <div class="drawer-header">
+      <div><div class="drawer-titulo" id="modalNovoProjTitulo">Novo Projeto Tradicional</div></div>
+      <button class="btn-fechar" onclick="fecharProjDrawer()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px;border-radius:6px;font-size:12px;margin-bottom:14px;display:none" id="novoProjErro"></div>
-    <div class="form-group"><label>Nome do Projeto *</label><input type="text" id="projNome" placeholder="Ex: Automação de Processos de RH"></div>
-    <div class="form-group"><label>Descrição</label><textarea id="projDesc" rows="3" placeholder="Descreva o objetivo do projeto..." style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;resize:vertical;font-family:inherit"></textarea></div>
-    <div class="form-grid-2">
-      <div class="form-group">
-        <label>Categoria</label>
-        <select id="projCategoria" onchange="projCategoriaChange(this)" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;outline:none;background:white">
-          <option value="">Selecione...</option>
-          <option>Resolução de Problemas</option>
-          <option>Melhoria Contínua</option>
-          <option>Transformação</option>
-          <option>Inovação</option>
-          <option>Outros</option>
-        </select>
+    <div class="drawer-body">
+      <div style="background:color-mix(in srgb, #FF2E4D 6%, white);border:1px solid color-mix(in srgb, #FF2E4D 30%, white);color:#FF2E4D;padding:10px;border-radius:6px;font-size:12px;margin-bottom:14px;display:none" id="novoProjErro"></div>
+      <div class="sec-titulo">Dados do Projeto</div>
+      <div class="form-group"><label>Nome do Projeto *</label><input type="text" id="projNome" placeholder="Ex: Automação de Processos de RH"></div>
+      <div class="form-group"><label>Descrição</label><textarea id="projDesc" rows="3" placeholder="Descreva o objetivo do projeto..." style="width:100%;padding:10px 14px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;resize:vertical;font-family:inherit;box-sizing:border-box"></textarea></div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="projCategoria" onchange="projCategoriaChange(this)" style="width:100%;height:42px;padding:0 14px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13.5px;outline:none;background:white;box-sizing:border-box">
+            <option value="">Selecione...</option>
+            <option>Resolução de Problemas</option>
+            <option>Melhoria Contínua</option>
+            <option>Transformação</option>
+            <option>Inovação</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <div class="form-group" id="projCategoriaOutroWrap" style="display:none">
+          <label>Especifique a categoria</label>
+          <input type="text" id="projCategoriaOutro" placeholder="Descreva a categoria...">
+        </div>
+        <div class="form-group"><label>Responsável</label><input type="text" id="projResponsavel" placeholder="Nome do responsável"></div>
+        <div class="form-group"><label>Budget (R$)</label><input type="number" id="projBudget" placeholder="Ex: 50000" min="0" step="0.01"></div>
+        <div class="form-group"><label>Data de Início</label><input type="date" id="projDataInicio"></div>
+        <div class="form-group"><label>Prazo de Término</label><input type="date" id="projDataFim"></div>
       </div>
-      <div class="form-group" id="projCategoriaOutroWrap" style="display:none">
-        <label>Especifique a categoria</label>
-        <input type="text" id="projCategoriaOutro" placeholder="Descreva a categoria...">
-      </div>
-      <div class="form-group"><label>Responsável</label><input type="text" id="projResponsavel" placeholder="Nome do responsável"></div>
-      <div class="form-group"><label>Budget (R$)</label><input type="number" id="projBudget" placeholder="Ex: 50000" min="0" step="0.01"></div>
-      <div class="form-group"><label>Data de Início</label><input type="date" id="projDataInicio"></div>
-      <div class="form-group"><label>Prazo de Término</label><input type="date" id="projDataFim"></div>
+      <div class="form-group"><label>Tags (separadas por vírgula)</label><input type="text" id="projTags" placeholder="Ex: automação, RH, eficiência"></div>
+      <input type="hidden" id="projTipo">
+      <input type="hidden" id="projEditId">
     </div>
-    <div class="form-group"><label>Tags (separadas por vírgula)</label><input type="text" id="projTags" placeholder="Ex: automação, RH, eficiência"></div>
-    <input type="hidden" id="projTipo">
-    <div class="modal-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalNovoProjeto')">Cancelar</button>
-      <button class="btn-confirmar" id="btnCriarProjeto" onclick="criarProjeto()" style="display:none">Criar Projeto</button>
-      <button class="btn-secondary" id="btnEnviarAprovacaoProjeto" onclick="abrirModalNotifProjeto()" style="background:#f0fff4;color:#276749;border-color:#c6f6d5">📨 Enviar para Aprovação</button>
+    <div class="drawer-footer">
+      <button class="btn-cancelar-drawer" onclick="fecharProjDrawer()">Cancelar</button>
+      <button class="btn-confirmar" id="btnCriarProjeto" onclick="criarProjeto()" style="display:none;flex:1">Criar Projeto</button>
+      <button class="btn-lic btn-outline-verde" id="btnEnviarAprovacaoProjeto" onclick="abrirModalNotifProjeto()" style="flex:1;justify-content:center">Enviar para Aprovação</button>
+      <button class="btn-confirmar" id="btnSalvarEdicaoProjeto" onclick="salvarEdicaoProjeto()" style="display:none;flex:1">Salvar</button>
     </div>
   </div>
 </div>
@@ -278,31 +404,17 @@
 <div class="modal-overlay" id="modalNotifProjeto">
   <div class="modal" style="max-width:420px">
     <div class="modal-header">
-      <span class="modal-titulo">📨 Enviar para Aprovação</span>
+      <span class="modal-titulo">Enviar para Aprovação</span>
       <button class="btn-fechar" onclick="fecharModal('modalNotifProjeto')">×</button>
     </div>
-    <p style="font-size:13px;color:#4a5568;margin:0 0 12px">Selecione quem deve ser notificado — a lista mostra só quem tem permissão de aprovar criação de projetos:</p>
-    <input type="text" id="notifProjSearch" placeholder="Buscar membro..." oninput="filtrarUsuariosNotifProj()" style="width:100%;padding:8px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:12px;outline:none;box-sizing:border-box;margin-bottom:6px">
+    <p style="font-size:12.5px;color:#6B7080;margin:0 0 12px;line-height:1.5">Selecione quem deve ser notificado — a lista mostra só quem tem permissão de aprovar criação de projetos:</p>
+    <input type="text" id="notifProjSearch" placeholder="Buscar membro..." oninput="filtrarUsuariosNotifProj()" style="width:100%;height:38px;padding:0 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;box-sizing:border-box;margin-bottom:6px">
     <div class="notif-user-list" id="notifProjUserList">
-      <div style="padding:20px;text-align:center;color:#a0aec0;font-size:12px">Carregando...</div>
+      <div style="padding:20px;text-align:center;color:#9CA0AC;font-size:12px">Carregando...</div>
     </div>
     <div class="modal-footer" style="margin-top:14px">
       <button class="btn-cancelar" onclick="fecharModal('modalNotifProjeto')">Cancelar</button>
-      <button class="btn-confirmar" onclick="confirmarEnvioProjeto()">📨 Enviar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Detalhes do Cadastro -->
-<div class="modal-overlay" id="modalDetalhesProjeto">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <span class="modal-titulo">ℹ️ Dados do Cadastro</span>
-      <button class="btn-fechar" onclick="fecharModal('modalDetalhesProjeto')">×</button>
-    </div>
-    <div id="detalhesProjetoBody" style="display:grid;gap:10px;font-size:13px"></div>
-    <div class="modal-footer" style="margin-top:14px">
-      <button class="btn-cancelar" onclick="fecharModal('modalDetalhesProjeto')">Fechar</button>
+      <button class="btn-confirmar" onclick="confirmarEnvioProjeto()">Enviar</button>
     </div>
   </div>
 </div>
@@ -322,7 +434,7 @@
 <div class="modal-overlay" id="modalPerfil">
   <div class="modal" style="max-width:460px;max-height:90vh;overflow-y:auto">
     <div class="modal-header">
-      <span class="modal-titulo">👤 Meu Perfil</span>
+      <span class="modal-titulo">Meu Perfil</span>
       <button class="btn-fechar" onclick="fecharModal('modalPerfil')">×</button>
     </div>
 
@@ -333,7 +445,7 @@
         <div class="perfil-avatar-overlay">📷</div>
       </div>
       <input type="file" id="perfilFotoInput" accept="image/*" style="display:none" onchange="carregarFoto(event)">
-      <div style="font-size:11px;color:#a0aec0;margin-top:4px">Clique no avatar para trocar a foto</div>
+      <div style="font-size:11px;color:#9CA0AC;margin-top:4px">Clique no avatar para trocar a foto</div>
       <div class="perfil-badge" id="perfilPerfilBadge">Usuário</div>
     </div>
 
@@ -353,7 +465,7 @@
       </div>
       <div class="form-group">
         <label>Email</label>
-        <input type="email" id="perfilEmail" disabled style="background:#f8fafc;color:#718096">
+        <input type="email" id="perfilEmail" disabled style="background:#F6F7F9;color:#6B7080">
       </div>
       <div class="form-group">
         <label>Cargo</label>
@@ -405,6 +517,63 @@
   // Header user abre modal de perfil
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
 
+  // ===== TEMA: sidebar recolhida + cor de destaque =====
+  const CORES_SISTEMA = [
+    { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
+    { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
+    { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
+    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
+  ];
+  function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
+  function setAccentColor(hex) {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+    if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
+  }
+  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+
+  const sidebarEl = document.getElementById('sidebarEl');
+  function aplicarSidebarRecolhida(recolhida) {
+    sidebarEl.classList.toggle('recolhida', recolhida);
+    document.getElementById('iconRecolher').innerHTML = recolhida
+      ? '<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>'
+      : '<polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>';
+    const lbl = document.getElementById('lblRecolher');
+    if (lbl) lbl.textContent = recolhida ? 'Expandir' : 'Recolher';
+  }
+  function toggleSidebarRecolhida() {
+    const recolhida = !sidebarEl.classList.contains('recolhida');
+    localStorage.setItem('sidebarRecolhida', recolhida ? '1' : '0');
+    aplicarSidebarRecolhida(recolhida);
+  }
+  aplicarSidebarRecolhida(localStorage.getItem('sidebarRecolhida') === '1');
+
+  const SISTEMA_ITEMS_HTML = document.getElementById('sistemaItemsWrap').innerHTML;
+  function mostrarCorSistemaNoMenu() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = 'cor';
+    const atual = (localStorage.getItem('accentColor') || '#2F5CFF').toLowerCase();
+    wrap.innerHTML = `
+      <button class="color-picker-back" onclick="voltarMenuSistema()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Cor do Sistema
+      </button>
+      ${CORES_SISTEMA.map(c => `
+        <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
+          <span class="color-swatch-rect" style="background:${c.hex}"></span>
+          <span class="color-swatch-label">${c.nome}</span>
+        </button>`).join('')}
+      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+  }
+  function voltarMenuSistema() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = '';
+    wrap.innerHTML = SISTEMA_ITEMS_HTML;
+  }
+  document.getElementById('sistemaMenu').addEventListener('toggle', (e) => { if (!e.target.open) voltarMenuSistema(); });
+
   let projetos = [];
   let _podePublicarImediato = false;
   let _podeAprovarCriacao = false;
@@ -432,53 +601,59 @@
     const grid = document.getElementById('projetosGrid');
     const filtrados = lista || getProjFiltrados();
     if (filtrados.length === 0) {
-      grid.innerHTML = `<div class="empty-state"><div style="font-size:40px;margin-bottom:12px">📁</div><div>Nenhum projeto encontrado.</div></div>`;
+      grid.innerHTML = `<div class="empty-state"><div>Nenhum projeto encontrado.</div></div>`;
       return;
     }
     const statusCls = { 'Ativo':'status-ativo','Concluído':'status-concluido','Atrasado':'status-atrasado','Pausado':'status-pausado','Aguardando Aprovação':'status-aguardando','Cancelado':'status-cancelado','Reprovado':'status-cancelado' };
+    const ICON_EDITAR = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>';
+    const ICON_PAUSE = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+    const ICON_PLAY = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
+    const ICON_CONCLUIR = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>';
+    const ICON_CANCELAR = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    const ICON_EXCLUIR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg>';
     grid.innerHTML = `<table>
       <thead>
         <tr>
           <th>Título</th>
-          <th>Tipo</th>
-          <th>Categoria</th>
-          <th>Responsável</th>
-          <th>Início</th>
-          <th>Prazo</th>
-          <th>Tags</th>
-          <th>Status</th>
-          <th></th>
+          <th data-col="tipo">Tipo</th>
+          <th data-col="categoria">Categoria</th>
+          <th data-col="responsavel">Responsável</th>
+          <th data-col="inicio">Início</th>
+          <th data-col="prazo">Prazo</th>
+          <th data-col="tags">Tags</th>
+          <th data-col="status">Status</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
         ${filtrados.map(p => {
-          const podeAcoes = p.status !== 'Cancelado' && p.status !== 'Concluído';
+          const naoAguardando = p.status !== 'Aguardando Aprovação';
           return `
         <tr class="lista-row" onclick="abrirProjeto('${p._id}','${p.tipo}')">
-          <td style="font-size:13px;font-weight:600;color:#1e2a4a">${p.nome}</td>
-          <td><span class="projeto-tipo tipo-${p.tipo}">${p.tipo === 'tradicional' ? 'Tradicional' : 'Ágil'}</span></td>
-          <td style="font-size:12px;color:#4a5568">${p.categoria || '—'}</td>
-          <td style="font-size:12px;color:#4a5568">${p.responsavel || '—'}</td>
-          <td style="font-size:12px;color:#718096;white-space:nowrap">${p.dataInicio ? formatarData(p.dataInicio) : '—'}</td>
-          <td style="font-size:12px;color:#718096;white-space:nowrap">${p.dataFim ? formatarData(p.dataFim) : '—'}</td>
-          <td><div class="projeto-tags-cell">${p.tags ? p.tags.split(',').slice(0,3).map(t=>`<span class="projeto-tag">${t.trim()}</span>`).join('') : '—'}</div></td>
-          <td><span class="projeto-status ${statusCls[p.status]||'status-ativo'}">${p.status}</span></td>
+          <td style="font-size:13px;font-weight:700;color:#0B0B0F">${p.nome}</td>
+          <td data-col="tipo"><span class="projeto-tipo">${p.tipo === 'tradicional' ? 'Tradicional' : 'Ágil'}</span></td>
+          <td data-col="categoria" style="font-size:12.5px;color:#33363F">${p.categoria || '—'}</td>
+          <td data-col="responsavel" style="font-size:12.5px;color:#33363F">${p.responsavel || '—'}</td>
+          <td data-col="inicio" style="font-size:12.5px;color:#33363F;white-space:nowrap">${p.dataInicio ? formatarData(p.dataInicio) : '—'}</td>
+          <td data-col="prazo" style="font-size:12.5px;color:#33363F;white-space:nowrap">${p.dataFim ? formatarData(p.dataFim) : '—'}</td>
+          <td data-col="tags"><div class="projeto-tags-cell">${p.tags ? p.tags.split(',').slice(0,3).map(t=>`<span class="projeto-tag">${t.trim()}</span>`).join('') : '—'}</div></td>
+          <td data-col="status"><span class="projeto-status ${statusCls[p.status]||'status-ativo'}">${p.status}</span></td>
           <td>
-            <div style="display:flex;gap:4px;flex-wrap:wrap">
-              <button class="btn-acao btn-abrir" onclick="event.stopPropagation();abrirProjeto('${p._id}','${p.tipo}')">Abrir</button>
-              <button class="btn-acao" onclick="event.stopPropagation();verDetalhesProjeto('${p._id}')" title="Ver dados do cadastro">ℹ️ Detalhes</button>
-              ${p.status === 'Aguardando Aprovação' && _podeAprovarCriacao ? `<button onclick="event.stopPropagation();aprovarProjeto('${p._id}')" style="padding:3px 8px;background:#f0fff4;color:#276749;border:1.5px solid #c6f6d5;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap" title="Aprovar projeto">✓ Aprovar</button>` : ''}
-              ${p.status === 'Aguardando Aprovação' && _podeAprovarCriacao ? `<button onclick="event.stopPropagation();reprovarProjeto('${p._id}')" style="padding:3px 8px;background:#fff5f5;color:#c53030;border:1.5px solid #fed7d7;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap" title="Reprovar projeto">✕ Reprovar</button>` : ''}
-              ${podeAcoes && p.status !== 'Pausado' && p.status !== 'Aguardando Aprovação' ? `<button class="btn-pause" onclick="event.stopPropagation();pausarProjeto('${p._id}')" title="Pausar">⏸</button>` : ''}
-              ${podeAcoes && p.status === 'Pausado' ? `<button class="btn-pause" onclick="event.stopPropagation();reativarProjeto('${p._id}')" title="Reativar" style="background:#f0fff4;color:#276749;border-color:#c6f6d5">▶</button>` : ''}
-              ${podeAcoes && !['Concluído','Cancelado','Reprovado','Aguardando Aprovação'].includes(p.status) ? `<button onclick="event.stopPropagation();concluirProjeto('${p._id}')" style="padding:3px 8px;background:#ebf8ff;color:#2b6cb0;border:1.5px solid #bee3f8;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap" title="Marcar como concluído">✔ Concluir</button>` : ''}
-              ${podeAcoes && p.status !== 'Aguardando Aprovação' && p.status !== 'Concluído' ? `<button class="btn-cancel-proj" onclick="event.stopPropagation();cancelarProjeto('${p._id}')" title="Cancelar projeto">✕</button>` : ''}
-              <button class="btn-acao btn-del" onclick="event.stopPropagation();deletarProjeto('${p._id}')">🗑</button>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+              <button class="btn-acao btn-det" onclick="event.stopPropagation();abrirEditarProjeto('${p._id}')" title="Editar dados do cadastro">${ICON_EDITAR}</button>
+              ${p.status === 'Aguardando Aprovação' && _podeAprovarCriacao ? `<button class="btn-acao btn-aprovar" onclick="event.stopPropagation();aprovarProjeto('${p._id}')" title="Aprovar projeto">✓</button>` : ''}
+              ${p.status === 'Aguardando Aprovação' && _podeAprovarCriacao ? `<button class="btn-acao btn-reprovar" onclick="event.stopPropagation();reprovarProjeto('${p._id}')" title="Reprovar projeto">✕</button>` : ''}
+              ${naoAguardando && p.status !== 'Pausado' ? `<button class="btn-acao btn-pause" onclick="event.stopPropagation();pausarProjeto('${p._id}')" title="Pausar">${ICON_PAUSE}</button>` : ''}
+              ${naoAguardando && ['Pausado','Cancelado','Concluído','Reprovado'].includes(p.status) ? `<button class="btn-acao btn-reativar" onclick="event.stopPropagation();reativarProjeto('${p._id}')" title="Reativar">${ICON_PLAY}</button>` : ''}
+              ${naoAguardando && p.status !== 'Concluído' ? `<button class="btn-acao btn-concluir" onclick="event.stopPropagation();concluirProjeto('${p._id}')" title="Marcar como concluído">${ICON_CONCLUIR}</button>` : ''}
+              ${naoAguardando && p.status !== 'Cancelado' ? `<button class="btn-acao btn-cancel-proj" onclick="event.stopPropagation();cancelarProjeto('${p._id}')" title="Cancelar projeto">${ICON_CANCELAR}</button>` : ''}
+              <button class="btn-acao btn-del" onclick="event.stopPropagation();deletarProjeto('${p._id}')" title="Excluir">${ICON_EXCLUIR}</button>
             </div>
           </td>
         </tr>`;}).join('')}
       </tbody>
     </table>`;
+    aplicarColunasProj();
   }
 
   function getProjFiltrados() {
@@ -507,12 +682,49 @@
     });
   }
 
-  function toggleFiltros() {
-    const panel = document.getElementById('filtrosPanel');
-    const btn = document.querySelector('.btn-filtros');
-    panel.classList.toggle('aberto');
-    btn.style.borderColor = panel.classList.contains('aberto') ? '#2d1b69' : '';
-    btn.style.color = panel.classList.contains('aberto') ? '#2d1b69' : '';
+  function toggleFiltros() { document.getElementById('filtrosPanel').classList.toggle('aberto'); }
+
+  // ===== Colunas visíveis (tabela de projetos) =====
+  let colunasVisiveisProj = { tipo: false, categoria: true, responsavel: true, inicio: true, prazo: true, tags: false, status: true };
+  try {
+    const salvoProj = JSON.parse(localStorage.getItem('gp_colunasVisiveisProj') || 'null');
+    if (salvoProj) colunasVisiveisProj = { ...colunasVisiveisProj, ...salvoProj };
+  } catch(e) {}
+
+  function toggleColunaProj(key) {
+    colunasVisiveisProj[key] = !colunasVisiveisProj[key];
+    try { localStorage.setItem('gp_colunasVisiveisProj', JSON.stringify(colunasVisiveisProj)); } catch(e) {}
+    renderColunasProjDrop();
+    aplicarColunasProj();
+  }
+  function renderColunasProjDrop() {
+    const drop = document.getElementById('dropColunasProj');
+    if (!drop) return;
+    const opcoes = [
+      { key: 'tipo', label: 'Tipo' },
+      { key: 'categoria', label: 'Categoria' },
+      { key: 'responsavel', label: 'Responsável' },
+      { key: 'inicio', label: 'Início' },
+      { key: 'prazo', label: 'Prazo' },
+      { key: 'tags', label: 'Tags' },
+      { key: 'status', label: 'Status' },
+    ];
+    drop.innerHTML = `
+      <label class="colunas-filtro-item travado"><input type="checkbox" checked disabled> Título</label>
+      ${opcoes.map(o => `<label class="colunas-filtro-item"><input type="checkbox" ${colunasVisiveisProj[o.key]?'checked':''} onchange="toggleColunaProj('${o.key}')"> ${o.label}</label>`).join('')}
+    `;
+  }
+  function toggleColunasProjDrop() {
+    const d = document.getElementById('dropColunasProj');
+    const abrir = d.style.display !== 'block';
+    if (abrir) renderColunasProjDrop();
+    d.style.display = abrir ? 'block' : 'none';
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('.colunas-filtro-wrap')) { const d = document.getElementById('dropColunasProj'); if (d) d.style.display='none'; } });
+  function aplicarColunasProj() {
+    document.querySelectorAll('#projetosGrid [data-col]').forEach(el => {
+      el.style.display = colunasVisiveisProj[el.dataset.col] === false ? 'none' : '';
+    });
   }
 
   function filtrarProjetos() { renderProjetos(); }
@@ -529,10 +741,11 @@
     document.getElementById('projCategoriaOutroWrap').style.display = sel.value === 'Outros' ? '' : 'none';
   }
 
-  function selecionarTipo(tipo) {
-    fecharModal('modalTipo');
-    document.getElementById('projTipo').value = tipo;
-    document.getElementById('modalNovoProjTitulo').textContent = tipo === 'tradicional' ? 'Novo Projeto Tradicional' : 'Novo Projeto Ágil';
+  function fecharProjDrawer() { document.getElementById('projDrawerOverlay').classList.remove('aberto'); }
+  function fecharProjDrawerFora(e) { if (e.target === document.getElementById('projDrawerOverlay')) fecharProjDrawer(); }
+
+  function _limparFormProjeto() {
+    document.getElementById('projEditId').value = '';
     document.getElementById('projNome').value = '';
     document.getElementById('projDesc').value = '';
     document.getElementById('projCategoria').value = '';
@@ -544,15 +757,24 @@
     document.getElementById('projDataFim').value = '';
     document.getElementById('projTags').value = '';
     document.getElementById('novoProjErro').style.display = 'none';
-    // Show/hide buttons based on permission
+  }
+
+  function selecionarTipo(tipo) {
+    fecharModal('modalTipo');
+    _limparFormProjeto();
+    document.getElementById('projTipo').value = tipo;
+    document.getElementById('modalNovoProjTitulo').textContent = tipo === 'tradicional' ? 'Novo Projeto Tradicional' : 'Novo Projeto Ágil';
+    // Modo criação: mostra Criar/Enviar para Aprovação, esconde Salvar
     document.getElementById('btnCriarProjeto').style.display = _podePublicarImediato ? '' : 'none';
-    document.getElementById('modalNovoProjeto').classList.add('aberto');
+    document.getElementById('btnEnviarAprovacaoProjeto').style.display = '';
+    document.getElementById('btnSalvarEdicaoProjeto').style.display = 'none';
+    document.getElementById('projDrawerOverlay').classList.add('aberto');
   }
 
   function _coletarDadosProjeto(statusOverride) {
     const catSel = document.getElementById('projCategoria').value;
     const catOutro = document.getElementById('projCategoriaOutro').value.trim();
-    return {
+    const dados = {
       nome: document.getElementById('projNome').value.trim(),
       tipo: document.getElementById('projTipo').value,
       descricao: document.getElementById('projDesc').value.trim(),
@@ -562,27 +784,53 @@
       dataInicio: document.getElementById('projDataInicio').value,
       dataFim: document.getElementById('projDataFim').value,
       tags: document.getElementById('projTags').value.trim(),
-      status: statusOverride || 'Ativo'
     };
+    if (statusOverride) dados.status = statusOverride;
+    return dados;
   }
 
-  function verDetalhesProjeto(id) {
+  function abrirEditarProjeto(id) {
     const p = projetos.find(x => x._id === id);
     if (!p) return;
-    const linha = (label, valor) => `<div><div style="font-size:11px;color:#a0aec0;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px">${label}</div><div style="color:#1e2a4a">${valor || '—'}</div></div>`;
-    document.getElementById('detalhesProjetoBody').innerHTML = [
-      linha('Nome', p.nome),
-      linha('Tipo', p.tipo === 'tradicional' ? 'Tradicional' : 'Ágil'),
-      linha('Descrição', p.descricao),
-      linha('Categoria', p.categoria),
-      linha('Responsável', p.responsavel),
-      linha('Orçamento', p.budget ? 'R$ ' + parseFloat(p.budget).toLocaleString('pt-BR', {minimumFractionDigits:2}) : ''),
-      linha('Data de Início', p.dataInicio ? formatarData(p.dataInicio) : ''),
-      linha('Data de Fim', p.dataFim ? formatarData(p.dataFim) : ''),
-      linha('Tags', p.tags),
-      linha('Status', p.status),
-    ].join('');
-    document.getElementById('modalDetalhesProjeto').classList.add('aberto');
+    _limparFormProjeto();
+    document.getElementById('projEditId').value = p._id;
+    document.getElementById('projTipo').value = p.tipo;
+    document.getElementById('modalNovoProjTitulo').textContent = 'Editar Projeto';
+    document.getElementById('projNome').value = p.nome || '';
+    document.getElementById('projDesc').value = p.descricao || '';
+    const categorias = ['Resolução de Problemas','Melhoria Contínua','Transformação','Inovação','Outros'];
+    if (p.categoria && !categorias.includes(p.categoria)) {
+      document.getElementById('projCategoria').value = 'Outros';
+      document.getElementById('projCategoriaOutro').value = p.categoria;
+      document.getElementById('projCategoriaOutroWrap').style.display = '';
+    } else {
+      document.getElementById('projCategoria').value = p.categoria || '';
+    }
+    document.getElementById('projResponsavel').value = p.responsavel || '';
+    document.getElementById('projBudget').value = p.budget || '';
+    document.getElementById('projDataInicio').value = p.dataInicio ? p.dataInicio.slice(0,10) : '';
+    document.getElementById('projDataFim').value = p.dataFim ? p.dataFim.slice(0,10) : '';
+    document.getElementById('projTags').value = p.tags || '';
+    // Modo edição: mostra só Salvar
+    document.getElementById('btnCriarProjeto').style.display = 'none';
+    document.getElementById('btnEnviarAprovacaoProjeto').style.display = 'none';
+    document.getElementById('btnSalvarEdicaoProjeto').style.display = '';
+    document.getElementById('projDrawerOverlay').classList.add('aberto');
+  }
+
+  async function salvarEdicaoProjeto() {
+    const id = document.getElementById('projEditId').value;
+    if (!id) return;
+    const erro = document.getElementById('novoProjErro');
+    erro.style.display = 'none';
+    const dados = _coletarDadosProjeto();
+    if (!dados.nome) { erro.textContent = 'Nome é obrigatório.'; erro.style.display = 'block'; return; }
+    try {
+      const res = await fetch(`/api/projetos/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify(dados) });
+      if (!res.ok) { const data = await res.json().catch(()=>({})); erro.textContent = data.erro || 'Erro ao salvar projeto.'; erro.style.display = 'block'; return; }
+      fecharProjDrawer();
+      await carregarProjetos();
+    } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
   }
 
   async function criarProjeto() {
@@ -594,7 +842,7 @@
       const res = await fetch('/api/projetos', { method: 'POST', headers: HEADERS, body: JSON.stringify(dados) });
       const data = await res.json();
       if (!res.ok) { erro.textContent = data.erro || 'Erro ao criar projeto.'; erro.style.display = 'block'; return; }
-      fecharModal('modalNovoProjeto');
+      fecharProjDrawer();
       abrirProjeto(data._id, data.tipo);
     } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
   }
@@ -608,7 +856,7 @@
     _notifProjUserSelecionado = null;
     document.getElementById('notifProjSearch').value = '';
     const lista = document.getElementById('notifProjUserList');
-    lista.innerHTML = '<div style="padding:20px;text-align:center;color:#a0aec0;font-size:12px">Carregando...</div>';
+    lista.innerHTML = '<div style="padding:20px;text-align:center;color:#9CA0AC;font-size:12px">Carregando...</div>';
     document.getElementById('modalNotifProjeto').classList.add('aberto');
     if (_usuariosNotifProj.length === 0) {
       fetch('/api/usuarios/com-permissao/gestaoProjetos/aprovarCriacao', { headers: HEADERS }).then(r => r.json()).then(data => {
@@ -621,12 +869,12 @@
 
   function renderUsuariosNotifProj(lista) {
     const el = document.getElementById('notifProjUserList');
-    if (!lista.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:#a0aec0;font-size:12px">Nenhum usuário com permissão para aprovar criação de projetos, além de você.</div>'; return; }
+    if (!lista.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:#9CA0AC;font-size:12px">Nenhum usuário com permissão para aprovar criação de projetos, além de você.</div>'; return; }
     el.innerHTML = lista.map(u => `
       <div class="notif-user-item${_notifProjUserSelecionado === u._id ? ' selecionado' : ''}" onclick="selecionarUserNotifProj('${u._id}')">
         <div class="notif-user-avatar">${(u.nome||'?')[0].toUpperCase()}</div>
-        <div><div class="notif-user-nome">${u.nome}</div><div class="notif-user-cargo">${u.cargo || u.perfil || ''}</div></div>
-        ${_notifProjUserSelecionado === u._id ? '<span style="margin-left:auto;color:#38a169;font-size:16px">✓</span>' : ''}
+        <div style="flex:1"><div class="notif-user-nome">${u.nome}</div><div class="notif-user-cargo">${u.cargo || u.perfil || ''}</div></div>
+        ${_notifProjUserSelecionado === u._id ? '<span style="color:#00B37E;font-size:15px">✓</span>' : ''}
       </div>`).join('');
   }
 
@@ -654,14 +902,13 @@
       if (!res.ok) { fecharModal('modalNotifProjeto'); erro.textContent = data.erro || 'Erro ao criar projeto.'; erro.style.display = 'block'; return; }
       await fetch('/api/notificacoes', { method: 'POST', headers: HEADERS, body: JSON.stringify({ titulo: `Aprovação necessária: ${dados.nome}`, mensagem: `O projeto "${dados.nome}" aguarda sua aprovação.`, tipo: 'alerta', icone: '📁', link: '/gestao-projetos', destinatario: _notifProjUserSelecionado }) });
       fecharModal('modalNotifProjeto');
-      fecharModal('modalNovoProjeto');
+      fecharProjDrawer();
       await carregarProjetos();
     } catch(err) { fecharModal('modalNotifProjeto'); erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
   }
 
   // ===== PAUSAR / CANCELAR =====
   async function pausarProjeto(id) {
-    if (!confirm('Pausar este projeto?')) return;
     await fetch(`/api/projetos/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ status: 'Pausado' }) });
     await carregarProjetos();
   }
@@ -670,12 +917,10 @@
     await carregarProjetos();
   }
   async function concluirProjeto(id) {
-    if (!confirm('Marcar este projeto como Concluído?')) return;
     await fetch(`/api/projetos/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ status: 'Concluído' }) });
     await carregarProjetos();
   }
   async function cancelarProjeto(id) {
-    if (!confirm('Cancelar este projeto? Esta ação não poderá ser desfeita facilmente.')) return;
     await fetch(`/api/projetos/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ status: 'Cancelado' }) });
     await carregarProjetos();
   }

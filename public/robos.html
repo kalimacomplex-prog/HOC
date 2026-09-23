@@ -1051,6 +1051,8 @@
   let _editandoId = null;
 
   function abrirModalRobo(id) {
+    const rBuilder = id ? robos.find(x=>x._id===id) : null;
+    if (rBuilder && rBuilder.origem === 'builder') { location.href = `/robo-builder?automacaoId=${rBuilder.automacaoId}&roboId=${rBuilder._id}`; return; }
     _editandoId = id || null;
     schedules = [];
     payloadRows = [];

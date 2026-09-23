@@ -1892,7 +1892,7 @@
               <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1.5px solid #9CA0AC;color:#9CA0AC;font-size:10px;font-weight:700;flex-shrink:0">i</span>
             </button>
             <div style="display:flex;gap:8px">
-              <button class="btn-lic" onclick="conectarGoogleDrive()" title="Autoriza os Robôs de Google Drive a usar a cota de armazenamento da sua conta (necessário pra enviar/atualizar arquivo — uma conta de serviço sozinha só lê/move/exclui)">Conectar Google Drive</button>
+              <button class="btn-lic" onclick="abrirModalGoogle()" title="Conecta a conta Google da sua empresa (Drive e Sheets) aos Robôs, usando o app OAuth que vocês criam no Google Cloud de vocês">Conectar conta Google</button>
               <button class="btn-lic btn-lic-add" onclick="abrirModalCredencial()">+ Nova Credencial</button>
             </div>
           </div>
@@ -9673,10 +9673,10 @@ senha = campos.get('senha', '')</pre>
     if (withStatus.length === 0) { tbody.innerHTML = emptyState('Nenhuma credencial cadastrada.'); return; }
     tbody.innerHTML = withStatus.map(c => {
       return `<tr>
-        <td><strong>${c.nome}</strong><div style="font-size:10px;color:#9CA0AC">${c.proprietario||'—'}</div></td>
+        <td><strong>${c.nome}</strong><div style="font-size:10px;color:#9CA0AC">${credEhGoogle(c) ? (c.campos.refresh_token && c.campos.client_id ? 'Conta Google conectada' : 'Conta Google — falta conectar') : (c.proprietario||'—')}</div></td>
         <td><span class="cred-status ${stCls[c._status]||'cst-valida'}">${c._status}</span></td>
         <td>${c.validade ? new Date(c.validade+'T12:00:00').toLocaleDateString('pt-BR') : 'Permanente'}</td>
-        <td>${btnEdit('editarCredencial',c._id)}${btnDel('deletarCredencial',c._id)}</td>
+        <td>${credEhGoogle(c) ? `<div style="display:flex;align-items:center;justify-content:center;gap:6px"><button class="btn-lic" style="height:30px;padding:0 10px;font-size:11px;white-space:nowrap" onclick="abrirModalGoogle(${JSON.stringify(c.nome).replace(/"/g,'&quot;')})">${c.campos.refresh_token && c.campos.client_id ? 'Reconectar' : 'Conectar'}</button>${btnEdit('editarCredencial',c._id)}${btnDel('deletarCredencial',c._id)}</div>` : btnEdit('editarCredencial',c._id) + btnDel('deletarCredencial',c._id)}</td>
       </tr>`;
     }).join('');
   }
@@ -9714,9 +9714,44 @@ senha = campos.get('senha', '')</pre>
     return 'Válida';
   }
 
-  function conectarGoogleDrive() {
-    const token = localStorage.getItem('token');
-    window.location.href = '/api/integracoes/google/conectar?token=' + encodeURIComponent(token);
+  // "Conectar conta Google": cada empresa usa o próprio app OAuth do Google Cloud
+  // (client ID/secret ficam na credencial do cofre, junto do refresh_token que o
+  // servidor salva na volta do login — ver /api/integracoes/google/* no index.js).
+  function credEhGoogle(c) { return !!(c && c.campos && (c.campos.client_id || c.campos.refresh_token)); }
+
+  async function abrirModalGoogle(nome) {
+    const cred = nome ? credenciais.find(c => c.nome === nome) : null;
+    document.getElementById('gNome').value = nome || 'google';
+    document.getElementById('gNome').readOnly = !!nome;
+    document.getElementById('gClientId').value = (cred && cred.campos && cred.campos.client_id) || '';
+    document.getElementById('gClientSecret').value = '';
+    document.getElementById('gClientSecret').placeholder = cred && cred.campos && cred.campos.client_secret ? 'Deixe vazio para manter o atual' : 'GOCSPX-...';
+    document.getElementById('gRedirectUri').value = location.origin + '/api/integracoes/google/callback';
+    document.getElementById('modalGoogle').style.display = 'flex';
+    try {
+      const r = await fetch('/api/integracoes/google/info', { headers: HEADERS });
+      if (r.ok) document.getElementById('gRedirectUri').value = (await r.json()).redirectUri;
+    } catch (_) {}
+  }
+
+  function copiarRedirectGoogle() {
+    const v = document.getElementById('gRedirectUri').value;
+    navigator.clipboard.writeText(v).then(() => hocToast('URL copiada!', 'ok'), () => hocToast('Não foi possível copiar — selecione e copie manualmente.', 'aviso'));
+  }
+
+  async function conectarGoogle() {
+    const dados = {
+      nome: document.getElementById('gNome').value.trim(),
+      client_id: document.getElementById('gClientId').value.trim(),
+      client_secret: document.getElementById('gClientSecret').value.trim(),
+    };
+    if (!dados.nome) { hocToast('Informe o nome da credencial.', 'aviso'); return; }
+    try {
+      const r = await fetch('/api/integracoes/google/iniciar', { method: 'POST', headers: HEADERS, body: JSON.stringify(dados) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.url) { hocToast(j.erro || 'Erro ao iniciar a conexão com o Google.', 'erro', 6000); return; }
+      window.location.href = j.url;
+    } catch (err) { hocToast('Erro ao iniciar a conexão com o Google.', 'erro'); console.error(err); }
   }
 
   function abrirModalCredencial(id) {
@@ -10438,8 +10473,8 @@ function copiarPixBloqueio(codigo) {
     if (params.get('robosTab') !== 'credenciais' && !google) return;
     mudarSecao('robos', document.querySelector(".op-mod-tab[onclick*=\"'robos'\"]"));
     mudarRoboTab('credenciais', document.querySelector(".robo-subtab[onclick*=\"'credenciais'\"]"));
-    if (google === 'ok') hocToast('Google Drive conectado! Os Robôs já podem enviar/atualizar arquivo usando a cota da sua conta.', 'ok', 6000);
-    else if (google === 'erro') hocToast('Falha ao conectar o Google Drive: ' + (params.get('msg') || 'erro desconhecido'), 'erro', 6000);
+    if (google === 'ok') hocToast('Conta Google conectada! Nos steps de Google Drive/Sheets do builder, escolha a credencial "' + (params.get('cred') || 'google') + '".', 'ok', 7000);
+    else if (google === 'erro') hocToast('Falha ao conectar a conta Google: ' + (params.get('msg') || 'erro desconhecido'), 'erro', 7000);
     window.history.replaceState({}, '', window.location.pathname);
   })();
 
@@ -10655,6 +10690,38 @@ function copiarPixBloqueio(codigo) {
     <div class="modal-footer" style="padding:16px 24px;border-top:1px solid #ECEDF0;justify-content:flex-end;flex-shrink:0;margin-top:0">
       <button class="btn-cancelar" onclick="fecharFormCredencial()" style="flex:none;padding:0 18px;height:40px">Cancelar</button>
       <button class="btn-confirmar" onclick="salvarCredencial()" style="flex:none;padding:0 20px;height:40px">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Conectar conta Google (app OAuth da própria empresa) -->
+<div class="modal-overlay" id="modalGoogle" style="display:none">
+  <div class="modal" style="max-width:640px;padding:0;max-height:88vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;border-bottom:1px solid #ECEDF0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div class="modal-titulo">Conectar conta Google (Drive e Sheets)</div>
+      <button class="btn-fechar" onclick="fecharModal('modalGoogle')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:22px 24px;display:flex;flex-direction:column;gap:14px">
+      <div style="font-size:11.5px;color:#33363F;line-height:1.7;background:#F7F8FA;border:1px solid #ECEDF0;border-radius:10px;padding:12px 14px">
+        A conexão usa um <b>app OAuth criado no Google Cloud da sua empresa</b> — os Robôs só acessam o Drive da conta Google que autorizar. Uma vez só:
+        <ol style="margin:6px 0 0 18px;padding:0">
+          <li>Em <b>console.cloud.google.com</b>, crie (ou escolha) um projeto e ative as APIs <b>Google Drive API</b> e <b>Google Sheets API</b>.</li>
+          <li>Em <b>APIs e serviços → Tela de consentimento OAuth</b>: tipo <b>Interno</b> (se for Google Workspace) ou <b>Externo</b>. Se for Externo, clique em <b>Publicar app</b> (status <b>Em produção</b>) — em modo "Teste" a conexão expira a cada 7 dias. Não precisa enviar para verificação.</li>
+          <li>Em <b>Credenciais → Criar credenciais → ID do cliente OAuth</b>, tipo <b>Aplicativo da Web</b>, e em <b>URIs de redirecionamento autorizados</b> cole a URL abaixo.</li>
+          <li>Copie o <b>ID do cliente</b> e a <b>Chave secreta do cliente</b> para os campos abaixo e clique em Conectar.</li>
+        </ol>
+        No login, o Google pode avisar que o app "não foi verificado": clique em <b>Avançado → Acessar</b> (o app é da sua própria empresa).
+      </div>
+      <div class="form-group" style="margin:0"><label>URI de redirecionamento (cole no Google Cloud)</label>
+        <div style="display:flex;gap:6px"><input type="text" class="form-control" id="gRedirectUri" readonly style="flex:1;min-width:0"><button type="button" class="btn-lic" onclick="copiarRedirectGoogle()" style="flex:none">Copiar</button></div>
+      </div>
+      <div class="form-group" style="margin:0"><label>Nome da credencial *</label><input type="text" class="form-control" id="gNome" placeholder="Ex: google"></div>
+      <div class="form-group" style="margin:0"><label>ID do cliente (Client ID) *</label><input type="text" class="form-control" id="gClientId" placeholder="xxxx.apps.googleusercontent.com"></div>
+      <div class="form-group" style="margin:0"><label>Chave secreta do cliente (Client secret) *</label><input type="password" class="form-control" id="gClientSecret" placeholder="GOCSPX-..."></div>
+    </div>
+    <div class="modal-footer" style="padding:16px 24px;border-top:1px solid #ECEDF0;justify-content:flex-end;flex-shrink:0;margin-top:0">
+      <button class="btn-cancelar" onclick="fecharModal('modalGoogle')" style="flex:none;padding:0 18px;height:40px">Cancelar</button>
+      <button class="btn-confirmar" onclick="conectarGoogle()" style="flex:none;padding:0 20px;height:40px">Conectar com o Google</button>
     </div>
   </div>
 </div>

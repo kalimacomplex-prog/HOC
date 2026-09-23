@@ -395,7 +395,7 @@ const RB_FIELD_META = {
   browser_profile: { label: 'Pasta de perfil persistente (opcional)', type: 'text', hint: 'Preenche pra manter login/cookies entre execuções (força janela visível, não headless).' },
   headless: { label: 'Sem interface visível (headless)', type: 'checkbox' },
   gdrive_file_id: { label: 'ID do arquivo/pasta', type: 'text', hint: 'Copie da URL do Drive (depois de "/d/" ou "/folders/"). Aceita {output} ou {variavel}.' },
-  gdrive_parent_id: { label: 'ID da pasta (opcional)', type: 'text', hint: 'Vazio = raiz do Drive compartilhado com a conta de serviço.' },
+  gdrive_parent_id: { label: 'ID da pasta (opcional)', type: 'text', hint: 'Vazio = raiz do Meu Drive da conta Google conectada.' },
   gdrive_new_parent_id: { label: 'ID da pasta de destino', type: 'text' },
   gdrive_file_name: { label: 'Nome do arquivo/pasta', type: 'text' },
   gdrive_mime_type: { label: 'Tipo (MIME, opcional)', type: 'text', placeholder: 'application/pdf' },
@@ -743,26 +743,29 @@ function rbAiKeyOrSession(id, c) {
   return html;
 }
 
-// Campo de credencial das ações do Google Drive: conta de serviço do Google (JSON) —
-// escolhida do cofre (recomendado) ou colada direto no step. Mesmo padrão do
-// "Token" da sessão de IA (ver rbRenderAiOpenForm), mas sem sessão: cada step
-// resolve a credencial e o token de acesso na hora, sem precisar "abrir" nada antes.
+// Campo de credencial das ações do Google Drive/Sheets: de preferência a conta Google
+// conectada em Operações → Credenciais ("Conectar conta Google" — app OAuth da própria
+// empresa, a credencial inteira é usada); ou uma conta de serviço (JSON) do cofre ou
+// colada direto no step. Cada step resolve a credencial e o token na hora.
 function rbGDriveCredField(id, c) {
   const cred = rbCredenciais.find((x) => x.nome === c.credencial_nome);
-  let html = rbField('Conta de serviço do Google — credencial do cofre (recomendado)', `<select onchange="rbUpdateConfig('${id}','credencial_nome',this.value);rbRenderProps()">
-    <option value="">Colar o JSON abaixo</option>
+  const ehOAuth = !!(cred && cred.campos && (cred.campos.client_id || cred.campos.refresh_token));
+  let html = rbField('Conta Google — credencial do cofre', `<select onchange="rbUpdateConfig('${id}','credencial_nome',this.value);rbRenderProps()">
+    <option value="">Colar JSON abaixo</option>
     ${c.credencial_nome && !cred ? `<option value="${escapeHtmlRb(c.credencial_nome)}" selected>${escapeHtmlRb(c.credencial_nome)} (não encontrada)</option>` : ''}
     ${rbCredenciais.map((x) => `<option value="${escapeHtmlRb(x.nome)}" ${x.nome === c.credencial_nome ? 'selected' : ''}>${escapeHtmlRb(x.nome)}</option>`).join('')}
-  </select>`, 'O JSON da conta de serviço fica guardado no cofre (Operações → Credenciais), não dentro do robô. Compartilhe a pasta do Drive com o "client_email" dessa conta de serviço.');
-  if (c.credencial_nome) {
+  </select>`, 'Conecte a conta Google da empresa em Operações → Credenciais → "Conectar conta Google" e escolha aqui a credencial criada. O robô acessa só o Drive dessa conta.');
+  if (c.credencial_nome && ehOAuth) {
+    if (!cred.campos.refresh_token || !cred.campos.client_id) html += '<div style="font-size:11px;color:#B45309;margin:-4px 0 10px">Essa conta Google ainda não foi conectada — clique em "Conectar" nela em Operações → Credenciais.</div>';
+  } else if (c.credencial_nome) {
     const campos = Object.keys((cred && cred.campos) || {});
     if (!campos.includes(c.campo_cred || 'service_account_json')) campos.unshift(c.campo_cred || 'service_account_json');
-    html += rbField('Campo da credencial', `<select onchange="rbUpdateConfig('${id}','campo_cred',this.value)">
+    html += rbField('Campo com o JSON da conta de serviço', `<select onchange="rbUpdateConfig('${id}','campo_cred',this.value)">
       ${campos.map((k) => `<option value="${escapeHtmlRb(k)}" ${k === (c.campo_cred || 'service_account_json') ? 'selected' : ''}>${escapeHtmlRb(k)}</option>`).join('')}
     </select>`);
   } else {
-    html += rbField('JSON da conta de serviço', `<textarea rows="4" placeholder='{"client_email":"...","private_key":"..."}' oninput="rbUpdateConfig('${id}','api_key',this.value)">${escapeHtmlRb(c.api_key || '')}</textarea>`,
-      'Cole aqui o arquivo de chave JSON (Google Cloud → IAM e admin → Contas de serviço → Chaves). Prefira uma credencial do cofre.');
+    html += rbField('JSON da credencial', `<textarea rows="4" placeholder='{"client_id":"...","client_secret":"...","refresh_token":"..."}  ou o JSON de uma conta de serviço' oninput="rbUpdateConfig('${id}','api_key',this.value)">${escapeHtmlRb(c.api_key || '')}</textarea>`,
+      'Prefira uma credencial do cofre — o que for colado aqui fica salvo dentro do robô.');
   }
   return html;
 }

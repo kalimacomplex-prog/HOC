@@ -3488,32 +3488,37 @@ app.delete('/api/credenciais/:id', authMiddleware, verificarAssinatura, permOper
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// ---- OAuth do Google (Drive) — dá cota de armazenamento de verdade aos
-// Robôs de Google Drive (conta de serviço sozinha não consegue enviar/
-// atualizar arquivo, só ler/mover/excluir — ver lib/stepLibrary.js). Guarda
-// o refresh_token na credencial "google-drive" (cria se não existir), no
-// mesmo campo "campos" que as outras credenciais — os steps do builder
-// detectam sozinhos se o valor é um JSON de conta de serviço ou um
-// refresh_token do OAuth.
+// ---- OAuth do Google (Drive/Sheets) — cada empresa usa o PRÓPRIO app OAuth
+// do Google Cloud dela (ver lib/googleOAuth.js): o client_id/client_secret e o
+// refresh_token ficam juntos numa credencial do cofre da empresa, com o nome
+// que ela escolher. Os steps do builder usam essa credencial inteira.
 const googleOAuth = require('./lib/googleOAuth');
-googleOAuth.init({
-  fetch,
-  clientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
-  clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
-  redirectUri: `${PUBLIC_URL}/api/integracoes/google/callback`,
-});
-const GOOGLE_OAUTH_CRED_NOME = 'google-drive';
-const GOOGLE_OAUTH_CAMPO = 'refresh_token';
+googleOAuth.init({ fetch });
+const GOOGLE_OAUTH_REDIRECT_URI = `${PUBLIC_URL}/api/integracoes/google/callback`;
 
-// Login inicia por navegação de página inteira (não dá pra usar fetch/XHR
-// num redirect pro Google), então não passa pelo authMiddleware normal —
-// recebe o JWT já emitido pela query string e o valida manualmente.
-app.get('/api/integracoes/google/conectar', async (req, res) => {
-  let decoded;
-  try { decoded = jwt.verify(String(req.query.token || ''), process.env.JWT_SECRET || 'segredo123'); }
-  catch { return res.status(401).send('Sessão inválida ou expirada — abra Operações → Credenciais e clique em "Conectar Google Drive" de novo.'); }
-  const state = jwt.sign({ empresa: decoded.empresa }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '10m' });
-  res.redirect(googleOAuth.buildAuthUrl(state));
+app.get('/api/integracoes/google/info', authMiddleware, verificarAssinatura, permOperacoes('acessar'), (req, res) => {
+  res.json({ redirectUri: GOOGLE_OAUTH_REDIRECT_URI });
+});
+
+// Grava (ou atualiza) client_id/client_secret na credencial escolhida e devolve
+// a URL de login do Google — o navegador segue pra ela por navegação de página
+// inteira. client_secret vazio = mantém o que já estava salvo (reconectar).
+app.post('/api/integracoes/google/iniciar', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const nome = String(req.body.nome || '').trim();
+    const clientId = String(req.body.client_id || '').trim();
+    const clientSecret = String(req.body.client_secret || '').trim();
+    if (!nome) return res.status(400).json({ erro: 'Informe o nome da credencial.' });
+    let cred = await Credencial.findOne({ nome, empresa: req.usuario.empresa });
+    const campos = { ...((cred && cred.campos) || {}) };
+    if (clientId) campos.client_id = clientId;
+    if (clientSecret) campos.client_secret = clientSecret;
+    if (!campos.client_id || !campos.client_secret) return res.status(400).json({ erro: 'Informe o Client ID e o Client secret do app OAuth do Google da sua empresa.' });
+    if (cred) { cred.campos = campos; cred.atualizadoEm = new Date(); await cred.save(); }
+    else cred = await Credencial.create({ nome, proprietario: 'Google', empresa: req.usuario.empresa, campos });
+    const state = jwt.sign({ empresa: String(req.usuario.empresa), credId: String(cred._id) }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '10m' });
+    res.json({ url: googleOAuth.buildAuthUrl({ clientId: campos.client_id, redirectUri: GOOGLE_OAUTH_REDIRECT_URI, state }) });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 app.get('/api/integracoes/google/callback', async (req, res) => {
@@ -3523,17 +3528,16 @@ app.get('/api/integracoes/google/callback', async (req, res) => {
   try { state = jwt.verify(String(req.query.state || ''), process.env.JWT_SECRET || 'segredo123'); }
   catch { return voltar('google=erro&msg=' + encodeURIComponent('Link expirado, tente conectar de novo.')); }
   try {
-    const tokens = await googleOAuth.exchangeCode(String(req.query.code || ''));
+    const cred = await Credencial.findOne({ _id: state.credId, empresa: state.empresa });
+    if (!cred || !cred.campos?.client_id || !cred.campos?.client_secret) throw new Error('Credencial do Google não encontrada — cadastre de novo.');
+    const tokens = await googleOAuth.exchangeCode({
+      code: String(req.query.code || ''), clientId: cred.campos.client_id, clientSecret: cred.campos.client_secret, redirectUri: GOOGLE_OAUTH_REDIRECT_URI,
+    });
     if (!tokens.refresh_token) throw new Error('O Google não devolveu um refresh_token (tente desconectar o app em myaccount.google.com/permissions e conectar de novo).');
-    const cred = await Credencial.findOne({ nome: GOOGLE_OAUTH_CRED_NOME, empresa: state.empresa });
-    if (cred) {
-      cred.campos = { ...(cred.campos || {}), [GOOGLE_OAUTH_CAMPO]: tokens.refresh_token };
-      cred.atualizadoEm = new Date();
-      await cred.save();
-    } else {
-      await Credencial.create({ nome: GOOGLE_OAUTH_CRED_NOME, empresa: state.empresa, campos: { [GOOGLE_OAUTH_CAMPO]: tokens.refresh_token } });
-    }
-    voltar('google=ok');
+    cred.campos = { ...cred.campos, refresh_token: tokens.refresh_token };
+    cred.atualizadoEm = new Date();
+    await cred.save();
+    voltar('google=ok&cred=' + encodeURIComponent(cred.nome));
   } catch (err) {
     voltar('google=erro&msg=' + encodeURIComponent(err.message));
   }
@@ -3557,8 +3561,6 @@ const automationEngine = require('./lib/automationEngine');
 automationEngine.init({
   Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina, ConfigIA, Credencial,
   enviarEmail, resolverEChamarIA, fetch, githubActions,
-  googleOAuthClientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
-  googleOAuthClientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
   hocApiUrl: PUBLIC_URL,
 });
 

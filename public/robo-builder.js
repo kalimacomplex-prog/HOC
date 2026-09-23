@@ -311,6 +311,15 @@ const RB_ACOES = [
   { tipo: 'gdrive_copy_file', label: 'Copiar arquivo (Google Drive)', icone: 'copy', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_file_name', 'gdrive_parent_id', 'api_key'] },
   { tipo: 'gdrive_share_file', label: 'Compartilhar arquivo/pasta (Google Drive)', icone: 'link', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_share_email', 'gdrive_share_role', 'api_key'] },
   { tipo: 'gdrive_file_info', label: 'Info do arquivo/pasta (Google Drive)', icone: 'info', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'api_key'] },
+
+  { tipo: 'gsheets_create_spreadsheet', label: 'Criar planilha (Google Sheets)', icone: 'table', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_titulo', 'gdrive_parent_id', 'api_key'] },
+  { tipo: 'gsheets_read_values', label: 'Ler intervalo (Google Sheets)', icone: 'table', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_range', 'api_key'] },
+  { tipo: 'gsheets_write_values', label: 'Escrever intervalo (Google Sheets)', icone: 'edit', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_range', 'data_input', 'api_key'] },
+  { tipo: 'gsheets_append_row', label: 'Adicionar linha (Google Sheets)', icone: 'check', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_range', 'data_input', 'api_key'] },
+  { tipo: 'gsheets_clear_values', label: 'Limpar intervalo (Google Sheets)', icone: 'broom', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_range', 'api_key'] },
+  { tipo: 'gsheets_list_sheets', label: 'Listar abas (Google Sheets)', icone: 'list', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'api_key'] },
+  { tipo: 'gsheets_add_sheet', label: 'Criar aba (Google Sheets)', icone: 'folder', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_titulo', 'api_key'] },
+  { tipo: 'gsheets_delete_sheet', label: 'Excluir aba (Google Sheets)', icone: 'trash', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_titulo', 'api_key'] },
 ];
 const RB_ACOES_MAP = Object.fromEntries(RB_ACOES.map((a) => [a.tipo, a]));
 
@@ -393,6 +402,9 @@ const RB_FIELD_META = {
   gdrive_query: { label: 'Filtro extra (opcional)', type: 'text', placeholder: "name contains 'relatorio'", hint: 'Sintaxe de busca do Google Drive (campo "q" da API).' },
   gdrive_share_email: { label: 'E-mail para compartilhar (opcional)', type: 'text', hint: 'Vazio = compartilha com "qualquer pessoa com o link".' },
   gdrive_share_role: { label: 'Permissão', type: 'select', options: [['reader', 'Leitor'], ['writer', 'Editor'], ['commenter', 'Comentarista']] },
+  gsheets_id: { label: 'ID da planilha', type: 'text', hint: 'Copie da URL do Sheets (depois de "/d/", antes de "/edit").' },
+  gsheets_range: { label: 'Intervalo', type: 'text', placeholder: 'Página1!A1:C10' },
+  gsheets_titulo: { label: 'Título', type: 'text' },
 };
 
 function rbGenericFields(step) {
@@ -679,7 +691,8 @@ const RB_AI_MODELOS = {
 };
 const RB_AI_MODELO_OUTRO = '__outro__';
 const RB_AI_OPENAI_TYPES = new Set(['generate_embedding', 'moderate_content', 'generate_ai_image', 'transcribe_audio', 'text_to_speech']);
-const RB_GDRIVE_TYPES = new Set(['gdrive_create_folder', 'gdrive_upload_file', 'gdrive_update_file_content', 'gdrive_download_file', 'gdrive_delete_file', 'gdrive_list_files', 'gdrive_rename_file', 'gdrive_move_file', 'gdrive_copy_file', 'gdrive_share_file', 'gdrive_file_info']);
+const RB_GDRIVE_TYPES = new Set(['gdrive_create_folder', 'gdrive_upload_file', 'gdrive_update_file_content', 'gdrive_download_file', 'gdrive_delete_file', 'gdrive_list_files', 'gdrive_rename_file', 'gdrive_move_file', 'gdrive_copy_file', 'gdrive_share_file', 'gdrive_file_info',
+  'gsheets_create_spreadsheet', 'gsheets_read_values', 'gsheets_write_values', 'gsheets_append_row', 'gsheets_clear_values', 'gsheets_list_sheets', 'gsheets_add_sheet', 'gsheets_delete_sheet']);
 
 async function rbCarregarDadosIA() {
   try { rbCredenciais = await rbApi('GET', '/api/credenciais'); } catch { rbCredenciais = []; }

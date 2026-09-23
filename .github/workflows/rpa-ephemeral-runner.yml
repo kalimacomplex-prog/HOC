@@ -46,4 +46,6 @@ jobs:
         env:
           HOC_API_URL: ${{ inputs.hoc_api_url }}
           HOC_MACHINE_KEY: ${{ inputs.machine_key }}
+          # Navegador sempre headless, sem perfil e com --no-sandbox (ver hoc_step_executor.NUVEM).
+          HOC_NUVEM: '1'
         run: python hoc_ephemeral_runner.py

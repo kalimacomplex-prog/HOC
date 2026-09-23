@@ -23,10 +23,13 @@ import base64
 import json
 import os
 import re
+import shutil
 import socket
 import subprocess
+import tempfile
 import threading
 import time
+import urllib.request
 
 
 def _sub(text, ctx):
@@ -106,6 +109,14 @@ _sessions = {}
 _sessions_lock = threading.Lock()
 _SESSION_TTL_SECONDS = 30 * 60
 
+# Rodando no ambiente "Nuvem (GitHub Actions)" (hoc_ephemeral_runner.py): não
+# existe tela (então o navegador é sempre headless, sem perfil) e o Ubuntu
+# 24.04 do runner bloqueia o sandbox do Chrome (user namespaces via AppArmor)
+# — sem --no-sandbox o Chrome aberto na mão (Popen) morre calado. O Playwright
+# já faz isso sozinho no browser_flow (chromium.launch); aqui é só pra sessão.
+NUVEM = os.environ.get('HOC_NUVEM') == '1' or os.environ.get('GITHUB_ACTIONS') == 'true'
+_CHROME_BOOT_TIMEOUT = 25
+
 
 def _session_key(cfg, ctx):
     nome = cfg.get('session_name') or 'default'
@@ -126,6 +137,7 @@ def _iniciar_watchdog(session_key):
             sess = _sessions.pop(session_key, None)
         if sess:
             _matar_processo(sess['pid'])
+            _apagar_perfil_tmp(sess.get('perfil_tmp'))
     threading.Thread(target=_watch, daemon=True).start()
 
 
@@ -167,11 +179,12 @@ def _browser_open(cfg, ctx):
         s.bind(('127.0.0.1', 0))
         porta = s.getsockname()[1]
 
-    perfil = _sub(cfg.get('browser_profile', ''), ctx)
     # Perfil persistente (extensões pagas de captcha, sessão de login salva)
     # só faz sentido com janela visível — headless nesse caso é ignorado de
-    # propósito, mesmo comportamento documentado no HAC.
-    headless = bool(cfg.get('headless', True)) and not perfil
+    # propósito, mesmo comportamento documentado no HAC. Na nuvem não há tela
+    # nem perfil salvo: sempre headless, perfil ignorado.
+    perfil = '' if NUVEM else _sub(cfg.get('browser_profile', ''), ctx)
+    headless = NUVEM or (_cfg_bool(cfg.get('headless', True)) and not perfil)
 
     args = [
         _chromium_path(),
@@ -179,18 +192,74 @@ def _browser_open(cfg, ctx):
         '--no-first-run',
         '--no-default-browser-check',
     ]
+    perfil_tmp = None
     if perfil:
         args.append(f'--user-data-dir={perfil}')
+    else:
+        # Sem perfil informado, cada sessão usa uma pasta própria e descartável:
+        # com o perfil padrão, um Chromium já aberto "engole" o novo processo
+        # (que sai na hora) e duas sessões ao mesmo tempo brigariam pelo perfil.
+        perfil_tmp = tempfile.mkdtemp(prefix='hoc-browser-')
+        args.append(f'--user-data-dir={perfil_tmp}')
     if headless:
         args.append('--headless=new')
+    if NUVEM:
+        args += ['--no-sandbox', '--disable-dev-shm-usage', '--window-size=1366,768']
     args.append(_sub(cfg.get('target') or cfg.get('url') or 'about:blank', ctx))
 
-    processo = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    log_erro = tempfile.TemporaryFile()
+    processo = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=log_erro)
+    try:
+        _esperar_chrome(processo, porta, log_erro)
+    except Exception:
+        _apagar_perfil_tmp(perfil_tmp)
+        raise
     with _sessions_lock:
-        _sessions[key] = {'porta': porta, 'pid': processo.pid, 'aberto_em': time.time()}
+        _sessions[key] = {'porta': porta, 'pid': processo.pid, 'aberto_em': time.time(), 'perfil_tmp': perfil_tmp}
     _iniciar_watchdog(key)
-    time.sleep(1.5)  # dá tempo do Chrome subir e o debug port responder
-    return f'Sessão aberta (porta {porta}).'
+    return f'Sessão aberta (porta {porta}{", nuvem/headless" if NUVEM else ""}).'
+
+
+def _apagar_perfil_tmp(pasta):
+    # O Chrome recém-morto ainda segura arquivos do perfil por um instante
+    # (no Windows o rmtree imediato falha) — tenta de novo em segundo plano.
+    if not pasta:
+        return
+
+    def _apagar():
+        for _ in range(20):
+            shutil.rmtree(pasta, ignore_errors=True)
+            if not os.path.exists(pasta):
+                return
+            time.sleep(0.5)
+    threading.Thread(target=_apagar, daemon=True).start()
+
+
+def _cfg_bool(v):
+    if isinstance(v, str):
+        return v.strip().lower() not in ('', '0', 'false', 'nao', 'não', 'off')
+    return bool(v)
+
+
+def _esperar_chrome(processo, porta, log_erro):
+    """Espera o debug port do Chrome responder (em vez de um sleep fixo — numa
+    máquina fria da nuvem ele demora mais). Se o Chrome morrer antes, devolve
+    o fim do stderr dele no erro, em vez de um "connect_over_cdp" genérico."""
+    prazo = time.time() + _CHROME_BOOT_TIMEOUT
+    while time.time() < prazo:
+        if processo.poll() is not None:
+            log_erro.seek(0)
+            detalhe = log_erro.read().decode('utf-8', 'replace').strip()[-800:]
+            raise RuntimeError(f'O navegador fechou ao abrir (código {processo.returncode}). {detalhe}')
+        try:
+            with urllib.request.urlopen(f'http://127.0.0.1:{porta}/json/version', timeout=1) as r:
+                if r.status == 200:
+                    return
+        except Exception:
+            pass
+        time.sleep(0.3)
+    _matar_processo(processo.pid)
+    raise RuntimeError(f'O navegador não respondeu em {_CHROME_BOOT_TIMEOUT}s.')
 
 
 def _com_pagina(cfg, ctx, fn):
@@ -254,6 +323,7 @@ def _browser_close(cfg, ctx):
     if not sess:
         return 'Sessão já estava fechada.'
     _matar_processo(sess['pid'])
+    _apagar_perfil_tmp(sess.get('perfil_tmp'))
     return 'Sessão fechada.'
 
 
@@ -269,6 +339,11 @@ def _browser_captcha_detect(cfg, ctx):
 
 
 def _browser_captcha_wait(cfg, ctx):
+    if NUVEM:
+        raise RuntimeError(
+            'Na nuvem ninguém vê a janela do navegador para resolver o captcha à mão. '
+            'Use "Capturar imagem do captcha" + "OCR de imagem", ou rode este robô num Agent (máquina física).'
+        )
     prazo = time.time() + float(cfg.get('timeout_seconds') or 120)
     while time.time() < prazo:
         if _browser_captcha_detect(cfg, ctx) == 'true':
@@ -487,7 +562,7 @@ def _executar_browser_flow(cfg, ctx):
         )
 
     acoes = cfg.get('actions') or []
-    headless = cfg.get('headless', True)
+    headless = NUVEM or _cfg_bool(cfg.get('headless', True))
     saida = {}
 
     with sync_playwright() as p:

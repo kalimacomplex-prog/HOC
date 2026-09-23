@@ -1511,7 +1511,7 @@
             <div class="form-group"><label>Ambiente</label>
               <select class="form-control" id="rAmbiente" onchange="atualizarCamposRobo()" style="width:100%;height:38px;padding:0 12px">
                 <option value="local">Local (máquina com Agent)</option>
-                <option value="nuvem">Nuvem (webhook)</option>
+                <option value="nuvem">Nuvem (GitHub Actions)</option>
               </select>
             </div>
             <div class="form-group" id="rGrupoMaquinaWrap"><label>Máquina</label>
@@ -1521,6 +1521,10 @@
               <div class="form-group"><label>Timeout máx. (min)</label><input type="number" class="form-control" id="rTimeout" value="30" min="1"></div>
               <div class="form-group"><label>Duração estimada (min)</label><input type="number" class="form-control" id="rDuracaoEstimada" value="15" min="1" placeholder="ex: 15"></div>
             </div>
+          </div>
+
+          <div id="rNotaNuvem" style="display:none;margin:-2px 0 12px;padding:9px 12px;background:#EEF6FF;border:1px solid #CFE3FA;border-radius:7px;font-size:11px;color:#2B4C7E;line-height:1.5">
+            Ao executar, o HOC sobe um runner temporário no <b>GitHub Actions</b> (Linux, Python 3.11, Chrome), roda o robô e o desliga ao terminar. Não precisa de máquina sua ligada.
           </div>
 
           <!-- Local: fonte do código -->
@@ -1705,7 +1709,7 @@
                   <div class="form-group"><label>Ambiente</label>
                     <select class="form-control" id="dpAmbiente" onchange="dpAtualizarAmbiente()" style="width:100%;height:38px;padding:0 12px">
                       <option value="local">Local (máquina com Agent)</option>
-                      <option value="nuvem">Nuvem (webhook)</option>
+                      <option value="nuvem">Nuvem (GitHub Actions)</option>
                     </select>
                   </div>
                   <div class="form-group" id="dpGrupoMaquinaWrap"><label>Máquina</label>
@@ -1715,6 +1719,9 @@
                   <div class="form-group"><label>Duração estimada (min)</label><input type="number" class="form-control" id="dpDuracaoEstimada" value="15" min="1"></div>
                 </div>
 
+                <div id="dpNotaNuvem" style="display:none;margin:0 0 10px;padding:8px 11px;background:#EEF6FF;border:1px solid #CFE3FA;border-radius:7px;font-size:11px;color:#2B4C7E;line-height:1.5">
+                  Ao executar, o HOC sobe um runner temporário no <b>GitHub Actions</b> (Linux, Python 3.11, Chrome), roda o robô e o desliga ao terminar. Não precisa de máquina sua ligada.
+                </div>
                 <div id="dpSecaoLocal">
                   <div class="rdp-secao-titulo" style="margin-top:20px">Fonte do Código</div>
                   <div class="form-row" style="margin-bottom:6px">
@@ -1884,7 +1891,10 @@
               Como usar uma credencial dentro de um robô
               <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1.5px solid #9CA0AC;color:#9CA0AC;font-size:10px;font-weight:700;flex-shrink:0">i</span>
             </button>
-            <button class="btn-lic btn-lic-add" onclick="abrirModalCredencial()">+ Nova Credencial</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn-lic" onclick="conectarGoogleDrive()" title="Autoriza os Robôs de Google Drive a usar a cota de armazenamento da sua conta (necessário pra enviar/atualizar arquivo — uma conta de serviço sozinha só lê/move/exclui)">Conectar Google Drive</button>
+              <button class="btn-lic btn-lic-add" onclick="abrirModalCredencial()">+ Nova Credencial</button>
+            </div>
           </div>
 
           <div id="credInfoBox" style="display:none;background:white;border:1px solid #ECEDF0;border-radius:14px;padding:18px 20px;margin-bottom:16px">
@@ -8777,8 +8787,7 @@ senha = campos.get('senha', '')</pre>
       const logs = exec.logs || [];
       const STATUS_COLOR = {info:'#33363F', success:'#00754F', error:'#B3123A'};
       const linhas = logs.length
-        ? logs.map(l=>`<div style="padding:8px 0;border-bottom:1px solid #F1F2F5;font-family:'SF Mono',Consolas,monospace;font-size:11.5px;color:${STATUS_COLOR[l.status]||'#33363F'};line-height:1.6">
-            <span style="color:#9CA0AC;margin-right:10px">${l.time?new Date(l.time).toLocaleTimeString('pt-BR'):''}</span>${_gesc(l.message||'')}</div>`).join('')
+        ? logs.map(l=>`<div style="padding:8px 0;border-bottom:1px solid #F1F2F5;font-family:'SF Mono',Consolas,monospace;font-size:11.5px;color:${STATUS_COLOR[l.status]||'#33363F'};line-height:1.6;white-space:pre-wrap;word-break:break-word"><span style="color:#9CA0AC;margin-right:10px">${l.time?new Date(l.time).toLocaleTimeString('pt-BR'):''}</span>${_gesc(l.message||'')}</div>`).join('')
         : '<div style="color:#9CA0AC;padding:24px;text-align:center;font-size:12.5px">Nenhum log disponível.</div>';
       const overlay = document.createElement('div');
       overlay.className = 'modal-overlay aberto';
@@ -8821,6 +8830,14 @@ senha = campos.get('senha', '')</pre>
     renderRobos(lista);
   }
 
+  // Só robôs criados no Studio (origem 'builder') têm fluxo editável — os demais
+  // (comando/webhook) são editados no painel de detalhes.
+  function editarRoboNoStudio(id) {
+    const r = robos.find(x => x._id === id);
+    if (!r || r.origem !== 'builder' || !r.automacaoId) return;
+    location.href = `/robo-builder?automacaoId=${encodeURIComponent(r.automacaoId)}&roboId=${encodeURIComponent(r._id)}`;
+  }
+
   function renderRobos(lista) {
     const dados = lista || robos;
     if (dados.length === 0) {
@@ -8844,6 +8861,10 @@ senha = campos.get('senha', '')</pre>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
               Executar
             </button>
+            ${r.origem === 'builder' && r.automacaoId ? `<button title="Editar o fluxo no Studio" onclick="event.stopPropagation();editarRoboNoStudio('${r._id}')" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;background:#F1F2F5;color:#33363F;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              Editar
+            </button>` : ''}
             <label class="hoc-switch" title="${ativo?'Ativo':'Inativo'}" onclick="event.stopPropagation()" style="margin-left:auto">
               <input type="checkbox" ${ativo?'checked':''} onchange="ativarInativarRobo('${r._id}',this.checked)">
               <span class="hoc-switch-slider"></span>
@@ -8923,6 +8944,7 @@ senha = campos.get('senha', '')</pre>
     set('dpPacotesPip', (r.pacotesPip||[]).join('\n'));
     set('dpPreComando', r.preComando);
     set('dpWebhookUrl', r.webhookUrl);
+    dpAtualizarAmbiente(); // de novo: a seção de webhook legado depende do valor acima
 
     const sch = r.schedule || {};
     setChk('dpScheduleAtivo', sch.ativo);
@@ -8968,9 +8990,14 @@ senha = campos.get('senha', '')</pre>
     const local = document.getElementById('dpSecaoLocal');
     const nuvem = document.getElementById('dpSecaoNuvem');
     const maqW  = document.getElementById('dpGrupoMaquinaWrap');
-    if (local) local.style.display = v === 'local' ? '' : 'none';
-    if (nuvem) nuvem.style.display = v === 'nuvem' ? '' : 'none';
+    // Nuvem = runner efêmero do GitHub Actions: mesma fonte de código (Git/ZIP) do
+    // Local; a seção de webhook só aparece pra robôs antigos que já tinham URL.
+    const webhookLegado = !!document.getElementById('dpWebhookUrl')?.value.trim();
+    if (local) local.style.display = '';
+    if (nuvem) nuvem.style.display = (v === 'nuvem' && webhookLegado) ? '' : 'none';
     if (maqW)  maqW.style.display  = v === 'local' ? '' : 'none';
+    const nota = document.getElementById('dpNotaNuvem');
+    if (nota) nota.style.display = v === 'nuvem' ? '' : 'none';
   }
 
   function dpAtualizarVinculo() {
@@ -9395,9 +9422,13 @@ senha = campos.get('senha', '')</pre>
 
   function atualizarCamposRobo() {
     const amb = document.getElementById('rAmbiente').value;
-    document.getElementById('rSecaoLocal').style.display  = amb==='local'  ? '' : 'none';
-    document.getElementById('rSecaoNuvem').style.display  = amb==='nuvem'  ? '' : 'none';
+    // Nuvem = runner efêmero do GitHub Actions: usa a mesma fonte de código (Git/ZIP)
+    // do Local; a seção de webhook só aparece pra robôs antigos que já tinham URL.
+    const webhookLegado = !!document.getElementById('rWebhookUrl').value.trim();
+    document.getElementById('rSecaoLocal').style.display  = '';
+    document.getElementById('rSecaoNuvem').style.display  = (amb==='nuvem' && webhookLegado) ? '' : 'none';
     document.getElementById('rGrupoMaquinaWrap').style.display = amb==='local' ? '' : 'none';
+    document.getElementById('rNotaNuvem').style.display = amb==='nuvem' ? '' : 'none';
   }
 
   function atualizarVinculo() {
@@ -9529,7 +9560,7 @@ senha = campos.get('senha', '')</pre>
       prioridade:         document.getElementById('rPrioridade').value,
       departamento:       document.getElementById('rDepartamento').value,
       ambiente:           amb,
-      vinculoTipo:        amb==='local' ? vt : 'webhook',
+      vinculoTipo:        vt,
       maquinaId:          amb==='local' ? document.getElementById('rMaquina').value : '',
       arquivoPrincipal:   document.getElementById('rArquivoPrincipal').value.trim(),
       comandoExecucao:    document.getElementById('rComando').value.trim(),
@@ -9681,6 +9712,11 @@ senha = campos.get('senha', '')</pre>
     if (dias < 0)   return 'Expirada';
     if (dias <= 30) return 'Expirando';
     return 'Válida';
+  }
+
+  function conectarGoogleDrive() {
+    const token = localStorage.getItem('token');
+    window.location.href = '/api/integracoes/google/conectar?token=' + encodeURIComponent(token);
   }
 
   function abrirModalCredencial(id) {
@@ -10392,6 +10428,20 @@ function copiarPixBloqueio(codigo) {
   setInterval(carregarNotificacoes, 60000);
   // Pré-carrega dados do dashboard ao abrir a página
   carregarDashboard();
+
+  // Volta do fluxo "Conectar Google Drive" (redirect de página inteira, ver
+  // /api/integracoes/google/callback no servidor) — abre direto em Robôs →
+  // Credenciais e avisa se deu certo, depois limpa a URL.
+  (function tratarRetornoGoogleOAuth() {
+    const params = new URLSearchParams(window.location.search);
+    const google = params.get('google');
+    if (params.get('robosTab') !== 'credenciais' && !google) return;
+    mudarSecao('robos', document.querySelector(".op-mod-tab[onclick*=\"'robos'\"]"));
+    mudarRoboTab('credenciais', document.querySelector(".robo-subtab[onclick*=\"'credenciais'\"]"));
+    if (google === 'ok') hocToast('Google Drive conectado! Os Robôs já podem enviar/atualizar arquivo usando a cota da sua conta.', 'ok', 6000);
+    else if (google === 'erro') hocToast('Falha ao conectar o Google Drive: ' + (params.get('msg') || 'erro desconhecido'), 'erro', 6000);
+    window.history.replaceState({}, '', window.location.pathname);
+  })();
 
   // Substitui as listas suspensas nativas dos filtros por um painel estilizado
   hocEnhanceSelects([

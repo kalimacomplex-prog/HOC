@@ -10,6 +10,11 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const fs = require('fs');
 
+// URL pública deste servidor (e-mails de tracking, config.json do Agent, runner efêmero do
+// GitHub Actions). BASE_URL manda; no Render, RENDER_EXTERNAL_URL vem preenchida sozinha —
+// sem esse fallback o runner tentava falar com localhost:3000 de dentro do GitHub.
+const PUBLIC_URL = (process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000').replace(/\/+$/, '');
+
 // ==================== ZIP builder (sem dependência externa) ====================
 // Usado só pra empacotar o pacote do Agent (config.json + agent.py + iniciar.vbs)
 // num único .zip — evita o usuário ter que gerenciar 3 downloads separados
@@ -226,7 +231,7 @@ async function enviarEmailTarefa(tarefaId, empresa, assinaturaHtml) {
   }
   if (!contatos.length) throw new Error('Nenhum contato associado.');
   const anexos = tarefa.anexos || [];
-  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  const baseUrl = PUBLIC_URL;
   // Generate tracking tokens per doc
   const tokens = [];
   for (let i = 0; i < anexos.length; i++) {
@@ -750,6 +755,10 @@ const maquinaSchema = new mongoose.Schema({
   ultimoHeartbeat: { type: Date, default: null },
   maintenanceMode: { type: Boolean, default: false },
   ativo:           { type: Boolean, default: true },
+  // Runner do GitHub Actions criado sob demanda pelo automationEngine
+  // quando não tem máquina física do tenant online (ver lib/automationEngine.js
+  // ::criarMaquinaEfemera) — some sozinha quando o run termina.
+  efemera:         { type: Boolean, default: false },
   empresa:         { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor:       { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm:        { type: Date, default: Date.now },
@@ -2446,8 +2455,13 @@ app.delete('/api/processos/:id', authMiddleware, verificarAssinatura, permOperac
 // ConfigIA) e chama a API de IA correspondente. Extraído da rota abaixo pra
 // também ser reaproveitado pelo step `call_ai_agent` do automationEngine —
 // mesma lógica, dois chamadores, sem duplicar as três integrações de provider.
-async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq, formatoSaida, camposJson }) {
+// Extras usados pelas sessões de IA do builder (ver lib/automationEngine.js::aiChat):
+// `apiKey` já resolvida (pula a busca no cofre), `history` (conversa anterior:
+// [{role:'user'|'assistant', content}]), `temperature` e `maxTokens`. A temperatura
+// NÃO é enviada à Anthropic (Claude) — só a OpenAI e ao Gemini.
+async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor: provedorReq, credencialNome: credNomeReq, campoCred: campoReq, formatoSaida, camposJson, apiKey: apiKeyDireta, history, temperature, maxTokens, modelo: modeloReq }) {
   if (!userMessage) throw new Error('Mensagem do usuário não informada');
+  const hist = Array.isArray(history) ? history : [];
 
   let provedor = provedorReq, credNome = credNomeReq, campo = campoReq;
   if (!provedor || provedor === 'empresa') {
@@ -2456,8 +2470,11 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
     if (!credNome) credNome = cfgIA?.credencialNome;
     if (!campo)   campo   = cfgIA?.campoCred || 'api_key';
   }
-  const cred = await Credencial.findOne({ nome: credNome, empresa }).lean();
-  const apiKey = cred?.campos?.[campo || 'api_key'] || '';
+  let apiKey = apiKeyDireta || '';
+  if (!apiKey) {
+    const cred = await Credencial.findOne({ nome: credNome, empresa }).lean();
+    apiKey = cred?.campos?.[campo || 'api_key'] || '';
+  }
   if (!apiKey) throw new Error('Credencial de API não encontrada. Configure em Configurações → IA ou informe uma credencial na action.');
 
   let finalUserMsg = userMessage;
@@ -2469,8 +2486,8 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
   let resposta = '';
 
   if (provedor === 'claude-sonnet' || provedor === 'claude-haiku') {
-    const modelId = provedor === 'claude-sonnet' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
-    const body = { model: modelId, max_tokens: 2048, messages: [{ role: 'user', content: finalUserMsg }] };
+    const modelId = modeloReq || (provedor === 'claude-sonnet' ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001');
+    const body = { model: modelId, max_tokens: maxTokens || 2048, messages: [...hist, { role: 'user', content: finalUserMsg }] };
     if (systemMessage) body.system = systemMessage;
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -2481,25 +2498,34 @@ async function resolverEChamarIA(empresa, { systemMessage, userMessage, provedor
     if (!r.ok) throw new Error(d.error?.message || 'Erro na API Anthropic');
     resposta = d.content?.[0]?.text || '';
 
-  } else if (provedor === 'gpt-4o' || provedor === 'gpt-4') {
+  } else if (provedor === 'gpt-4o' || provedor === 'gpt-4' || provedor === 'groq') {
+    // A Groq usa a mesma API da OpenAI (chat/completions), só muda a URL, a chave e o modelo.
+    const ehGroq = provedor === 'groq';
     const messages = [];
     if (systemMessage) messages.push({ role: 'system', content: systemMessage });
-    messages.push({ role: 'user', content: finalUserMsg });
-    const body = { model: provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4', messages };
+    messages.push(...hist, { role: 'user', content: finalUserMsg });
+    const body = { model: modeloReq || (ehGroq ? 'openai/gpt-oss-20b' : provedor === 'gpt-4o' ? 'gpt-4o' : 'gpt-4'), messages };
+    if (typeof temperature === 'number') body.temperature = temperature;
+    if (maxTokens) body.max_tokens = maxTokens;
     if (formatoSaida === 'json') body.response_format = { type: 'json_object' };
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    const r = await fetch(ehGroq ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
     const d = await r.json();
-    if (!r.ok) throw new Error(d.error?.message || 'Erro na API OpenAI');
+    if (!r.ok) throw new Error(d.error?.message || (ehGroq ? 'Erro na API Groq' : 'Erro na API OpenAI'));
     resposta = d.choices?.[0]?.message?.content || '';
 
   } else if (provedor === 'gemini') {
-    const body = { contents: [{ parts: [{ text: finalUserMsg }] }] };
+    // Gemini chama o papel do assistente de "model".
+    const body = { contents: [...hist.map(h => ({ role: h.role === 'assistant' ? 'model' : 'user', parts: [{ text: h.content }] })), { role: 'user', parts: [{ text: finalUserMsg }] }] };
+    const genCfg = {};
+    if (typeof temperature === 'number') genCfg.temperature = temperature;
+    if (maxTokens) genCfg.maxOutputTokens = maxTokens;
+    if (Object.keys(genCfg).length) body.generationConfig = genCfg;
     if (systemMessage) body.systemInstruction = { parts: [{ text: systemMessage }] };
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${apiKey}`, {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modeloReq || 'gemini-1.5-pro'}:generateContent?key=${apiKey}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
     });
     const d = await r.json();
@@ -2768,6 +2794,37 @@ app.get('/api/robos/:id/auditoria', authMiddleware, permOperacoes('acessar'), as
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Robô "Nuvem" roda num runner efêmero do GitHub Actions. Robôs legados com
+// webhookUrl preenchido continuam no fluxo antigo (o agent local dispara o webhook).
+function roboRodaNoGithub(robo) {
+  return robo.ambiente === 'nuvem' && !robo.webhookUrl;
+}
+
+// Decide onde a execução de um robô (não-builder) vai rodar. Nuvem: sobe um
+// runner efêmero (Maquina temporária + workflow_dispatch) que faz heartbeat e
+// pega o comando como um agent normal. Local: máquina vinculada, senão qualquer
+// online com slot livre.
+async function alocarMaquinaDoRobo(robo, empresa) {
+  if (roboRodaNoGithub(robo)) {
+    try {
+      return { maquina: await automationEngine.criarMaquinaEfemera(empresa), motivo: '' };
+    } catch (e) {
+      return { maquina: null, motivo: `Não foi possível iniciar o runner no GitHub Actions: ${e.message}` };
+    }
+  }
+  let maquina = null;
+  if (robo.maquinaId) {
+    maquina = await Maquina.findOne({ _id: robo.maquinaId, empresa, status: { $in: ['online','busy'] }, ativo: true });
+  }
+  if (!maquina) {
+    maquina = await Maquina.findOne({
+      empresa, status: 'online', ativo: true,
+      $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
+    }).sort({ robosAtivos: 1 });
+  }
+  return { maquina, motivo: maquina ? '' : 'Nenhuma máquina online disponível' };
+}
+
 // Executar robô manualmente
 app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
@@ -2796,23 +2853,13 @@ app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOpe
       return;
     }
 
-    // Busca máquina alvo: primeiro a vinculada ao robô, senão qualquer online com slot livre
-    let maquina = null;
-    if (robo.maquinaId) {
-      maquina = await Maquina.findOne({ _id: robo.maquinaId, empresa: req.usuario.empresa, status: { $in: ['online','busy'] }, ativo: true });
-    }
-    if (!maquina) {
-      maquina = await Maquina.findOne({
-        empresa: req.usuario.empresa, status: 'online', ativo: true,
-        $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
-      }).sort({ robosAtivos: 1 });
-    }
+    const { maquina, motivo } = await alocarMaquinaDoRobo(robo, req.usuario.empresa);
 
     const exec = await ExecucaoRobo.create({
       roboId:    robo._id,
       roboNome:  robo.nome,
       status:    maquina ? 'em_execucao' : 'nao_disparado',
-      motivoInterrupcao: maquina ? '' : 'Nenhuma máquina online disponível',
+      motivoInterrupcao: maquina ? '' : motivo,
       maquina:   maquina ? maquina.machineId : '',
       maquinaId: maquina ? maquina._id : null,
       gatilho:   req.body.gatilho || 'manual',
@@ -3036,7 +3083,7 @@ app.get('/api/maquinas/:id/agent-config', authMiddleware, verificarAssinatura, p
     const maquina = await Maquina.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
     if (!maquina) return res.status(404).json({ erro: 'Máquina não encontrada' });
     res.json({
-      server: process.env.BASE_URL || 'http://localhost:3000',
+      server: PUBLIC_URL,
       workspace: req.usuario.empresa.toString(),
       machineKey: maquina.machineKey,
       machineId: maquina.machineId
@@ -3052,7 +3099,7 @@ app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatu
     const maquina = await Maquina.findOne({ _id: req.params.id, empresa: req.usuario.empresa });
     if (!maquina) return res.status(404).json({ erro: 'Máquina não encontrada' });
     const config = {
-      server: process.env.BASE_URL || 'http://localhost:3000',
+      server: PUBLIC_URL,
       workspace: req.usuario.empresa.toString(),
       machineKey: maquina.machineKey,
       machineId: maquina.machineId
@@ -3073,6 +3120,19 @@ app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatu
     res.setHeader('Pragma', 'no-cache');
     res.send(zipBuf);
   } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Runner efêmero avisa que terminou o(s) comando(s) dele — apaga a Maquina temporária
+// (o próximo heartbeat volta 401 e o runner encerra sozinho, poupando minutos do
+// Actions). Só age em Maquina efemera:true; agent de máquina real recebe 404.
+app.post('/api/maquinas/efemera/encerrar', async (req, res) => {
+  try {
+    const { machineKey } = req.body;
+    if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
+    const maquina = await Maquina.findOneAndDelete({ machineKey, efemera: true });
+    if (!maquina) return res.status(404).json({ erro: 'Máquina efêmera não encontrada' });
+    res.json({ ok: true });
+  } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
 // Heartbeat — chamado pelo agent.py a cada 20s (autenticado por machineKey no body)
@@ -3134,7 +3194,9 @@ app.post('/api/maquinas/heartbeat', async (req, res) => {
         webhookPayload:   robo.webhookPayload || {},
         gitUrl:           robo.gitUrl || '',
         gitBranch:        robo.gitBranch || 'main',
-        pacotesPip:       robo.pacotesPip || '',
+        // O painel de detalhes salva como array, o modal de criação como string —
+        // o agent espera string (usa .splitlines()).
+        pacotesPip:       Array.isArray(robo.pacotesPip) ? robo.pacotesPip.join('\n') : (robo.pacotesPip || ''),
         preComando:       robo.preComando || '',
         timeout:          robo.timeout || 30,
         apiKey:           robo.apiKey || ''
@@ -3258,6 +3320,31 @@ setInterval(async () => {
   } catch (e) { /* silent */ }
 }, 30000);
 
+// Job: faxina de runners efêmeros órfãos (roda a cada 60s). Cobre o runner que
+// nunca subiu (fila/erro no GitHub, workflow inexistente) ou que morreu no meio
+// sem chamar /api/maquinas/efemera/encerrar (servidor reiniciou, timeout do job).
+// Sem isso a Maquina temporária e a execução ficariam "em andamento" pra sempre.
+setInterval(async () => {
+  try {
+    const nuncaSubiu = new Date(Date.now() - 10 * 60 * 1000);
+    const sumiu = new Date(Date.now() - 3 * 60 * 1000);
+    const orfas = await Maquina.find({
+      efemera: true,
+      $or: [
+        { ultimoHeartbeat: null, criadoEm: { $lt: nuncaSubiu } },
+        { ultimoHeartbeat: { $lt: sumiu } },
+      ],
+    });
+    for (const m of orfas) {
+      await ExecucaoRobo.updateMany(
+        { maquinaId: m._id, status: 'em_execucao' },
+        { status: 'erro', finalizadoEm: new Date(), motivoInterrupcao: m.ultimoHeartbeat ? 'Runner do GitHub Actions parou de responder' : 'Runner do GitHub Actions não iniciou a tempo' }
+      );
+      await Maquina.findByIdAndDelete(m._id);
+    }
+  } catch (e) { /* silent */ }
+}, 60000);
+
 function calcularProximaExec(schedule) {
   const { frequencia, horario, diasSemana, diaMes, intervaloValor, intervaloUnidade, inicio, dataUnica } = schedule || {};
   const now = new Date();
@@ -3298,20 +3385,11 @@ setInterval(async () => {
     const now = new Date();
     const agendados = await Robot.find({ 'schedule.ativo': true, 'schedule.proximaExec': { $lte: now }, ativo: true });
     for (const robo of agendados) {
-      let maquina = null;
-      if (robo.maquinaId) {
-        maquina = await Maquina.findOne({ _id: robo.maquinaId, status: { $in: ['online','busy'] }, ativo: true });
-      }
-      if (!maquina) {
-        maquina = await Maquina.findOne({
-          empresa: robo.empresa, status: 'online', ativo: true,
-          $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
-        }).sort({ robosAtivos: 1 });
-      }
+      const { maquina, motivo } = await alocarMaquinaDoRobo(robo, robo.empresa);
       await ExecucaoRobo.create({
         roboId: robo._id, roboNome: robo.nome,
         status: maquina ? 'em_execucao' : 'nao_disparado',
-        motivoInterrupcao: maquina ? '' : 'Nenhuma máquina disponível',
+        motivoInterrupcao: maquina ? '' : motivo,
         maquina: maquina ? maquina.machineId : '',
         maquinaId: maquina ? maquina._id : null,
         gatilho: 'schedule', prioridade: robo.prioridade || 'Media',
@@ -3410,14 +3488,78 @@ app.delete('/api/credenciais/:id', authMiddleware, verificarAssinatura, permOper
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// ---- OAuth do Google (Drive) — dá cota de armazenamento de verdade aos
+// Robôs de Google Drive (conta de serviço sozinha não consegue enviar/
+// atualizar arquivo, só ler/mover/excluir — ver lib/stepLibrary.js). Guarda
+// o refresh_token na credencial "google-drive" (cria se não existir), no
+// mesmo campo "campos" que as outras credenciais — os steps do builder
+// detectam sozinhos se o valor é um JSON de conta de serviço ou um
+// refresh_token do OAuth.
+const googleOAuth = require('./lib/googleOAuth');
+googleOAuth.init({
+  fetch,
+  clientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
+  clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
+  redirectUri: `${PUBLIC_URL}/api/integracoes/google/callback`,
+});
+const GOOGLE_OAUTH_CRED_NOME = 'google-drive';
+const GOOGLE_OAUTH_CAMPO = 'refresh_token';
+
+// Login inicia por navegação de página inteira (não dá pra usar fetch/XHR
+// num redirect pro Google), então não passa pelo authMiddleware normal —
+// recebe o JWT já emitido pela query string e o valida manualmente.
+app.get('/api/integracoes/google/conectar', async (req, res) => {
+  let decoded;
+  try { decoded = jwt.verify(String(req.query.token || ''), process.env.JWT_SECRET || 'segredo123'); }
+  catch { return res.status(401).send('Sessão inválida ou expirada — abra Operações → Credenciais e clique em "Conectar Google Drive" de novo.'); }
+  const state = jwt.sign({ empresa: decoded.empresa }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '10m' });
+  res.redirect(googleOAuth.buildAuthUrl(state));
+});
+
+app.get('/api/integracoes/google/callback', async (req, res) => {
+  const voltar = (qs) => res.redirect(`${PUBLIC_URL}/operacoes?robosTab=credenciais&${qs}`);
+  if (req.query.error) return voltar(`google=erro&msg=${encodeURIComponent(req.query.error)}`);
+  let state;
+  try { state = jwt.verify(String(req.query.state || ''), process.env.JWT_SECRET || 'segredo123'); }
+  catch { return voltar('google=erro&msg=' + encodeURIComponent('Link expirado, tente conectar de novo.')); }
+  try {
+    const tokens = await googleOAuth.exchangeCode(String(req.query.code || ''));
+    if (!tokens.refresh_token) throw new Error('O Google não devolveu um refresh_token (tente desconectar o app em myaccount.google.com/permissions e conectar de novo).');
+    const cred = await Credencial.findOne({ nome: GOOGLE_OAUTH_CRED_NOME, empresa: state.empresa });
+    if (cred) {
+      cred.campos = { ...(cred.campos || {}), [GOOGLE_OAUTH_CAMPO]: tokens.refresh_token };
+      cred.atualizadoEm = new Date();
+      await cred.save();
+    } else {
+      await Credencial.create({ nome: GOOGLE_OAUTH_CRED_NOME, empresa: state.empresa, campos: { [GOOGLE_OAUTH_CAMPO]: tokens.refresh_token } });
+    }
+    voltar('google=ok');
+  } catch (err) {
+    voltar('google=erro&msg=' + encodeURIComponent(err.message));
+  }
+});
+
 // ==================== AUTOMAÇÃO (builder visual de Robôs) ====================
 // Ver C:\Users\novai\.claude\plans\enchanted-gathering-pearl.md — porte
 // reduzido (MVP) do "HAC Studio" pro conceito de Robô do HOC.
 
+const githubActions = require('./lib/githubActions');
+githubActions.init({
+  fetch,
+  token: process.env.GITHUB_TOKEN || '',
+  owner: process.env.GITHUB_OWNER || 'kalimacomplex-prog',
+  repo: process.env.GITHUB_REPO || 'HOC',
+  workflowFile: process.env.GITHUB_WORKFLOW_FILE || 'rpa-ephemeral-runner.yml',
+  ref: process.env.GITHUB_REF || 'main',
+});
+
 const automationEngine = require('./lib/automationEngine');
 automationEngine.init({
-  Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina,
-  enviarEmail, resolverEChamarIA, fetch,
+  Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina, ConfigIA, Credencial,
+  enviarEmail, resolverEChamarIA, fetch, githubActions,
+  googleOAuthClientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
+  googleOAuthClientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
+  hocApiUrl: PUBLIC_URL,
 });
 
 const AUTOMACAO_STATUS_PARA_EXECUCAO = { success: 'concluido', failed: 'erro', cancelled: 'interrompido' };
@@ -3425,6 +3567,28 @@ const AUTOMACAO_STATUS_PARA_EXECUCAO = { success: 'concluido', failed: 'erro', c
 // Poll simples (não é chamado com alta frequência — 1 por execução de robô
 // origem='builder') até o AutomacaoRun sair de "running", e espelha o
 // resultado no ExecucaoRobo público (aba Execuções já existente).
+// Texto do log de um step no histórico de Execuções: cabeçalho ("nome (tipo): status")
+// + a saída do step numa segunda linha — é onde fica, por exemplo, o texto que a IA escreveu.
+// Saída comprida é cortada (respostas de IA têm limite maior) e conteúdo que parece
+// base64 (imagem/áudio gerado, arquivo lido) vira só o tamanho, pra não poluir o log.
+const LOG_SAIDA_MAX = 500;
+const LOG_SAIDA_IA_MAX = 4000;
+function _formatarLogDoStep(s) {
+  let msg = `${s.stepName} (${s.stepType}): ${s.status}${s.error ? ' — ' + s.error : ''}`;
+  const saida = typeof s.output === 'string' ? s.output.trim() : '';
+  if (saida && s.status === 'success') {
+    let texto;
+    if (saida.length > 200 && /^[A-Za-z0-9+/=_-]+$/.test(saida)) {
+      texto = `(conteúdo de ${saida.length} caracteres)`;
+    } else {
+      const max = (s.stepType === 'ai_chat' || s.stepType === 'call_ai_agent') ? LOG_SAIDA_IA_MAX : LOG_SAIDA_MAX;
+      texto = saida.length > max ? `${saida.slice(0, max)}… (+${saida.length - max} caracteres)` : saida;
+    }
+    msg += `\n→ ${texto}`;
+  }
+  return msg;
+}
+
 async function _espelharRunNaExecucao(runId, execId) {
   const deadline = Date.now() + 60 * 60 * 1000; // 1h de teto de segurança
   while (Date.now() < deadline) {
@@ -3433,7 +3597,7 @@ async function _espelharRunNaExecucao(runId, execId) {
     if (!run || run.status === 'running') continue;
     const statusExec = AUTOMACAO_STATUS_PARA_EXECUCAO[run.status] || 'erro';
     const resumo = (run.stepsResult || []).map((s) => ({
-      message: `${s.stepName} (${s.stepType}): ${s.status}${s.error ? ' — ' + s.error : ''}`,
+      message: _formatarLogDoStep(s),
       status: s.status === 'failed' ? 'error' : s.status === 'success' ? 'success' : 'info',
       time: new Date(),
     }));

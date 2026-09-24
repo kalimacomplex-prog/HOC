@@ -759,11 +759,13 @@ const maquinaSchema = new mongoose.Schema({
   // quando não tem máquina física do tenant online (ver lib/automationEngine.js
   // ::criarMaquinaEfemera) — some sozinha quando o run termina.
   efemera:         { type: Boolean, default: false },
-  // Só máquina da Nuvem: execuções usando a máquina agora (compartilhada pela
-  // empresa) e marca de "sendo apagada" — ver lib/automationEngine.js::obterMaquinaEfemera.
+  // Só máquina da Nuvem: execuções rodando nela (usos), esperando vaga (fila),
+  // marca de "sendo apagada" e desde quando está sem uso — ver
+  // lib/automationEngine.js::obterMaquinaEfemera.
   usos:            { type: Number, default: 0 },
   encerrando:      { type: Boolean, default: false },
   ociosaDesde:     { type: Date, default: null },
+  fila:            { type: Number, default: 0 },
   empresa:         { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor:       { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm:        { type: Date, default: Date.now },
@@ -3048,7 +3050,7 @@ app.post('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('ac
   try {
     const machineKey = crypto.randomUUID();
     // Campos da máquina da Nuvem são controlados só pelo servidor.
-    const { efemera, usos, encerrando, ociosaDesde, ...dados } = req.body;
+    const { efemera, usos, fila, encerrando, ociosaDesde, ...dados } = req.body;
     const maquina = await Maquina.create({
       ...dados, machineKey,
       empresa: req.usuario.empresa, criadoPor: req.usuario.id
@@ -3059,7 +3061,7 @@ app.post('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('ac
 
 app.put('/api/maquinas/:id', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
-    const { machineKey, efemera, usos, encerrando, ociosaDesde, ...updates } = req.body;
+    const { machineKey, efemera, usos, fila, encerrando, ociosaDesde, ...updates } = req.body;
     const maquina = await Maquina.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
       { ...updates, atualizadoEm: new Date() },
@@ -3134,7 +3136,7 @@ app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatu
 });
 
 // Runner da Nuvem avisa que terminou o(s) comando(s) dele. Como a máquina é
-// compartilhada pela empresa, só apaga se ninguém mais estiver usando (usos=0);
+// compartilhada pela empresa, só apaga se ninguém estiver usando nem na fila;
 // apagada, o próximo heartbeat volta 401 e o runner encerra sozinho. Só age em
 // Maquina efemera:true; agent de máquina real recebe 404.
 app.post('/api/maquinas/efemera/encerrar', async (req, res) => {
@@ -3143,7 +3145,6 @@ app.post('/api/maquinas/efemera/encerrar', async (req, res) => {
     if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
     const maquina = await Maquina.findOne({ machineKey, efemera: true });
     if (!maquina) return res.status(404).json({ erro: 'Máquina efêmera não encontrada' });
-    if ((maquina.usos || 0) <= 0 && !maquina.ociosaDesde) await Maquina.updateOne({ _id: maquina._id, usos: { $lte: 0 } }, { $set: { ociosaDesde: new Date() } });
     const encerrada = await automationEngine.encerrarMaquinaEfemeraSeOciosa(maquina._id);
     res.json({ ok: true, encerrada });
   } catch (err) { res.status(400).json({ erro: err.message }); }
@@ -3362,8 +3363,9 @@ setInterval(async () => {
       );
       await Maquina.findByIdAndDelete(m._id);
     }
+    // Máquina da Nuvem sem uso segurada por uma fila que ninguém mais atende (ex.: servidor reiniciou).
     const ociosas = await Maquina.find({ efemera: true, encerrando: false, usos: { $lte: 0 }, ociosaDesde: { $ne: null } }).select('_id').lean();
-    for (const m of ociosas) await automationEngine.encerrarMaquinaEfemeraSeOciosa(m._id);
+    for (const m of ociosas) await automationEngine.encerrarMaquinaEfemeraSeOciosa(m._id, { abandonadas: true });
   } catch (e) { /* silent */ }
 }, 60000);
 

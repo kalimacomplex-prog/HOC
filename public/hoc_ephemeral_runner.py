@@ -1,7 +1,9 @@
 """
 hoc_ephemeral_runner.py — roda dentro de um runner efêmero do GitHub Actions
-(workflow_dispatch), fazendo o papel de "Maquina" pra UM run de automação
-do builder por vez.
+(workflow_dispatch), fazendo o papel da "Maquina" da Nuvem de UMA empresa —
+uma execução por vez; as seguintes da fila reaproveitam o mesmo runner, e o
+servidor o apaga assim que não há execução nem fila (ver
+lib/automationEngine.js::obterMaquinaEfemera).
 
 Diferente do agent.py normal (que fica de pé indefinidamente numa máquina
 real do tenant, com ícone de bandeja etc.), esse processo é deliberadamente
@@ -36,9 +38,9 @@ import hoc_step_executor  # noqa: E402
 SERVER = os.environ['HOC_API_URL'].rstrip('/')
 MACHINE_KEY = os.environ['HOC_MACHINE_KEY']
 # Rede de segurança: o normal é o servidor apagar a Maquina quando a última
-# execução da empresa sai dela (401 no heartbeat). A máquina é compartilhada
-# pelas execuções da empresa, e uma delas pode passar minutos só em passos do
-# servidor (IA, HTTP…) — por isso a folga maior que os 90 s de antes.
+# execução da empresa sai dela e a fila está vazia (401 no heartbeat). Não é
+# "tempo ocioso": uma execução pode passar minutos só em passos do servidor
+# (IA, HTTP…) sem mandar nada para a máquina — por isso a folga de 300 s.
 IDLE_TIMEOUT_SECONDS = float(os.environ.get('IDLE_TIMEOUT_SECONDS', 300))
 POLL_INTERVAL = 1.5
 

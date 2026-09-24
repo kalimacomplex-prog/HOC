@@ -150,7 +150,7 @@ const RB_ACOES = [
   { tipo: 'browser_flow', label: 'Fluxo de navegador', icone: 'globe', cor: '#c53030', cat: 'Navegador' },
 
   // ---- Sessão de browser persistente entre steps ----
-  { tipo: 'browser_open', label: 'Abrir sessão de navegador', icone: 'globe', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target', 'headless', 'browser_profile'], agente: true },
+  { tipo: 'browser_open', label: 'Abrir sessão de navegador', icone: 'globe', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target', 'navegador', 'headless', 'browser_profile'], agente: true },
   { tipo: 'browser_click', label: 'Clicar (sessão)', icone: 'mouse-pointer', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target'], agente: true },
   { tipo: 'browser_type', label: 'Digitar (sessão)', icone: 'keyboard', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target', 'value'], agente: true },
   { tipo: 'browser_extract', label: 'Extrair texto (sessão)', icone: 'clipboard', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target'], agente: true },
@@ -325,6 +325,9 @@ const RB_ACOES_MAP = Object.fromEntries(RB_ACOES.map((a) => [a.tipo, a]));
 
 // Metadados de campo pro formulário genérico (usado pelos steps de expansão
 // acima, que têm `fields: [...]` em vez de um formulário escrito à mão).
+// Navegadores do campo "Navegador" (mesmos nomes de NAVEGADORES em hoc_step_executor.py).
+const RB_NAVEGADORES = [['chromium', 'Chromium (padrão)'], ['chrome', 'Google Chrome'], ['msedge', 'Microsoft Edge'], ['firefox', 'Firefox'], ['webkit', 'WebKit (motor do Safari)']];
+const RB_NAVEGADOR_HINT = 'Todos rodam no Agent e na Nuvem. Na primeira vez que um navegador é usado numa máquina ele é instalado sozinho (pode levar 1–2 min); no Agent, Chrome e Edge precisam já estar instalados.';
 const RB_FIELD_META = {
   value: { label: 'Valor', type: 'text', hint: 'Pode usar {output} ou {variavel}.' },
   expression: { label: 'Expressão', type: 'text', hint: 'Ex: {x} * 2 + Math.sqrt(9)' },
@@ -392,6 +395,7 @@ const RB_FIELD_META = {
   seconds: { label: 'Segundos', type: 'text' },
   timeout_seconds: { label: 'Timeout (segundos)', type: 'text' },
   session_name: { label: 'Nome da sessão', type: 'text', placeholder: 'principal', hint: 'Mesmo nome usado em "Abrir sessão" — identifica qual navegador esse step controla.' },
+  navegador: { label: 'Navegador', type: 'select', options: RB_NAVEGADORES, hint: RB_NAVEGADOR_HINT },
   browser_profile: { label: 'Pasta de perfil persistente (opcional)', type: 'text', hint: 'Preenche pra manter login/cookies entre execuções (força janela visível, não headless). Só vale num Agent — na Nuvem é ignorado.' },
   headless: { label: 'Sem interface visível (headless)', type: 'checkbox' },
   gdrive_file_id: { label: 'ID do arquivo/pasta', type: 'text', hint: 'Copie da URL do Drive (depois de "/d/" ou "/folders/"). Aceita {output} ou {variavel}.' },
@@ -940,6 +944,7 @@ function rbRenderProps() {
     form += rbField('Salvar saída na variável', inp('variable_name'));
     form += RB_HINT_MAQUINA;
   } else if (step.type === 'browser_flow') {
+    form += rbField('Navegador', sel('navegador', RB_NAVEGADORES), RB_NAVEGADOR_HINT);
     form += chk('headless', 'Sem interface visível (headless)');
     form += rbRenderBrowserActions(step);
     form += `<div class="rb-hint">Um navegador por execução (abre, faz as ações e fecha). Roda num Agent ou na Nuvem (GitHub Actions) — na Nuvem sempre sem interface visível.</div>`;

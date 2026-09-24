@@ -35,7 +35,11 @@ import hoc_step_executor  # noqa: E402
 
 SERVER = os.environ['HOC_API_URL'].rstrip('/')
 MACHINE_KEY = os.environ['HOC_MACHINE_KEY']
-IDLE_TIMEOUT_SECONDS = float(os.environ.get('IDLE_TIMEOUT_SECONDS', 90))
+# Rede de segurança: o normal é o servidor apagar a Maquina quando a última
+# execução da empresa sai dela (401 no heartbeat). A máquina é compartilhada
+# pelas execuções da empresa, e uma delas pode passar minutos só em passos do
+# servidor (IA, HTTP…) — por isso a folga maior que os 90 s de antes.
+IDLE_TIMEOUT_SECONDS = float(os.environ.get('IDLE_TIMEOUT_SECONDS', 300))
 POLL_INTERVAL = 1.5
 
 # agent.py lê config.json no import (é assim que o agente instalado numa

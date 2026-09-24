@@ -759,11 +759,19 @@ const maquinaSchema = new mongoose.Schema({
   // quando não tem máquina física do tenant online (ver lib/automationEngine.js
   // ::criarMaquinaEfemera) — some sozinha quando o run termina.
   efemera:         { type: Boolean, default: false },
+  // Só máquina da Nuvem: execuções usando a máquina agora (compartilhada pela
+  // empresa) e marca de "sendo apagada" — ver lib/automationEngine.js::obterMaquinaEfemera.
+  usos:            { type: Number, default: 0 },
+  encerrando:      { type: Boolean, default: false },
+  ociosaDesde:     { type: Date, default: null },
   empresa:         { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor:       { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm:        { type: Date, default: Date.now },
   atualizadoEm:    { type: Date, default: Date.now }
 }, { strict: false });
+// No máximo UMA máquina da Nuvem (runner do GitHub Actions) viva por empresa:
+// o índice recusa a 2ª criação mesmo com duas execuções chegando juntas.
+maquinaSchema.index({ empresa: 1 }, { unique: true, name: 'uma_maquina_nuvem_por_empresa', partialFilterExpression: { efemera: true, encerrando: false } });
 const Maquina = mongoose.model('Maquina', maquinaSchema);
 
 // ==================== AUTOMAÇÃO (builder visual de Robôs) ====================
@@ -2807,9 +2815,10 @@ function roboRodaNoGithub(robo) {
 async function alocarMaquinaDoRobo(robo, empresa) {
   if (roboRodaNoGithub(robo)) {
     try {
-      return { maquina: await automationEngine.criarMaquinaEfemera(empresa), motivo: '' };
+      // Dentro da própria requisição: não espera vaga, avisa se estiver ocupada.
+      return { maquina: await automationEngine.obterMaquinaEfemera(empresa, { esperar: false }), motivo: '' };
     } catch (e) {
-      return { maquina: null, motivo: `Não foi possível iniciar o runner no GitHub Actions: ${e.message}` };
+      return { maquina: null, motivo: `Não foi possível usar a máquina da Nuvem: ${e.message}` };
     }
   }
   let maquina = null;
@@ -3122,16 +3131,19 @@ app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatu
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// Runner efêmero avisa que terminou o(s) comando(s) dele — apaga a Maquina temporária
-// (o próximo heartbeat volta 401 e o runner encerra sozinho, poupando minutos do
-// Actions). Só age em Maquina efemera:true; agent de máquina real recebe 404.
+// Runner da Nuvem avisa que terminou o(s) comando(s) dele. Como a máquina é
+// compartilhada pela empresa, só apaga se ninguém mais estiver usando (usos=0);
+// apagada, o próximo heartbeat volta 401 e o runner encerra sozinho. Só age em
+// Maquina efemera:true; agent de máquina real recebe 404.
 app.post('/api/maquinas/efemera/encerrar', async (req, res) => {
   try {
     const { machineKey } = req.body;
     if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
-    const maquina = await Maquina.findOneAndDelete({ machineKey, efemera: true });
+    const maquina = await Maquina.findOne({ machineKey, efemera: true });
     if (!maquina) return res.status(404).json({ erro: 'Máquina efêmera não encontrada' });
-    res.json({ ok: true });
+    if ((maquina.usos || 0) <= 0 && !maquina.ociosaDesde) await Maquina.updateOne({ _id: maquina._id, usos: { $lte: 0 } }, { $set: { ociosaDesde: new Date() } });
+    const encerrada = await automationEngine.encerrarMaquinaEfemeraSeOciosa(maquina._id);
+    res.json({ ok: true, encerrada });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
@@ -3249,6 +3261,12 @@ app.post('/api/robos/execucoes/:id/logs', async (req, res) => {
     if (status === 'success' || (status === 'error' && exec?.status !== 'interrompido')) {
       await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: -1 } });
     }
+    // Robô Git/ZIP na máquina da Nuvem: libera a vaga dele ao terminar (inclusive interrompido).
+    // A marca vagaNuvemLiberada (update atômico) evita liberar duas vezes se o fim chegar repetido.
+    if (maquina.efemera && (status === 'success' || status === 'error')) {
+      const primeira = await ExecucaoRobo.findOneAndUpdate({ _id: req.params.id, vagaNuvemLiberada: { $ne: true } }, { $set: { vagaNuvemLiberada: true } });
+      if (primeira) await automationEngine.liberarMaquinaEfemera(maquina._id);
+    }
     res.json({ ok: true });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -3342,6 +3360,8 @@ setInterval(async () => {
       );
       await Maquina.findByIdAndDelete(m._id);
     }
+    const ociosas = await Maquina.find({ efemera: true, encerrando: false, usos: { $lte: 0 }, ociosaDesde: { $ne: null } }).select('_id').lean();
+    for (const m of ociosas) await automationEngine.encerrarMaquinaEfemeraSeOciosa(m._id);
   } catch (e) { /* silent */ }
 }, 60000);
 

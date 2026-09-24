@@ -709,7 +709,7 @@ const AuditoriaRobo = mongoose.model('AuditoriaRobo', auditoriaRoboSchema);
 const execucaoRoboSchema = new mongoose.Schema({
   roboId: { type: mongoose.Schema.Types.ObjectId, ref: 'Robot', required: true },
   roboNome: { type: String, default: '' },
-  status: { type: String, default: 'em_execucao', enum: ['em_execucao','interrompido','erro','concluido','nao_disparado'] },
+  status: { type: String, default: 'em_execucao', enum: ['em_execucao','na_fila','interrompido','erro','concluido','nao_disparado'] },
   motivoInterrupcao: { type: String, default: '' },
   maquina: { type: String, default: '' },
   gatilho: { type: String, default: 'manual', enum: ['manual','schedule','webhook','workflow'] },
@@ -759,13 +759,13 @@ const maquinaSchema = new mongoose.Schema({
   // quando não tem máquina física do tenant online (ver lib/automationEngine.js
   // ::criarMaquinaEfemera) — some sozinha quando o run termina.
   efemera:         { type: Boolean, default: false },
-  // Só máquina da Nuvem: execuções rodando nela (usos), esperando vaga (fila),
+  // Só máquina da Nuvem: execuções rodando nela (usos), senhas de quem espera vaga em ordem de chegada (filaOrdem),
   // marca de "sendo apagada" e desde quando está sem uso — ver
   // lib/automationEngine.js::obterMaquinaEfemera.
   usos:            { type: Number, default: 0 },
   encerrando:      { type: Boolean, default: false },
   ociosaDesde:     { type: Date, default: null },
-  fila:            { type: Number, default: 0 },
+  filaOrdem:       { type: [String], default: [] },
   empresa:         { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor:       { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm:        { type: Date, default: Date.now },
@@ -2815,14 +2815,7 @@ function roboRodaNoGithub(robo) {
 // pega o comando como um agent normal. Local: máquina vinculada, senão qualquer
 // online com slot livre.
 async function alocarMaquinaDoRobo(robo, empresa) {
-  if (roboRodaNoGithub(robo)) {
-    try {
-      // Dentro da própria requisição: não espera vaga, avisa se estiver ocupada.
-      return { maquina: await automationEngine.obterMaquinaEfemera(empresa, { esperar: false }), motivo: '' };
-    } catch (e) {
-      return { maquina: null, motivo: `Não foi possível usar a máquina da Nuvem: ${e.message}` };
-    }
-  }
+  // Nuvem não passa por aqui: ver dispararExecucaoRobo (fila FIFO em segundo plano).
   let maquina = null;
   if (robo.maquinaId) {
     maquina = await Maquina.findOne({ _id: robo.maquinaId, empresa, status: { $in: ['online','busy'] }, ativo: true });
@@ -2834,6 +2827,45 @@ async function alocarMaquinaDoRobo(robo, empresa) {
     }).sort({ robosAtivos: 1 });
   }
   return { maquina, motivo: maquina ? '' : 'Nenhuma máquina online disponível' };
+}
+
+// Cria a ExecucaoRobo de um robô não-builder e a encaminha. Local: máquina física
+// na hora (ou "não disparado"). Nuvem: a execução nasce "na_fila", a requisição
+// responde na hora e a espera pela máquina da Nuvem da empresa (FIFO, uma por
+// vez) roda em segundo plano; quando chega a vez vira "em_execucao" apontando
+// para a máquina, e o heartbeat do runner a pega. Interromper na fila cancela.
+async function dispararExecucaoRobo(robo, { empresa, gatilho, criadoPor = null }) {
+  const base = { roboId: robo._id, roboNome: robo.nome, gatilho, prioridade: robo.prioridade || 'Media', empresa, ...(criadoPor ? { criadoPor } : {}) };
+  if (roboRodaNoGithub(robo)) {
+    const exec = await ExecucaoRobo.create({ ...base, status: 'na_fila', maquina: '', maquinaId: null, iniciadoEm: null });
+    (async () => {
+      try {
+        const maquina = await automationEngine.obterMaquinaEfemera(empresa, {
+          deveCancelar: async () => (await ExecucaoRobo.findById(exec._id).select('status').lean())?.status !== 'na_fila',
+        });
+        const ok = await ExecucaoRobo.findOneAndUpdate({ _id: exec._id, status: 'na_fila' },
+          { $set: { status: 'em_execucao', maquina: maquina.machineId, maquinaId: maquina._id, iniciadoEm: new Date() } });
+        if (!ok) await automationEngine.liberarMaquinaEfemera(maquina._id); // interrompida no último instante
+      } catch (e) {
+        if (!e.cancelled) {
+          await ExecucaoRobo.updateOne({ _id: exec._id, status: 'na_fila' },
+            { $set: { status: 'nao_disparado', motivoInterrupcao: `Não foi possível usar a máquina da Nuvem: ${e.message}` } });
+        }
+      }
+    })().catch((err) => console.error('Erro na fila da Nuvem:', err));
+    return exec;
+  }
+  const { maquina, motivo } = await alocarMaquinaDoRobo(robo, empresa);
+  const exec = await ExecucaoRobo.create({
+    ...base,
+    status: maquina ? 'em_execucao' : 'nao_disparado',
+    motivoInterrupcao: maquina ? '' : motivo,
+    maquina: maquina ? maquina.machineId : '',
+    maquinaId: maquina ? maquina._id : null,
+    iniciadoEm: maquina ? new Date() : null,
+  });
+  if (maquina) await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
+  return exec;
 }
 
 // Executar robô manualmente
@@ -2864,26 +2896,7 @@ app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOpe
       return;
     }
 
-    const { maquina, motivo } = await alocarMaquinaDoRobo(robo, req.usuario.empresa);
-
-    const exec = await ExecucaoRobo.create({
-      roboId:    robo._id,
-      roboNome:  robo.nome,
-      status:    maquina ? 'em_execucao' : 'nao_disparado',
-      motivoInterrupcao: maquina ? '' : motivo,
-      maquina:   maquina ? maquina.machineId : '',
-      maquinaId: maquina ? maquina._id : null,
-      gatilho:   req.body.gatilho || 'manual',
-      prioridade: robo.prioridade || 'Media',
-      iniciadoEm: maquina ? new Date() : null,
-      empresa:   req.usuario.empresa,
-      criadoPor: req.usuario.id
-    });
-
-    if (maquina) {
-      await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
-    }
-
+    const exec = await dispararExecucaoRobo(robo, { empresa: req.usuario.empresa, gatilho: req.body.gatilho || 'manual', criadoPor: req.usuario.id });
     res.status(201).json({ ...exec.toObject(), status: exec.status });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -2891,7 +2904,7 @@ app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOpe
 // Interromper execução
 app.post('/api/robos/execucoes/:id/interromper', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
-    const atual = await ExecucaoRobo.findOne({ _id: req.params.id, empresa: req.usuario.empresa, status: 'em_execucao' });
+    const atual = await ExecucaoRobo.findOne({ _id: req.params.id, empresa: req.usuario.empresa, status: { $in: ['em_execucao', 'na_fila'] } });
     if (!atual) return res.status(404).json({ erro: 'Execução não encontrada ou já finalizada' });
 
     // Execução vinda do builder: cancelamento é cooperativo (cancelRequested no
@@ -2903,7 +2916,7 @@ app.post('/api/robos/execucoes/:id/interromper', authMiddleware, verificarAssina
     }
 
     const exec = await ExecucaoRobo.findOneAndUpdate(
-      { _id: req.params.id, empresa: req.usuario.empresa, status: 'em_execucao' },
+      { _id: req.params.id, empresa: req.usuario.empresa, status: { $in: ['em_execucao', 'na_fila'] } },
       { status: 'interrompido', motivoInterrupcao: req.body.motivo || 'Interrupção manual', finalizadoEm: new Date() },
       { new: true }
     );
@@ -3050,7 +3063,7 @@ app.post('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('ac
   try {
     const machineKey = crypto.randomUUID();
     // Campos da máquina da Nuvem são controlados só pelo servidor.
-    const { efemera, usos, fila, encerrando, ociosaDesde, ...dados } = req.body;
+    const { efemera, usos, filaOrdem, encerrando, ociosaDesde, ...dados } = req.body;
     const maquina = await Maquina.create({
       ...dados, machineKey,
       empresa: req.usuario.empresa, criadoPor: req.usuario.id
@@ -3061,7 +3074,7 @@ app.post('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('ac
 
 app.put('/api/maquinas/:id', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
-    const { machineKey, efemera, usos, fila, encerrando, ociosaDesde, ...updates } = req.body;
+    const { machineKey, efemera, usos, filaOrdem, encerrando, ociosaDesde, ...updates } = req.body;
     const maquina = await Maquina.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
       { ...updates, atualizadoEm: new Date() },
@@ -3409,17 +3422,7 @@ setInterval(async () => {
     const now = new Date();
     const agendados = await Robot.find({ 'schedule.ativo': true, 'schedule.proximaExec': { $lte: now }, ativo: true });
     for (const robo of agendados) {
-      const { maquina, motivo } = await alocarMaquinaDoRobo(robo, robo.empresa);
-      await ExecucaoRobo.create({
-        roboId: robo._id, roboNome: robo.nome,
-        status: maquina ? 'em_execucao' : 'nao_disparado',
-        motivoInterrupcao: maquina ? '' : motivo,
-        maquina: maquina ? maquina.machineId : '',
-        maquinaId: maquina ? maquina._id : null,
-        gatilho: 'schedule', prioridade: robo.prioridade || 'Media',
-        iniciadoEm: maquina ? new Date() : null, empresa: robo.empresa
-      });
-      if (maquina) await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
+      await dispararExecucaoRobo(robo, { empresa: robo.empresa, gatilho: 'schedule' });
       const proxima = calcularProximaExec(robo.schedule);
       if (proxima) await Robot.findByIdAndUpdate(robo._id, { 'schedule.proximaExec': proxima });
       else await Robot.findByIdAndUpdate(robo._id, { 'schedule.ativo': false }); // unico: desativa após disparar

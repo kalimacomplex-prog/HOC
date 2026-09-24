@@ -8730,8 +8730,8 @@ senha = campos.get('senha', '')</pre>
     );
     const tbody = document.getElementById('execRobosBody');
     if(!tbody) return;
-    const STATUS_BADGE = {em_execucao:'background:var(--accent);color:white',concluido:'background:#00B37E;color:white',erro:'background:#FF2E4D;color:white',interrompido:'background:#FFAE00;color:white',nao_disparado:'background:#F1F2F5;color:#6B7080'};
-    const STATUS_LABEL = {em_execucao:'Em execução',concluido:'Concluído',erro:'Erro',interrompido:'Interrompido',nao_disparado:'Não disparado'};
+    const STATUS_BADGE = {em_execucao:'background:var(--accent);color:white',concluido:'background:#00B37E;color:white',erro:'background:#FF2E4D;color:white',interrompido:'background:#FFAE00;color:white',nao_disparado:'background:#F1F2F5;color:#6B7080',na_fila:'background:#E0E7FF;color:#3730A3'};
+    const STATUS_LABEL = {em_execucao:'Em execução',concluido:'Concluído',erro:'Erro',interrompido:'Interrompido',nao_disparado:'Não disparado',na_fila:'Na fila (Nuvem)'};
     if(lista.length===0) { tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:#9CA0AC">Nenhuma execução encontrada.</td></tr>`; return; }
     tbody.innerHTML = lista.map(e=>{
       const style = STATUS_BADGE[e.status]||'background:#F1F2F5;color:#6B7080';
@@ -8764,6 +8764,9 @@ senha = campos.get('senha', '')</pre>
         if (!res.ok) { hocToast('Erro: ' + (data.erro||res.status), 'erro'); return; }
         if (data.status === 'nao_disparado') {
           hocToast('Nenhuma máquina online disponível. Verifique a aba Ambiente.', 'aviso', 5000);
+        } else if (data.status === 'na_fila') {
+          hocToast('Robô na fila da Nuvem — roda assim que a máquina da empresa ficar livre.', 'ok', 5000);
+          mudarRoboTab('producao', document.getElementById('roboTabProducaoBtn'));
         } else {
           hocToast('Robô disparado! Acompanhe em Execuções.', 'ok');
           mudarRoboTab('producao', document.getElementById('roboTabProducaoBtn'));
@@ -9211,6 +9214,7 @@ senha = campos.get('senha', '')</pre>
     erro:         { bg:'color-mix(in srgb,#FF2E4D 10%,white)', color:'#B3123A', label:'Erro' },
     interrompido: { bg:'color-mix(in srgb,#FFAE00 14%,white)', color:'#8A5D00', label:'Interrompido' },
     nao_disparado:{ bg:'#F1F2F5', color:'#6B7080', label:'Não disparado' },
+    na_fila:      { bg:'#E0E7FF', color:'#3730A3', label:'Na fila (Nuvem)' },
   };
 
   async function carregarHistoricoExecucoes(roboId) {

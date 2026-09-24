@@ -53,6 +53,7 @@
     .st-erro { background:#fee2e2; color:#dc2626; }
     .st-interrompido { background:#fef9c3; color:#854d0e; }
     .st-nao_disparado { background:#f1f5f9; color:#64748b; }
+    .st-na_fila { background:#e0e7ff; color:#3730a3; }
     .btn-xs { padding:3px 8px; border-radius:5px; font-size:10px; font-weight:600; cursor:pointer; border:1px solid; transition:all .15s; }
     /* Robôs list */
     .rbt-toolbar { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
@@ -294,6 +295,7 @@
           <select id="execFiltroStatus" class="exec-filter" onchange="filtrarExecucoes()">
             <option value="">Todos os status</option>
             <option value="em_execucao">Em execução</option>
+            <option value="na_fila">Na fila (Nuvem)</option>
             <option value="concluido">Concluído</option>
             <option value="erro">Erro</option>
             <option value="interrompido">Interrompido</option>
@@ -865,7 +867,7 @@
     const r = await fetch(`/api/robos/${id}/executar`, { method:'POST', headers:HEADERS, body:JSON.stringify({gatilho:'manual'}) });
     const d = await r.json();
     if (r.ok) {
-      alert(d.status==='nao_disparado'?'⚠️ Sem agentes disponíveis. Execução registrada como não disparada.':'✅ Robô disparado com sucesso!');
+      alert(d.status==='nao_disparado'?'⚠️ Sem agentes disponíveis. Execução registrada como não disparada.':d.status==='na_fila'?'⏳ Robô na fila da Nuvem — roda assim que a máquina da empresa ficar livre.':'✅ Robô disparado com sucesso!');
     } else alert('Erro: ' + (d.erro||'desconhecido'));
   }
 
@@ -1218,6 +1220,7 @@
       erro: ['Erro','st-erro','❌'],
       interrompido: ['Interrompido','st-interrompido','⚠️'],
       nao_disparado: ['Não disparado','st-nao_disparado','⏸️'],
+      na_fila: ['Na fila (Nuvem)','st-na_fila','⏳'],
     };
     const [label, cls, icon] = map[st] || [st||'—','st-nao_disparado',''];
     return `<span class="status-badge ${cls}">${icon} ${label}</span>`;

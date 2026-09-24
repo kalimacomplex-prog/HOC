@@ -697,7 +697,7 @@ const RB_AI_MODELO_OUTRO = '__outro__';
 const RB_AI_OPENAI_TYPES = new Set(['generate_embedding', 'moderate_content', 'generate_ai_image', 'transcribe_audio', 'text_to_speech']);
 // Steps "de máquina" (AGENT_STEP_TYPES no servidor): vão pra um Agent online da empresa ou,
 // sem nenhum, pra um runner efêmero da Nuvem (GitHub Actions) — ver automationEngine.escolherMaquina.
-const RB_HINT_MAQUINA = '<div class="rb-hint">Roda num Agent da empresa (se houver um online) ou na Nuvem (GitHub Actions). Na Nuvem o navegador é sempre sem interface visível e sem perfil salvo.</div>';
+const RB_HINT_MAQUINA = '<div class="rb-hint">Passo de máquina: roda onde o robô foi configurado no topo ("Rodar: Local" = Agent da empresa, precisa estar online; "Rodar: Nuvem" = GitHub Actions, uma execução por vez por empresa). Na Nuvem o navegador é sempre sem interface visível e sem perfil salvo.</div>';
 const RB_GDRIVE_TYPES = new Set(['gdrive_create_folder', 'gdrive_upload_file', 'gdrive_update_file_content', 'gdrive_download_file', 'gdrive_delete_file', 'gdrive_list_files', 'gdrive_rename_file', 'gdrive_move_file', 'gdrive_copy_file', 'gdrive_share_file', 'gdrive_file_info',
   'gsheets_create_spreadsheet', 'gsheets_read_values', 'gsheets_write_values', 'gsheets_append_row', 'gsheets_clear_values', 'gsheets_list_sheets', 'gsheets_add_sheet', 'gsheets_delete_sheet']);
 
@@ -1112,6 +1112,12 @@ async function rbCarregar() {
     document.getElementById('rbDesc').value = automacao.descricao || '';
     rbSteps = JSON.parse(JSON.stringify(automacao.steps || []));
     rbRoboId = automacao.roboId || rbRoboId;
+    if (rbRoboId) {
+      // Não há GET de um robô só: pega da lista da empresa pra mostrar onde ele roda.
+      const robos = await rbApi('GET', '/api/robos').catch(() => []);
+      const robo = (Array.isArray(robos) ? robos : robos.robos || []).find((r) => r._id === rbRoboId);
+      if (robo) document.getElementById('rbAmbiente').value = robo.ambiente === 'nuvem' ? 'nuvem' : 'local';
+    }
   } catch (e) {
     rbToast('Erro ao carregar automação: ' + e.message, 'error');
   }
@@ -1136,7 +1142,7 @@ async function rbSalvar() {
 
     if (!rbRoboId) {
       const robo = await rbApi('POST', '/api/robos', {
-        nome, descricao, origem: 'builder', automacaoId: automacao._id, ambiente: 'local',
+        nome, descricao, origem: 'builder', automacaoId: automacao._id, ambiente: rbAmbienteEscolhido(),
       });
       rbRoboId = robo._id;
       await rbApi('PATCH', `/api/automacoes/${rbAutomacaoId}`, { roboId: rbRoboId }).catch(() => {});
@@ -1144,7 +1150,7 @@ async function rbSalvar() {
     } else {
       // Edição de um robô já existente: mantém nome/descrição do card (Robô) iguais aos do
       // fluxo — senão renomear no Studio não apareceria na lista de Robôs.
-      await rbApi('PUT', `/api/robos/${rbRoboId}`, { nome, descricao }).catch(() => {});
+      await rbApi('PUT', `/api/robos/${rbRoboId}`, { nome, descricao, ambiente: rbAmbienteEscolhido() }).catch(() => {});
     }
 
     rbEmpresaSteps = false;
@@ -1155,6 +1161,10 @@ async function rbSalvar() {
   } finally {
     btn.disabled = false;
   }
+}
+
+function rbAmbienteEscolhido() {
+  return document.getElementById('rbAmbiente')?.value === 'nuvem' ? 'nuvem' : 'local';
 }
 
 function rbVoltar() {

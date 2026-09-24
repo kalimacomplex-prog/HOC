@@ -2826,9 +2826,9 @@ async function alocarMaquinaDoRobo(robo, empresa) {
     maquina = await Maquina.findOne({ _id: robo.maquinaId, empresa, status: { $in: ['online','busy'] }, ativo: true });
   }
   if (!maquina) {
+    // Agent local (máquina física): sem limite de execuções simultâneas.
     maquina = await Maquina.findOne({
-      empresa, status: 'online', ativo: true,
-      $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
+      empresa, status: { $in: ['online', 'busy'] }, ativo: true, efemera: { $ne: true },
     }).sort({ robosAtivos: 1 });
   }
   return { maquina, motivo: maquina ? '' : 'Nenhuma máquina online disponível' };
@@ -3047,8 +3047,10 @@ app.get('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('ace
 app.post('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
     const machineKey = crypto.randomUUID();
+    // Campos da máquina da Nuvem são controlados só pelo servidor.
+    const { efemera, usos, encerrando, ociosaDesde, ...dados } = req.body;
     const maquina = await Maquina.create({
-      ...req.body, machineKey,
+      ...dados, machineKey,
       empresa: req.usuario.empresa, criadoPor: req.usuario.id
     });
     res.status(201).json({ ...maquina.toObject() }); // key included only on creation
@@ -3057,7 +3059,7 @@ app.post('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('ac
 
 app.put('/api/maquinas/:id', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
-    const { machineKey, ...updates } = req.body;
+    const { machineKey, efemera, usos, encerrando, ociosaDesde, ...updates } = req.body;
     const maquina = await Maquina.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
       { ...updates, atualizadoEm: new Date() },

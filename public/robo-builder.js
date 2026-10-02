@@ -147,19 +147,19 @@ const RB_ACOES = [
   { tipo: 'read_file', label: 'Ler arquivo', icone: 'file-text', cor: '#276749', cat: 'Arquivos (na máquina)' },
   { tipo: 'write_file', label: 'Escrever arquivo', icone: 'edit', cor: '#276749', cat: 'Arquivos (na máquina)' },
   { tipo: 'run_command', label: 'Rodar comando', icone: 'terminal', cor: '#1a202c', cat: 'Sistema (na máquina)' },
-  { tipo: 'browser_flow', label: 'Fluxo de navegador', icone: 'globe', cor: '#c53030', cat: 'Browser (na máquina)' },
+  { tipo: 'browser_flow', label: 'Fluxo de navegador', icone: 'globe', cor: '#c53030', cat: 'Navegador' },
 
   // ---- Sessão de browser persistente entre steps ----
-  { tipo: 'browser_open', label: 'Abrir sessão de navegador', icone: 'globe', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target', 'headless', 'browser_profile'], agente: true },
-  { tipo: 'browser_click', label: 'Clicar (sessão)', icone: 'mouse-pointer', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target'], agente: true },
-  { tipo: 'browser_type', label: 'Digitar (sessão)', icone: 'keyboard', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target', 'value'], agente: true },
-  { tipo: 'browser_extract', label: 'Extrair texto (sessão)', icone: 'clipboard', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target'], agente: true },
-  { tipo: 'browser_wait', label: 'Aguardar elemento (sessão)', icone: 'clock', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target', 'seconds', 'timeout_seconds'], agente: true },
-  { tipo: 'browser_screenshot', label: 'Screenshot (sessão)', icone: 'camera', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target'], agente: true },
-  { tipo: 'browser_close', label: 'Fechar sessão de navegador', icone: 'x', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name'], agente: true },
-  { tipo: 'browser_captcha_detect', label: 'Captcha foi resolvido?', icone: 'shield-alert', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name'], agente: true },
-  { tipo: 'browser_captcha_wait', label: 'Aguardar resolução de captcha', icone: 'clock-repeat', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'timeout_seconds'], agente: true },
-  { tipo: 'browser_captcha_solve_image', label: 'Capturar imagem do captcha', icone: 'camera', cor: '#c53030', cat: 'Browser com sessão (na máquina)', fields: ['session_name', 'target'], agente: true },
+  { tipo: 'browser_open', label: 'Abrir sessão de navegador', icone: 'globe', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target', 'navegador', 'headless', 'browser_profile'], agente: true },
+  { tipo: 'browser_click', label: 'Clicar (sessão)', icone: 'mouse-pointer', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target'], agente: true },
+  { tipo: 'browser_type', label: 'Digitar (sessão)', icone: 'keyboard', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target', 'value'], agente: true },
+  { tipo: 'browser_extract', label: 'Extrair texto (sessão)', icone: 'clipboard', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target'], agente: true },
+  { tipo: 'browser_wait', label: 'Aguardar elemento (sessão)', icone: 'clock', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target', 'seconds', 'timeout_seconds'], agente: true },
+  { tipo: 'browser_screenshot', label: 'Screenshot (sessão)', icone: 'camera', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target'], agente: true },
+  { tipo: 'browser_close', label: 'Fechar sessão de navegador', icone: 'x', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name'], agente: true },
+  { tipo: 'browser_captcha_detect', label: 'Captcha foi resolvido?', icone: 'shield-alert', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name'], agente: true },
+  { tipo: 'browser_captcha_wait', label: 'Aguardar resolução de captcha', icone: 'clock-repeat', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'timeout_seconds'], agente: true },
+  { tipo: 'browser_captcha_solve_image', label: 'Capturar imagem do captcha', icone: 'camera', cor: '#c53030', cat: 'Navegador com sessão', fields: ['session_name', 'target'], agente: true },
 
   // ---- Expansão (formulário genérico por metadados de campo, ver RB_FIELD_META) ----
   { tipo: 'calculate', label: 'Calcular expressão', icone: 'calculator', cor: '#3b5bdb', cat: 'Variáveis', fields: ['expression'] },
@@ -311,11 +311,23 @@ const RB_ACOES = [
   { tipo: 'gdrive_copy_file', label: 'Copiar arquivo (Google Drive)', icone: 'copy', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_file_name', 'gdrive_parent_id', 'api_key'] },
   { tipo: 'gdrive_share_file', label: 'Compartilhar arquivo/pasta (Google Drive)', icone: 'link', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'gdrive_share_email', 'gdrive_share_role', 'api_key'] },
   { tipo: 'gdrive_file_info', label: 'Info do arquivo/pasta (Google Drive)', icone: 'info', cor: '#0f9d58', cat: 'Google Drive', fields: ['gdrive_file_id', 'api_key'] },
+
+  { tipo: 'gsheets_create_spreadsheet', label: 'Criar planilha (Google Sheets)', icone: 'table', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_titulo', 'gdrive_parent_id', 'api_key'] },
+  { tipo: 'gsheets_read_values', label: 'Ler intervalo (Google Sheets)', icone: 'table', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_range', 'api_key'] },
+  { tipo: 'gsheets_write_values', label: 'Escrever intervalo (Google Sheets)', icone: 'edit', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_range', 'data_input', 'api_key'] },
+  { tipo: 'gsheets_append_row', label: 'Adicionar linha (Google Sheets)', icone: 'check', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_range', 'data_input', 'api_key'] },
+  { tipo: 'gsheets_clear_values', label: 'Limpar intervalo (Google Sheets)', icone: 'broom', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_range', 'api_key'] },
+  { tipo: 'gsheets_list_sheets', label: 'Listar abas (Google Sheets)', icone: 'list', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'api_key'] },
+  { tipo: 'gsheets_add_sheet', label: 'Criar aba (Google Sheets)', icone: 'folder', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_titulo', 'api_key'] },
+  { tipo: 'gsheets_delete_sheet', label: 'Excluir aba (Google Sheets)', icone: 'trash', cor: '#188038', cat: 'Google Sheets', fields: ['gsheets_id', 'gsheets_titulo', 'api_key'] },
 ];
 const RB_ACOES_MAP = Object.fromEntries(RB_ACOES.map((a) => [a.tipo, a]));
 
 // Metadados de campo pro formulário genérico (usado pelos steps de expansão
 // acima, que têm `fields: [...]` em vez de um formulário escrito à mão).
+// Navegadores do campo "Navegador" (mesmos nomes de NAVEGADORES em hoc_step_executor.py).
+const RB_NAVEGADORES = [['chromium', 'Chromium (padrão)'], ['chrome', 'Google Chrome'], ['msedge', 'Microsoft Edge'], ['firefox', 'Firefox'], ['webkit', 'WebKit (motor do Safari)']];
+const RB_NAVEGADOR_HINT = 'Todos rodam no Agent e na Nuvem. Na primeira vez que um navegador é usado numa máquina ele é instalado sozinho (pode levar 1–2 min); no Agent, Chrome e Edge precisam já estar instalados.';
 const RB_FIELD_META = {
   value: { label: 'Valor', type: 'text', hint: 'Pode usar {output} ou {variavel}.' },
   expression: { label: 'Expressão', type: 'text', hint: 'Ex: {x} * 2 + Math.sqrt(9)' },
@@ -383,16 +395,20 @@ const RB_FIELD_META = {
   seconds: { label: 'Segundos', type: 'text' },
   timeout_seconds: { label: 'Timeout (segundos)', type: 'text' },
   session_name: { label: 'Nome da sessão', type: 'text', placeholder: 'principal', hint: 'Mesmo nome usado em "Abrir sessão" — identifica qual navegador esse step controla.' },
-  browser_profile: { label: 'Pasta de perfil persistente (opcional)', type: 'text', hint: 'Preenche pra manter login/cookies entre execuções (força janela visível, não headless).' },
+  navegador: { label: 'Navegador', type: 'select', options: RB_NAVEGADORES, hint: RB_NAVEGADOR_HINT },
+  browser_profile: { label: 'Pasta de perfil persistente (opcional)', type: 'text', hint: 'Preenche pra manter login/cookies entre execuções (força janela visível, não headless). Só vale num Agent — na Nuvem é ignorado.' },
   headless: { label: 'Sem interface visível (headless)', type: 'checkbox' },
   gdrive_file_id: { label: 'ID do arquivo/pasta', type: 'text', hint: 'Copie da URL do Drive (depois de "/d/" ou "/folders/"). Aceita {output} ou {variavel}.' },
-  gdrive_parent_id: { label: 'ID da pasta (opcional)', type: 'text', hint: 'Vazio = raiz do Drive compartilhado com a conta de serviço.' },
+  gdrive_parent_id: { label: 'ID da pasta (opcional)', type: 'text', hint: 'Vazio = raiz do Meu Drive da conta Google conectada.' },
   gdrive_new_parent_id: { label: 'ID da pasta de destino', type: 'text' },
   gdrive_file_name: { label: 'Nome do arquivo/pasta', type: 'text' },
   gdrive_mime_type: { label: 'Tipo (MIME, opcional)', type: 'text', placeholder: 'application/pdf' },
   gdrive_query: { label: 'Filtro extra (opcional)', type: 'text', placeholder: "name contains 'relatorio'", hint: 'Sintaxe de busca do Google Drive (campo "q" da API).' },
   gdrive_share_email: { label: 'E-mail para compartilhar (opcional)', type: 'text', hint: 'Vazio = compartilha com "qualquer pessoa com o link".' },
   gdrive_share_role: { label: 'Permissão', type: 'select', options: [['reader', 'Leitor'], ['writer', 'Editor'], ['commenter', 'Comentarista']] },
+  gsheets_id: { label: 'ID da planilha', type: 'text', hint: 'Copie da URL do Sheets (depois de "/d/", antes de "/edit").' },
+  gsheets_range: { label: 'Intervalo', type: 'text', placeholder: 'Página1!A1:C10' },
+  gsheets_titulo: { label: 'Título', type: 'text' },
 };
 
 function rbGenericFields(step) {
@@ -679,7 +695,11 @@ const RB_AI_MODELOS = {
 };
 const RB_AI_MODELO_OUTRO = '__outro__';
 const RB_AI_OPENAI_TYPES = new Set(['generate_embedding', 'moderate_content', 'generate_ai_image', 'transcribe_audio', 'text_to_speech']);
-const RB_GDRIVE_TYPES = new Set(['gdrive_create_folder', 'gdrive_upload_file', 'gdrive_update_file_content', 'gdrive_download_file', 'gdrive_delete_file', 'gdrive_list_files', 'gdrive_rename_file', 'gdrive_move_file', 'gdrive_copy_file', 'gdrive_share_file', 'gdrive_file_info']);
+// Steps "de máquina" (AGENT_STEP_TYPES no servidor): vão pra um Agent online da empresa ou,
+// sem nenhum, pra um runner efêmero da Nuvem (GitHub Actions) — ver automationEngine.escolherMaquina.
+const RB_HINT_MAQUINA = '<div class="rb-hint">Passo de máquina: roda onde o robô foi configurado no topo ("Rodar: Local" = Agent da empresa, precisa estar online; "Rodar: Nuvem" = GitHub Actions, uma execução por vez por empresa). Na Nuvem o navegador é sempre sem interface visível e sem perfil salvo.</div>';
+const RB_GDRIVE_TYPES = new Set(['gdrive_create_folder', 'gdrive_upload_file', 'gdrive_update_file_content', 'gdrive_download_file', 'gdrive_delete_file', 'gdrive_list_files', 'gdrive_rename_file', 'gdrive_move_file', 'gdrive_copy_file', 'gdrive_share_file', 'gdrive_file_info',
+  'gsheets_create_spreadsheet', 'gsheets_read_values', 'gsheets_write_values', 'gsheets_append_row', 'gsheets_clear_values', 'gsheets_list_sheets', 'gsheets_add_sheet', 'gsheets_delete_sheet']);
 
 async function rbCarregarDadosIA() {
   try { rbCredenciais = await rbApi('GET', '/api/credenciais'); } catch { rbCredenciais = []; }
@@ -730,26 +750,29 @@ function rbAiKeyOrSession(id, c) {
   return html;
 }
 
-// Campo de credencial das ações do Google Drive: conta de serviço do Google (JSON) —
-// escolhida do cofre (recomendado) ou colada direto no step. Mesmo padrão do
-// "Token" da sessão de IA (ver rbRenderAiOpenForm), mas sem sessão: cada step
-// resolve a credencial e o token de acesso na hora, sem precisar "abrir" nada antes.
+// Campo de credencial das ações do Google Drive/Sheets: de preferência a conta Google
+// conectada em Operações → Credenciais ("Conectar conta Google" — app OAuth da própria
+// empresa, a credencial inteira é usada); ou uma conta de serviço (JSON) do cofre ou
+// colada direto no step. Cada step resolve a credencial e o token na hora.
 function rbGDriveCredField(id, c) {
   const cred = rbCredenciais.find((x) => x.nome === c.credencial_nome);
-  let html = rbField('Conta de serviço do Google — credencial do cofre (recomendado)', `<select onchange="rbUpdateConfig('${id}','credencial_nome',this.value);rbRenderProps()">
-    <option value="">Colar o JSON abaixo</option>
+  const ehOAuth = !!(cred && cred.campos && (cred.campos.client_id || cred.campos.refresh_token));
+  let html = rbField('Conta Google — credencial do cofre', `<select onchange="rbUpdateConfig('${id}','credencial_nome',this.value);rbRenderProps()">
+    <option value="">Colar JSON abaixo</option>
     ${c.credencial_nome && !cred ? `<option value="${escapeHtmlRb(c.credencial_nome)}" selected>${escapeHtmlRb(c.credencial_nome)} (não encontrada)</option>` : ''}
     ${rbCredenciais.map((x) => `<option value="${escapeHtmlRb(x.nome)}" ${x.nome === c.credencial_nome ? 'selected' : ''}>${escapeHtmlRb(x.nome)}</option>`).join('')}
-  </select>`, 'O JSON da conta de serviço fica guardado no cofre (Operações → Credenciais), não dentro do robô. Compartilhe a pasta do Drive com o "client_email" dessa conta de serviço.');
-  if (c.credencial_nome) {
+  </select>`, 'Conecte a conta Google da empresa em Operações → Credenciais → "Conectar conta Google" e escolha aqui a credencial criada. O robô acessa só o Drive dessa conta.');
+  if (c.credencial_nome && ehOAuth) {
+    if (!cred.campos.refresh_token || !cred.campos.client_id) html += '<div style="font-size:11px;color:#B45309;margin:-4px 0 10px">Essa conta Google ainda não foi conectada — clique em "Conectar" nela em Operações → Credenciais.</div>';
+  } else if (c.credencial_nome) {
     const campos = Object.keys((cred && cred.campos) || {});
     if (!campos.includes(c.campo_cred || 'service_account_json')) campos.unshift(c.campo_cred || 'service_account_json');
-    html += rbField('Campo da credencial', `<select onchange="rbUpdateConfig('${id}','campo_cred',this.value)">
+    html += rbField('Campo com o JSON da conta de serviço', `<select onchange="rbUpdateConfig('${id}','campo_cred',this.value)">
       ${campos.map((k) => `<option value="${escapeHtmlRb(k)}" ${k === (c.campo_cred || 'service_account_json') ? 'selected' : ''}>${escapeHtmlRb(k)}</option>`).join('')}
     </select>`);
   } else {
-    html += rbField('JSON da conta de serviço', `<textarea rows="4" placeholder='{"client_email":"...","private_key":"..."}' oninput="rbUpdateConfig('${id}','api_key',this.value)">${escapeHtmlRb(c.api_key || '')}</textarea>`,
-      'Cole aqui o arquivo de chave JSON (Google Cloud → IAM e admin → Contas de serviço → Chaves). Prefira uma credencial do cofre.');
+    html += rbField('JSON da credencial', `<textarea rows="4" placeholder='{"client_id":"...","client_secret":"...","refresh_token":"..."}  ou o JSON de uma conta de serviço' oninput="rbUpdateConfig('${id}','api_key',this.value)">${escapeHtmlRb(c.api_key || '')}</textarea>`,
+      'Prefira uma credencial do cofre — o que for colado aqui fica salvo dentro do robô.');
   }
   return html;
 }
@@ -909,21 +932,22 @@ function rbRenderProps() {
   } else if (step.type === 'read_file') {
     form += rbField('Caminho do arquivo', inp('file_path', 'C:\\pasta\\arquivo.txt'));
     form += rbField('Salvar conteúdo na variável', inp('variable_name'));
-    form += `<div class="rb-hint">Roda na máquina do tenant (precisa de um agente online).</div>`;
+    form += RB_HINT_MAQUINA;
   } else if (step.type === 'write_file') {
     form += rbField('Caminho do arquivo', inp('file_path'));
     form += rbField('Conteúdo', ta('content'));
     form += chk('append', 'Adicionar ao final (em vez de sobrescrever)');
-    form += `<div class="rb-hint">Roda na máquina do tenant (precisa de um agente online).</div>`;
+    form += RB_HINT_MAQUINA;
   } else if (step.type === 'run_command') {
     form += rbField('Comando', ta('command', 'python script.py'));
     form += rbField('Timeout (segundos)', inp('timeout_seconds', '60'));
     form += rbField('Salvar saída na variável', inp('variable_name'));
-    form += `<div class="rb-hint">Roda na máquina do tenant (precisa de um agente online).</div>`;
+    form += RB_HINT_MAQUINA;
   } else if (step.type === 'browser_flow') {
+    form += rbField('Navegador', sel('navegador', RB_NAVEGADORES), RB_NAVEGADOR_HINT);
     form += chk('headless', 'Sem interface visível (headless)');
     form += rbRenderBrowserActions(step);
-    form += `<div class="rb-hint">Roda na máquina do tenant, um browser por execução (sem sessão persistente entre steps nesta versão).</div>`;
+    form += `<div class="rb-hint">Um navegador por execução (abre, faz as ações e fecha). Roda num Agent ou na Nuvem (GitHub Actions) — na Nuvem sempre sem interface visível.</div>`;
   } else if (step.type === 'comment') {
     form += rbField('Anotação', ta('text'));
   } else {
@@ -944,7 +968,9 @@ function rbRenderProps() {
       form += meta.type === 'checkbox' ? `<div class="rb-field">${campoHtml}</div>` : rbField(meta.label, campoHtml, meta.hint);
     }
     form += rbField('Salvar resultado na variável', inp('variable_name'));
-    if (acao.agente) form += `<div class="rb-hint">Roda na máquina do tenant (precisa de um agente online).</div>`;
+    if (acao.agente) form += step.type === 'browser_captcha_wait'
+      ? '<div class="rb-hint">Precisa de um Agent (máquina da empresa): alguém resolve o captcha na janela aberta. Na Nuvem não há quem veja a janela — lá use "Capturar imagem do captcha" + "OCR de imagem".</div>'
+      : RB_HINT_MAQUINA;
   }
 
   el.innerHTML = `<div class="rb-props-titulo"><span class="rb-step-icone" style="background:${acao.cor}22;color:${acao.cor}">${_rbIcon(acao.icone, 14, acao.cor)}</span> ${escapeHtmlRb(acao.label)}</div>${form}`;
@@ -1086,6 +1112,12 @@ async function rbCarregar() {
     document.getElementById('rbDesc').value = automacao.descricao || '';
     rbSteps = JSON.parse(JSON.stringify(automacao.steps || []));
     rbRoboId = automacao.roboId || rbRoboId;
+    if (rbRoboId) {
+      // Não há GET de um robô só: pega da lista da empresa pra mostrar onde ele roda.
+      const robos = await rbApi('GET', '/api/robos').catch(() => []);
+      const robo = (Array.isArray(robos) ? robos : robos.robos || []).find((r) => r._id === rbRoboId);
+      if (robo) document.getElementById('rbAmbiente').value = robo.ambiente === 'nuvem' ? 'nuvem' : 'local';
+    }
   } catch (e) {
     rbToast('Erro ao carregar automação: ' + e.message, 'error');
   }
@@ -1110,7 +1142,7 @@ async function rbSalvar() {
 
     if (!rbRoboId) {
       const robo = await rbApi('POST', '/api/robos', {
-        nome, descricao, origem: 'builder', automacaoId: automacao._id, ambiente: 'local',
+        nome, descricao, origem: 'builder', automacaoId: automacao._id, ambiente: rbAmbienteEscolhido(),
       });
       rbRoboId = robo._id;
       await rbApi('PATCH', `/api/automacoes/${rbAutomacaoId}`, { roboId: rbRoboId }).catch(() => {});
@@ -1118,7 +1150,7 @@ async function rbSalvar() {
     } else {
       // Edição de um robô já existente: mantém nome/descrição do card (Robô) iguais aos do
       // fluxo — senão renomear no Studio não apareceria na lista de Robôs.
-      await rbApi('PUT', `/api/robos/${rbRoboId}`, { nome, descricao }).catch(() => {});
+      await rbApi('PUT', `/api/robos/${rbRoboId}`, { nome, descricao, ambiente: rbAmbienteEscolhido() }).catch(() => {});
     }
 
     rbEmpresaSteps = false;
@@ -1129,6 +1161,10 @@ async function rbSalvar() {
   } finally {
     btn.disabled = false;
   }
+}
+
+function rbAmbienteEscolhido() {
+  return document.getElementById('rbAmbiente')?.value === 'nuvem' ? 'nuvem' : 'local';
 }
 
 function rbVoltar() {

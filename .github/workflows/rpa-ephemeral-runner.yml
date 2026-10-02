@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y --no-install-recommends \
             tesseract-ocr tesseract-ocr-por poppler-utils libzbar0 ffmpeg
-          pip install --no-cache-dir requests playwright psutil
+          pip install --no-cache-dir requests playwright psutil ffmpeg-python
           playwright install --with-deps chromium
 
       - name: Rodar
@@ -46,4 +46,6 @@ jobs:
         env:
           HOC_API_URL: ${{ inputs.hoc_api_url }}
           HOC_MACHINE_KEY: ${{ inputs.machine_key }}
+          # Navegador sempre headless, sem perfil e com --no-sandbox (ver hoc_step_executor.NUVEM).
+          HOC_NUVEM: '1'
         run: python hoc_ephemeral_runner.py

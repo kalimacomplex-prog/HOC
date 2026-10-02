@@ -709,7 +709,7 @@ const AuditoriaRobo = mongoose.model('AuditoriaRobo', auditoriaRoboSchema);
 const execucaoRoboSchema = new mongoose.Schema({
   roboId: { type: mongoose.Schema.Types.ObjectId, ref: 'Robot', required: true },
   roboNome: { type: String, default: '' },
-  status: { type: String, default: 'em_execucao', enum: ['em_execucao','interrompido','erro','concluido','nao_disparado'] },
+  status: { type: String, default: 'em_execucao', enum: ['em_execucao','na_fila','interrompido','erro','concluido','nao_disparado'] },
   motivoInterrupcao: { type: String, default: '' },
   maquina: { type: String, default: '' },
   gatilho: { type: String, default: 'manual', enum: ['manual','schedule','webhook','workflow'] },
@@ -759,11 +759,21 @@ const maquinaSchema = new mongoose.Schema({
   // quando não tem máquina física do tenant online (ver lib/automationEngine.js
   // ::criarMaquinaEfemera) — some sozinha quando o run termina.
   efemera:         { type: Boolean, default: false },
+  // Só máquina da Nuvem: execuções rodando nela (usos), senhas de quem espera vaga em ordem de chegada (filaOrdem),
+  // marca de "sendo apagada" e desde quando está sem uso — ver
+  // lib/automationEngine.js::obterMaquinaEfemera.
+  usos:            { type: Number, default: 0 },
+  encerrando:      { type: Boolean, default: false },
+  ociosaDesde:     { type: Date, default: null },
+  filaOrdem:       { type: [String], default: [] },
   empresa:         { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true },
   criadoPor:       { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' },
   criadoEm:        { type: Date, default: Date.now },
   atualizadoEm:    { type: Date, default: Date.now }
 }, { strict: false });
+// No máximo UMA máquina da Nuvem (runner do GitHub Actions) viva por empresa:
+// o índice recusa a 2ª criação mesmo com duas execuções chegando juntas.
+maquinaSchema.index({ empresa: 1 }, { unique: true, name: 'uma_maquina_nuvem_por_empresa', partialFilterExpression: { efemera: true, encerrando: false } });
 const Maquina = mongoose.model('Maquina', maquinaSchema);
 
 // ==================== AUTOMAÇÃO (builder visual de Robôs) ====================
@@ -2805,24 +2815,57 @@ function roboRodaNoGithub(robo) {
 // pega o comando como um agent normal. Local: máquina vinculada, senão qualquer
 // online com slot livre.
 async function alocarMaquinaDoRobo(robo, empresa) {
-  if (roboRodaNoGithub(robo)) {
-    try {
-      return { maquina: await automationEngine.criarMaquinaEfemera(empresa), motivo: '' };
-    } catch (e) {
-      return { maquina: null, motivo: `Não foi possível iniciar o runner no GitHub Actions: ${e.message}` };
-    }
-  }
+  // Nuvem não passa por aqui: ver dispararExecucaoRobo (fila FIFO em segundo plano).
   let maquina = null;
   if (robo.maquinaId) {
     maquina = await Maquina.findOne({ _id: robo.maquinaId, empresa, status: { $in: ['online','busy'] }, ativo: true });
   }
   if (!maquina) {
+    // Agent local (máquina física): sem limite de execuções simultâneas.
     maquina = await Maquina.findOne({
-      empresa, status: 'online', ativo: true,
-      $expr: { $lt: ['$robosAtivos', '$capacidadeMaxima'] }
+      empresa, status: { $in: ['online', 'busy'] }, ativo: true, efemera: { $ne: true },
     }).sort({ robosAtivos: 1 });
   }
   return { maquina, motivo: maquina ? '' : 'Nenhuma máquina online disponível' };
+}
+
+// Cria a ExecucaoRobo de um robô não-builder e a encaminha. Local: máquina física
+// na hora (ou "não disparado"). Nuvem: a execução nasce "na_fila", a requisição
+// responde na hora e a espera pela máquina da Nuvem da empresa (FIFO, uma por
+// vez) roda em segundo plano; quando chega a vez vira "em_execucao" apontando
+// para a máquina, e o heartbeat do runner a pega. Interromper na fila cancela.
+async function dispararExecucaoRobo(robo, { empresa, gatilho, criadoPor = null }) {
+  const base = { roboId: robo._id, roboNome: robo.nome, gatilho, prioridade: robo.prioridade || 'Media', empresa, ...(criadoPor ? { criadoPor } : {}) };
+  if (roboRodaNoGithub(robo)) {
+    const exec = await ExecucaoRobo.create({ ...base, status: 'na_fila', maquina: '', maquinaId: null, iniciadoEm: null });
+    (async () => {
+      try {
+        const maquina = await automationEngine.obterMaquinaEfemera(empresa, {
+          deveCancelar: async () => (await ExecucaoRobo.findById(exec._id).select('status').lean())?.status !== 'na_fila',
+        });
+        const ok = await ExecucaoRobo.findOneAndUpdate({ _id: exec._id, status: 'na_fila' },
+          { $set: { status: 'em_execucao', maquina: maquina.machineId, maquinaId: maquina._id, iniciadoEm: new Date() } });
+        if (!ok) await automationEngine.liberarMaquinaEfemera(maquina._id); // interrompida no último instante
+      } catch (e) {
+        if (!e.cancelled) {
+          await ExecucaoRobo.updateOne({ _id: exec._id, status: 'na_fila' },
+            { $set: { status: 'nao_disparado', motivoInterrupcao: `Não foi possível usar a máquina da Nuvem: ${e.message}` } });
+        }
+      }
+    })().catch((err) => console.error('Erro na fila da Nuvem:', err));
+    return exec;
+  }
+  const { maquina, motivo } = await alocarMaquinaDoRobo(robo, empresa);
+  const exec = await ExecucaoRobo.create({
+    ...base,
+    status: maquina ? 'em_execucao' : 'nao_disparado',
+    motivoInterrupcao: maquina ? '' : motivo,
+    maquina: maquina ? maquina.machineId : '',
+    maquinaId: maquina ? maquina._id : null,
+    iniciadoEm: maquina ? new Date() : null,
+  });
+  if (maquina) await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
+  return exec;
 }
 
 // Executar robô manualmente
@@ -2853,26 +2896,7 @@ app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOpe
       return;
     }
 
-    const { maquina, motivo } = await alocarMaquinaDoRobo(robo, req.usuario.empresa);
-
-    const exec = await ExecucaoRobo.create({
-      roboId:    robo._id,
-      roboNome:  robo.nome,
-      status:    maquina ? 'em_execucao' : 'nao_disparado',
-      motivoInterrupcao: maquina ? '' : motivo,
-      maquina:   maquina ? maquina.machineId : '',
-      maquinaId: maquina ? maquina._id : null,
-      gatilho:   req.body.gatilho || 'manual',
-      prioridade: robo.prioridade || 'Media',
-      iniciadoEm: maquina ? new Date() : null,
-      empresa:   req.usuario.empresa,
-      criadoPor: req.usuario.id
-    });
-
-    if (maquina) {
-      await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
-    }
-
+    const exec = await dispararExecucaoRobo(robo, { empresa: req.usuario.empresa, gatilho: req.body.gatilho || 'manual', criadoPor: req.usuario.id });
     res.status(201).json({ ...exec.toObject(), status: exec.status });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -2880,7 +2904,7 @@ app.post('/api/robos/:id/executar', authMiddleware, verificarAssinatura, permOpe
 // Interromper execução
 app.post('/api/robos/execucoes/:id/interromper', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
-    const atual = await ExecucaoRobo.findOne({ _id: req.params.id, empresa: req.usuario.empresa, status: 'em_execucao' });
+    const atual = await ExecucaoRobo.findOne({ _id: req.params.id, empresa: req.usuario.empresa, status: { $in: ['em_execucao', 'na_fila'] } });
     if (!atual) return res.status(404).json({ erro: 'Execução não encontrada ou já finalizada' });
 
     // Execução vinda do builder: cancelamento é cooperativo (cancelRequested no
@@ -2892,7 +2916,7 @@ app.post('/api/robos/execucoes/:id/interromper', authMiddleware, verificarAssina
     }
 
     const exec = await ExecucaoRobo.findOneAndUpdate(
-      { _id: req.params.id, empresa: req.usuario.empresa, status: 'em_execucao' },
+      { _id: req.params.id, empresa: req.usuario.empresa, status: { $in: ['em_execucao', 'na_fila'] } },
       { status: 'interrompido', motivoInterrupcao: req.body.motivo || 'Interrupção manual', finalizadoEm: new Date() },
       { new: true }
     );
@@ -3038,8 +3062,10 @@ app.get('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('ace
 app.post('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
     const machineKey = crypto.randomUUID();
+    // Campos da máquina da Nuvem são controlados só pelo servidor.
+    const { efemera, usos, filaOrdem, encerrando, ociosaDesde, ...dados } = req.body;
     const maquina = await Maquina.create({
-      ...req.body, machineKey,
+      ...dados, machineKey,
       empresa: req.usuario.empresa, criadoPor: req.usuario.id
     });
     res.status(201).json({ ...maquina.toObject() }); // key included only on creation
@@ -3048,7 +3074,7 @@ app.post('/api/maquinas', authMiddleware, verificarAssinatura, permOperacoes('ac
 
 app.put('/api/maquinas/:id', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
   try {
-    const { machineKey, ...updates } = req.body;
+    const { machineKey, efemera, usos, filaOrdem, encerrando, ociosaDesde, ...updates } = req.body;
     const maquina = await Maquina.findOneAndUpdate(
       { _id: req.params.id, empresa: req.usuario.empresa },
       { ...updates, atualizadoEm: new Date() },
@@ -3122,16 +3148,18 @@ app.get('/api/maquinas/:id/agent-package.zip', authMiddleware, verificarAssinatu
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// Runner efêmero avisa que terminou o(s) comando(s) dele — apaga a Maquina temporária
-// (o próximo heartbeat volta 401 e o runner encerra sozinho, poupando minutos do
-// Actions). Só age em Maquina efemera:true; agent de máquina real recebe 404.
+// Runner da Nuvem avisa que terminou o(s) comando(s) dele. Como a máquina é
+// compartilhada pela empresa, só apaga se ninguém estiver usando nem na fila;
+// apagada, o próximo heartbeat volta 401 e o runner encerra sozinho. Só age em
+// Maquina efemera:true; agent de máquina real recebe 404.
 app.post('/api/maquinas/efemera/encerrar', async (req, res) => {
   try {
     const { machineKey } = req.body;
     if (!machineKey) return res.status(400).json({ erro: 'machineKey obrigatória' });
-    const maquina = await Maquina.findOneAndDelete({ machineKey, efemera: true });
+    const maquina = await Maquina.findOne({ machineKey, efemera: true });
     if (!maquina) return res.status(404).json({ erro: 'Máquina efêmera não encontrada' });
-    res.json({ ok: true });
+    const encerrada = await automationEngine.encerrarMaquinaEfemeraSeOciosa(maquina._id);
+    res.json({ ok: true, encerrada });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
 
@@ -3249,6 +3277,12 @@ app.post('/api/robos/execucoes/:id/logs', async (req, res) => {
     if (status === 'success' || (status === 'error' && exec?.status !== 'interrompido')) {
       await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: -1 } });
     }
+    // Robô Git/ZIP na máquina da Nuvem: libera a vaga dele ao terminar (inclusive interrompido).
+    // A marca vagaNuvemLiberada (update atômico) evita liberar duas vezes se o fim chegar repetido.
+    if (maquina.efemera && (status === 'success' || status === 'error')) {
+      const primeira = await ExecucaoRobo.findOneAndUpdate({ _id: req.params.id, vagaNuvemLiberada: { $ne: true } }, { $set: { vagaNuvemLiberada: true } });
+      if (primeira) await automationEngine.liberarMaquinaEfemera(maquina._id);
+    }
     res.json({ ok: true });
   } catch (err) { res.status(400).json({ erro: err.message }); }
 });
@@ -3342,6 +3376,9 @@ setInterval(async () => {
       );
       await Maquina.findByIdAndDelete(m._id);
     }
+    // Máquina da Nuvem sem uso segurada por uma fila que ninguém mais atende (ex.: servidor reiniciou).
+    const ociosas = await Maquina.find({ efemera: true, encerrando: false, usos: { $lte: 0 }, ociosaDesde: { $ne: null } }).select('_id').lean();
+    for (const m of ociosas) await automationEngine.encerrarMaquinaEfemeraSeOciosa(m._id, { abandonadas: true });
   } catch (e) { /* silent */ }
 }, 60000);
 
@@ -3385,17 +3422,7 @@ setInterval(async () => {
     const now = new Date();
     const agendados = await Robot.find({ 'schedule.ativo': true, 'schedule.proximaExec': { $lte: now }, ativo: true });
     for (const robo of agendados) {
-      const { maquina, motivo } = await alocarMaquinaDoRobo(robo, robo.empresa);
-      await ExecucaoRobo.create({
-        roboId: robo._id, roboNome: robo.nome,
-        status: maquina ? 'em_execucao' : 'nao_disparado',
-        motivoInterrupcao: maquina ? '' : motivo,
-        maquina: maquina ? maquina.machineId : '',
-        maquinaId: maquina ? maquina._id : null,
-        gatilho: 'schedule', prioridade: robo.prioridade || 'Media',
-        iniciadoEm: maquina ? new Date() : null, empresa: robo.empresa
-      });
-      if (maquina) await Maquina.findByIdAndUpdate(maquina._id, { $inc: { robosAtivos: 1 } });
+      await dispararExecucaoRobo(robo, { empresa: robo.empresa, gatilho: 'schedule' });
       const proxima = calcularProximaExec(robo.schedule);
       if (proxima) await Robot.findByIdAndUpdate(robo._id, { 'schedule.proximaExec': proxima });
       else await Robot.findByIdAndUpdate(robo._id, { 'schedule.ativo': false }); // unico: desativa após disparar
@@ -3488,32 +3515,37 @@ app.delete('/api/credenciais/:id', authMiddleware, verificarAssinatura, permOper
   catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
-// ---- OAuth do Google (Drive) — dá cota de armazenamento de verdade aos
-// Robôs de Google Drive (conta de serviço sozinha não consegue enviar/
-// atualizar arquivo, só ler/mover/excluir — ver lib/stepLibrary.js). Guarda
-// o refresh_token na credencial "google-drive" (cria se não existir), no
-// mesmo campo "campos" que as outras credenciais — os steps do builder
-// detectam sozinhos se o valor é um JSON de conta de serviço ou um
-// refresh_token do OAuth.
+// ---- OAuth do Google (Drive/Sheets) — cada empresa usa o PRÓPRIO app OAuth
+// do Google Cloud dela (ver lib/googleOAuth.js): o client_id/client_secret e o
+// refresh_token ficam juntos numa credencial do cofre da empresa, com o nome
+// que ela escolher. Os steps do builder usam essa credencial inteira.
 const googleOAuth = require('./lib/googleOAuth');
-googleOAuth.init({
-  fetch,
-  clientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
-  clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
-  redirectUri: `${PUBLIC_URL}/api/integracoes/google/callback`,
-});
-const GOOGLE_OAUTH_CRED_NOME = 'google-drive';
-const GOOGLE_OAUTH_CAMPO = 'refresh_token';
+googleOAuth.init({ fetch });
+const GOOGLE_OAUTH_REDIRECT_URI = `${PUBLIC_URL}/api/integracoes/google/callback`;
 
-// Login inicia por navegação de página inteira (não dá pra usar fetch/XHR
-// num redirect pro Google), então não passa pelo authMiddleware normal —
-// recebe o JWT já emitido pela query string e o valida manualmente.
-app.get('/api/integracoes/google/conectar', async (req, res) => {
-  let decoded;
-  try { decoded = jwt.verify(String(req.query.token || ''), process.env.JWT_SECRET || 'segredo123'); }
-  catch { return res.status(401).send('Sessão inválida ou expirada — abra Operações → Credenciais e clique em "Conectar Google Drive" de novo.'); }
-  const state = jwt.sign({ empresa: decoded.empresa }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '10m' });
-  res.redirect(googleOAuth.buildAuthUrl(state));
+app.get('/api/integracoes/google/info', authMiddleware, verificarAssinatura, permOperacoes('acessar'), (req, res) => {
+  res.json({ redirectUri: GOOGLE_OAUTH_REDIRECT_URI });
+});
+
+// Grava (ou atualiza) client_id/client_secret na credencial escolhida e devolve
+// a URL de login do Google — o navegador segue pra ela por navegação de página
+// inteira. client_secret vazio = mantém o que já estava salvo (reconectar).
+app.post('/api/integracoes/google/iniciar', authMiddleware, verificarAssinatura, permOperacoes('acessar'), async (req, res) => {
+  try {
+    const nome = String(req.body.nome || '').trim();
+    const clientId = String(req.body.client_id || '').trim();
+    const clientSecret = String(req.body.client_secret || '').trim();
+    if (!nome) return res.status(400).json({ erro: 'Informe o nome da credencial.' });
+    let cred = await Credencial.findOne({ nome, empresa: req.usuario.empresa });
+    const campos = { ...((cred && cred.campos) || {}) };
+    if (clientId) campos.client_id = clientId;
+    if (clientSecret) campos.client_secret = clientSecret;
+    if (!campos.client_id || !campos.client_secret) return res.status(400).json({ erro: 'Informe o Client ID e o Client secret do app OAuth do Google da sua empresa.' });
+    if (cred) { cred.campos = campos; cred.atualizadoEm = new Date(); await cred.save(); }
+    else cred = await Credencial.create({ nome, proprietario: 'Google', empresa: req.usuario.empresa, campos });
+    const state = jwt.sign({ empresa: String(req.usuario.empresa), credId: String(cred._id) }, process.env.JWT_SECRET || 'segredo123', { expiresIn: '10m' });
+    res.json({ url: googleOAuth.buildAuthUrl({ clientId: campos.client_id, redirectUri: GOOGLE_OAUTH_REDIRECT_URI, state }) });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 app.get('/api/integracoes/google/callback', async (req, res) => {
@@ -3523,17 +3555,16 @@ app.get('/api/integracoes/google/callback', async (req, res) => {
   try { state = jwt.verify(String(req.query.state || ''), process.env.JWT_SECRET || 'segredo123'); }
   catch { return voltar('google=erro&msg=' + encodeURIComponent('Link expirado, tente conectar de novo.')); }
   try {
-    const tokens = await googleOAuth.exchangeCode(String(req.query.code || ''));
+    const cred = await Credencial.findOne({ _id: state.credId, empresa: state.empresa });
+    if (!cred || !cred.campos?.client_id || !cred.campos?.client_secret) throw new Error('Credencial do Google não encontrada — cadastre de novo.');
+    const tokens = await googleOAuth.exchangeCode({
+      code: String(req.query.code || ''), clientId: cred.campos.client_id, clientSecret: cred.campos.client_secret, redirectUri: GOOGLE_OAUTH_REDIRECT_URI,
+    });
     if (!tokens.refresh_token) throw new Error('O Google não devolveu um refresh_token (tente desconectar o app em myaccount.google.com/permissions e conectar de novo).');
-    const cred = await Credencial.findOne({ nome: GOOGLE_OAUTH_CRED_NOME, empresa: state.empresa });
-    if (cred) {
-      cred.campos = { ...(cred.campos || {}), [GOOGLE_OAUTH_CAMPO]: tokens.refresh_token };
-      cred.atualizadoEm = new Date();
-      await cred.save();
-    } else {
-      await Credencial.create({ nome: GOOGLE_OAUTH_CRED_NOME, empresa: state.empresa, campos: { [GOOGLE_OAUTH_CAMPO]: tokens.refresh_token } });
-    }
-    voltar('google=ok');
+    cred.campos = { ...cred.campos, refresh_token: tokens.refresh_token };
+    cred.atualizadoEm = new Date();
+    await cred.save();
+    voltar('google=ok&cred=' + encodeURIComponent(cred.nome));
   } catch (err) {
     voltar('google=erro&msg=' + encodeURIComponent(err.message));
   }
@@ -3557,8 +3588,6 @@ const automationEngine = require('./lib/automationEngine');
 automationEngine.init({
   Automacao, AutomacaoRun, AutomacaoStepDispatch, Robot, ExecucaoRobo, Maquina, ConfigIA, Credencial,
   enviarEmail, resolverEChamarIA, fetch, githubActions,
-  googleOAuthClientId: process.env.GOOGLE_OAUTH_CLIENT_ID || '',
-  googleOAuthClientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET || '',
   hocApiUrl: PUBLIC_URL,
 });
 

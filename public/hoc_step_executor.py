@@ -22,11 +22,16 @@ Dois modelos de browser coexistem:
 import base64
 import json
 import os
+import queue
 import re
+import shutil
 import socket
 import subprocess
+import sys
+import tempfile
 import threading
 import time
+import urllib.request
 
 
 def _sub(text, ctx):
@@ -106,6 +111,143 @@ _sessions = {}
 _sessions_lock = threading.Lock()
 _SESSION_TTL_SECONDS = 30 * 60
 
+# Rodando no ambiente "Nuvem (GitHub Actions)" (hoc_ephemeral_runner.py): não
+# existe tela (então o navegador é sempre headless, sem perfil) e o Ubuntu
+# 24.04 do runner bloqueia o sandbox do Chrome (user namespaces via AppArmor)
+# — sem --no-sandbox o Chrome aberto na mão (Popen) morre calado. O Playwright
+# já faz isso sozinho no browser_flow (chromium.launch); aqui é só pra sessão.
+NUVEM = os.environ.get('HOC_NUVEM') == '1' or os.environ.get('GITHUB_ACTIONS') == 'true'
+_CHROME_BOOT_TIMEOUT = 25
+
+# Navegadores disponíveis no campo "Navegador" dos steps: nome -> (tipo do
+# Playwright, channel). "chromium" é o padrão e o único que usa a sessão via
+# CDP abaixo; os outros (Firefox/WebKit não falam CDP) usam _SessaoPlaywright.
+NAVEGADORES = {
+    'chromium': ('chromium', None),
+    'chrome': ('chromium', 'chrome'),
+    'msedge': ('chromium', 'msedge'),
+    'firefox': ('firefox', None),
+    'webkit': ('webkit', None),
+}
+_NOMES_NAVEGADOR = {'chromium': 'Chromium', 'chrome': 'Google Chrome', 'msedge': 'Microsoft Edge',
+                    'firefox': 'Firefox', 'webkit': 'WebKit (Safari)'}
+_instalacao_lock = threading.Lock()
+_instalados = set()
+
+
+def _navegador(cfg):
+    nome = str(cfg.get('navegador') or 'chromium').strip().lower()
+    if nome not in NAVEGADORES:
+        raise RuntimeError(f'Navegador "{nome}" desconhecido. Use: {", ".join(NAVEGADORES)}.')
+    return nome
+
+
+def _garantir_navegador(nome):
+    """Instala o navegador na primeira vez que ele é pedido nesta máquina (em
+    vez de instalar todos sempre — deixaria cada execução na Nuvem mais lenta
+    mesmo para quem só usa Chromium). Na Nuvem instala também as dependências
+    do sistema (--with-deps; o runner do GitHub tem sudo sem senha)."""
+    with _instalacao_lock:
+        if nome in _instalados:
+            return
+        if nome in ('chrome', 'msedge') and not NUVEM:
+            # No Windows instalar Chrome/Edge exige administrador: só avisa.
+            raise RuntimeError(f'{_NOMES_NAVEGADOR[nome]} não está instalado nesta máquina. Instale o navegador ou escolha outro no passo.')
+        cmd = [sys.executable, '-m', 'playwright', 'install'] + (['--with-deps'] if NUVEM else []) + [nome]
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
+        if r.returncode != 0:
+            raise RuntimeError(f'Falha ao instalar o {_NOMES_NAVEGADOR[nome]}: {(r.stderr or r.stdout).strip()[-500:]}')
+        _instalados.add(nome)
+
+
+def _falta_executavel(erro):
+    msg = str(erro)
+    return "Executable doesn't exist" in msg or 'is not found at' in msg or 'Chromium distribution' in msg
+
+
+def _abrir_contexto(p, nome, headless, perfil=''):
+    """Abre o navegador `nome` e devolve (browser_ou_None, contexto), instalando
+    o navegador e tentando de novo se o executável ainda não existir."""
+    tipo, canal = NAVEGADORES[nome]
+    bt = getattr(p, tipo)
+    kw = {'headless': headless}
+    if canal:
+        kw['channel'] = canal
+    for tentativa in (1, 2):
+        try:
+            if perfil:
+                return None, bt.launch_persistent_context(perfil, **kw)
+            browser = bt.launch(**kw)
+            return browser, browser.new_context(viewport={'width': 1366, 'height': 768})
+        except Exception as e:
+            if tentativa == 1 and _falta_executavel(e):
+                _garantir_navegador(nome)
+                continue
+            raise
+
+
+class _SessaoPlaywright:
+    """Sessão persistente para navegadores que não falam CDP (Firefox, WebKit) e
+    para Chrome/Edge. A API síncrona do Playwright não pode ser usada de threads
+    diferentes, então UMA thread é dona do navegador e executa, em ordem, as
+    ações que os steps (cada um na sua thread) colocam na fila."""
+
+    def __init__(self, nome, headless, perfil, url):
+        self._fila = queue.Queue()
+        self._pronto = threading.Event()
+        self._erro = None
+        self._thread = threading.Thread(target=self._rodar, args=(nome, headless, perfil, url), daemon=True)
+        self._thread.start()
+        # Folga para a instalação do navegador na primeira vez (pode levar minutos).
+        if not self._pronto.wait(900):
+            raise RuntimeError('O navegador não abriu a tempo.')
+        if self._erro:
+            raise self._erro
+
+    def _rodar(self, nome, headless, perfil, url):
+        try:
+            from playwright.sync_api import sync_playwright
+            with sync_playwright() as p:
+                browser, contexto = _abrir_contexto(p, nome, headless, perfil)
+                try:
+                    pagina = contexto.pages[0] if contexto.pages else contexto.new_page()
+                    if url and url != 'about:blank':
+                        pagina.goto(url)
+                    self._pronto.set()
+                    while True:
+                        item = self._fila.get()
+                        if item is None:
+                            break
+                        fn, resposta = item
+                        try:
+                            resposta.put((True, fn(pagina)))
+                        except Exception as e:  # erro da ação volta para o step que pediu
+                            resposta.put((False, e))
+                finally:
+                    try:
+                        contexto.close()
+                        if browser:
+                            browser.close()
+                    except Exception:
+                        pass
+        except Exception as e:
+            self._erro = RuntimeError(str(e).splitlines()[0] if str(e) else repr(e))
+            self._pronto.set()
+
+    def executar(self, fn, timeout=600):
+        if not self._thread.is_alive():
+            raise RuntimeError('A sessão de navegador foi encerrada.')
+        resposta = queue.Queue()
+        self._fila.put((fn, resposta))
+        ok, valor = resposta.get(timeout=timeout)
+        if not ok:
+            raise valor
+        return valor
+
+    def fechar(self):
+        self._fila.put(None)
+        self._thread.join(20)
+
 
 def _session_key(cfg, ctx):
     nome = cfg.get('session_name') or 'default'
@@ -125,8 +267,16 @@ def _iniciar_watchdog(session_key):
         with _sessions_lock:
             sess = _sessions.pop(session_key, None)
         if sess:
-            _matar_processo(sess['pid'])
+            _encerrar_sessao(sess)
     threading.Thread(target=_watch, daemon=True).start()
+
+
+def _encerrar_sessao(sess):
+    if sess.get('pw'):
+        sess['pw'].fechar()
+        return
+    _matar_processo(sess['pid'])
+    _apagar_perfil_tmp(sess.get('perfil_tmp'))
 
 
 def _matar_processo(pid):
@@ -167,30 +317,101 @@ def _browser_open(cfg, ctx):
         s.bind(('127.0.0.1', 0))
         porta = s.getsockname()[1]
 
-    perfil = _sub(cfg.get('browser_profile', ''), ctx)
     # Perfil persistente (extensões pagas de captcha, sessão de login salva)
     # só faz sentido com janela visível — headless nesse caso é ignorado de
-    # propósito, mesmo comportamento documentado no HAC.
-    headless = bool(cfg.get('headless', True)) and not perfil
+    # propósito, mesmo comportamento documentado no HAC. Na nuvem não há tela
+    # nem perfil salvo: sempre headless, perfil ignorado.
+    perfil = '' if NUVEM else _sub(cfg.get('browser_profile', ''), ctx)
+    headless = NUVEM or (_cfg_bool(cfg.get('headless', True)) and not perfil)
+    nav = _navegador(cfg)
+    url = _sub(cfg.get('target') or cfg.get('url') or 'about:blank', ctx)
+    sufixo = ', nuvem/headless' if NUVEM else ''
+
+    if nav != 'chromium':
+        sessao = _SessaoPlaywright(nav, headless, perfil, url)
+        with _sessions_lock:
+            _sessions[key] = {'pw': sessao, 'aberto_em': time.time()}
+        _iniciar_watchdog(key)
+        return f'Sessão aberta ({_NOMES_NAVEGADOR[nav]}{sufixo}).'
+
+    caminho = _chromium_path()
+    if not os.path.exists(caminho):
+        _garantir_navegador('chromium')
 
     args = [
-        _chromium_path(),
+        caminho,
         f'--remote-debugging-port={porta}',
         '--no-first-run',
         '--no-default-browser-check',
     ]
+    perfil_tmp = None
     if perfil:
         args.append(f'--user-data-dir={perfil}')
+    else:
+        # Sem perfil informado, cada sessão usa uma pasta própria e descartável:
+        # com o perfil padrão, um Chromium já aberto "engole" o novo processo
+        # (que sai na hora) e duas sessões ao mesmo tempo brigariam pelo perfil.
+        perfil_tmp = tempfile.mkdtemp(prefix='hoc-browser-')
+        args.append(f'--user-data-dir={perfil_tmp}')
     if headless:
         args.append('--headless=new')
-    args.append(_sub(cfg.get('target') or cfg.get('url') or 'about:blank', ctx))
+    if NUVEM:
+        args += ['--no-sandbox', '--disable-dev-shm-usage', '--window-size=1366,768']
+    args.append(url)
 
-    processo = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    log_erro = tempfile.TemporaryFile()
+    processo = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=log_erro)
+    try:
+        _esperar_chrome(processo, porta, log_erro)
+    except Exception:
+        _apagar_perfil_tmp(perfil_tmp)
+        raise
     with _sessions_lock:
-        _sessions[key] = {'porta': porta, 'pid': processo.pid, 'aberto_em': time.time()}
+        _sessions[key] = {'porta': porta, 'pid': processo.pid, 'aberto_em': time.time(), 'perfil_tmp': perfil_tmp}
     _iniciar_watchdog(key)
-    time.sleep(1.5)  # dá tempo do Chrome subir e o debug port responder
-    return f'Sessão aberta (porta {porta}).'
+    return f'Sessão aberta (Chromium, porta {porta}{sufixo}).'
+
+
+def _apagar_perfil_tmp(pasta):
+    # O Chrome recém-morto ainda segura arquivos do perfil por um instante
+    # (no Windows o rmtree imediato falha) — tenta de novo em segundo plano.
+    if not pasta:
+        return
+
+    def _apagar():
+        for _ in range(20):
+            shutil.rmtree(pasta, ignore_errors=True)
+            if not os.path.exists(pasta):
+                return
+            time.sleep(0.5)
+    threading.Thread(target=_apagar, daemon=True).start()
+
+
+def _cfg_bool(v):
+    if isinstance(v, str):
+        return v.strip().lower() not in ('', '0', 'false', 'nao', 'não', 'off')
+    return bool(v)
+
+
+def _esperar_chrome(processo, porta, log_erro):
+    """Espera o debug port do Chrome responder (em vez de um sleep fixo — numa
+    máquina fria da nuvem ele demora mais). Se o Chrome morrer antes, devolve
+    o fim do stderr dele no erro, em vez de um "connect_over_cdp" genérico."""
+    prazo = time.time() + _CHROME_BOOT_TIMEOUT
+    while time.time() < prazo:
+        if processo.poll() is not None:
+            log_erro.seek(0)
+            detalhe = log_erro.read().decode('utf-8', 'replace').strip()[-800:]
+            raise RuntimeError(f'O navegador fechou ao abrir (código {processo.returncode}). {detalhe}')
+        try:
+            with urllib.request.urlopen(f'http://127.0.0.1:{porta}/json/version', timeout=1) as r:
+                if r.status == 200:
+                    return
+        except Exception:
+            pass
+        time.sleep(0.3)
+    _matar_processo(processo.pid)
+    raise RuntimeError(f'O navegador não respondeu em {_CHROME_BOOT_TIMEOUT}s.')
 
 
 def _com_pagina(cfg, ctx, fn):
@@ -202,6 +423,8 @@ def _com_pagina(cfg, ctx, fn):
     if not sess:
         nome = cfg.get('session_name') or 'default'
         raise RuntimeError(f'Sessão de navegador "{nome}" não está aberta. Use "Abrir sessão de navegador" antes.')
+    if sess.get('pw'):
+        return sess['pw'].executar(fn)
 
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
@@ -253,7 +476,7 @@ def _browser_close(cfg, ctx):
         sess = _sessions.pop(key, None)
     if not sess:
         return 'Sessão já estava fechada.'
-    _matar_processo(sess['pid'])
+    _encerrar_sessao(sess)
     return 'Sessão fechada.'
 
 
@@ -269,6 +492,11 @@ def _browser_captcha_detect(cfg, ctx):
 
 
 def _browser_captcha_wait(cfg, ctx):
+    if NUVEM:
+        raise RuntimeError(
+            'Na nuvem ninguém vê a janela do navegador para resolver o captcha à mão. '
+            'Use "Capturar imagem do captcha" + "OCR de imagem", ou rode este robô num Agent (máquina física).'
+        )
     prazo = time.time() + float(cfg.get('timeout_seconds') or 120)
     while time.time() < prazo:
         if _browser_captcha_detect(cfg, ctx) == 'true':
@@ -487,12 +715,13 @@ def _executar_browser_flow(cfg, ctx):
         )
 
     acoes = cfg.get('actions') or []
-    headless = cfg.get('headless', True)
+    headless = NUVEM or _cfg_bool(cfg.get('headless', True))
+    nav = _navegador(cfg)
     saida = {}
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=headless)
-        page = browser.new_page()
+        browser, contexto = _abrir_contexto(p, nav, headless)
+        page = contexto.new_page()
         try:
             for acao in acoes:
                 tipo_acao = acao.get('type')

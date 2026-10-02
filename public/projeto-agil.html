@@ -39,7 +39,7 @@
     .btn-secondary:hover { background: #F1F2F5; }
     .btn-lic { height: 38px; padding: 0 14px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: flex; align-items: center; gap: 6px; white-space: nowrap; box-sizing: border-box; }
     .btn-lic-outline { background: white; color: #33363F; border: 1.5px solid #E5E7EB; }
-    .btn-lic-outline:hover { border-color: #0B0B0F; }
+    .btn-lic-outline:hover { background: #F1F2F5; }
     .btn-lic-add { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; padding: 0 16px; }
 
     /* ===== SIDEBAR ===== */
@@ -87,8 +87,6 @@
     .notif-btn:hover { background: #F1F2F5; }
     .notif-btn svg { color: var(--accent); }
     .notif-badge.cinza { background: var(--accent); }
-    .notif-btn.amarelo svg { color: #FFAE00; }
-    .notif-btn.vermelho svg { color: #FF2E4D; }
 
     .main { min-width: 0; }
 
@@ -101,14 +99,13 @@
     .proj-tab-slide { padding: 8px 16px; font-size: 12.5px; font-weight: 600; color: #6B7080; border: none; background: none; cursor: pointer; border-radius: 7px; white-space: nowrap; }
     .proj-tab-slide.active { background: white; color: #0B0B0F; font-weight: 700; box-shadow: 0 1px 3px rgba(11,11,15,.08); }
     .proj-nome { font-size: 18px; font-weight: 800; color: #0B0B0F; }
-    .proj-badge { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 6px; }
+    .proj-badge { display:inline-flex;align-items:center;justify-content:center;height:22px;box-sizing:border-box;font-size:11px;font-weight:700;padding:0 12px;border-radius:999px;background:white;border:1.5px solid; }
     .proj-acoes { margin-left: auto; display: flex; align-items: center; gap: 10px; }
     .proj-info-wrap { position: relative; display: inline-flex; }
     .proj-info-icon { width: 19px; height: 19px; border: none; background: transparent; color: #9CA0AC; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
     .proj-info-icon svg { width: 19px; height: 19px; }
     .proj-info-icon:hover { color: var(--accent); }
-    .proj-info-tip { display: none; position: absolute; left: 0; top: calc(100% + 8px); background: white; color: #33363F; border-radius: 12px; padding: 14px 16px; font-size: 12px; width: 240px; z-index: 300; line-height: 1.7; box-shadow: 0 8px 24px rgba(11,11,15,.14); }
-    .proj-info-tip b { color: #9CA0AC; font-weight: 600; }
+    .proj-info-tip { display: none; position: absolute; left: 0; top: calc(100% + 8px); background: white; color: #0B0B0F; border-radius: 12px; padding: 14px 16px; font-size: 12px; width: 240px; z-index: 300; line-height: 1.7; box-shadow: 0 8px 24px rgba(11,11,15,.14); }
 
     /* Tabs */
     .proj-tabs { background: white; padding: 14px 40px; border-bottom: 1px solid #ECEDF0; display: flex; overflow-x: auto; }
@@ -118,21 +115,28 @@
 
     /* Agente IA */
     .agente-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+    .agente-wrap { display: flex; flex-direction: column; min-height: 0; }
+    .agente-hero { text-align: center; margin-bottom: 16px; flex-shrink: 0; }
+    .agente-icon { width: 34px; height: 34px; margin: 0 auto 10px; border-radius: 11px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, black)); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 35%, transparent); }
+    .agente-titulo { font-size: 20px; font-weight: 700; color: #0B0B0F; margin-bottom: 6px; }
+    .agente-sub { font-size: 13px; font-weight: 400; color: #0B0B0F; }
     .agente-chat { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow: hidden; }
     .agente-msgs { height: 360px; overflow-y: auto; padding: 16px; background: #FAFBFC; }
-    .agente-msg { margin-bottom: 10px; display: flex; gap: 8px; }
+    .agente-msg { margin-bottom: 10px; display: flex; gap: 8px; align-items: flex-end; }
     .agente-msg.user { flex-direction: row-reverse; }
+    .agente-avatar { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, black)); display: flex; align-items: center; justify-content: center; color: white; }
     .agente-bubble { padding: 10px 14px; border-radius: 10px; font-size: 12.5px; max-width: 75%; line-height: 1.5; }
-    .agente-msg.bot .agente-bubble { background: white; color: #0B0B0F; border: 1px solid #ECEDF0; }
+    .agente-msg.bot .agente-bubble { background: color-mix(in srgb, var(--accent) 8%, white); color: #0B0B0F; border: 1px solid color-mix(in srgb, var(--accent) 16%, white); }
     .agente-msg.user .agente-bubble { background: var(--accent); color: white; }
     .agente-input-row { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #ECEDF0; }
     .agente-input { flex: 1; padding: 0 12px; height: 38px; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 12.5px; outline: none; }
     .agente-input:focus { border-color: var(--accent); }
-    .agente-send { padding: 0 18px; height: 38px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); color: white; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; opacity: 0.5; }
+    .agente-send { width: 38px; height: 38px; flex-shrink: 0; background: var(--accent); color: white; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.5; }
     .agente-sidebar { display: flex; flex-direction: column; gap: 12px; }
-    .agente-box { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 16px; }
-    .agente-box-titulo { font-size: 11px; font-weight: 800; color: #0B0B0F; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 10px; }
-    .agente-item { font-size: 12px; color: #33363F; padding: 7px 8px; background: #FAFBFC; border-radius: 7px; margin-bottom: 4px; cursor: pointer; }
+    .agente-box { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow: hidden; }
+    .agente-box-titulo { font-size: 11px; font-weight: 700; color: white; background: #0B0B0F; text-transform: uppercase; letter-spacing: .03em; padding: 13px 16px; }
+    .agente-item { font-size: 12px; font-weight: 400; color: #0B0B0F; text-align: center; padding: 10px 16px; background: white; border-bottom: 1px solid #F2F3F5; cursor: pointer; }
+    .agente-item:last-child { border-bottom: none; }
     .agente-item:hover { background: #F1F2F5; }
 
     .btn-export { padding: 0 14px; height: 34px; background: #0B0B0F; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
@@ -150,12 +154,15 @@
     .ec-sidebar-header { padding: 10px 14px; border-bottom: 1px solid #F1F2F5; display: flex; align-items: center; justify-content: space-between; }
     .ec-sidebar-header span { font-size: 11px; font-weight: 800; color: #0B0B0F; text-transform: uppercase; letter-spacing: .03em; }
     .ec-sidebar-body { padding: 6px 6px; }
-    .ec-pasta-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 6px 8px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: #0B0B0F; margin-bottom: 1px; transition: all 0.2s; gap: 4px; }
-    .ec-pasta-btn:hover { background: #F1F2F5; color: #0B0B0F; }
-    .ec-pasta-btn:hover .ec-pasta-del { opacity: 1; }
-    .ec-pasta-btn.active { background: color-mix(in srgb, var(--accent) 10%, white); color: var(--accent); font-weight: 700; }
-    .ec-pasta-del { background: none; border: none; cursor: pointer; padding: 1px 4px; border-radius: 3px; font-size: 10px; color: #9CA0AC; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
-    .ec-pasta-del:hover { background: #E5E7EB; color: #FF2E4D; }
+    .ec-pasta-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #33363F; margin-bottom: 1px; transition: all 0.15s; gap: 4px; }
+    .ec-pasta-btn:hover { background: #FAFBFC; color: #0B0B0F; }
+    .ec-pasta-btn.active { background: color-mix(in srgb, var(--accent) 8%, white); color: var(--accent); font-weight: 700; }
+    #ecBtnTemplates.active { background: transparent; }
+    input.ec-pasta-nome-input[type="text"] { flex: 1; min-width: 0; border: none; border-radius: 0; background: transparent; outline: none; padding: 0; height: auto; font: inherit; color: inherit; cursor: text; }
+    .ec-pasta-acoes { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+    .ec-pasta-btn:hover .ec-pasta-acoes { opacity: 1; }
+    .ec-pasta-del { background: none; border: none; cursor: pointer; padding: 3px; border-radius: 4px; color: #9CA0AC; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+    .ec-pasta-del:hover { background: #ECEDF0; color: #FF2E4D; }
     .ec-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
     .ec-search, input[type="text"].ec-search { flex: 1; min-width: 160px; height: 38px; padding: 0 12px; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 12.5px; outline: none; box-sizing: border-box; }
     .ec-search:focus { border-color: var(--accent); }
@@ -186,13 +193,22 @@
     .ec-material-item:hover .ec-material-acoes { opacity: 1; }
     .ec-mat-btn { padding: 3px 7px; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 600; }
     /* Editor de notas inline */
-    .ec-editor-wrap { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow: hidden; }
+    .ec-editor-wrap { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow: hidden; min-width: 0; }
     .ec-editor-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid #F1F2F5; flex-wrap: wrap; }
     .ec-editor-titulo { flex: 1; border: none; outline: none; font-size: 15px; font-weight: 800; color: #0B0B0F; font-family: inherit; min-width: 200px; }
     .ec-editor-body { padding: 16px; min-height: 300px; }
     .ec-editor-area { outline: none; font-size: 13px; color: #0B0B0F; line-height: 1.7; min-height: 260px; }
-    .exec-shape-btn { font-size:11px; padding:4px 9px; border-radius:6px; cursor:pointer; font-weight:600; border:1.5px solid #E5E7EB; background:white; color:#33363F; transition:all .12s; white-space:nowrap; }
-    .exec-shape-btn.active, .exec-shape-btn:hover { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, white); color:var(--accent); }
+    .exec-shape-btn, .exec-fill-btn { width:32px; height:32px; display:flex; align-items:center; justify-content:center; padding:0; border-radius:7px; cursor:pointer; border:1.5px solid #E5E7EB; background:white; color:#33363F; transition:all .12s; flex-shrink:0; }
+    .exec-shape-btn.active, .exec-shape-btn:hover, .exec-fill-btn.active, .exec-fill-btn:hover { border-color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, white); color:var(--accent); }
+    .draw-sep { width:1px; background:#E5E7EB; align-self:stretch; margin:0 4px; flex-shrink:0; }
+    .draw-clabel { display:flex; align-items:center; gap:6px; cursor:pointer; padding:0 9px; height:32px; border-radius:7px; border:1.5px solid #E5E7EB; background:white; color:#33363F; user-select:none; position:relative; flex-shrink:0; }
+    .draw-clabel:hover { border-color:var(--accent); }
+    .draw-cswatch { width:15px; height:15px; border-radius:4px; border:1px solid rgba(11,11,15,.15); flex-shrink:0; }
+    .draw-cinp { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; border:none; padding:0; }
+    .draw-action-btn { display:flex; align-items:center; gap:5px; font-size:11.5px; padding:0 10px; height:32px; border-radius:7px; cursor:pointer; font-weight:600; border:1.5px solid #E5E7EB; background:white; color:#33363F; white-space:nowrap; }
+    .draw-action-btn:hover { background:#F1F2F5; }
+    .draw-action-btn.danger { border-color:color-mix(in srgb, #FF2E4D 30%, #E5E7EB); color:#FF2E4D; background:color-mix(in srgb, #FF2E4D 4%, white); }
+    .draw-action-btn.danger:hover { background:color-mix(in srgb, #FF2E4D 10%, white); }
     .ec-editor-area ul, .ec-editor-area ol { margin: 0.4em 0; padding-left: 1.8em; list-style-position: outside; }
     .ec-editor-area li { margin: 2px 0; line-height: 1.6; }
     .ec-editor-area ul li { list-style-type: disc; }
@@ -304,12 +320,12 @@
     .rev-metric-val { font-size:24px;font-weight:800;line-height:1;color:var(--accent); }
     .rev-metric-lbl { font-size:11.5px;font-weight:600;color:#6B7080;margin-bottom:10px; }
     .sprint-meta { font-size:11px;color:#9CA0AC; }
-    .sprint-badge { font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;color:white; }
-    .sprint-pendente { background:#FFAE00; }
-    .sprint-ativa { background:#00B37E; }
-    .sprint-concluida { background:var(--accent); }
-    .sprint-suspensa { background:#FF2E4D; }
-    .sprint-desistida { background:#6B7080; }
+    .sprint-badge { display:inline-flex;align-items:center;justify-content:center;height:22px;box-sizing:border-box;font-size:11px;font-weight:700;padding:0 12px;border-radius:999px;background:white;border:1.5px solid; }
+    .sprint-pendente { color:#FFAE00; }
+    .sprint-ativa { color:#00B37E; }
+    .sprint-concluida { color:#00B37E; }
+    .sprint-suspensa { color:#FF2E4D; }
+    .sprint-desistida { color:#6B7080; }
     .sprint-subtabs { display:flex;gap:4px; }
     .sprint-subtab { padding:8px 14px;font-size:12.5px;font-weight:600;color:#6B7080;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;white-space:nowrap; }
     .sprint-subtab:hover { color:#0B0B0F; }
@@ -322,7 +338,7 @@
     .task-tbl td { padding:12px 14px;border-bottom:1px solid #F2F3F5;vertical-align:middle;text-align:center;font-size:12.5px;color:#33363F; }
     .task-tbl tr:last-child td { border-bottom:none; }
     .btn-acao { width:28px;height:28px;padding:0;border:none;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0; }
-    .btn-det { background:#F1F2F5;color:var(--accent); }
+    .btn-det { background:#F1F2F5;color:#0B0B0F; }
     .btn-det:hover { background:#E5E7EB; }
     .btn-del { background:#F1F2F5;color:#FF2E4D; }
     .btn-del:hover { background:#E5E7EB; }
@@ -336,9 +352,10 @@
 
     /* Kanban cards (richer) */
     .kanban { display:grid;grid-template-columns:repeat(3,1fr);gap:14px; }
-    .kanban-col { background:white;border:1.5px solid #ECEDF0;border-radius:14px;padding:16px;min-height:300px;box-shadow:0 2px 10px rgba(11,11,15,0.05); }
-    .kanban-col-header { font-size:11px;font-weight:800;color:#6B7080;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between; }
-    .kanban-count { background:#F1F2F5;color:#6B7080;min-width:20px;height:20px;padding:0 6px;border-radius:999px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center; }
+    .kanban-col { background:white;border:1.5px solid #ECEDF0;border-radius:14px;overflow:hidden;min-height:300px;box-shadow:0 2px 10px rgba(11,11,15,0.05); }
+    .kanban-col-header { font-size:11px;font-weight:800;color:white;background:#0B0B0F;font-family:inherit;text-transform:uppercase;letter-spacing:0.5px;margin:0;padding:13px 16px;display:flex;align-items:center;justify-content:space-between; }
+    .kanban-col-body { padding:16px; }
+    .kanban-count { background:rgba(255,255,255,0.15);color:white;min-width:20px;height:20px;padding:0 6px;border-radius:999px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center; }
     .kanban-card { background:#FAFBFC;border-radius:12px;padding:14px;border:1px solid #ECEDF0;margin-bottom:10px;cursor:pointer;transition:all 0.2s; }
     .kanban-card:hover { border-color:var(--accent);box-shadow:0 4px 12px rgba(11,11,15,0.08); }
     .kanban-card-titulo { font-size:13px;font-weight:700;color:#0B0B0F;margin-bottom:0; }
@@ -384,6 +401,7 @@
     .hoc-select-wrap { position: relative; display: inline-block; width: 100%; }
     .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
     .hoc-select-trigger { appearance: none; -webkit-appearance: none; -moz-appearance: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: white; cursor: pointer; font-family: inherit; }
+    .hoc-select-trigger:hover { background: #F1F2F5 !important; }
     .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
     .hoc-select-trigger.open svg { transform: rotate(180deg); }
     .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
@@ -391,7 +409,7 @@
     .hoc-select-panel.open { display: block; }
     .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
     .hoc-select-item:hover { background: #F1F2F5; }
-    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent) 14%, white); color: var(--accent); }
+    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent) 12%, white); color: #0B0B0F; }
 
     /* View toggle */
     .view-toggle { display:flex;background:#F1F2F5;border-radius:9px;padding:3px; }
@@ -424,10 +442,11 @@
     .rdp-secao-titulo { font-size:11px;font-weight:800;color:#0B0B0F;padding:6px 0;border-bottom:1.5px solid #ECEDF0;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.6px; }
 
     /* Backlog table */
-    .bl-status-afazer { background:#FFAE00;color:white;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:700; }
-    .bl-status-prog { background:var(--accent);color:white;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:700; }
-    .bl-status-done { background:#00B37E;color:white;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:700; }
-    .bl-status-atrasado { background:#FF2E4D;color:white;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:700; }
+    .bl-status-afazer, .bl-status-prog, .bl-status-done, .bl-status-atrasado { display:inline-flex;align-items:center;justify-content:center;height:22px;box-sizing:border-box;background:white;border:1.5px solid;border-radius:999px;padding:0 12px;font-size:11px;font-weight:700; }
+    .bl-status-afazer { color:#FFAE00; }
+    .bl-status-prog { color:var(--accent); }
+    .bl-status-done { color:#00B37E; }
+    .bl-status-atrasado { color:#FF2E4D; }
 
     /* Equipe e Clientes */
     .ec-ag-card { background:white;border:1px solid #ECEDF0;border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:12px; }
@@ -453,8 +472,7 @@
     <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
     <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
     <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
-    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
-    <a class="menu-item active" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item active" href="/gestao-projetos" title="Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Projetos</span></a>
     <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
@@ -478,21 +496,24 @@
   <div id="bannerAssinatura" style="display:none"></div>
   <div class="proj-header">
     <div class="proj-title-row">
-      <button onclick="location.href='/gestao-projetos'" style="width:32px;height:32px;border-radius:8px;background:white;border:1.5px solid #E5E7EB;color:#33363F;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <button class="btn-fechar" onclick="location.href='/gestao-projetos'" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
       <div class="proj-nome" id="projNome">Carregando...</div>
       <div class="proj-info-wrap">
         <button class="proj-info-icon" onclick="toggleInfoPopover('projInfoTip',event)" title="Mais informações">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
         </button>
         <div class="proj-info-tip" id="projInfoTip">
-          <div><b>Responsável:</b> <span id="projRespTip">—</span></div>
-          <div><b>Categoria:</b> <span id="projAreaTip">—</span></div>
-          <div><b>Início — Prazo:</b> <span id="projDatasTip">—</span></div>
+          <div style="font-weight:700;color:#0B0B0F;margin-bottom:8px">Informações do Projeto</div>
+          <div style="border-top:1px solid #F1F2F5;margin:0 0 8px"></div>
+          <div style="margin-bottom:3px"><strong>Responsável:</strong> <span id="projRespTip">—</span></div>
+          <div style="margin-bottom:3px"><strong>Categoria:</strong> <span id="projAreaTip">—</span></div>
+          <div style="margin-bottom:3px"><strong>Início:</strong> <span id="projInicioTip">—</span></div>
+          <div><strong>Prazo:</strong> <span id="projPrazoTip">—</span></div>
         </div>
       </div>
       <div class="proj-acoes">
         <span id="projSaveIndicator" style="font-size:11px;color:#00B37E;font-weight:600"></span>
-        <span class="proj-badge" id="projStatusBadge" style="background:#00B37E;color:white">Ativo</span>
+        <span class="proj-badge" id="projStatusBadge" style="color:#00B37E">Ativo</span>
       </div>
     </div>
   </div>
@@ -500,7 +521,7 @@
   <div class="proj-tabs">
     <div class="proj-tabs-slider">
       <button class="proj-tab-slide active" onclick="mudarTab('dashboard',this)">Dashboard</button>
-      <button class="proj-tab-slide" onclick="mudarTab('estudo',this)">Estudo de Caso</button>
+      <button class="proj-tab-slide" onclick="mudarTab('estudo',this)">Repositório</button>
       <button class="proj-tab-slide" onclick="mudarTab('backlog',this)">Product Backlog</button>
       <button class="proj-tab-slide" onclick="mudarTab('sprints',this)">Gestão de Sprints</button>
       <button class="proj-tab-slide" onclick="mudarTab('equipe',this)">Equipe e Clientes</button>
@@ -517,40 +538,51 @@
 
     <!-- ESTUDO DE CASO -->
     <div id="tab-estudo" style="display:none">
-      <!-- EC two-column layout: folder list + content. Grid rows keep the Pastas card and the
-           materials area starting at the exact same height regardless of the toolbar's own size. -->
-      <div id="ecGridWrap" style="display:grid;grid-template-columns:200px 1fr;grid-template-rows:auto 1fr;gap:16px">
-        <div id="ecToolbarSpacer"></div>
-        <!-- Toolbar -->
-        <div id="ecToolbarRow" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
-          <input class="ec-search" type="text" id="ecSearch" placeholder="Buscar materiais..." oninput="renderECContent()" style="flex:1;min-width:180px;max-width:320px">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-            <label class="btn-lic btn-lic-outline" style="cursor:pointer;flex-shrink:0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Carregar arquivo<input type="file" id="ecFileInput" style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg" onchange="pedirPastaUpload(this)">
-            </label>
-            <div style="position:relative;flex-shrink:0">
-              <button class="btn-lic btn-lic-outline" onclick="toggleTemplatesMenuEC(event)">
-                Usar Template
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-              </button>
-              <div id="ecTemplatesMenu" style="display:none;position:fixed;background:white;border:1px solid #ECEDF0;border-radius:14px;box-shadow:0 12px 32px rgba(11,11,15,0.16);padding:8px;z-index:9500;width:max-content;min-width:260px;text-align:left;overflow-y:auto"></div>
+      <!-- EC two-column layout, same technique as the Biblioteca (overview.html): each column
+           stacks its own header + card independently, with a spacer matching the toolbar's
+           height so both cards start at the exact same Y. -->
+      <div id="ecGridWrap" style="display:grid;grid-template-columns:200px 1fr;gap:16px;align-items:start">
+        <div>
+          <div id="ecToolbarSpacer" style="height:38px;margin-bottom:16px" aria-hidden="true"></div>
+          <div id="ecPastasCol" style="background:white;border:1px solid #ECEDF0;border-radius:14px;overflow:hidden;position:sticky;top:80px">
+            <div style="padding:10px 14px;border-bottom:1px solid #F1F2F5;display:flex;align-items:center;justify-content:space-between">
+              <span style="font-size:11px;font-weight:800;color:#0B0B0F;text-transform:uppercase;letter-spacing:.5px">Pastas</span>
+              <button onclick="criarPastaEC()" class="btn-lic btn-lic-outline" style="height:26px;padding:0 9px;font-size:11px">+ Nova</button>
             </div>
-            <button onclick="pedirTituloNota()" class="btn-lic btn-lic-add">+ Criar Documento</button>
-            <span id="ecSaveStatus" style="font-size:10px;color:#9CA0AC"></span>
+            <div style="padding:6px">
+              <button class="ec-pasta-btn active" id="ecBtnTemplates" onclick="selecionarPastaEC('templates')"><span style="display:flex;align-items:center;gap:8px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Todos os Documentos</span></span></button>
+              <div id="ecPastasSidebar"></div>
+            </div>
           </div>
         </div>
-        <div id="ecPastasCol" style="background:white;border:1px solid #ECEDF0;border-radius:14px;overflow:hidden;align-self:start;position:sticky;top:80px">
-          <div style="padding:10px 14px;border-bottom:1px solid #F1F2F5;display:flex;align-items:center;justify-content:space-between">
-            <span style="font-size:11px;font-weight:800;color:#0B0B0F;text-transform:uppercase;letter-spacing:.5px">Pastas</span>
-            <button onclick="criarPastaEC()" class="btn-lic btn-lic-outline" style="height:26px;padding:0 9px;font-size:11px">+ Nova</button>
+        <div id="ecContentCol" style="min-width:0">
+          <!-- Toolbar -->
+          <div id="ecToolbarRow" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+            <input class="ec-search" type="text" id="ecSearch" placeholder="Buscar materiais..." oninput="renderECContent()" style="flex:1;min-width:180px;max-width:320px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+              <label class="btn-lic btn-lic-outline" style="cursor:pointer;flex-shrink:0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Carregar arquivo<input type="file" id="ecFileInput" style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg" onchange="pedirPastaUpload(this)">
+              </label>
+              <div style="position:relative;flex-shrink:0">
+                <button class="btn-lic btn-lic-outline" onclick="toggleTemplatesMenuEC(event)">
+                  Usar Template
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="ecTemplatesMenu" style="display:none;position:fixed;background:white;border:1px solid #ECEDF0;border-radius:14px;box-shadow:0 12px 32px rgba(11,11,15,0.16);padding:8px;z-index:9500;width:max-content;min-width:260px;text-align:left;overflow-y:auto"></div>
+              </div>
+              <div style="position:relative;flex-shrink:0">
+                <button class="btn-lic btn-lic-add" onclick="toggleCriarMenuEC(event)">
+                  + Criar Documento
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div id="ecCriarMenu" style="display:none;position:fixed;background:white;border:1px solid #ECEDF0;border-radius:14px;box-shadow:0 12px 32px rgba(11,11,15,0.16);padding:8px;z-index:9500;width:max-content;min-width:200px;text-align:left;overflow-y:auto"></div>
+              </div>
+              <span id="ecSaveStatus" style="font-size:10px;color:#9CA0AC"></span>
+            </div>
           </div>
-          <div style="padding:6px">
-            <button class="ec-pasta-btn active" id="ecBtnTemplates" onclick="selecionarPastaEC('templates')"><span>Todos os Documentos</span></button>
-            <div id="ecPastasSidebar"></div>
-          </div>
+          <div id="ecAreaPrincipal"></div>
         </div>
-        <div id="ecAreaPrincipal" style="align-self:start"></div>
       </div>
     </div>
 
@@ -569,8 +601,7 @@
             <th style="width:90px">Prioridade</th>
             <th style="width:70px;text-align:center">Story Points</th>
             <th style="width:100px">Status</th>
-            <th style="width:40px"></th>
-            <th style="width:32px"></th>
+            <th style="width:64px;text-align:center">Ações</th>
           </tr></thead>
           <tbody id="backlogTbody"></tbody>
         </table>
@@ -588,20 +619,23 @@
 
     <!-- EQUIPE E CLIENTES -->
     <div id="tab-equipe" style="display:none">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-        <button class="btn-primary" onclick="ecAgAbrirModal()" style="font-size:12.5px;padding:0 16px;height:38px;background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));box-shadow:0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent);border:none;border-radius:9px;font-weight:700">+ Adicionar Pessoa</button>
-      </div>
-      <div id="ecAgKpis" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:end">
         <input id="ecAgFiltroNome" type="text" placeholder="Buscar por nome..." oninput="renderEquipeAgil()" style="height:38px;padding:0 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;width:220px;box-sizing:border-box">
         <input id="ecAgFiltroPapel" type="text" placeholder="Papel..." oninput="renderEquipeAgil()" style="height:38px;padding:0 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;width:160px;box-sizing:border-box">
-        <select id="ecAgFiltroTipo" onchange="renderEquipeAgil()" style="height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;background:white;width:150px">
-          <option value="">Tipo: Todos</option><option value="Interno">Interno</option><option value="Externo">Externo</option>
-        </select>
-        <select id="ecAgFiltroStatus" onchange="renderEquipeAgil()" style="height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;background:white;width:150px">
-          <option value="">Status: Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option>
-        </select>
-        <button class="btn-secondary" onclick="document.getElementById('ecAgFiltroNome').value='';document.getElementById('ecAgFiltroPapel').value='';document.getElementById('ecAgFiltroTipo').value='';document.getElementById('ecAgFiltroStatus').value='';renderEquipeAgil()">Limpar</button>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="task-detail-label">Tipo</div>
+          <select id="ecAgFiltroTipo" onchange="renderEquipeAgil()" style="height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;background:white;width:150px">
+            <option value="">Todos</option><option value="Interno">Interno</option><option value="Externo">Externo</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="task-detail-label">Status</div>
+          <select id="ecAgFiltroStatus" onchange="renderEquipeAgil()" style="height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;background:white;width:150px">
+            <option value="">Todos</option><option value="ativo">Ativo</option><option value="inativo">Inativo</option>
+          </select>
+        </div>
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="ecAgAbrirModal()" style="font-size:12.5px;padding:0 16px;height:38px;background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));box-shadow:0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent);border:none;border-radius:9px;font-weight:700">+ Adicionar Pessoa</button>
       </div>
       <div id="ecAgEmpty" style="display:none;text-align:center;padding:40px;color:#9CA0AC;font-size:13px;background:white;border:1px solid #ECEDF0;border-radius:14px">Nenhuma pessoa encontrada.</div>
       <div id="ecAgLista" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -610,22 +644,23 @@
     <!-- AGENTE IA -->
     <div id="tab-agente" style="display:none">
       <div class="agente-layout">
-        <div class="agente-chat">
-          <div class="agente-msgs" id="agenteMsgs">
-            <div class="agente-msg bot"><div class="agente-bubble">Olá! Sou o Agente de IA especialista em projetos ágeis. Em breve poderei analisar suas sprints e ajudar com retrospectivas.</div></div>
+        <div class="agente-wrap">
+          <div class="agente-hero">
+            <div class="agente-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.528c0 .96-.343 1.887-.966 2.615A5.98 5.98 0 0 0 4.5 11c0 .334.024.661.07.98A3.5 3.5 0 0 0 3 15a3.5 3.5 0 0 0 1.5 2.878A2.5 2.5 0 0 0 7 20.5v0A2.5 2.5 0 0 0 9.5 23v0A2.5 2.5 0 0 0 12 20.5V4.5A2.5 2.5 0 0 0 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.528c0 .96.343 1.887.966 2.615A5.98 5.98 0 0 1 19.5 11c0 .334-.024.661-.07.98A3.5 3.5 0 0 1 21 15a3.5 3.5 0 0 1-1.5 2.878A2.5 2.5 0 0 1 17 20.5v0A2.5 2.5 0 0 1 14.5 23v0A2.5 2.5 0 0 1 12 20.5V4.5A2.5 2.5 0 0 1 14.5 2Z"/><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" fill="currentColor" stroke="none" transform="translate(23,-0.3) scale(0.9) translate(-12,-9)"/></svg></div>
+            <div class="agente-titulo">Olá! Sou o seu assistente especializado neste projeto.</div>
+            <div class="agente-sub">Como posso te ajudar hoje?</div>
           </div>
-          <div class="agente-input-row">
-            <input class="agente-input" type="text" placeholder="Digite sua pergunta... (em breve)" disabled>
-            <button class="agente-send" disabled>Enviar</button>
+          <div class="agente-chat">
+            <div class="agente-msgs" id="agenteMsgs">
+              <div class="agente-msg bot"><div class="agente-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.528c0 .96-.343 1.887-.966 2.615A5.98 5.98 0 0 0 4.5 11c0 .334.024.661.07.98A3.5 3.5 0 0 0 3 15a3.5 3.5 0 0 0 1.5 2.878A2.5 2.5 0 0 0 7 20.5v0A2.5 2.5 0 0 0 9.5 23v0A2.5 2.5 0 0 0 12 20.5V4.5A2.5 2.5 0 0 0 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.528c0 .96.343 1.887.966 2.615A5.98 5.98 0 0 1 19.5 11c0 .334-.024.661-.07.98A3.5 3.5 0 0 1 21 15a3.5 3.5 0 0 1-1.5 2.878A2.5 2.5 0 0 1 17 20.5v0A2.5 2.5 0 0 1 14.5 23v0A2.5 2.5 0 0 1 12 20.5V4.5A2.5 2.5 0 0 1 14.5 2Z"/><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" fill="currentColor" stroke="none" transform="translate(21,0.8) scale(0.55) translate(-12,-9)"/></svg></div><div class="agente-bubble">Ainda estou aprendendo, mas em breve poderei analisar os dados do seu projeto e responder perguntas sobre ele e sobre as melhores práticas de resolução de problemas, otimização de cronograma, melhorias operacionais entre outros temas técnicos!</div></div>
+            </div>
+            <div class="agente-input-row">
+              <input class="agente-input" type="text" placeholder="Digite sua pergunta... (em breve)" disabled>
+              <button class="agente-send" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(-1.95,2)"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></g></svg></button>
+            </div>
           </div>
         </div>
         <div class="agente-sidebar">
-          <div class="agente-box">
-            <div class="agente-box-titulo">Contexto do Projeto</div>
-            <div class="agente-item" id="agenteCtxNome">—</div>
-            <div class="agente-item">Projeto Ágil</div>
-            <div class="agente-item" id="agenteCtxStatus">—</div>
-          </div>
           <div class="agente-box">
             <div class="agente-box-titulo">Ações Rápidas</div>
             <div class="agente-item">Analisar velocidade do time</div>
@@ -699,13 +734,13 @@
   <div class="modal" style="max-width:560px;max-height:92vh;overflow-y:auto">
     <div class="modal-header">
       <span class="modal-titulo" id="modalEcAgTitulo">Nova Pessoa</span>
-      <button class="btn-fechar" onclick="fecharModal('modalEcAg')">×</button>
+      <button class="btn-fechar" onclick="fecharModal('modalEcAg')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <input type="hidden" id="ecAgEditIdx" value="">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 12px">
       <div class="form-group" style="grid-column:1/-1"><label>Nome *</label><input type="text" id="ecAgNome" placeholder="Nome completo..."></div>
       <div class="form-group"><label>Tipo de Membro *</label>
-        <select id="ecAgTipo" style="width:100%">
+        <select id="ecAgTipo" class="task-detail-select" style="width:100%">
           <option value="Interno">Interno (equipe)</option>
           <option value="Externo">Externo (cliente / stakeholder)</option>
         </select>
@@ -717,7 +752,7 @@
       <div class="form-group"><label>E-mail</label><input type="email" id="ecAgEmail" placeholder="email@exemplo.com" style="width:100%"></div>
       <div class="form-group"><label>Telefone</label><input type="text" id="ecAgTelefone" placeholder="(00) 00000-0000" style="width:100%"></div>
       <div class="form-group"><label>Ativo no projeto?</label>
-        <select id="ecAgAtivo" style="width:100%">
+        <select id="ecAgAtivo" class="task-detail-select" style="width:100%">
           <option value="true">Sim</option>
           <option value="false">Não (inativo)</option>
         </select>
@@ -737,7 +772,7 @@
   <div class="modal" style="max-width:440px">
     <div class="modal-header">
       <span class="modal-titulo">📊 Registrar Avaliação</span>
-      <button class="btn-fechar" onclick="fecharModal('modalPesqAg')">×</button>
+      <button class="btn-fechar" onclick="fecharModal('modalPesqAg')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <input type="hidden" id="pesqAgMemberIdx" value="">
     <div style="padding:4px 0">
@@ -808,7 +843,7 @@
 <!-- Modal Nova Nota EC -->
 <div class="modal-overlay" id="modalNovaNotaEC">
   <div class="modal" style="max-width:400px">
-    <div class="modal-header"><span class="modal-titulo">Novo Documento</span><button class="btn-fechar" onclick="fecharModal('modalNovaNotaEC')">×</button></div>
+    <div class="modal-header"><span class="modal-titulo">Novo Documento</span><button class="btn-fechar" onclick="fecharModal('modalNovaNotaEC')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="form-group"><label>Título *</label><input type="text" id="novaNotaECTitulo" placeholder="Título do documento..."></div>
     <div class="form-group"><label>Salvar em *</label>
       <div class="ec-folder-picker" id="novaNotaECPastaWrap"></div>
@@ -1066,12 +1101,11 @@
       projeto = await res.json();
       document.getElementById('projNome').textContent = projeto.nome;
       document.getElementById('projRespTip').textContent = projeto.responsavel || '—';
-      document.getElementById('projAreaTip').textContent = projeto.area || '—';
-      document.getElementById('projDatasTip').textContent = (projeto.dataInicio ? new Date(projeto.dataInicio).toLocaleDateString('pt-BR') : '—') + ' — ' + (projeto.dataFim ? new Date(projeto.dataFim).toLocaleDateString('pt-BR') : '—');
-      document.getElementById('agenteCtxNome').textContent = projeto.nome;
-      document.getElementById('agenteCtxStatus').textContent = projeto.status;
+      document.getElementById('projAreaTip').textContent = projeto.categoria || '—';
+      document.getElementById('projInicioTip').textContent = projeto.dataInicio ? new Date(projeto.dataInicio).toLocaleDateString('pt-BR') : '—';
+      document.getElementById('projPrazoTip').textContent = projeto.dataFim ? new Date(projeto.dataFim).toLocaleDateString('pt-BR') : '—';
       const sb = document.getElementById('projStatusBadge');
-      const cores = { 'Ativo':'background:#00B37E;color:white','Concluído':'background:var(--accent);color:white','Atrasado':'background:#FF2E4D;color:white','Pausado':'background:#FFAE00;color:white' };
+      const cores = { 'Ativo':'color:#00B37E','Concluído':'color:var(--accent)','Atrasado':'color:#FF2E4D','Pausado':'color:#FFAE00' };
       sb.textContent = projeto.status; sb.style.cssText = cores[projeto.status]||cores['Ativo'];
       sprints = projeto.sprints || [];
       backlogItems = projeto.backlogItems || [];
@@ -1105,15 +1139,26 @@
     if (id === 'estudo') { renderECSidebar(); renderECContent(); }
   }
 
+  function _ecSyncSpacerHeight() {
+    const toolbar = document.getElementById('ecToolbarRow');
+    const spacer = document.getElementById('ecToolbarSpacer');
+    if (!toolbar || !spacer) return;
+    spacer.style.height = toolbar.offsetHeight + 'px';
+  }
+  window.addEventListener('resize', () => { if (document.getElementById('tab-estudo')?.style.display !== 'none') _ecSyncSpacerHeight(); });
+
   function formatarData(d) { if (!d) return '—'; try { return new Date(d).toLocaleDateString('pt-BR'); } catch { return d; } }
 
-  const ICO_TASK_EDIT = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>';
+  const ICO_TASK_EDIT = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
   const ICO_TASK_TRASH = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg>';
-  const ICO_FOLDER = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>';
+  const ICO_FOLDER = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>';
+  const ICO_HOME = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
   const ICO_DOC = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>';
   const ICO_CLIPBOARD = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="13" y2="15"/></svg>';
   const ICO_PAPERCLIP2 = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>';
   const ICO_DOWNLOAD = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+  const ICO_TABLE = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/><line x1="15" y1="9" x2="15" y2="21"/></svg>';
+  const ICO_DRAW = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>';
 
   function toggleInfoPopover(id, e) {
     if (e) e.stopPropagation();
@@ -1210,8 +1255,10 @@
     const subPastas = ecPastas.filter(p => (p.parentId||null) === currentParentId);
     html += subPastas.map(p => `
       <button class="ec-pasta-btn ${ecPastaAtual===p.id?'active':''}" onclick="ecNavegarPasta('${p.id}','${p.nome.replace(/'/g,"\\'").replace(/\\/g,"\\\\")}')">
-        <span style="display:flex;align-items:center;gap:7px;min-width:0;overflow:hidden">${ICO_FOLDER}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.nome}</span></span>
-        <span class="ec-pasta-del" role="button" tabindex="-1" onclick="event.stopPropagation();deletarPastaEC('${p.id}')" title="Remover pasta">✕</span>
+        <span style="display:flex;align-items:center;gap:8px;overflow:hidden;flex:1;min-width:0">${ICO_FOLDER}<input type="text" class="ec-pasta-nome-input" value="${p.nome.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" onclick="event.stopPropagation()" onchange="renomearPastaEC('${p.id}',this.value)"></span>
+        <span class="ec-pasta-acoes">
+          <span class="ec-pasta-del" onclick="event.stopPropagation();deletarPastaEC('${p.id}')" title="Remover pasta">${ICO_TASK_TRASH}</span>
+        </span>
       </button>`).join('');
     sb.innerHTML = html;
     const btnTpl = document.getElementById('ecBtnTemplates');
@@ -1269,6 +1316,7 @@
     if (!area) return;
     if (ecEditandoId !== null) { _ecSetLayoutMode(true); renderECEditor(); return; }
     _ecSetLayoutMode(false);
+    setTimeout(_ecSyncSpacerHeight, 0);
 
     const q = (document.getElementById('ecSearch')?.value || '').toLowerCase();
     const pastaAtualNome = ecPastaAtual === 'templates' ? 'Todos os Documentos' : (ecPastas.find(p=>p.id===ecPastaAtual)?.nome || 'Pasta');
@@ -1284,7 +1332,7 @@
       corpo = `<div style="text-align:center;padding:24px;color:#9CA0AC;font-size:13px">Nenhum material ${ecPastaAtual === 'templates' ? 'ainda' : 'nesta pasta ainda'}.</div>`;
     } else {
       corpo = materiaisFiltrados.map(m => {
-        const tipoIcon = m.tipo==='nota' ? ICO_DOC : m.tipo==='template' ? ICO_CLIPBOARD : ICO_PAPERCLIP2;
+        const tipoIcon = m.tipo==='nota' ? ICO_DOC : m.tipo==='template' ? ICO_CLIPBOARD : m.tipo==='tabela' ? ICO_TABLE : m.tipo==='desenho' ? ICO_DRAW : ICO_PAPERCLIP2;
         return `<div class="ec-material-item" onclick="abrirMaterialEC('${m.id}')">
           <div class="ec-material-icon" style="display:flex;align-items:center;justify-content:center;color:#6B7080">${tipoIcon}</div>
           <div style="flex:1;min-width:0">
@@ -1298,9 +1346,11 @@
       }).join('');
     }
 
-    area.innerHTML = `<div style="background:white;border:1px solid #ECEDF0;border-radius:14px;padding:18px">
-      <div style="font-size:10.5px;font-weight:800;color:#0B0B0F;text-transform:uppercase;letter-spacing:.03em;margin-bottom:12px">${pastaAtualNome}</div>
-      <div style="display:flex;flex-direction:column;gap:6px">${corpo}</div>
+    area.innerHTML = `<div style="background:white;border:1px solid #ECEDF0;border-radius:14px;overflow:hidden">
+      <div style="padding:10px 14px;border-bottom:1px solid #F1F2F5;display:flex;align-items:center;min-height:26px;box-sizing:content-box">
+        <span style="font-size:11px;font-weight:800;color:#0B0B0F;text-transform:uppercase;letter-spacing:.5px">${pastaAtualNome}</span>
+      </div>
+      <div style="padding:18px;display:flex;flex-direction:column;gap:6px">${corpo}</div>
     </div>`;
   }
 
@@ -1313,7 +1363,7 @@
     menu.innerHTML = EC_TEMPLATES.map(t => `
       <div onclick="toggleTemplatesMenuEC();abrirTemplateEC('${t.id}')" style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;cursor:pointer;margin-bottom:2px" onmouseover="this.style.background='color-mix(in srgb, var(--accent) 10%, white)'" onmouseout="this.style.background='transparent'">
         <span style="width:8px;height:8px;border-radius:2px;background:${dotColors[t.cls]||'var(--accent)'};flex-shrink:0"></span>
-        <div><div style="font-size:12.5px;font-weight:700;color:#0B0B0F;white-space:nowrap">${t.nome}</div><div style="font-size:11px;color:#9CA0AC;white-space:nowrap">${t.desc}</div></div>
+        <div style="font-size:12.5px;font-weight:500;color:#0B0B0F;white-space:nowrap">${t.nome}</div>
       </div>`).join('');
     // Posiciona em relação à viewport (position:fixed) para nunca ser cortado pela altura da página
     const btn = e ? e.currentTarget : document.querySelector('[onclick^="toggleTemplatesMenuEC"]');
@@ -1328,6 +1378,34 @@
   }
   document.addEventListener('click', e => { if (!e.target.closest('#ecTemplatesMenu') && !e.target.closest('[onclick^="toggleTemplatesMenuEC"]')) { const m = document.getElementById('ecTemplatesMenu'); if (m) m.style.display = 'none'; } });
   document.addEventListener('scroll', () => { const m = document.getElementById('ecTemplatesMenu'); if (m) m.style.display = 'none'; }, true);
+
+  function toggleCriarMenuEC(e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById('ecCriarMenu');
+    if (!menu) return;
+    if (menu.style.display === 'block') { menu.style.display = 'none'; return; }
+    const itens = [
+      { tipo:'nota', icon:ICO_DOC, cor:'#2F5CFF', nome:'Nota', desc:'Documento de texto rico' },
+      { tipo:'tabela', icon:ICO_TABLE, cor:'#00B37E', nome:'Planilha', desc:'Tabela com fórmulas' },
+      { tipo:'desenho', icon:ICO_DRAW, cor:'#FFAE00', nome:'Desenho', desc:'Quadro de desenho livre' },
+    ];
+    menu.innerHTML = itens.map(it => `
+      <div onclick="toggleCriarMenuEC();pedirTituloNota('${it.tipo}')" style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;cursor:pointer;margin-bottom:2px" onmouseover="this.style.background='color-mix(in srgb, var(--accent) 10%, white)'" onmouseout="this.style.background='transparent'">
+        <span style="color:${it.cor};flex-shrink:0;display:flex">${it.icon}</span>
+        <div><div style="font-size:12.5px;font-weight:700;color:#0B0B0F;white-space:nowrap">${it.nome}</div><div style="font-size:11px;color:#9CA0AC;white-space:nowrap">${it.desc}</div></div>
+      </div>`).join('');
+    const btn = e ? e.currentTarget : document.querySelector('[onclick^="toggleCriarMenuEC"]');
+    if (btn) {
+      const r = btn.getBoundingClientRect();
+      menu.style.top = (r.bottom + 6) + 'px';
+      menu.style.right = (window.innerWidth - r.right) + 'px';
+      menu.style.left = 'auto';
+      menu.style.maxHeight = Math.max(160, Math.min(420, window.innerHeight - r.bottom - 16)) + 'px';
+    }
+    menu.style.display = 'block';
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('#ecCriarMenu') && !e.target.closest('[onclick^="toggleCriarMenuEC"]')) { const m = document.getElementById('ecCriarMenu'); if (m) m.style.display = 'none'; } });
+  document.addEventListener('scroll', () => { const m = document.getElementById('ecCriarMenu'); if (m) m.style.display = 'none'; }, true);
 
   // ===== TEMPLATE SYSTEM (full-screen, tables, SWOT, A3) =====
   function _ecInitDados(tplId) {
@@ -1879,7 +1957,7 @@
     if(!m.dados) m.dados=_ecInitDados(m.templateId);
     area.innerHTML=`<div class="ec-tpl-view">
       <div class="ec-tpl-view-top">
-        <button class="sprint-detail-back" onclick="fecharEditorEC()" title="Voltar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="btn-fechar" onclick="fecharEditorEC()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
         <input class="ec-editor-titulo" id="ecTplTitulo" value="${m.titulo.replace(/"/g,'&quot;')}" placeholder="Título..." oninput="ecAgendarAutoSave()" style="flex:1;border:none;outline:none;font-size:14px;font-weight:700;color:#0B0B0F;font-family:inherit">
         <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
         <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
@@ -1980,14 +2058,19 @@
   function abrirTemplatePreenchidoEC(m) { editarMaterialEC(m.id); } // compat
 
   // ===== Editor de notas =====
-  function pedirTituloNota() {
+  let _ecNovoTipo = 'nota';
+  const _EC_NOVO_TITULOS = { nota:'Nova Nota', tabela:'Nova Planilha', desenho:'Novo Desenho' };
+  function pedirTituloNota(tipo) {
+    _ecNovoTipo = tipo || 'nota';
     document.getElementById('novaNotaECTitulo').value = '';
+    document.getElementById('novaNotaECTitulo').placeholder = _EC_NOVO_TITULOS[_ecNovoTipo] || 'Título do documento...';
     _renderEcFolderPicker('novaNotaECPastaWrap', 'novaNotaECPasta', ecPastaAtual !== 'templates' ? ecPastaAtual : '', undefined, true);
     document.getElementById('modalNovaNotaEC').classList.add('aberto');
     setTimeout(() => document.getElementById('novaNotaECTitulo').focus(), 80);
   }
   function confirmarNovaNotaEC() {
-    const titulo = document.getElementById('novaNotaECTitulo').value.trim() || 'Nova Nota';
+    const tipo = _ecNovoTipo || 'nota';
+    const titulo = document.getElementById('novaNotaECTitulo').value.trim() || _EC_NOVO_TITULOS[tipo] || 'Novo Documento';
     const pasta = document.getElementById('novaNotaECPasta')?.value || null;
     const erroEl = document.getElementById('novaNotaECPastaErro');
     if (!pasta) {
@@ -1998,7 +2081,12 @@
     }
     if (erroEl) erroEl.style.display = 'none';
     fecharModal('modalNovaNotaEC');
-    const material = { id: Date.now(), tipo:'nota', titulo, conteudo:'', pasta: pasta, criado: new Date().toISOString().split('T')[0] };
+    const criado = new Date().toISOString().split('T')[0];
+    const material = tipo === 'tabela'
+      ? { id: Date.now(), tipo, titulo, pasta, criado, dados:{} }
+      : tipo === 'desenho'
+      ? { id: Date.now(), tipo, titulo, pasta, criado, canvasData: null }
+      : { id: Date.now(), tipo:'nota', titulo, conteudo:'', pasta, criado };
     ecMateriais.unshift(material);
     salvarDadosEC();
     editarMaterialEC(material.id);
@@ -2015,10 +2103,114 @@
     _ecSetLayoutMode(true);
     if (m.tipo === 'template') { renderTemplateView(m); return; }
     const area = document.getElementById('ecAreaPrincipal');
+    const mid = m.id;
+    if (m.tipo === 'tabela') {
+      area.innerHTML = `
+        <div class="ec-editor-wrap" style="display:flex;flex-direction:column;height:calc(100vh - 155px);overflow:hidden">
+          <div class="ec-editor-header" style="flex-shrink:0">
+            <button class="btn-fechar" onclick="fecharEditorEC()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <input class="ec-editor-titulo" id="ecEditorTitulo" value="${m.titulo}" placeholder="Título da planilha..." oninput="ecAgendarAutoSave()">
+            <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
+            <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+              <select id="ecEditorPasta" class="task-detail-select" style="width:170px" onchange="ecAgendarAutoSave()">${_ecPastaOpts(m.pasta||'')}</select>
+              <button class="btn-lic btn-lic-outline" onclick="_ecExportTabelaPDF(${mid})">${ICO_DOWNLOAD} PDF</button>
+            </div>
+          </div>
+          <div class="st-toolbar" onmousedown="event.preventDefault()">
+            <input type="number" class="st-tb-size" id="stFontSizeInput" min="6" max="96" placeholder="Tam" title="Tamanho da fonte" onmousedown="event.stopPropagation()" onchange="if(this.value)_stFmt('fontSize',+this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+            <div class="st-tb-sep"></div>
+            <button class="st-tb-btn" onclick="_stFmt('bold')" title="Negrito (Ctrl+B)"><b>N</b></button>
+            <button class="st-tb-btn" onclick="_stFmt('italic')" title="Itálico (Ctrl+I)"><i>I</i></button>
+            <button class="st-tb-btn" onclick="_stFmt('underline')" title="Sublinhado" style="text-decoration:underline">S</button>
+            <div class="st-tb-sep"></div>
+            <label class="st-clabel" title="Cor do texto" onmousedown="event.stopPropagation()">
+              <span style="display:flex;align-items:center;gap:2px">
+                <span style="font-weight:800;font-size:13px;line-height:1">A</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 114.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 00-3-3.02z"/></svg>
+              </span>
+              <span class="st-cswatch" id="stColorTxtSwatch" style="background:#000000"></span>
+              <input type="color" id="stColorTxt" value="#000000" class="st-cinp" oninput="document.getElementById('stColorTxtSwatch').style.background=this.value;_stFmt('color',this.value)" onchange="_stFmt('color',this.value)">
+            </label>
+            <label class="st-clabel" title="Cor de fundo da célula" onmousedown="event.stopPropagation()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+              <span class="st-cswatch" id="stColorBgSwatch" style="background:#ffffff"></span>
+              <input type="color" id="stColorBg" value="#ffffff" class="st-cinp" oninput="document.getElementById('stColorBgSwatch').style.background=this.value;_stFmt('bg',this.value==='#ffffff'?'':this.value)" onchange="_stFmt('bg',this.value==='#ffffff'?'':this.value)">
+            </label>
+            <div class="st-tb-sep"></div>
+            <button class="st-tb-btn" onclick="_stFmt('align','left')" title="Alinhar à esquerda"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="21" y1="6" x2="3" y2="6"/><line x1="15" y1="12" x2="3" y2="12"/><line x1="17" y1="18" x2="3" y2="18"/></svg></button>
+            <button class="st-tb-btn" onclick="_stFmt('align','center')" title="Alinhar ao centro"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="21" y1="6" x2="3" y2="6"/><line x1="17" y1="12" x2="7" y2="12"/><line x1="19" y1="18" x2="5" y2="18"/></svg></button>
+            <button class="st-tb-btn" onclick="_stFmt('align','right')" title="Alinhar à direita"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="12" x2="9" y2="12"/><line x1="21" y1="18" x2="7" y2="18"/></svg></button>
+          </div>
+          <div class="st-fxbar">
+            <input class="st-fxref" id="stCellRef" value="A1" onkeydown="_stRefNav(event)" title="Referência da célula">
+            <span style="font-size:13px;color:#9CA0AC;font-style:italic;padding:0 4px">fx</span>
+            <input class="st-fxinp" id="stFxInput" placeholder="Valor ou fórmula (ex: =SOMA(A1:B3))..." onkeydown="_stFxNav(event)" oninput="_stFxInput(this.value)" title="Fórmula ou valor da célula selecionada">
+          </div>
+          <div id="stWrap" style="display:flex;flex-direction:column;flex:1;overflow:hidden;min-height:0;min-width:0"></div>
+        </div>`;
+      hocEnhanceSelect(document.getElementById('ecEditorPasta'));
+      setTimeout(() => { _stInit(mid); _stRender(); _stFocus(); }, 0);
+      return;
+    }
+    if (m.tipo === 'desenho') {
+      const ICO_DRAW_PEN = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.174 6.812a1 1 0 00-3.986-3.987L3.842 16.174a2 2 0 00-.5.83l-1.321 4.352a.5.5 0 00.623.622l4.353-1.32a2 2 0 00.83-.497z"/><path d="m15 5 4 4"/></svg>';
+      const ICO_DRAW_ERASER = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>';
+      const ICO_DRAW_LINE = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"/></svg>';
+      const ICO_DRAW_ARROW = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="19" x2="19" y2="5"/><polyline points="9 5 19 5 19 15"/></svg>';
+      const ICO_DRAW_RECT = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg>';
+      const ICO_DRAW_CIRCLE = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/></svg>';
+      const ICO_DRAW_TEXT = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>';
+      const ICO_DRAW_BRUSH = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 114.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 00-3-3.02z"/></svg>';
+      const ICO_DRAW_UNDO = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-15-6.7L3 13"/></svg>';
+      const toolBtn = (id, tool, icon, label) =>
+        `<button id="${id}" onclick="_execSetTool('${tool}')" class="exec-shape-btn ${_execCanvasTool===tool?'active':''}" title="${label}">${icon}</button>`;
+      area.innerHTML = `
+        <div class="ec-editor-wrap">
+          <div class="ec-editor-header">
+            <button class="btn-fechar" onclick="fecharEditorEC()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <input class="ec-editor-titulo" id="ecEditorTitulo" value="${m.titulo}" placeholder="Título do desenho..." oninput="ecAgendarAutoSave()">
+            <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
+            <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
+              <select id="ecEditorPasta" class="task-detail-select" style="width:170px" onchange="ecAgendarAutoSave()">${_ecPastaOpts(m.pasta||'')}</select>
+              <button class="btn-lic btn-lic-outline" onclick="_ecExportDesenhoPDF(${mid})">${ICO_DOWNLOAD} PDF</button>
+            </div>
+          </div>
+          <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#fafafa;border-radius:8px;border:1px solid #F1F2F5">
+              ${toolBtn('execToolPen','pen',ICO_DRAW_PEN,'Caneta')}
+              ${toolBtn('execToolEraser','eraser',ICO_DRAW_ERASER,'Borracha')}
+              <div class="draw-sep"></div>
+              ${toolBtn('execToolLine','line',ICO_DRAW_LINE,'Linha')}
+              ${toolBtn('execToolArrow','arrow',ICO_DRAW_ARROW,'Seta')}
+              ${toolBtn('execToolRect','rect',ICO_DRAW_RECT,'Retângulo')}
+              ${toolBtn('execToolCircle','circle',ICO_DRAW_CIRCLE,'Círculo')}
+              <div class="draw-sep"></div>
+              ${toolBtn('execToolText','text',ICO_DRAW_TEXT,'Caixa de texto')}
+              <div class="draw-sep"></div>
+              <label class="draw-clabel" title="Cor">
+                ${ICO_DRAW_BRUSH}
+                <span class="draw-cswatch" id="execCanvasColorSwatch" style="background:${_execCanvasColor}"></span>
+                <input type="color" id="execCanvasColor" value="${_execCanvasColor}" class="draw-cinp" oninput="_execCanvasColor=this.value;document.getElementById('execCanvasColorSwatch').style.background=this.value">
+              </label>
+              <label class="draw-clabel" style="cursor:default" title="Espessura do traço">
+                <input type="range" id="execCanvasSize" min="1" max="20" value="${_execCanvasSize}" oninput="_execCanvasSize=+this.value" style="width:60px">
+              </label>
+              <button id="execShapeFillBtn" onclick="_execToggleFill(this)" class="exec-fill-btn ${_execShapeFill?'active':''}" title="Preencher forma"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+              <div class="draw-sep"></div>
+              <button onclick="_execUndoCanvas()" class="draw-action-btn">${ICO_DRAW_UNDO} Desfazer</button>
+              <button onclick="_execClearCanvas()" class="draw-action-btn danger">${ICO_TASK_TRASH} Limpar</button>
+            </div>
+            <canvas id="execCanvas" style="border:1.5px solid #E5E7EB;border-radius:8px;cursor:crosshair;background:white;display:block;max-width:100%;touch-action:none"></canvas>
+          </div>
+        </div>`;
+      hocEnhanceSelect(document.getElementById('ecEditorPasta'));
+      setTimeout(() => _execInitCanvas(m), 50);
+      return;
+    }
     area.innerHTML = `
       <div class="ec-editor-wrap">
         <div class="ec-editor-header">
-          <button class="sprint-detail-back" onclick="fecharEditorEC()" title="Voltar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button class="btn-fechar" onclick="fecharEditorEC()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
           <input class="ec-editor-titulo" id="ecEditorTitulo" value="${m.titulo}" placeholder="Título do documento..." oninput="ecAgendarAutoSave()">
           <span class="ec-autosave" id="ecAutoSaveIndicator"></span>
           <div style="display:flex;align-items:center;gap:8px;margin-left:auto">
@@ -2058,6 +2250,877 @@
       + (m.conteudo||'<p style="color:#9CA0AC">Documento vazio.</p>')
       + '</body></html>';
     const w = window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),600);
+  }
+
+  function _execFindM(mid) { return ecMateriais.find(x => x.id == mid); }
+
+  // ===================== SPREADSHEET ENGINE =====================
+  let _stD=null,_stMid=null,_stSel=[1,1],_stSel2=null,_stEditing=false,_stCopied=null,_stDragging=false;
+  const _stRC=100,_stCC=26,_stDCW=90,_stDRH=24;
+
+  function _stLtr(c){if(c<=26)return String.fromCharCode(64+c);return String.fromCharCode(64+Math.floor((c-1)/26))+String.fromCharCode(65+(c-1)%26);}
+  function _stKey(r,c){return _stLtr(c)+r;}
+  function _stSh(){return _stD.sheets[_stD.act];}
+  function _stGC(r,c){return _stSh().cells[_stKey(r,c)]||{};}
+  function _stSC(r,c,p){const k=_stKey(r,c),sh=_stSh();if(!sh.cells[k])sh.cells[k]={};Object.assign(sh.cells[k],p);const cell=sh.cells[k];if(!cell.v&&!cell.f&&!cell.bold&&!cell.italic&&!cell.underline&&!cell.color&&!cell.bg&&!cell.align&&!cell.fontSize)delete sh.cells[k];}
+
+  // Formula evaluator
+  function _stCV(key,si){const sh=_stD.sheets[si??_stD.act],cell=sh?.cells?.[key];if(!cell)return 0;if(cell.f?.startsWith('=')){try{return _stEval(cell.f.slice(1),si??_stD.act);}catch{return'#ERRO';}}const v=cell.v??'';return v===''?0:(isNaN(+v)||v.trim()===''?v:+v);}
+  function _stRV(r1,c1,r2,c2,si){const vals=[];for(let r=Math.min(r1,r2);r<=Math.max(r1,r2);r++)for(let c=Math.min(c1,c2);c<=Math.max(c1,c2);c++)vals.push(_stCV(_stLtr(c)+r,si));return vals;}
+  function _stParseRef(ref){const m=/^([A-Za-z]+)(\d+)$/.exec(ref);if(!m)return null;let c=0;for(const ch of m[1].toUpperCase())c=c*26+ch.charCodeAt(0)-64;return[+m[2],c];}
+  function _stSplitArgs(s){const a=[];let d=0,cur='';for(const ch of s){if('(['.includes(ch))d++;else if(')]'.includes(ch))d--;else if(ch===';'&&d===0){a.push(cur.trim());cur='';continue;}else if(ch===','&&d===0){a.push(cur.trim());cur='';continue;}cur+=ch;}if(cur.trim())a.push(cur.trim());return a;}
+  function _stFnRange(arg,si){
+    arg=arg.trim();
+    if(/^".*"$/.test(arg))return[arg.slice(1,-1)]; // quoted string literal
+    if(arg.includes(':')){const[r1k,r2k]=arg.split(':'),a=_stParseRef(r1k),b=_stParseRef(r2k);return a&&b?_stRV(a[0],a[1],b[0],b[1],si):[]}
+    const rc=_stParseRef(arg);if(rc)return[_stCV(arg,si)];
+    const n=+arg;return isNaN(n)?[]:[n];
+  }
+  function _stFn(fn,args,si){
+    const vals=args.flatMap(a=>_stFnRange(a,si)).filter(v=>typeof v==='number'&&!isNaN(v));
+    const all=args.flatMap(a=>_stFnRange(a,si));
+    switch(fn){
+      case'SOMA':case'SUM':return vals.reduce((a,b)=>a+b,0);
+      case'MÉDIA':case'MEDIA':case'AVERAGE':return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;
+      case'CONT.NÚM':case'CONT':case'COUNT':return vals.length;
+      case'CONT.VALORES':case'COUNTA':return all.filter(v=>v!==''&&v!==0&&v!==null&&v!==undefined).length;
+      case'MÍNIMO':case'MINIMO':case'MIN':return vals.length?Math.min(...vals):0;
+      case'MÁXIMO':case'MAXIMO':case'MAX':return vals.length?Math.max(...vals):0;
+      case'ARRED':case'ROUND':return vals.length>=2?Math.round(vals[0]*10**vals[1])/10**vals[1]:Math.round(vals[0]||0);
+      case'ABS':return Math.abs(vals[0]||0);
+      case'RAIZ':case'SQRT':return Math.sqrt(vals[0]||0);
+      case'POTÊNCIA':case'POWER':return vals.length>=2?Math.pow(vals[0],vals[1]):0;
+      case'MOD':return vals.length>=2?vals[0]%vals[1]:0;
+      case'INT':case'TRUNCAR':return Math.floor(vals[0]||0);
+      case'CONCATENAR':case'CONCAT':return all.map(String).join('');
+      default:return '#NOME?';
+    }
+  }
+  function _stEvalSafe(expr,si){if(/^".*"$/.test(expr.trim()))return expr.trim().slice(1,-1);try{return _stEval(expr,si);}catch{return expr;}}
+  function _stEval(expr,si){
+    si=si??_stD.act;
+    // SE/IF(cond;t;f)
+    const ifRx=/\b(SE|IF)\s*\((.+)\)\s*$/i;
+    let ifM=ifRx.exec(expr);
+    if(ifM){const parts=_stSplitArgs(ifM[2]);if(parts.length>=2){const cond=_stEvalSafe(parts[0],si);const res=cond?parts[1]:(parts[2]||'');return _stEvalSafe(res,si);}return'#ERRO';}
+    // Functions — loop to handle nested calls like ARRED(MEDIA(A1:A3);2)
+    {let prev;do{prev=expr;expr=expr.replace(/\b([A-ZÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÃÕÇ\.]+)\s*\(([^()]*)\)/gi,(_,fn,args)=>{const r=_stFn(fn.toUpperCase(),_stSplitArgs(args),si);return typeof r==='number'?String(r):'"'+String(r).replace(/\\/g,'\\\\').replace(/"/g,'\\"')+'"';});}while(expr!==prev);}
+    // Cell refs (case-insensitive: a1 == A1)
+    expr=expr.replace(/\b([A-Za-z]+\d+)\b/g,(_,ref)=>{const v=_stCV(ref.toUpperCase(),si);return typeof v==='number'?String(v):`"${String(v).replace(/\\/g,'\\\\').replace(/"/g,'\\"')}"`;});
+    try{const r=Function('"use strict";return('+expr+')')();return r===undefined?'':r;}catch{return'#ERRO';}
+  }
+  function _stDisp(r,c){const cell=_stGC(r,c);if(!cell.v&&!cell.f)return'';if(cell.f?.startsWith('=')){try{const v=_stEval(cell.f.slice(1));if(typeof v==='number')return Number.isInteger(v)?String(v):v.toFixed(10).replace(/\.?0+$/,'');return v===undefined?'':String(v);}catch{return'#ERRO';}}return String(cell.v??'');}
+  function _stEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  // Save / Load
+  function _stSave(){const m=_execFindM(_stMid);if(!m)return;m.dados=m.dados||{};m.dados.planilha=JSON.parse(JSON.stringify(_stD));ecAgendarAutoSave();}
+  function _stInit(mid){
+    _stMid=mid;const m=_execFindM(mid);if(!m)return;
+    m.dados=m.dados||{};
+    if(!m.dados.planilha){
+      const sh={name:'Plan1',cells:{},colWidths:{},rowHeights:{}};
+      if(m.dados?.tabela){const{cols,rows}=m.dados.tabela;cols.forEach((c,ci)=>{sh.cells[_stLtr(ci+1)+'1']={v:c,bold:true};});rows.forEach((row,ri)=>row.forEach((v,ci)=>{if(v)sh.cells[_stLtr(ci+1)+(ri+2)]={v};}));}
+      m.dados.planilha={sheets:[sh],act:0};
+    }
+    _stD=JSON.parse(JSON.stringify(m.dados.planilha));
+    if(!_stD.sheets?.length)_stD.sheets=[{name:'Plan1',cells:{},colWidths:{},rowHeights:{}}];
+    if(_stD.act===undefined||_stD.act===null)_stD.act=0;
+    if(typeof _stD.act!=='number')_stD.act=+_stD.act||0;
+    _stSel=[1,1];_stSel2=null;_stEditing=false;_stCopied=null;
+  }
+
+  // CSS
+  function _stCSS(){return`
+#ecAreaPrincipal{min-width:0;overflow:hidden}
+.st-tbl{border-collapse:collapse;font-size:12px;font-family:inherit;table-layout:fixed;outline:none}
+.st-tbl th,.st-tbl td{border:1px solid #E5E7EB;padding:0;box-sizing:border-box;overflow:hidden;white-space:nowrap}
+.st-corner{background:#FAFBFC;position:sticky;top:0;left:0;z-index:4;min-width:40px;width:40px;border-color:#cbd5e0}
+.st-ch{background:#FAFBFC;position:sticky;top:0;z-index:2;text-align:center;font-weight:600;font-size:11px;color:#6B7080;user-select:none;cursor:default;border-color:#cbd5e0}
+.st-ch-sel{background:var(--accent)!important;color:white!important;border-bottom:3px solid #4c1d95!important}
+.st-ch-inner{position:relative;display:flex;align-items:center;justify-content:center;height:22px}
+.st-col-resize{position:absolute;right:0;top:0;width:5px;height:100%;cursor:col-resize;z-index:5}
+.st-col-resize:hover,.st-col-resize:active{background:var(--accent)}
+.st-rh{background:#FAFBFC;position:sticky;left:0;z-index:1;text-align:center;padding:0;font-weight:600;font-size:11px;color:#6B7080;user-select:none;cursor:pointer;min-width:40px;width:40px;border-color:#cbd5e0;position:relative}
+.st-rh-sel{background:var(--accent)!important;color:white!important;border-right:3px solid #4c1d95!important}
+.st-row-resize{position:absolute;bottom:0;left:0;width:100%;height:4px;cursor:row-resize;z-index:5}
+.st-row-resize:hover,.st-row-resize:active{background:var(--accent)}
+.st-cell{padding:1px 4px;text-align:left;cursor:cell;overflow:hidden;white-space:nowrap;position:relative}
+.st-cell:hover{background:#f7f8ff}
+.st-cell-sel{outline:2px solid var(--accent)!important;outline-offset:-2px;background:color-mix(in srgb, var(--accent) 14%, white)!important;z-index:1}
+.st-cell-range{background:#f3f0ff}
+.st-tabbar{display:flex;align-items:flex-end;border-top:2px solid #E5E7EB;background:#FAFBFC;padding:0 8px;gap:2px;flex-shrink:0;min-height:30px}
+.st-tab{padding:5px 14px;font-size:11px;cursor:pointer;border:1px solid transparent;border-bottom:none;border-radius:4px 4px 0 0;color:#6B7080;user-select:none;transition:all .15s}
+.st-tab:hover{background:#E5E7EB}
+.st-tab.active{background:white;border-color:#E5E7EB;color:var(--accent);font-weight:700;margin-bottom:-1px}
+.st-tab-add{color:#9CA0AC;padding:5px 10px;font-size:16px}
+.st-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;background:#fafafa;border-bottom:1px solid #F1F2F5;flex-shrink:0}
+.st-tb-sep{width:1px;background:#E5E7EB;align-self:stretch;margin:0 4px;flex-shrink:0}
+.st-fxbar{display:flex;align-items:center;gap:4px;padding:2px 8px;border-bottom:1px solid #E5E7EB;background:white;flex-shrink:0}
+.st-fxref{width:56px;border:1px solid #E5E7EB;border-radius:3px;padding:2px 4px;font-size:11px;text-align:center;font-family:monospace;flex-shrink:0}
+.st-fxinp{flex:1;border:1px solid #E5E7EB;border-radius:3px;padding:2px 6px;font-size:12px;font-family:monospace;min-width:0}
+.st-tb-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:7px;cursor:pointer;border:1.5px solid #E5E7EB;background:white;font-size:13px;color:#33363F;white-space:nowrap;transition:all .12s;flex-shrink:0}
+.st-tb-btn:hover{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 10%, white);color:var(--accent)}
+.st-tb-sel{height:32px;padding:0 9px;border:1.5px solid #E5E7EB;border-radius:7px;font-size:12px;cursor:pointer;background:white;color:#33363F}
+#stFontSizeInput.st-tb-size{width:48px!important;height:32px!important;padding:0 6px!important;border:1.5px solid #E5E7EB;border-radius:7px;font-size:12px;text-align:center;color:#33363F;outline:none;flex-shrink:0;box-sizing:border-box}
+.st-tb-size:focus{border-color:var(--accent)}
+.st-clabel{display:flex;align-items:center;gap:6px;cursor:pointer;padding:0 9px;height:32px;border-radius:7px;border:1.5px solid #E5E7EB;background:white;color:#33363F;user-select:none;position:relative;flex-shrink:0}
+.st-clabel:hover{border-color:var(--accent)}
+.st-cswatch{width:15px;height:15px;border-radius:4px;border:1px solid rgba(11,11,15,.15);flex-shrink:0}
+.st-cinp{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0}
+.st-rh:hover{background:#edf2f7}
+.st-ctx{position:fixed;z-index:9999;background:white;border:1px solid #E5E7EB;border-radius:7px;padding:4px 0;box-shadow:0 6px 20px rgba(0,0,0,.15);min-width:180px;font-size:12px}
+.st-ctx-item{padding:7px 16px;cursor:pointer;color:#2d3748;display:flex;align-items:center;gap:8px}
+.st-ctx-item:hover{background:#f0f4f8}
+.st-ctx-sep{height:1px;background:#E5E7EB;margin:3px 0}
+`;}
+
+  // Render
+  function _stRender(){
+    const wrap=document.getElementById('stWrap');if(!wrap)return;
+    if(!document.getElementById('stCss')){const s=document.createElement('style');s.id='stCss';s.textContent=_stCSS();document.head.appendChild(s);}
+    // Preserve scroll position
+    const prevGrid=document.getElementById('stGridWrap');
+    const sv={t:prevGrid?.scrollTop||0,l:prevGrid?.scrollLeft||0};
+    const sh=_stSh();
+    const usedRows=Object.keys(sh.cells).map(k=>{const m=/(\d+)$/.exec(k);return m?+m[1]:0;});
+    const rows=Math.max(_stRC,usedRows.length?Math.max(...usedRows)+5:_stRC);
+    const cols=_stCC;
+    const cw=c=>sh.colWidths?.[c]||_stDCW;
+    const rh=r=>sh.rowHeights?.[r]||_stDRH;
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const rMin=Math.min(sr,se[0]),rMax=Math.max(sr,se[0]),cMin=Math.min(sc,se[1]),cMax=Math.max(sc,se[1]);
+    let totalW=40;for(let c=1;c<=cols;c++)totalW+=cw(c);
+    let html=`<div id="stGridWrap" style="overflow:auto;flex:1;min-height:0;width:100%;min-width:0"><table class="st-tbl" id="stTable" style="width:${totalW}px" tabindex="0" onkeydown="_stKeyDown(event)" onmousedown="_stTableMD(event)" onmouseover="_stTableMO(event)" ondblclick="_stTableDblClick(event)">`;
+    html+='<colgroup><col style="width:40px;min-width:40px">';
+    for(let c=1;c<=cols;c++)html+=`<col style="width:${cw(c)}px;min-width:${cw(c)}px">`;
+    html+='</colgroup>';
+    html+='<thead><tr><th class="st-corner" onclick="_stSelAll()"></th>';
+    for(let c=1;c<=cols;c++){
+      const sel=c>=cMin&&c<=cMax;
+      html+=`<th class="st-ch${sel?' st-ch-sel':''}" data-stc="${c}" onclick="_stSelCol(${c},event)" oncontextmenu="_stCtxCol(event,${c})"><div class="st-ch-inner">${_stLtr(c)}<div class="st-col-resize" onmousedown="_stStartColRes(event,${c})"></div></div></th>`;
+    }
+    html+='</tr></thead><tbody>';
+    for(let r=1;r<=rows;r++){
+      const rsel=r>=rMin&&r<=rMax;
+      html+=`<tr><td class="st-rh${rsel?' st-rh-sel':''}" data-str="${r}" style="height:${rh(r)}px" onclick="_stSelRow(${r},event)" oncontextmenu="_stCtxRow(event,${r})">${r}<div class="st-row-resize" onmousedown="_stStartRowRes(event,${r})"></div></td>`;
+      for(let c=1;c<=cols;c++){
+        const cell=_stGC(r,c);
+        const isSel=r===sr&&c===sc;
+        const inRange=r>=rMin&&r<=rMax&&c>=cMin&&c<=cMax;
+        const disp=_stDisp(r,c);
+        const st=_stCellStyle(cell);
+        html+=`<td class="st-cell${isSel?' st-cell-sel':''}${inRange&&!isSel?' st-cell-range':''}" data-str="${r}" data-stc="${c}" style="${st}height:${rh(r)}px">${_stEsc(disp)}</td>`;
+      }
+      html+='</tr>';
+    }
+    html+='</tbody></table></div>';
+    html+='<div class="st-tabbar" id="stTabBar">';
+    _stD.sheets.forEach((s,i)=>{html+=`<div class="st-tab${i===_stD.act?' active':''}" ondblclick="_stRenameSheet(${i})" onclick="_stSwitch(${i})" title="Duplo clique para renomear">${_stEsc(s.name)}</div>`;});
+    html+='<div class="st-tab st-tab-add" onclick="_stAddSheet()" title="Nova aba">+</div></div>';
+    wrap.innerHTML=html;
+    // Restore scroll (prevents page jump on cell click)
+    const ng=document.getElementById('stGridWrap');
+    if(ng){ng.scrollTop=sv.t;ng.scrollLeft=sv.l;}
+    _stUpdateFormulaBar();
+  }
+
+  function _stCellStyle(cell){
+    let s='';
+    if(cell.bold)s+='font-weight:700;';
+    if(cell.italic)s+='font-style:italic;';
+    if(cell.underline)s+='text-decoration:underline;';
+    if(cell.color)s+=`color:${cell.color};`;
+    if(cell.bg)s+=`background:${cell.bg};`;
+    if(cell.align)s+=`text-align:${cell.align};`;
+    if(cell.fontSize)s+=`font-size:${cell.fontSize}px;`;
+    return s;
+  }
+
+  function _stUpdateFormulaBar(){
+    const refEl=document.getElementById('stCellRef'),fxEl=document.getElementById('stFxInput');
+    if(!refEl||!fxEl)return;
+    refEl.value=_stLtr(_stSel[1])+_stSel[0];
+    const cell=_stGC(_stSel[0],_stSel[1]);
+    fxEl.value=cell.f||(cell.v??'');
+    const szEl=document.getElementById('stFontSizeInput');
+    if(szEl)szEl.value=cell.fontSize||'';
+  }
+
+  // Interaction
+  function _stFocus(){document.getElementById('stTable')?.focus({preventScroll:true});}
+  function _stTableMD(e){
+    const td=e.target.closest('[data-str][data-stc]');if(!td)return;
+    e.preventDefault();
+    if(_stEditing){
+      const inp=document.getElementById('stEditInp');
+      if(inp&&inp.value.startsWith('=')){
+        // Insert cell reference at cursor position
+        const r2=+td.dataset.str,c2=+td.dataset.stc,ref=_stLtr(c2)+r2;
+        const pos=inp.selectionStart,end=inp.selectionEnd;
+        inp.value=inp.value.slice(0,pos)+ref+inp.value.slice(end);
+        inp.setSelectionRange(pos+ref.length,pos+ref.length);
+        inp.focus({preventScroll:true});
+        const fx=document.getElementById('stFxInput');if(fx)fx.value=inp.value;
+        return;
+      }
+      _stCommit();
+    }
+    const r=+td.dataset.str,c=+td.dataset.stc;
+    if(e.shiftKey){_stSel2=[r,c];_stUpdateSelClasses();return;}
+    _stSel=[r,c];_stSel2=null;_stDragging=true;
+    _stUpdateSelClasses();
+    _stFocus();
+    document.addEventListener('mouseup',_stTableMU,{once:true});
+  }
+  function _stTableMO(e){
+    if(!_stDragging)return;
+    const td=e.target.closest('[data-str][data-stc]');if(!td)return;
+    const r=+td.dataset.str,c=+td.dataset.stc;
+    const cur=_stSel2||_stSel;
+    if(r===cur[0]&&c===cur[1])return;
+    _stSel2=[r,c];
+    _stUpdateSelClasses();
+  }
+  function _stTableMU(){_stDragging=false;}
+  function _stTableDblClick(e){
+    const td=e.target.closest('[data-str][data-stc]');if(!td)return;
+    _stSel=[+td.dataset.str,+td.dataset.stc];_stSel2=null;
+    _stStartEdit();
+  }
+  // Lightweight selection highlight update — no full re-render
+  function _stUpdateSelClasses(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const rMin=Math.min(sr,se[0]),rMax=Math.max(sr,se[0]);
+    const cMin=Math.min(sc,se[1]),cMax=Math.max(sc,se[1]);
+    document.querySelectorAll('.st-cell').forEach(td=>{
+      const r=+td.dataset.str,c=+td.dataset.stc;
+      const isSel=r===sr&&c===sc,inRange=r>=rMin&&r<=rMax&&c>=cMin&&c<=cMax;
+      td.classList.toggle('st-cell-sel',isSel);
+      td.classList.toggle('st-cell-range',inRange&&!isSel);
+    });
+    document.querySelectorAll('.st-ch[data-stc]').forEach(th=>{
+      th.classList.toggle('st-ch-sel',+th.dataset.stc>=cMin&&+th.dataset.stc<=cMax);
+    });
+    document.querySelectorAll('.st-rh[data-str]').forEach(td=>{
+      td.classList.toggle('st-rh-sel',+td.dataset.str>=rMin&&+td.dataset.str<=rMax);
+    });
+    _stUpdateFormulaBar();
+  }
+  function _stKeyDown(e){
+    if(_stEditing){
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();_stCommit(1,0);}
+      else if(e.key==='Tab'){e.preventDefault();_stCommit(0,e.shiftKey?-1:1);}
+      else if(e.key==='Escape')_stCancelEdit();
+      return;
+    }
+    const[r,c]=_stSel;
+    if(e.ctrlKey){
+      switch(e.key){
+        case'c':_stCopy();break;
+        case'v':_stPaste();break;
+        case'b':e.preventDefault();_stFmt('bold');break;
+        case'i':e.preventDefault();_stFmt('italic');break;
+        case'z':e.preventDefault();break;
+      }return;
+    }
+    switch(e.key){
+      case'ArrowUp':e.preventDefault();_stMoveSel(-1,0,e.shiftKey);break;
+      case'ArrowDown':e.preventDefault();_stMoveSel(1,0,e.shiftKey);break;
+      case'ArrowLeft':e.preventDefault();_stMoveSel(0,-1,e.shiftKey);break;
+      case'ArrowRight':e.preventDefault();_stMoveSel(0,1,e.shiftKey);break;
+      case'Tab':e.preventDefault();_stMoveSel(0,e.shiftKey?-1:1,false);break;
+      case'Enter':e.preventDefault();_stMoveSel(1,0,false);break;
+      case'Delete':case'Backspace':_stClearSel();break;
+      case'F2':e.preventDefault();_stStartEdit();break;
+      default:if(!e.altKey&&e.key.length===1){_stStartEdit(e.key);e.preventDefault();}
+    }
+  }
+  function _stMoveSel(dr,dc,extend){
+    const[r,c]=_stSel,nr=Math.max(1,Math.min(500,r+dr)),nc=Math.max(1,Math.min(_stCC,c+dc));
+    if(extend){_stSel2=[nr,nc];}else{_stSel=[nr,nc];_stSel2=null;}
+    _stRender();_stFocus();
+  }
+  function _stStartEdit(initChar){
+    if(_stEditing){const inp=document.getElementById('stEditInp');if(inp)inp.focus();return;}
+    _stEditing=true;_stSel2=null;
+    const[r,c]=_stSel;
+    const cell=_stGC(r,c);
+    const td=document.querySelector(`td[data-str="${r}"][data-stc="${c}"]`);if(!td)return;
+    const wrap=document.getElementById('stGridWrap');if(!wrap)return;
+    const tdR=td.getBoundingClientRect(),wR=wrap.getBoundingClientRect();
+    const inp=document.createElement('input');
+    inp.id='stEditInp';
+    const initVal=initChar!=null?initChar:(cell.f||cell.v||'');
+    inp.value=initVal;
+    inp.style.cssText=`position:absolute;left:${td.offsetLeft}px;top:${td.offsetTop}px;width:${Math.max(td.offsetWidth,120)}px;height:${td.offsetHeight}px;border:2px solid var(--accent);outline:none;padding:0 4px;font-size:${cell.fontSize||12}px;font-family:inherit;z-index:30;box-sizing:border-box;${_stCellStyle(cell)}`;
+    wrap.appendChild(inp);inp.focus({preventScroll:true});
+    if(initChar)inp.setSelectionRange(inp.value.length,inp.value.length);else inp.select();
+    inp.addEventListener('input',()=>{const fx=document.getElementById('stFxInput');if(fx)fx.value=inp.value;});
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();_stCommit(1,0);}
+      else if(e.key==='Tab'){e.preventDefault();_stCommit(0,e.shiftKey?-1:1);}
+      else if(e.key==='Escape'){e.preventDefault();_stCancelEdit();}
+    });
+    inp.addEventListener('blur',()=>{setTimeout(()=>{if(_stEditing)_stCommit();},30);});
+  }
+  function _stCommit(dr=0,dc=0){
+    const inp=document.getElementById('stEditInp');if(!inp)return;
+    const val=inp.value;const[r,c]=_stSel;
+    inp.removeEventListener('blur',_stCommit);
+    _stEditing=false;inp.remove();
+    if(val.startsWith('=')){_stSC(r,c,{f:val,v:undefined});}else{_stSC(r,c,{v:val,f:undefined});}
+    _stSave();
+    if(dr||dc){const nr=Math.max(1,Math.min(500,r+dr)),nc=Math.max(1,Math.min(_stCC,c+dc));_stSel=[nr,nc];_stSel2=null;}
+    _stRender();_stFocus();
+  }
+  function _stCancelEdit(){const inp=document.getElementById('stEditInp');if(inp){_stEditing=false;inp.remove();}_stRender();_stFocus();}
+  function _stClearSel(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    for(let r=Math.min(sr,se[0]);r<=Math.max(sr,se[0]);r++)for(let c=Math.min(sc,se[1]);c<=Math.max(sc,se[1]);c++){const k=_stKey(r,c),sh=_stSh();if(sh.cells[k]){delete sh.cells[k].v;delete sh.cells[k].f;if(Object.keys(sh.cells[k]).length===0)delete sh.cells[k];}}
+    _stSave();_stRender();_stFocus();
+  }
+
+  // Context menus
+  function _stCtxClose(){document.querySelectorAll('.st-ctx').forEach(m=>m.remove());}
+  function _stCtxShow(e,html){
+    e.preventDefault();e.stopPropagation();_stCtxClose();
+    const m=document.createElement('div');m.className='st-ctx';
+    m.style.left=Math.min(e.clientX,window.innerWidth-200)+'px';
+    m.style.top=Math.min(e.clientY,window.innerHeight-120)+'px';
+    m.innerHTML=html;document.body.appendChild(m);
+    setTimeout(()=>document.addEventListener('mousedown',_stCtxClose,{once:true}),0);
+  }
+  function _stCtxRow(e,r){
+    // Ensure the row is selected
+    if(r<Math.min(_stSel[0],(_stSel2||_stSel)[0])||r>Math.max(_stSel[0],(_stSel2||_stSel)[0])){_stSel=[r,1];_stSel2=[r,_stCC];_stUpdateSelClasses();}
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const r1=Math.min(sr,se[0]),r2=Math.max(sr,se[0]);
+    const lbl=r2>r1?`linhas ${r1}–${r2}`:`linha ${r1}`;
+    _stCtxShow(e,`<div class="st-ctx-item" onmousedown="event.stopPropagation();_stCtxClose();_stDelRows()">Excluir ${lbl}</div>
+      <div class="st-ctx-sep"></div>
+      <div class="st-ctx-item" onmousedown="event.stopPropagation();_stCtxClose();_stClearSel()">✕ Limpar conteúdo</div>`);
+  }
+  function _stCtxCol(e,c){
+    if(c<Math.min(_stSel[1],(_stSel2||_stSel)[1])||c>Math.max(_stSel[1],(_stSel2||_stSel)[1])){_stSel=[1,c];_stSel2=[_stRC,c];_stUpdateSelClasses();}
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const c1=Math.min(sc,se[1]),c2=Math.max(sc,se[1]);
+    const lbl=c2>c1?`colunas ${_stLtr(c1)}–${_stLtr(c2)}`:`coluna ${_stLtr(c1)}`;
+    _stCtxShow(e,`<div class="st-ctx-item" onmousedown="event.stopPropagation();_stCtxClose();_stDelCols()">Excluir ${lbl}</div>
+      <div class="st-ctx-sep"></div>
+      <div class="st-ctx-item" onmousedown="event.stopPropagation();_stCtxClose();_stClearSel()">✕ Limpar conteúdo</div>`);
+  }
+  function _stSelAll(){_stSel=[1,1];_stSel2=[_stRC,_stCC];_stUpdateSelClasses();}
+  function _stSelRow(r,e){if(e&&e.shiftKey){_stSel2=[r,_stCC];}else{_stSel=[r,1];_stSel2=[r,_stCC];}_stUpdateSelClasses();_stFocus();}
+  function _stSelCol(c,e){if(e&&e.shiftKey){_stSel2=[_stRC,c];}else{_stSel=[1,c];_stSel2=[_stRC,c];}_stUpdateSelClasses();_stFocus();}
+  function _stDelRows(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const r1=Math.min(sr,se[0]),r2=Math.max(sr,se[0]);
+    const sh=_stSh();
+    const newCells={};
+    Object.keys(sh.cells).forEach(k=>{
+      const m=/^([A-Za-z]+)(\d+)$/.exec(k);if(!m)return;
+      const r=+m[2];
+      if(r>=r1&&r<=r2)return;
+      const nr=r>r2?r-(r2-r1+1):r;
+      newCells[m[1]+nr]=sh.cells[k];
+    });
+    sh.cells=newCells;
+    _stSel=[Math.max(1,r1),sc];_stSel2=null;
+    _stSave();_stRender();_stFocus();
+  }
+  function _stDelCols(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const c1=Math.min(sc,se[1]),c2=Math.max(sc,se[1]);
+    const sh=_stSh();
+    const newCells={};
+    Object.keys(sh.cells).forEach(k=>{
+      const m=/^([A-Za-z]+)(\d+)$/.exec(k);if(!m)return;
+      let c=0;for(const ch of m[1])c=c*26+ch.charCodeAt(0)-64;
+      if(c>=c1&&c<=c2)return;
+      const nc=c>c2?c-(c2-c1+1):c;
+      newCells[_stLtr(nc)+m[2]]=sh.cells[k];
+    });
+    sh.cells=newCells;
+    _stSel=[sr,Math.max(1,c1)];_stSel2=null;
+    _stSave();_stRender();_stFocus();
+  }
+
+  // Formatting
+  function _stFmt(prop,val){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    const r1=Math.min(sr,se[0]),r2=Math.max(sr,se[0]),c1=Math.min(sc,se[1]),c2=Math.max(sc,se[1]);
+    for(let r=r1;r<=r2;r++)for(let c=c1;c<=c2;c++){
+      const cur=_stGC(r,c);
+      if(prop==='bold')_stSC(r,c,{bold:!cur.bold});
+      else if(prop==='italic')_stSC(r,c,{italic:!cur.italic});
+      else if(prop==='underline')_stSC(r,c,{underline:!cur.underline});
+      else if(prop==='align')_stSC(r,c,{align:val});
+      else if(prop==='color')_stSC(r,c,{color:val});
+      else if(prop==='bg')_stSC(r,c,{bg:val||undefined});
+      else if(prop==='fontSize')_stSC(r,c,{fontSize:val});
+    }
+    _stSave();_stRender();_stFocus();
+  }
+
+  // Column / row resize
+  let _stResType=null,_stResIdx=null,_stResStart=0,_stResCurSize=0;
+  function _stStartColRes(e,c){e.preventDefault();e.stopPropagation();_stResType='col';_stResIdx=c;_stResStart=e.clientX;_stResCurSize=_stSh().colWidths?.[c]||_stDCW;document.addEventListener('mousemove',_stOnRes);document.addEventListener('mouseup',_stEndRes);}
+  function _stStartRowRes(e,r){e.preventDefault();e.stopPropagation();_stResType='row';_stResIdx=r;_stResStart=e.clientY;_stResCurSize=_stSh().rowHeights?.[r]||_stDRH;document.addEventListener('mousemove',_stOnRes);document.addEventListener('mouseup',_stEndRes);}
+  function _stOnRes(e){
+    if(!_stResType)return;
+    const sh=_stSh();
+    if(_stResType==='col'){
+      const nw=Math.max(40,_stResCurSize+(e.clientX-_stResStart));
+      if(!sh.colWidths)sh.colWidths={};sh.colWidths[_stResIdx]=nw;
+      const idx=_stResIdx;
+      document.querySelectorAll(`[data-stc="${idx}"]`).forEach(el=>{if(el.tagName==='TH'||el.tagName==='TD')el.style.width=nw+'px';});
+      const col=document.querySelectorAll('#stTable colgroup col')[idx];if(col)col.style.width=nw+'px';
+    } else {
+      const nh=Math.max(18,_stResCurSize+(e.clientY-_stResStart));
+      if(!sh.rowHeights)sh.rowHeights={};sh.rowHeights[_stResIdx]=nh;
+      const tds=document.querySelectorAll(`[data-str="${_stResIdx}"]`);tds.forEach(td=>td.style.height=nh+'px');
+    }
+  }
+  function _stEndRes(){document.removeEventListener('mousemove',_stOnRes);document.removeEventListener('mouseup',_stEndRes);_stResType=null;_stSave();}
+
+  // Sheets
+  function _stSwitch(idx){if(_stEditing)_stCancelEdit();_stD.act=idx;_stSel=[1,1];_stSel2=null;_stSave();_stRender();_stFocus();}
+  function _stAddSheet(){const n=_stD.sheets.length+1;_stD.sheets.push({name:'Plan'+n,cells:{},colWidths:{},rowHeights:{}});_stD.act=_stD.sheets.length-1;_stSave();_stRender();_stFocus();}
+  function _stRenameSheet(idx){const name=prompt('Nome da aba:',_stD.sheets[idx].name);if(name?.trim()){_stD.sheets[idx].name=name.trim();_stSave();_stRender();}}
+
+  // Copy / Paste
+  function _stCopy(){
+    const[sr,sc]=_stSel,se=_stSel2||_stSel;
+    _stCopied={r1:Math.min(sr,se[0]),c1:Math.min(sc,se[1]),r2:Math.max(sr,se[0]),c2:Math.max(sc,se[1]),data:{}};
+    for(let r=_stCopied.r1;r<=_stCopied.r2;r++)for(let c=_stCopied.c1;c<=_stCopied.c2;c++)_stCopied.data[_stKey(r-_stCopied.r1+1,c-_stCopied.c1+1)]=JSON.parse(JSON.stringify(_stGC(r,c)));
+  }
+  function _stPaste(){
+    if(!_stCopied)return;
+    const[tr,tc]=_stSel,dr=_stCopied.r2-_stCopied.r1,dc=_stCopied.c2-_stCopied.c1;
+    for(let r=0;r<=dr;r++)for(let c=0;c<=dc;c++){const src=_stCopied.data[_stKey(r+1,c+1)];if(src)_stSC(tr+r,tc+c,JSON.parse(JSON.stringify(src)));}
+    _stSave();_stRender();
+  }
+
+  // Formula bar
+  function _stFxNav(e){if(e.key==='Enter'){e.preventDefault();const val=document.getElementById('stFxInput')?.value;if(val!=null){const[r,c]=_stSel;if(val.startsWith('=')){_stSC(r,c,{f:val,v:undefined});}else{_stSC(r,c,{v:val,f:undefined});}_stSave();_stRender();}_stFocus();}}
+  function _stFxInput(val){if(!_stEditing)return;const inp=document.getElementById('stEditInp');if(inp)inp.value=val;}
+  function _stRefNav(e){if(e.key!=='Enter')return;const ref=document.getElementById('stCellRef')?.value?.trim()?.toUpperCase();if(!ref)return;const m=/^([A-Z]+)(\d+)$/.exec(ref);if(!m)return;let col=0;for(const ch of m[1])col=col*26+ch.charCodeAt(0)-64;_stSel=[+m[2],col];_stSel2=null;_stRender();_stFocus();}
+
+  // ===================== CANVAS DRAWING ENGINE =====================
+  let _execTextBoxes = [];
+  function _execInitCanvas(m) {
+    const canvas = document.getElementById('execCanvas');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const cssWidth = canvas.parentElement.offsetWidth - 24 || 800;
+    const cssHeight = Math.max(500, Math.round(cssWidth * 0.6));
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = Math.round(cssWidth * dpr);
+    canvas.height = Math.round(cssHeight * dpr);
+    const ctx = canvas.getContext('2d');
+    _execUndoStack = [];
+    _execTextBoxes = m.textBoxes ? JSON.parse(JSON.stringify(m.textBoxes)) : [];
+
+    const bgSrc = m.canvasBase || m.canvasData;
+    if (bgSrc) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        _execRenderAllTextBoxes(canvas.parentElement, canvas);
+      };
+      img.src = bgSrc;
+    } else {
+      setTimeout(() => _execRenderAllTextBoxes(canvas.parentElement, canvas), 0);
+    }
+
+    function getPos(e) {
+      const r = canvas.getBoundingClientRect();
+      const src = e.touches ? e.touches[0] : e;
+      return [(src.clientX - r.left) * (canvas.width/r.width), (src.clientY - r.top) * (canvas.height/r.height)];
+    }
+
+    function applyCtxStyle(isEraser) {
+      ctx.lineWidth = (isEraser ? _execCanvasSize * 4 : _execCanvasSize) * dpr;
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = isEraser ? 'rgba(0,0,0,1)' : _execCanvasColor;
+      ctx.fillStyle = _execCanvasColor;
+      ctx.globalCompositeOperation = isEraser ? 'destination-out' : 'source-over';
+    }
+
+    function drawShape(x1, y1, x2, y2) {
+      ctx.beginPath();
+      switch(_execCanvasTool) {
+        case 'line':
+          ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); break;
+        case 'arrow':
+          _execDrawArrow(ctx, x1, y1, x2, y2); break;
+        case 'rect':
+          if (_execShapeFill) ctx.fillRect(x1,y1,x2-x1,y2-y1);
+          ctx.strokeRect(x1,y1,x2-x1,y2-y1); break;
+        case 'circle':
+          const rx = (x2-x1)/2, ry = (y2-y1)/2, cx = x1+rx, cy = y1+ry;
+          ctx.ellipse(cx, cy, Math.abs(rx), Math.abs(ry), 0, 0, Math.PI*2);
+          if (_execShapeFill) ctx.fill();
+          ctx.stroke(); break;
+      }
+    }
+
+    function startDraw(e) {
+      e.preventDefault();
+      if (_execCanvasTool === 'text') {
+        const [x,y] = getPos(e);
+        _execPlaceTextInput(canvas, ctx, x, y);
+        return;
+      }
+      _execCanvasDrawing = true;
+      const [x,y] = getPos(e);
+      _execCanvasStartX = x; _execCanvasStartY = y;
+      const isFree = _execCanvasTool === 'pen' || _execCanvasTool === 'eraser';
+      // Save undo snapshot before stroke
+      _execUndoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+      if (_execUndoStack.length > 30) _execUndoStack.shift();
+      if (isFree) { applyCtxStyle(_execCanvasTool==='eraser'); ctx.beginPath(); ctx.moveTo(x,y); }
+      else { _execCanvasSnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height); }
+    }
+
+    function draw(e) {
+      if (!_execCanvasDrawing) return; e.preventDefault();
+      const [x,y] = getPos(e);
+      const isFree = _execCanvasTool === 'pen' || _execCanvasTool === 'eraser';
+      if (isFree) {
+        applyCtxStyle(_execCanvasTool==='eraser');
+        ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y);
+      } else {
+        // Restore snapshot then draw live preview
+        if (_execCanvasSnapshot) ctx.putImageData(_execCanvasSnapshot, 0, 0);
+        applyCtxStyle(false);
+        drawShape(_execCanvasStartX, _execCanvasStartY, x, y);
+      }
+    }
+
+    function endDraw(e) {
+      if (!_execCanvasDrawing) return;
+      _execCanvasDrawing = false;
+      ctx.globalCompositeOperation = 'source-over';
+      if (_execCanvasSnapshot) {
+        // Commit shape: already drawn in last mousemove
+        _execCanvasSnapshot = null;
+      }
+      _execSaveCanvas(canvas);
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', endDraw);
+    canvas.addEventListener('mouseleave', endDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', endDraw);
+  }
+
+  function _execDrawArrow(ctx, x1, y1, x2, y2) {
+    const headLen = Math.max(12, _execCanvasSize * 4);
+    const angle = Math.atan2(y2-y1, x2-x1);
+    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI/6), y2 - headLen * Math.sin(angle - Math.PI/6));
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI/6), y2 - headLen * Math.sin(angle + Math.PI/6));
+    ctx.stroke();
+  }
+
+  function _execSetTool(tool) {
+    _execCanvasTool = tool;
+    const existing = document.getElementById('execTextInput');
+    if (existing) existing.blur();
+    document.querySelectorAll('.exec-shape-btn').forEach(b => b.classList.remove('active'));
+    const ids = {pen:'execToolPen',eraser:'execToolEraser',line:'execToolLine',arrow:'execToolArrow',rect:'execToolRect',circle:'execToolCircle',text:'execToolText'};
+    const el = document.getElementById(ids[tool]);
+    if (el) el.classList.add('active');
+    const canvas = document.getElementById('execCanvas');
+    if (canvas) canvas.style.cursor = tool === 'eraser' ? 'cell' : tool === 'text' ? 'text' : 'crosshair';
+  }
+
+  function _execToggleFill(btn) {
+    _execShapeFill = !_execShapeFill;
+    btn.classList.toggle('active', _execShapeFill);
+  }
+
+  function _execPlaceTextInput(canvas, ctx, cx, cy) {
+    if (document.getElementById('execTextBox')) return;
+    const container = canvas.parentElement;
+    container.style.position = 'relative';
+    const canvasR = canvas.getBoundingClientRect();
+    const containerR = container.getBoundingClientRect();
+    const scaleX = canvasR.width / canvas.width;
+    const scaleY = canvasR.height / canvas.height;
+    const canvL = canvasR.left - containerR.left;
+    const canvT = canvasR.top  - containerR.top;
+    const BOX_W = 180, BOX_H = 80;
+    let left = Math.max(canvL, Math.min(canvL + cx * scaleX, canvL + canvasR.width  - BOX_W));
+    let top  = Math.max(canvT, Math.min(canvT + cy * scaleY, canvT + canvasR.height - BOX_H));
+    const fontSize = Math.max(12, _execCanvasSize * 2 + 8);
+
+    // Outer box (draggable + resizable)
+    const box = document.createElement('div');
+    box.id = 'execTextBox';
+    box.style.cssText = `position:absolute;left:${left}px;top:${top}px;width:${BOX_W}px;height:${BOX_H}px;min-width:100px;min-height:60px;border:1.5px solid var(--accent);border-radius:5px;background:rgba(255,255,255,0.96);z-index:20;box-shadow:0 3px 12px rgba(0,0,0,0.18);display:flex;flex-direction:column;resize:both;overflow:hidden`;
+
+    // Drag handle (header)
+    const handle = document.createElement('div');
+    handle.style.cssText = `background:var(--accent);padding:3px 8px;cursor:move;user-select:none;display:flex;align-items:center;justify-content:space-between;flex-shrink:0`;
+    handle.innerHTML = `<span style="font-size:10px;color:rgba(255,255,255,0.9);font-weight:600;letter-spacing:.3px">T CAIXA DE TEXTO</span><button id="_etbCancel" style="background:none;border:none;color:white;cursor:pointer;font-size:15px;line-height:1;padding:0 2px;font-weight:700;opacity:.8" title="Cancelar (Esc)">×</button>`;
+
+    // Textarea
+    const inp = document.createElement('textarea');
+    inp.id = 'execTextInput';
+    inp.placeholder = 'Digite o texto...';
+    inp.style.cssText = `flex:1;border:none;outline:none;padding:5px 8px;font-size:${fontSize}px;color:${_execCanvasColor};font-family:sans-serif;line-height:1.4;resize:none;background:transparent;width:100%;box-sizing:border-box`;
+
+    // Confirm button bar
+    const bar = document.createElement('div');
+    bar.style.cssText = `display:flex;justify-content:flex-end;padding:2px 4px;background:#f8f5ff;flex-shrink:0;border-top:1px solid color-mix(in srgb, var(--accent) 20%, white)`;
+    bar.innerHTML = `<button id="_etbOk" style="font-size:10px;padding:2px 8px;background:var(--accent);color:white;border:none;border-radius:3px;cursor:pointer;font-weight:600">✓ Inserir</button>`;
+
+    box.appendChild(handle); box.appendChild(inp); box.appendChild(bar);
+    container.appendChild(box);
+    inp.focus();
+
+    // Drag logic (handle prevents textarea blur via preventDefault)
+    let drag = false, dsx = 0, dsy = 0, bsl = 0, bst = 0;
+    handle.addEventListener('mousedown', e => {
+      if (e.target.id === '_etbCancel') return;
+      drag = true; dsx = e.clientX; dsy = e.clientY;
+      bsl = parseFloat(box.style.left); bst = parseFloat(box.style.top);
+      e.preventDefault();
+    });
+    function onMove(e) {
+      if (!drag) return;
+      let nl = bsl + e.clientX - dsx, nt = bst + e.clientY - dsy;
+      nl = Math.max(canvL, Math.min(nl, canvL + canvasR.width  - box.offsetWidth));
+      nt = Math.max(canvT, Math.min(nt, canvT + canvasR.height - box.offsetHeight));
+      box.style.left = nl + 'px'; box.style.top = nt + 'px';
+    }
+    function onUp() { drag = false; }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+
+    function destroy() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      box.remove();
+    }
+    document.getElementById('_etbOk').addEventListener('mousedown', e => e.preventDefault());
+    document.getElementById('_etbOk').addEventListener('click', commit);
+    document.getElementById('_etbCancel').addEventListener('mousedown', e => e.preventDefault());
+    document.getElementById('_etbCancel').addEventListener('click', destroy);
+    bar.addEventListener('mousedown', e => e.preventDefault());
+    inp.addEventListener('keydown', e => { if (e.key === 'Escape') { destroy(); e.stopPropagation(); } });
+
+    function commit() {
+      const text = inp.value;
+      const boxL = parseFloat(box.style.left) - canvL;
+      const boxT = parseFloat(box.style.top)  - canvT;
+      const handleH = handle.offsetHeight;
+      const barH = bar.offsetHeight;
+      const boxW = box.offsetWidth;
+      const boxH = box.offsetHeight;
+      destroy();
+      if (text.trim()) {
+        const tb = {
+          id: Date.now(),
+          x: (boxL + 8) / scaleX,
+          y: (boxT + handleH + 5) / scaleY,
+          w: (boxW - 16) / scaleX,
+          h: (boxH - handleH - barH - 10) / scaleY,
+          text,
+          fontSize: Math.round(fontSize / scaleX),
+          color: _execCanvasColor
+        };
+        _execTextBoxes.push(tb);
+        _execRenderAllTextBoxes(container, canvas);
+        _execSaveCanvas(canvas);
+      }
+    }
+  }
+
+  function _execSaveCanvas(canvas) {
+    const m = _execFindM(ecEditandoId);
+    if (!m) return;
+    m.canvasBase = canvas.toDataURL('image/png');
+    m.textBoxes = JSON.parse(JSON.stringify(_execTextBoxes));
+    // Build composite image for PDF / view
+    const tmp = document.createElement('canvas');
+    tmp.width = canvas.width; tmp.height = canvas.height;
+    const tCtx = tmp.getContext('2d');
+    tCtx.drawImage(canvas, 0, 0);
+    _execTextBoxes.forEach(tb => {
+      tCtx.font = `${tb.fontSize}px sans-serif`;
+      tCtx.fillStyle = tb.color;
+      const lh = tb.fontSize * 1.4;
+      tb.text.split('\n').forEach((line, i) => {
+        if (line) tCtx.fillText(line, tb.x, tb.y + tb.fontSize * (i + 1) + lh * i);
+      });
+    });
+    m.canvasData = tmp.toDataURL('image/png');
+    ecAgendarAutoSave();
+  }
+
+  function _execRenderAllTextBoxes(container, canvas) {
+    container.querySelectorAll('[data-exec-tb]').forEach(el => el.remove());
+    if (!_execTextBoxes.length) return;
+    const canvasR = canvas.getBoundingClientRect();
+    const containerR = container.getBoundingClientRect();
+    const scaleX = canvasR.width / canvas.width;
+    const scaleY = canvasR.height / canvas.height;
+    const canvL = canvasR.left - containerR.left;
+    const canvT = canvasR.top  - containerR.top;
+    _execTextBoxes.forEach(tb => _execRenderTextBox(tb, container, canvas, scaleX, scaleY, canvL, canvT));
+  }
+
+  function _execRenderTextBox(tb, container, canvas, scaleX, scaleY, canvL, canvT) {
+    const el = document.createElement('div');
+    el.dataset.execTb = tb.id;
+    const cssX = canvL + tb.x * scaleX;
+    const cssY = canvT + tb.y * scaleY;
+    const cssW = Math.max(80, tb.w * scaleX);
+    const cssH = Math.max(40, tb.h * scaleY);
+    const fsCss = Math.round(tb.fontSize * scaleX);
+    el.style.cssText = `position:absolute;left:${cssX}px;top:${cssY}px;width:${cssW}px;min-width:80px;min-height:40px;border:1.5px solid var(--accent);border-radius:5px;background:rgba(255,255,255,0.96);z-index:20;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.12);resize:both`;
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = `background:var(--accent);padding:2px 8px;cursor:move;user-select:none;display:flex;align-items:center;justify-content:space-between;flex-shrink:0`;
+    hdr.innerHTML = `<span style="font-size:9px;color:rgba(255,255,255,0.85);font-weight:600;letter-spacing:.3px">TEXTO</span><button data-del style="background:none;border:none;color:white;cursor:pointer;font-size:13px;line-height:1;padding:0 2px;font-weight:700" title="Remover">×</button>`;
+
+    const display = document.createElement('div');
+    display.style.cssText = `flex:1;padding:5px 8px;font-size:${fsCss}px;color:${tb.color};font-family:sans-serif;line-height:1.4;white-space:pre-wrap;word-break:break-word;overflow:auto;cursor:text;min-height:24px`;
+    display.textContent = tb.text;
+    display.title = 'Duplo clique para editar';
+
+    el.appendChild(hdr); el.appendChild(display);
+    container.appendChild(el);
+
+    // Drag via pointer capture on header
+    let drag = false, dsx = 0, dsy = 0, bsl = 0, bst = 0;
+    hdr.addEventListener('pointerdown', e => {
+      if (e.target.dataset.del !== undefined) return;
+      drag = true; dsx = e.clientX; dsy = e.clientY;
+      bsl = parseFloat(el.style.left); bst = parseFloat(el.style.top);
+      hdr.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    hdr.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const cr = canvas.getBoundingClientRect(), cor = container.getBoundingClientRect();
+      const cl = cr.left - cor.left, ct = cr.top - cor.top;
+      let nl = Math.max(cl, Math.min(bsl + e.clientX - dsx, cl + cr.width  - el.offsetWidth));
+      let nt = Math.max(ct, Math.min(bst + e.clientY - dsy, ct + cr.height - el.offsetHeight));
+      el.style.left = nl + 'px'; el.style.top = nt + 'px';
+    });
+    hdr.addEventListener('pointerup', e => {
+      if (!drag) return; drag = false;
+      const cr = canvas.getBoundingClientRect(), cor = container.getBoundingClientRect();
+      const cl = cr.left - cor.left, ct = cr.top - cor.top;
+      const sx = cr.width / canvas.width, sy = cr.height / canvas.height;
+      tb.x = (parseFloat(el.style.left) - cl) / sx;
+      tb.y = (parseFloat(el.style.top)  - ct) / sy;
+      _execSaveCanvas(canvas);
+    });
+
+    // Delete
+    hdr.querySelector('[data-del]').addEventListener('click', () => {
+      _execTextBoxes = _execTextBoxes.filter(t => t.id !== tb.id);
+      el.remove();
+      _execSaveCanvas(canvas);
+    });
+
+    // Double-click to edit text inline
+    display.addEventListener('dblclick', () => {
+      display.style.display = 'none';
+      const ta = document.createElement('textarea');
+      ta.value = tb.text;
+      ta.style.cssText = `flex:1;border:none;outline:none;padding:5px 8px;font-size:${fsCss}px;color:${tb.color};font-family:sans-serif;line-height:1.4;resize:none;background:transparent;width:100%;box-sizing:border-box;min-height:24px`;
+      el.insertBefore(ta, display);
+      ta.focus();
+      ta.addEventListener('mousedown', e => e.stopPropagation());
+      ta.addEventListener('blur', () => {
+        tb.text = ta.value;
+        display.textContent = tb.text;
+        display.style.display = '';
+        ta.remove();
+        _execSaveCanvas(canvas);
+      });
+      ta.addEventListener('keydown', e => { if (e.key === 'Escape') ta.blur(); });
+    });
+  }
+
+  function _execUndoCanvas() {
+    if (!_execUndoStack.length) return;
+    const canvas = document.getElementById('execCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.putImageData(_execUndoStack.pop(), 0, 0);
+    _execSaveCanvas(canvas);
+  }
+
+  function _execClearCanvas() {
+    if (!confirm('Limpar o desenho?')) return;
+    const canvas = document.getElementById('execCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    _execUndoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    _execTextBoxes = [];
+    canvas.parentElement.querySelectorAll('[data-exec-tb]').forEach(el => el.remove());
+    _execSaveCanvas(canvas);
+  }
+
+  function _ecExportTabelaPDF(mid) {
+    const m = _execFindM(mid); if (!m) return;
+    const sheets = m.dados?.planilha?.sheets || [];
+    const sheetsHtml = sheets.map(sh => {
+      const cells = sh.cells || {};
+      let maxR = 1, maxC = 1;
+      Object.keys(cells).forEach(k => {
+        const match = k.match(/^([A-Z]+)(\d+)$/);
+        if (!match) return;
+        const r = +match[2];
+        let c = 0; for (const ch of match[1]) c = c*26 + (ch.charCodeAt(0)-64);
+        if (r > maxR) maxR = r;
+        if (c > maxC) maxC = c;
+      });
+      const colLtr = c => { let s=''; while (c>0) { const m2=(c-1)%26; s=String.fromCharCode(65+m2)+s; c=Math.floor((c-1)/26); } return s; };
+      let rowsHtml = '';
+      for (let r=1; r<=maxR; r++) {
+        rowsHtml += '<tr>';
+        for (let c=1; c<=maxC; c++) {
+          const cell = cells[colLtr(c)+r] || {};
+          const val = cell.v!=null ? cell.v : '';
+          rowsHtml += `<td style="padding:5px 8px;border:1px solid #ddd;${cell.bold?'font-weight:700;':''}${cell.italic?'font-style:italic;':''}text-align:${cell.align||'left'}">${val}</td>`;
+        }
+        rowsHtml += '</tr>';
+      }
+      return `<h2 style="font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 6px">${sh.name||'Planilha'}</h2><table style="width:100%;border-collapse:collapse;font-size:12px">${rowsHtml}</table>`;
+    }).join('') || '<p style="color:#9CA0AC">Planilha vazia.</p>';
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${m.titulo||'Tabela'}</title>
+    <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;color:#0B0B0F;background:white;padding:32px 40px}@media print{body{padding:16px 20px}@page{margin:15mm 12mm;size:A4 landscape}}h1{font-size:18px;font-weight:800;color:var(--accent);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--accent)}</style>
+    </head><body><h1>${m.titulo||'Tabela'}</h1>${sheetsHtml}</body></html>`;
+    const w = window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(() => w.print(), 400);
+  }
+
+  function _ecExportDesenhoPDF(mid) {
+    const m = _execFindM(mid); if (!m) return;
+    // Try live canvas first, fall back to stored data
+    let imgSrc = m.canvasData;
+    const liveCv = document.getElementById('execCanvas');
+    if (liveCv && ecEditandoId == mid) imgSrc = liveCv.toDataURL('image/png');
+    if (!imgSrc) { alert('Nenhum desenho para exportar.'); return; }
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${m.titulo||'Desenho'}</title>
+    <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;color:#0B0B0F;background:white;padding:24px 30px}@media print{body{padding:14px 18px}@page{margin:12mm;size:A4 landscape}}h1{font-size:18px;font-weight:800;color:var(--accent);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--accent)}img{max-width:100%;height:auto;border:1px solid #E5E7EB;border-radius:6px}</style>
+    </head><body><h1>${m.titulo||'Desenho'}</h1><img src="${imgSrc}"></body></html>`;
+    const w = window.open('','_blank'); w.document.write(html); w.document.close(); setTimeout(() => w.print(), 600);
   }
 
   function ecAgendarAutoSave() {
@@ -2134,6 +3197,16 @@
       const val = pastaSelect.value;
       pastaSelect.innerHTML = _ecPastaOpts(val);
     }
+  }
+  function renomearPastaEC(id, val) {
+    const pasta = ecPastas.find(p => p.id === id);
+    if (!pasta) return;
+    const novoNome = val.trim();
+    if (!novoNome || novoNome === pasta.nome) { renderECSidebar(); return; }
+    pasta.nome = novoNome;
+    salvarDadosEC();
+    renderECSidebar();
+    if (ecPastaAtual === id) renderECContent();
   }
   function deletarPastaEC(id) {
     if (!confirm('Remover esta pasta? Materiais e subpastas ficam sem pasta.')) return;
@@ -2511,7 +3584,7 @@
       const concPts = _allT.filter(t=>t.status==='concluido').reduce((a,t)=>a+(Number(t.pontos)||0),0);
       const pct = totalPts ? Math.round(concPts/totalPts*100) : 0;
 
-      const _outlineBtn = (color, onclick, label) => `<button onclick="event.stopPropagation();${onclick}" style="padding:5px 12px;background:white;color:${color};border:1.5px solid color-mix(in srgb, ${color} 45%, white);border-radius:7px;cursor:pointer;font-size:11.5px;font-weight:700">${label}</button>`;
+      const _outlineBtn = (color, onclick, label) => `<button onclick="event.stopPropagation();${onclick}" style="padding:5px 12px;background:${color};color:white;border:none;border-radius:7px;cursor:pointer;font-size:11.5px;font-weight:700">${label}</button>`;
 
       let acoes = '';
       if (status === 'pendente') {
@@ -2525,15 +3598,18 @@
       }
 
       return `<div class="sprint-card" id="sprint-${s.id}" onclick="abrirSprintDetalhe(${s.id})" style="cursor:pointer">
-        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px">
-          <span class="sprint-nome" style="flex:1">${s.nome}</span>
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:14px 16px 10px">
+          <div style="flex:1;min-width:0">
+            <span class="sprint-nome">${s.nome}</span>
+            ${s.objetivo ? `<div style="font-size:12px;font-weight:400;color:#0B0B0F;margin-top:3px">${_gesc(s.objetivo)}</div>` : ''}
+          </div>
           <span class="sprint-badge ${cls}">${lbl}</span>
-          <span style="font-size:11px;color:#9CA0AC;white-space:nowrap">${inicio} &rarr; ${fim}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;padding:0 16px 14px">
+        <div style="display:flex;align-items:center;gap:12px;padding:0 16px 8px">
           <div style="flex:1;height:8px;background:#F1F2F5;border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:var(--accent);border-radius:4px"></div></div>
           <span style="font-size:11.5px;font-weight:700;color:#33363F;white-space:nowrap">${concPts}/${totalPts} pts</span>
         </div>
+        <div style="padding:0 16px 14px;font-size:11px;color:#9CA0AC;white-space:nowrap">${inicio} &rarr; ${fim}</div>
         <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid #F2F3F5" onclick="event.stopPropagation()">
           ${acoes}
           <div style="flex:1"></div>
@@ -2581,11 +3657,10 @@
         <td style="font-weight:700;color:#0B0B0F">${_gesc(t.tarefa||'—')}</td>
         <td>${_gesc(t.responsavel||'—')}</td>
         <td style="white-space:nowrap">${t.prazo?formatarData(t.prazo):'—'}</td>
-        <td style="font-weight:700">${t.pontos||'—'}</td>
+        <td>${t.pontos||'—'}</td>
         <td><span class="${prioCls}">${t.prioridade||'Média'}</span></td>
         <td><span class="${st.cls}">${st.lbl}</span></td>
-        <td style="text-align:center"><button class="btn-acao btn-det" onclick="${cols.onDetalhe(t)}" title="Editar">${ICO_TASK_EDIT}</button></td>
-        ${cols.hasDelete ? `<td style="text-align:center"><button class="btn-acao btn-del" onclick="${cols.onDelete(t)}" title="Excluir">${ICO_TASK_TRASH}</button></td>` : '<td></td>'}
+        <td><div style="display:flex;gap:4px;justify-content:center"><button class="btn-acao btn-det" onclick="${cols.onDetalhe(t)}" title="Editar">${ICO_TASK_EDIT}</button>${cols.hasDelete ? `<button class="btn-acao btn-del" onclick="${cols.onDelete(t)}" title="Excluir">${ICO_TASK_TRASH}</button>` : ''}</div></td>
       </tr>`;
     }
     const THEAD = `<thead><tr>
@@ -2595,8 +3670,7 @@
       <th style="width:60px;text-align:center">SP</th>
       <th style="min-width:85px">Prioridade</th>
       <th style="min-width:100px">Status</th>
-      <th style="width:40px"></th>
-      <th style="width:40px"></th>
+      <th style="width:64px;text-align:center">Ações</th>
     </tr></thead>`;
 
     // ---- Section 1: Backlog desta Sprint ----
@@ -2686,7 +3760,9 @@
         ondragover="_kanbanDragOver(event)"
         ondrop="_kanbanDrop(event,${sprint.id},'${col.key}')">
         <div class="kanban-col-header"><span>${col.label}</span><span class="kanban-count">${count}</span></div>
-        ${blCards||adCards ? blCards+adCards : '<div style="color:#9CA0AC;font-size:12px;text-align:center;padding:16px">Vazio</div>'}
+        <div class="kanban-col-body">
+          ${blCards||adCards ? blCards+adCards : '<div style="color:#9CA0AC;font-size:12px;text-align:center;padding:16px">Vazio</div>'}
+        </div>
       </div>`;
     }).join('') + `</div>`;
   }
@@ -2805,8 +3881,9 @@
       <div>
         <div style="font-size:12px;font-weight:600;color:#33363F;margin-bottom:6px">Anexos</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${anexosHTML}</div>
-        <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:color-mix(in srgb, var(--accent) 8%, white);color:var(--accent);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">
-          ${ICO_PAPERCLIP} Adicionar arquivo
+        <label class="btn-lic btn-lic-outline" style="cursor:pointer;display:inline-flex">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Carregar arquivo
           <input type="file" style="display:none" onchange="revisaoUpload(${sprint.id},this)">
         </label>
       </div>
@@ -2992,6 +4069,8 @@
     renderTaskFiles(t);
     document.getElementById('commentsPanel').classList.add('aberto');
     document.getElementById('commentsOverlay').style.display = 'block';
+    const scrollWrap = document.querySelector('#commentsPanel .td-scroll-wrap');
+    if (scrollWrap) scrollWrap.scrollTop = 0;
   }
 
   function abrirTarefaDetalhe(sprintId, tarefaId) {
@@ -3149,7 +4228,7 @@
           ${c.editado ? '<span class="comment-editado">(editada)</span>' : ''}
           <div style="display:flex;gap:2px;margin-left:auto">
             <button class="comment-acao-btn" onclick="editarComentario(${c.id})" title="Editar">&#9998;</button>
-            <button class="comment-acao-btn" onclick="excluirComentario(${c.id})" title="Excluir" style="color:color-mix(in srgb, #FF2E4D 40%, white)">&#128465;</button>
+            <button class="comment-acao-btn" onclick="excluirComentario(${c.id})" title="Excluir" style="color:color-mix(in srgb, #FF2E4D 40%, white);display:inline-flex;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg></button>
           </div>
         </div>
         <div class="comment-texto" id="comment-texto-${c.id}">${_gesc(c.texto)}</div>
@@ -3293,10 +4372,9 @@
         <td>${_gesc(t.responsavel||'—')}</td>
         <td style="white-space:nowrap">${t.prazo?formatarData(t.prazo):'—'}</td>
         <td><span class="${prioCls}">${t.prioridade||'Média'}</span></td>
-        <td style="font-weight:700">${t.pontos||'—'}</td>
+        <td>${t.pontos||'—'}</td>
         <td><span class="${st.cls}">${st.lbl}</span></td>
-        <td style="text-align:center"><button class="btn-acao btn-det" onclick="abrirDetalheItem({tipo:'backlog',id:'${t.id}'})" title="Editar">${ICO_TASK_EDIT}</button></td>
-        <td style="text-align:center"><button class="btn-acao btn-del" onclick="backlogDeletar('${t.id}')" title="Excluir">${ICO_TASK_TRASH}</button></td>
+        <td><div style="display:flex;gap:4px;justify-content:center"><button class="btn-acao btn-det" onclick="abrirDetalheItem({tipo:'backlog',id:'${t.id}'})" title="Editar">${ICO_TASK_EDIT}</button><button class="btn-acao btn-del" onclick="backlogDeletar('${t.id}')" title="Excluir">${ICO_TASK_TRASH}</button></div></td>
       </tr>`;
     }).join('');
   }
@@ -3366,7 +4444,7 @@
       const totalDays = Math.max(1,Math.round((endDate-startDate)/86400000));
       const total = allTasks.length;
 
-      const W=480, H=175, PL=46, PR=18, PT=18, PB=42;
+      const W=1100, H=300, PL=50, PR=16, PT=16, PB=44;
       const cW=W-PL-PR, cH=H-PT-PB;
       const xOf = d => Math.max(0,Math.min(cW,Math.round((d-startDate)/86400000/totalDays*cW)));
       const yOf = n => Math.round(cH - (n/total)*cH);
@@ -3376,7 +4454,7 @@
       const gridLines = yTicks.map(v => {
         const y = PT + yOf(v);
         return `<line x1="${PL}" y1="${y}" x2="${PL+cW}" y2="${y}" stroke="#F1F2F5" stroke-width="1"/>
-                <text x="${PL-6}" y="${y+4}" text-anchor="end" font-size="8" fill="#6B7080">${v}</text>`;
+                <text x="${PL-8}" y="${y+3.5}" text-anchor="end" font-size="10.5" fill="#9CA0AC">${v}</text>`;
       }).join('');
 
       // Actual burndown step line
@@ -3404,47 +4482,38 @@
         const x = Math.round(frac * cW);
         const d = new Date(startDate.getTime() + Math.round(frac * totalDays) * 86400000);
         const lbl = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-        return `<text x="${PL+x}" y="${PT+cH+16}" text-anchor="middle" font-size="8" fill="#6B7080">${lbl}</text>`;
+        return `<text x="${PL+x}" y="${PT+cH+20}" text-anchor="middle" font-size="10.5" fill="#9CA0AC">${lbl}</text>`;
       }).join('');
 
       // Sprint boundary vertical markers
       const sprintLines = sprints.flatMap(s=>[
-        s.inicio ? `<line x1="${PL+xOf(new Date(s.inicio+'T00:00:00'))}" y1="${PT}" x2="${PL+xOf(new Date(s.inicio+'T00:00:00'))}" y2="${PT+cH}" stroke="color-mix(in srgb, var(--accent) 20%, white)" stroke-width="1" stroke-dasharray="3,3"/>` : '',
-        s.fim    ? `<line x1="${PL+xOf(new Date(s.fim+'T00:00:00'))}"   y1="${PT}" x2="${PL+xOf(new Date(s.fim+'T00:00:00'))}"   y2="${PT+cH}" stroke="color-mix(in srgb, var(--accent) 20%, white)" stroke-width="1" stroke-dasharray="3,3"/>` : ''
+        s.inicio ? `<line x1="${PL+xOf(new Date(s.inicio+'T00:00:00'))}" y1="${PT}" x2="${PL+xOf(new Date(s.inicio+'T00:00:00'))}" y2="${PT+cH}" stroke="color-mix(in srgb, var(--accent) 18%, white)" stroke-width="1" stroke-dasharray="3,3"/>` : '',
+        s.fim    ? `<line x1="${PL+xOf(new Date(s.fim+'T00:00:00'))}"   y1="${PT}" x2="${PL+xOf(new Date(s.fim+'T00:00:00'))}"   y2="${PT+cH}" stroke="color-mix(in srgb, var(--accent) 18%, white)" stroke-width="1" stroke-dasharray="3,3"/>` : ''
       ]).join('');
 
       // Today marker (only if today is within range)
       const showToday = today >= startDate && today <= endDate;
       const todayLine = showToday
         ? `<line x1="${PL+todayX}" y1="${PT}" x2="${PL+todayX}" y2="${PT+cH}" stroke="#FFAE00" stroke-width="1.5" stroke-dasharray="4,3"/>
-           <text x="${PL+todayX+3}" y="${PT+10}" font-size="8" fill="#FFAE00" font-weight="700">Hoje</text>`
+           <text x="${PL+todayX+5}" y="${PT+12}" font-size="10" fill="#FFAE00" font-weight="700">Hoje</text>`
         : '';
 
-      // Legend
-      const legendY = PT - 6;
-      const legend = `
-        <line x1="${PL+cW-140}" y1="${legendY}" x2="${PL+cW-124}" y2="${legendY}" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="5,4"/>
-        <text x="${PL+cW-121}" y="${legendY+4}" font-size="8" fill="#6B7080">Ritmo ideal</text>
-        <line x1="${PL+cW-64}" y1="${legendY}" x2="${PL+cW-48}" y2="${legendY}" stroke="var(--accent)" stroke-width="2.5"/>
-        <text x="${PL+cW-45}" y="${legendY+4}" font-size="8" fill="#6B7080">Real</text>`;
-
       // Y-axis title (rotated)
-      const yTitle = `<text x="${-H/2}" y="12" text-anchor="middle" font-size="8" fill="#6B7080" transform="rotate(-90)" letter-spacing="0.3">Tarefas restantes</text>`;
+      const yTitle = `<text x="${-H/2}" y="14" text-anchor="middle" font-size="9.5" font-weight="700" fill="#9CA0AC" transform="rotate(-90)" letter-spacing="0.4">TAREFAS RESTANTES</text>`;
       // X-axis title
-      const xTitle = `<text x="${PL+cW/2}" y="${H-4}" text-anchor="middle" font-size="8" fill="#6B7080" letter-spacing="0.3">Data</text>`;
+      const xTitle = `<text x="${PL+cW/2}" y="${H-6}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#9CA0AC" letter-spacing="0.4">DATA</text>`;
 
       return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;overflow:visible;display:block">
         ${yTitle}
         ${gridLines}
         ${sprintLines}
-        <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH+1}" stroke="#E5E7EB" stroke-width="1.5"/>
-        <line x1="${PL-1}" y1="${PT+cH}" x2="${PL+cW}" y2="${PT+cH}" stroke="#E5E7EB" stroke-width="1.5"/>
-        <polyline points="${idealPts}" fill="none" stroke="#E5E7EB" stroke-width="1.5" stroke-dasharray="6,4"/>
-        <polyline points="${actualPts}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH+1}" stroke="#E5E7EB" stroke-width="1"/>
+        <line x1="${PL-1}" y1="${PT+cH}" x2="${PL+cW}" y2="${PT+cH}" stroke="#E5E7EB" stroke-width="1"/>
+        <polyline points="${idealPts}" fill="none" stroke="#D9DCE3" stroke-width="1.5" stroke-dasharray="7,5"/>
+        <polyline points="${actualPts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
         ${todayLine}
         ${xLabels}
         ${xTitle}
-        ${legend}
       </svg>`;
     }
 
@@ -3457,7 +4526,11 @@
           <button class="dash-info-icon" onclick="toggleInfoPopover('${infoId}',event)" title="Mais informações">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
           </button>
-          <div class="dash-info-tip" id="${infoId}">${tip}</div>
+          <div class="dash-info-tip" id="${infoId}">
+            <div style="font-weight:700;color:#0B0B0F;margin-bottom:8px">${label}</div>
+            <div style="border-top:1px solid #F1F2F5;margin:0 0 8px"></div>
+            <div>${tip}</div>
+          </div>
         </div>
         <div class="dash-kpi-label">${label}</div>
         <div class="dash-kpi-val" style="color:${color||'var(--accent)'}">${v}</div>
@@ -3476,14 +4549,31 @@
           ${kpi('Velocidade Média', velocidadeMedia!==null?velocidadeMedia+'d':null, 'Tempo médio (em dias) entre início do andamento e conclusão das tarefas.', 'var(--accent)')}
         </div>
         <div style="background:white;border:1px solid #ECEDF0;border-radius:14px;padding:16px 18px;position:relative">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding-right:26px">
             <span style="font-size:11px;font-weight:700;color:#6B7080;letter-spacing:.5px">Burndown Chart</span>
+            <div style="display:flex;align-items:center;gap:16px">
+              <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7080"><span style="display:inline-block;width:14px;border-top:1.5px dashed #D9DCE3"></span>Ritmo ideal</span>
+              <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:#6B7080"><span style="display:inline-block;width:14px;height:2px;background:var(--accent);border-radius:1px"></span>Real</span>
+            </div>
           </div>
           <div class="dash-info-wrap">
             <button class="dash-info-icon" onclick="toggleInfoPopover('infoBurndown',event)" title="Mais informações">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
             </button>
-            <div class="dash-info-tip" id="infoBurndown" style="width:280px"><strong>Como ler este gráfico</strong><br>— <strong>Linha Ideal:</strong> ritmo necessário para zerar todas as tarefas até o fim do projeto<br>— <strong>Linha Real:</strong> tarefas restantes ao longo do tempo (cai a cada conclusão registrada)<br>— <strong>Limites de Sprint:</strong> marcas verticais de início/fim de cada sprint<br><strong>Eixo Y:</strong> tarefas não concluídas · <strong>Eixo X:</strong> linha do tempo<br>Linha real <em>abaixo</em> da ideal = equipe adiantada; <em>acima</em> = atrasada</div>
+            <div class="dash-info-tip" id="infoBurndown" style="width:280px">
+              <div style="font-weight:700;color:#0B0B0F;margin-bottom:8px">Como ler este gráfico</div>
+              <div style="border-top:1px solid #F1F2F5;margin:0 0 8px"></div>
+              <div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Legenda</div>
+              <div style="margin-bottom:3px"><strong>Linha Ideal:</strong> ritmo necessário para zerar todas as tarefas até o fim do projeto</div>
+              <div style="margin-bottom:3px"><strong>Linha Real:</strong> tarefas restantes ao longo do tempo (cai a cada conclusão registrada)</div>
+              <div><strong>Limites de Sprint:</strong> marcas verticais de início/fim de cada sprint</div>
+              <div style="border-top:1px solid #F1F2F5;margin:10px 0 8px"></div>
+              <div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Eixos</div>
+              <div style="margin-bottom:3px"><strong>Eixo Y:</strong> tarefas não concluídas</div>
+              <div><strong>Eixo X:</strong> linha do tempo</div>
+              <div style="border-top:1px solid #F1F2F5;margin:10px 0 8px"></div>
+              <div>Linha real <em>abaixo</em> da ideal = equipe adiantada; <em>acima</em> = atrasada</div>
+            </div>
           </div>
           ${burndownSVG()}
         </div>
@@ -3519,20 +4609,9 @@
   function renderEquipeAgil() {
     const listaEl  = document.getElementById('ecAgLista');
     const emptyEl  = document.getElementById('ecAgEmpty');
-    const kpisEl   = document.getElementById('ecAgKpis');
     if (!listaEl) return;
 
     const list     = equipeClientes || [];
-    const internos = list.filter(p=>p.tipo==='Interno');
-    const externos = list.filter(p=>p.tipo==='Externo');
-
-    if (kpisEl) kpisEl.innerHTML = [
-      ['Membros Internos', internos.length],
-      ['Membros Externos', externos.length],
-    ].map(([l,v])=>`<div class="dash-kpi" style="position:static">
-      <div class="dash-kpi-label">${l}</div>
-      <div class="dash-kpi-val" style="color:#0B0B0F">${v}</div>
-    </div>`).join('');
 
     hocEnhanceSelect(document.getElementById('ecAgFiltroTipo'));
     hocEnhanceSelect(document.getElementById('ecAgFiltroStatus'));
@@ -3564,14 +4643,23 @@
       const avatarBg = AVATAR_CORES[Math.abs([...(p.nome||'?')].reduce((a,c)=>a+c.charCodeAt(0),0)) % AVATAR_CORES.length];
       const avaliacoesId = 'ecAgAval' + i_orig;
       return `<div class="ec-ag-card" style="flex-direction:column;align-items:stretch;gap:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <span class="proj-badge" style="background:#F1F2F5;color:#33363F">${p.tipo||'Interno'}</span>
+          <span class="proj-badge" style="background:white;color:${ativo?'#00B37E':'#6B7080'};border:1.5px solid;border-radius:999px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;height:21px;box-sizing:border-box">${ativo?'Ativo':'Inativo'}</span>
+        </div>
         <div style="display:flex;align-items:center;gap:12px;min-height:38px">
           <div class="ec-ag-avatar" style="background:${avatarBg};color:white;align-self:center">${iniciais}</div>
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;align-self:center">
             <div style="font-weight:700;font-size:13px;color:#0B0B0F;line-height:1.3">${_gesc(p.nome||'(sem nome)')}</div>
             <div style="font-size:11.5px;color:#9CA0AC;line-height:1.3">${_gesc(p.papel||'—')}</div>
           </div>
-          <span class="proj-badge" style="background:#F1F2F5;color:#33363F">${p.tipo||'Interno'}</span>
-          <span class="proj-badge" style="background:${ativo?'#00B37E':'#6B7080'};color:white">${ativo?'Ativo':'Inativo'}</span>
+          <div style="position:relative;flex-shrink:0">
+            <button onclick="toggleAvalMenuEc(event,${i_orig})" style="background:none;border:none;cursor:pointer;padding:0;color:var(--accent);font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:4px">
+              Avaliações (${notasP.length})
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div id="avalMenu${i_orig}" class="ec-aval-menu" style="display:none;position:fixed;background:white;border:1px solid #ECEDF0;border-radius:10px;box-shadow:0 8px 24px rgba(11,11,15,0.14);padding:6px;z-index:9000;min-width:180px"></div>
+          </div>
           <div style="display:flex;gap:6px;flex-shrink:0">
             <button class="btn-acao btn-det" onclick="ecAgAbrirModal(${i_orig})" title="Editar">${ICO_TASK_EDIT}</button>
             <button class="btn-acao btn-del" onclick="ecAgDel(${i_orig})" title="Excluir">${ICO_TASK_TRASH}</button>
@@ -3581,11 +4669,11 @@
           ${p.email?`<span style="font-size:11.5px;color:#6B7080">${_gesc(p.email)}</span>`:''}
           ${p.telefone?`<span style="font-size:11.5px;color:#6B7080">${_gesc(p.telefone)}</span>`:''}
           ${!ativo&&p.dataInativacao?`<span style="font-size:11.5px;color:#6B7080">Inativado em ${new Date(p.dataInativacao).toLocaleDateString('pt-BR')}</span>`:''}
-          <div style="flex:1"></div>
-          <button onclick="pesqAgAbrirModal(${i_orig})" style="background:none;border:none;cursor:pointer;padding:0;color:var(--accent);font-size:11.5px;font-weight:600">+ Avaliar</button>
-          <button onclick="const el=document.getElementById('${avaliacoesId}');el.style.display=el.style.display==='none'?'block':'none';this.textContent=el.style.display==='none'?'Ver Avaliações (${notasP.length})':'Ocultar Avaliações'" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;font-size:11.5px;font-weight:600">Ver Avaliações (${notasP.length})</button>
         </div>
         <div id="${avaliacoesId}" style="display:none;margin-top:10px;margin-left:50px">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+            <button class="btn-acao" onclick="_ecAgToggleAvaliacoes(${i_orig})" title="Fechar" style="background:#F1F2F5;color:#33363F"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
           ${avgP!=null?`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:10px 14px;background:#FAFBFC;border:1px solid #ECEDF0;border-radius:10px">
             <span style="font-size:18px;font-weight:800;color:#0B0B0F">${avgP}</span>
             <span style="color:#FFAE00;font-size:13px;letter-spacing:1px">${'★'.repeat(Math.round(+avgP))}${'☆'.repeat(5-Math.round(+avgP))}</span>
@@ -3621,6 +4709,8 @@
     document.getElementById('ecAgAtivo').value = String(p.ativo!==false&&p.ativo!=='false'?true:false);
     document.getElementById('ecAgDataInativacao').value = p.dataInativacao||'';
     document.getElementById('ecAgObs').value = p.obs||'';
+    hocEnhanceSelect(document.getElementById('ecAgTipo'));
+    hocEnhanceSelect(document.getElementById('ecAgAtivo'));
     document.getElementById('modalEcAg').classList.add('aberto');
     setTimeout(()=>document.getElementById('ecAgNome').focus(),60);
   }
@@ -3658,6 +4748,30 @@
   }
 
   let _pesqAgIdx = null;
+  function toggleAvalMenuEc(e, idx) {
+    e.stopPropagation();
+    const id = 'avalMenu' + idx;
+    document.querySelectorAll('.ec-aval-menu').forEach(m => { if (m.id !== id) m.style.display = 'none'; });
+    const menu = document.getElementById(id);
+    if (!menu) return;
+    if (menu.style.display === 'block') { menu.style.display = 'none'; return; }
+    const count = (equipeClientes[idx]?.pesquisas || []).length;
+    menu.innerHTML = `
+      <div onclick="event.stopPropagation();toggleAvalMenuEc(event,${idx});pesqAgAbrirModal(${idx})" style="padding:8px 12px;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;color:#33363F" onmouseover="this.style.background='#F1F2F5'" onmouseout="this.style.background='transparent'">Avaliar</div>
+      <div onclick="event.stopPropagation();toggleAvalMenuEc(event,${idx});_ecAgToggleAvaliacoes(${idx})" style="padding:8px 12px;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:600;color:#33363F" onmouseover="this.style.background='#F1F2F5'" onmouseout="this.style.background='transparent'">Ver Avaliações (${count})</div>
+    `;
+    const r = e.currentTarget.getBoundingClientRect();
+    menu.style.top = (r.bottom + 6) + 'px';
+    menu.style.left = r.left + 'px';
+    menu.style.display = 'block';
+  }
+  document.addEventListener('click', () => document.querySelectorAll('.ec-aval-menu').forEach(m => m.style.display = 'none'));
+
+  function _ecAgToggleAvaliacoes(idx) {
+    const el = document.getElementById('ecAgAval' + idx);
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
   function pesqAgAbrirModal(personIdx) {
     _pesqAgIdx = personIdx;
     const p = equipeClientes[personIdx];

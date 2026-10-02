@@ -68,8 +68,6 @@
     .notif-btn:hover { background: #F1F2F5; }
     .notif-btn svg { color: var(--accent); }
     .notif-badge.cinza { background: var(--accent); }
-    .notif-btn.amarelo svg { color: #c05621; }
-    .notif-btn.vermelho svg { color: #c53030; }
 
     .tabs-central { display: inline-flex; align-items: center; background: #F1F2F5; border-radius: 10px; padding: 3px; gap: 2px; }
     .tabs { border-bottom: none; margin-bottom: 0; gap: 4px; }
@@ -82,12 +80,12 @@
 
     /* ===== TENDÊNCIAS ===== */
     .periodo-filtro-wrap { position: relative; flex-shrink: 0; }
-    .periodo-filtro-btn { height: 38px; padding: 0 16px; border-radius: 9px; border: 1.5px solid #E5E7EB; background: white; color: #33363F; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-    .periodo-filtro-btn:hover { border-color: #0B0B0F; }
+    .periodo-filtro-btn { height: 38px; padding: 0 16px; border-radius: 9px; border: 1.5px solid #E5E7EB; background: white; color: #0B0B0F; font-size: 12.5px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    .periodo-filtro-btn:hover { background: #F1F2F5; }
     .periodo-filtro-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); padding: 6px; min-width: 180px; z-index: 50; }
     .periodo-filtro-item { padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
     .periodo-filtro-item:hover { background: #F1F2F5; }
-    .periodo-filtro-item.selecionado { background: color-mix(in srgb, var(--accent) 10%, white); color: var(--accent); }
+    .periodo-filtro-item.selecionado { background: color-mix(in srgb, var(--accent) 10%, white); color: #0B0B0F; }
     .pct-geral-pill { display: flex; align-items: center; gap: 10px; background: #0B0B0F; border-radius: 12px; padding: 10px 20px; }
     .pct-geral-valor { font-size: 22px; font-weight: 800; color: white; line-height: 1; }
     .pct-geral-info { display: flex; flex-direction: column; }
@@ -108,8 +106,8 @@
     .grafico-titulo { font-size: 13.5px; font-weight: 700; color: #0B0B0F; margin-bottom: 16px; }
 
     .filtro-multi-wrap { position: relative; }
-    .filtro-multi-btn { height: 38px; padding: 0 14px; border-radius: 9px; border: 1.5px solid #E5E7EB; font-size: 12.5px; font-weight: 600; color: #33363F; background: white; cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-    .filtro-multi-btn:hover { border-color: #0B0B0F; }
+    .filtro-multi-btn { height: 38px; padding: 0 14px; border-radius: 9px; border: 1.5px solid #E5E7EB; font-size: 12.5px; font-weight: 500; color: #0B0B0F; background: white; cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .filtro-multi-btn:hover { background: #F1F2F5; }
     .filtro-multi-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); min-width: 230px; z-index: 200; padding: 6px; }
     .filtro-drop-limpar { display: block; width: 100%; padding: 9px 12px; margin-bottom: 4px; border-radius: 8px; border: none; border-bottom: 1px solid #F2F3F5; background: transparent; font-size: 12px; font-weight: 700; color: var(--accent); cursor: pointer; text-align: left; font-family: inherit; }
     .filtro-drop-limpar:hover { background: color-mix(in srgb, var(--accent) 8%, white); }
@@ -122,35 +120,37 @@
     .filtro-drop-lista { max-height: 220px; overflow-y: auto; }
     .filtro-drop-item { padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
     .filtro-drop-item:hover { background: #F1F2F5; }
-    .filtro-drop-item.selecionado { background: color-mix(in srgb, var(--accent) 10%, white); color: var(--accent); }
+    .filtro-drop-item.selecionado { background: color-mix(in srgb, var(--accent) 10%, white); color: #0B0B0F; }
 
     /* ===== ÍCONE INFORMATIVO (i) ===== */
     .info-icon-wrap { position: relative; display: inline-flex; vertical-align: middle; }
     .info-icon-btn { width: 19px; height: 19px; border: none; background: transparent; color: #9CA0AC; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
     .info-icon-btn svg { width: 19px; height: 19px; }
     .info-icon-btn:hover { color: var(--accent); }
-    .info-popover { position: absolute; top: calc(100% + 8px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.14); padding: 14px 16px; font-size: 12px; color: #33363F; line-height: 1.7; z-index: 300; min-width: 280px; max-width: 340px; }
+    .info-popover { position: absolute; top: calc(100% + 8px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.14); padding: 14px 16px; font-size: 12px; color: #0B0B0F; line-height: 1.7; z-index: 300; min-width: 280px; max-width: 340px; }
     .info-popover div + div { margin-top: 2px; }
 
     /* ===== BOWLER ===== */
     .bowler-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-    .bowler-ano { display: flex; align-items: center; gap: 8px; }
+    .bowler-ano { display: flex; align-items: center; gap: 2px; height: 38px; padding: 0 6px; border: 1.5px solid #E5E7EB; border-radius: 9px; background: white; box-sizing: border-box; }
     .colunas-filtro-wrap { position: relative; }
     .colunas-filtro-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); min-width: 210px; z-index: 200; padding: 6px; }
     .colunas-filtro-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
+    .colunas-filtro-item input[type="checkbox"] { accent-color: var(--accent); }
     .colunas-filtro-item:hover { background: #F1F2F5; }
     .colunas-filtro-item.travado { color: #9CA0AC; cursor: default; }
     .colunas-filtro-item.travado:hover { background: transparent; }
-    .ano-btn { width: 30px; height: 30px; border: 1.5px solid #E5E7EB; border-radius: 8px; background: white; cursor: pointer; font-size: 15px; color: #33363F; display: flex; align-items: center; justify-content: center; }
-    .ano-btn:hover { border-color: #0B0B0F; }
-    .ano-display { font-size: 15px; font-weight: 800; color: #0B0B0F; min-width: 44px; text-align: center; }
+    .ano-btn { width: 24px; height: 24px; border: none; border-radius: 6px; background: transparent; cursor: pointer; font-size: 15px; color: #33363F; display: flex; align-items: center; justify-content: center; }
+    .ano-btn:hover { background: #F1F2F5; }
+    .ano-display { font-size: 13px; font-weight: 800; color: #0B0B0F; min-width: 36px; text-align: center; }
     .bowler-acoes { margin-left: auto; display: flex; gap: 10px; }
     .btn-modo { height: 38px; padding: 0 16px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: 1.5px solid #E5E7EB; background: white; color: #33363F; }
-    .btn-modo:hover { border-color: #0B0B0F; }
-    .btn-modo.ativo { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border-color: transparent; }
-    .btn-salvar-bowler { height: 38px; padding: 0 16px; border-radius: 9px; background: #00B37E; border: none; color: white; font-size: 12.5px; font-weight: 700; cursor: pointer; display: none; }
-    .btn-cancelar-modo { height: 38px; padding: 0 16px; border-radius: 9px; background: #F1F2F5; border: none; color: #4A4E5A; font-size: 12.5px; font-weight: 700; cursor: pointer; display: none; }
-    .modo-aviso { padding: 10px 16px; background: color-mix(in srgb, var(--accent) 8%, white); border-radius: 10px; font-size: 12.5px; color: var(--accent); font-weight: 600; margin-bottom: 14px; display: none; }
+    .btn-modo:hover { background: #F1F2F5; }
+    .btn-modo.ativo { background: white; color: var(--accent); border-color: var(--accent); }
+    .btn-salvar-bowler { height: 38px; padding: 0 16px; border-radius: 9px; background: var(--accent); border: none; color: white; font-size: 12.5px; font-weight: 700; cursor: pointer; display: none; }
+    .btn-cancelar-modo { height: 38px; padding: 0 16px; border-radius: 9px; background: white; border: 1.5px solid #E5E7EB; color: #33363F; font-size: 12.5px; font-weight: 700; cursor: pointer; display: none; }
+    .btn-cancelar-modo:hover { background: #F1F2F5; }
+    .modo-aviso { margin-bottom: 10px; display: none; }
     .modo-aviso.ativo { display: block; }
     .bowler-wrap { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow-x: auto; overflow-y: hidden; }
     .bowler-table { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 0; min-width: 1360px; font-size: 11px; }
@@ -167,7 +167,7 @@
     .bowler-table .sticky-col { position: sticky; z-index: 2; }
     .bowler-table th.sticky-col { background: #0B0B0F; z-index: 3; }
     .bowler-table td.sticky-col { background: white; }
-    .bowler-table td.cell-edit.sticky-col { background: color-mix(in srgb, var(--accent) 6%, white); }
+    .bowler-table td.cell-edit.sticky-col { background: white; }
     .bowler-table .col-indicador { font-weight: 700 !important; }
     .cell-resultado { font-size: 11px !important; font-weight: 700; color: #0B0B0F; }
     .cell-verde { color: #00B37E !important; font-weight: 700; }
@@ -175,9 +175,22 @@
     .cell-vermelho { color: #FF2E4D !important; font-weight: 700; }
     .cell-input { width: 46px; border: 1.5px solid #E5E7EB; border-radius: 6px; padding: 3px; text-align: center; font-size: 11px; background: white; font-family: inherit; }
     .cell-input:focus { border-color: var(--accent); outline: none; }
-    .cell-edit { background: color-mix(in srgb, var(--accent) 6%, white) !important; }
-    .estrutura-input { width: 100%; border: 1.5px solid #E5E7EB; border-radius: 6px; padding: 4px 6px; font-size: 11px; background: white; box-sizing: border-box; font-family: inherit; }
+    .cell-edit { background: white !important; }
+    .estrutura-input { width: 100%; border: 1.5px solid #E5E7EB; border-radius: 8px; padding: 6px 8px; font-size: 11px; background: white; color: #0B0B0F; box-sizing: border-box; font-family: inherit; }
     .estrutura-input:focus { border-color: var(--accent); outline: none; }
+    select.estrutura-input { appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; padding-right: 22px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239CA0AC' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; background-size: 11px; }
+    .hoc-select-wrap { position: relative; display: inline-block; width: 100%; }
+    .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
+    .hoc-select-trigger { appearance: none; -webkit-appearance: none; -moz-appearance: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 6px; background: white; cursor: pointer; font-family: inherit; }
+    .hoc-select-trigger:hover { background: #F1F2F5 !important; }
+    .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
+    .hoc-select-trigger.open svg { transform: rotate(180deg); }
+    .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+    .hoc-select-panel { display: none; position: fixed; background: white; border: 1px solid #ECEDF0; border-radius: 10px; box-shadow: 0 12px 32px rgba(11,11,15,0.16); padding: 6px; z-index: 600; max-height: 260px; overflow-y: auto; }
+    .hoc-select-panel.open { display: block; }
+    .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 11.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
+    .hoc-select-item:hover { background: #F1F2F5; }
+    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent) 12%, white); color: #0B0B0F; }
     .bowler-legenda { display: flex; gap: 16px; padding: 12px 16px; background: #F6F7F9; border-top: 1px solid #ECEDF0; font-size: 11.5px; color: #6B7080; }
     .legenda-item { display: flex; align-items: center; gap: 6px; }
     .legenda-cor { width: 10px; height: 10px; border-radius: 3px; }
@@ -209,8 +222,7 @@
     <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
     <a class="menu-item active" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
     <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
-    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
-    <a class="menu-item" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Projetos</span></a>
     <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
@@ -288,6 +300,22 @@
             <span class="pct-geral-sub" id="cardPctGeralSub"></span>
           </div>
         </div>
+        <div class="info-icon-wrap">
+          <button class="info-icon-btn" onclick="toggleInfoPopover('infoRanking',event)" title="Mais informações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </button>
+          <div class="info-popover" id="infoRanking" style="display:none;right:0;left:auto">
+            <div style="font-weight:700;color:#0B0B0F;margin-bottom:8px">Itens rankeados por desvio médio % em relação à meta</div>
+            <div style="border-top:1px solid #F1F2F5;margin:0 0 8px"></div>
+            <div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Legenda</div>
+            <div style="margin-bottom:3px"><strong>Melhores</strong> — maior superação da meta</div>
+            <div><strong>Piores</strong> — maior déficit em relação à meta</div>
+            <div style="border-top:1px solid #F1F2F5;margin:10px 0 8px"></div>
+            <div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Cálculo do desvio</div>
+            <div style="margin-bottom:3px"><strong>Indicador positivo:</strong> (resultado − meta) / meta</div>
+            <div><strong>Indicador negativo:</strong> (meta − resultado) / meta</div>
+          </div>
+        </div>
       </div>
 
       <!-- Destaques: top 3 melhores/piores por área, categoria, indicador -->
@@ -314,22 +342,6 @@
           <div id="cardIndsPiores"></div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:10px;margin-bottom:20px">
-        <span style="font-size:11px;font-weight:700;color:#33363F">Itens rankeados por desvio médio % em relação à meta</span>
-        <div class="info-icon-wrap">
-          <button class="info-icon-btn" onclick="toggleInfoPopover('infoRanking',event)" title="Mais informações">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
-          </button>
-          <div class="info-popover" id="infoRanking" style="display:none">
-            <div>Ranking por desvio médio % em relação à meta no período selecionado</div>
-            <div>Melhores = maior superação</div>
-            <div>Piores = maior déficit</div>
-            <div>Indicadores positivos: (resultado − meta) / meta</div>
-            <div>Indicadores negativos: (meta − resultado) / meta</div>
-          </div>
-        </div>
-      </div>
-
       <!-- Gráfico com filtro por área, categoria ou indicador -->
       <div style="margin-bottom:20px">
         <div class="filtro-multi-bar">
@@ -372,8 +384,8 @@
           <button class="btn-modo" id="btnEditarResultados" onclick="ativarModo('resultados')">Edição de Resultados</button>
           <button class="btn-modo" id="btnEditarEstrutura" onclick="ativarModo('estrutura')">Edição de Estrutura</button>
           <button class="btn-add-indicador" id="btnAddLinha" style="display:none" onclick="abrirModalLinha()">+ Novo Indicador</button>
-          <button class="btn-salvar-bowler" id="btnSalvar" onclick="salvarBowler()">Salvar</button>
           <button class="btn-cancelar-modo" id="btnCancelar" onclick="cancelarModo()">Cancelar</button>
+          <button class="btn-salvar-bowler" id="btnSalvar" onclick="salvarBowler()">Salvar</button>
         </div>
       </div>
       <div class="modo-aviso" id="modoAviso"></div>
@@ -667,9 +679,10 @@
       { key: 'indicador', label: 'Indicador', width: 150, sempre: true },
       { key: 'formula', label: 'Fórmula/Fonte', width: 140 },
       { key: 'area', label: 'Área Responsável', width: 120 },
+      { key: 'config', label: 'Configuração', width: 140, apenasEstrutura: true },
       { key: 'periodicidade', label: 'Periodicidade', width: 150 },
     ];
-    const visiveis = defs.filter(d => d.sempre || colunasVisiveis[d.key]);
+    const visiveis = defs.filter(d => d.apenasEstrutura ? modoEdicao === 'estrutura' : (d.sempre || colunasVisiveis[d.key]));
     visiveis.push({ key: 'label', label: '', width: 74, sempre: true });
     let acc = 0;
     visiveis.forEach(c => { c.left = acc; acc += c.width; });
@@ -689,6 +702,7 @@
       <th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='indicador'))}">Indicador</th>
       ${temFormula ? `<th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='formula'))}">Fórmula/Fonte</th>` : ''}
       ${temArea ? `<th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='area'))}">Área Responsável</th>` : ''}
+      ${modoEdicao === 'estrutura' ? `<th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='config'))}">Configuração</th>` : ''}
       ${temPeriod ? `<th class="col-info sticky-col" style="${_colStyle(cols.find(c=>c.key==='periodicidade'))}">Periodicidade</th>` : ''}
       <th class="sticky-col" style="${_colStyle(cols.find(c=>c.key==='label'))}"></th>
       ${MESES.map(m=>`<th class="mes-header">${m}</th>`).join('')}
@@ -706,6 +720,7 @@
         const styleInd = _colStyle(cols.find(c=>c.key==='indicador'));
         const styleFormula = temFormula ? _colStyle(cols.find(c=>c.key==='formula')) : '';
         const styleArea = temArea ? _colStyle(cols.find(c=>c.key==='area')) : '';
+        const styleConfig = modoEdicao === 'estrutura' ? _colStyle(cols.find(c=>c.key==='config')) : '';
         const stylePeriod = temPeriod ? _colStyle(cols.find(c=>c.key==='periodicidade')) : '';
         const styleLabel = _colStyle(cols.find(c=>c.key==='label'));
 
@@ -714,19 +729,25 @@
             <td class="col-info col-indicador cell-edit sticky-col" style="${styleInd}" rowspan="2"><input class="estrutura-input" value="${row.indicador}" onchange="bowlerData[${gi}].indicador=this.value"></td>
             ${temFormula ? `<td class="col-info cell-edit sticky-col" style="${styleFormula}" rowspan="2"><input class="estrutura-input" value="${row.formula}" onchange="bowlerData[${gi}].formula=this.value"></td>` : ''}
             ${temArea ? `<td class="col-info cell-edit sticky-col" style="${styleArea}" rowspan="2"><input class="estrutura-input" value="${row.area}" onchange="bowlerData[${gi}].area=this.value"></td>` : ''}
+            <td class="col-info cell-edit sticky-col" style="${styleConfig}" rowspan="2">
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <select class="estrutura-input" onchange="bowlerData[${gi}].sentidoMeta=this.value">
+                  <option value="positiva"${sentido==='positiva'?' selected':''}>↑ Positivo</option>
+                  <option value="negativa"${sentido==='negativa'?' selected':''}>↓ Negativo</option>
+                </select>
+                <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;font-weight:600">
+                  <input type="checkbox" style="margin:0" ${row.isPercentual?'checked':''} onchange="bowlerData[${gi}].isPercentual=this.checked;renderBowler()"> Valores em %
+                </label>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <button onclick="limparMetasFuturas(${gi})" style="width:100%;background:white;border:1.5px solid #FFAE00;border-radius:8px;cursor:pointer;padding:6px 0;color:#0B0B0F;font-size:10.5px;font-weight:600">Limpar Metas Futuras</button>
+                  <button onclick="removerLinha(${gi})" style="width:100%;background:white;border:1.5px solid #FF2E4D;border-radius:8px;cursor:pointer;padding:6px 0;color:#0B0B0F;font-size:10.5px;font-weight:600">Remover Indicador</button>
+                </div>
+              </div>
+            </td>
             ${temPeriod ? `<td class="col-info cell-edit sticky-col" style="${stylePeriod}" rowspan="2">
               <select class="estrutura-input" onchange="bowlerData[${gi}].periodicidade=this.value">
                 ${['Mensal','Trimestral','Semestral','Anual'].map(p=>`<option${p===row.periodicidade?' selected':''}>${p}</option>`).join('')}
               </select>
-              <select class="estrutura-input" style="margin-top:4px" onchange="bowlerData[${gi}].sentidoMeta=this.value">
-                <option value="positiva"${sentido==='positiva'?' selected':''}>↑ Positivo</option>
-                <option value="negativa"${sentido==='negativa'?' selected':''}>↓ Negativo</option>
-              </select>
-              <label style="display:flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;cursor:pointer;font-weight:600">
-                <input type="checkbox" ${row.isPercentual?'checked':''} onchange="bowlerData[${gi}].isPercentual=this.checked;renderBowler()"> Valores em %
-              </label>
-              <button onclick="limparMetasFuturas(${gi})" style="margin-top:6px;width:100%;background:color-mix(in srgb, #FFAE00 12%, white);border:1px solid color-mix(in srgb, #FFAE00 35%, white);border-radius:6px;cursor:pointer;padding:4px 0;color:#966000;font-size:10.5px;font-weight:600">Limpar metas futuras</button>
-              <button onclick="removerLinha(${gi})" style="margin-top:5px;width:100%;background:#FFE9EC;border:1px solid #FFC2CA;border-radius:6px;cursor:pointer;padding:4px 0;color:#c53030;font-size:10.5px;font-weight:600">Remover</button>
             </td>` : ''}
             <td class="row-label sticky-col" style="${styleLabel}">Meta</td>
             ${row.meses.map((m,mi)=>`<td class="cell-edit"><input class="cell-input" value="${m.plan||''}" onchange="bowlerData[${gi}].meses[${mi}].plan=this.value"></td>`).join('')}
@@ -768,7 +789,97 @@
     });
     html += '</tbody>';
     table.innerHTML = html;
+    document.querySelectorAll('body > .hoc-select-panel').forEach(p => p.remove());
+    table.querySelectorAll('select.estrutura-input').forEach(hocEnhanceSelect);
   }
+
+  function hocEnhanceSelect(sel) {
+    if (!sel || sel._hocEnhanced) return;
+    sel._hocEnhanced = true;
+    const originalStyle = sel.getAttribute('style') || '';
+    const originalClass = sel.className || '';
+    const styleParts = originalStyle.split(';').map(s=>s.trim()).filter(Boolean);
+    const marginParts = styleParts.filter(p=>/^margin/i.test(p));
+    const triggerStyle = styleParts.filter(p=>!/^margin/i.test(p)).join(';');
+
+    const wrap = document.createElement('span');
+    wrap.className = 'hoc-select-wrap';
+    if (marginParts.length) wrap.setAttribute('style', marginParts.join(';'));
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    sel.classList.add('hoc-select-native');
+    sel.tabIndex = -1;
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = ('hoc-select-trigger ' + originalClass).trim();
+    trigger.setAttribute('style', triggerStyle);
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'hoc-select-trigger-label';
+    trigger.appendChild(labelSpan);
+    trigger.insertAdjacentHTML('beforeend', '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>');
+    wrap.appendChild(trigger);
+
+    const panel = document.createElement('div');
+    panel.className = 'hoc-select-panel';
+    document.body.appendChild(panel);
+
+    function syncLabel() {
+      const opt = sel.options[sel.selectedIndex];
+      labelSpan.textContent = opt ? opt.textContent : '';
+    }
+    function closePanel() {
+      panel.classList.remove('open');
+      trigger.classList.remove('open');
+    }
+    function renderPanel() {
+      panel.innerHTML = '';
+      [...sel.options].forEach((opt, i) => {
+        const item = document.createElement('div');
+        item.className = 'hoc-select-item' + (i === sel.selectedIndex ? ' selected' : '');
+        item.textContent = opt.textContent;
+        item.onclick = () => {
+          sel.selectedIndex = i;
+          syncLabel();
+          closePanel();
+          sel.dispatchEvent(new Event('change', {bubbles:true}));
+        };
+        panel.appendChild(item);
+      });
+    }
+    trigger.onclick = (e) => {
+      e.stopPropagation();
+      const willOpen = !panel.classList.contains('open');
+      document.querySelectorAll('.hoc-select-panel.open').forEach(p=>p.classList.remove('open'));
+      document.querySelectorAll('.hoc-select-trigger.open').forEach(t=>t.classList.remove('open'));
+      if (willOpen) {
+        renderPanel();
+        const rect = trigger.getBoundingClientRect();
+        panel.style.top = (rect.bottom + 4) + 'px';
+        panel.style.left = rect.left + 'px';
+        panel.style.minWidth = rect.width + 'px';
+        panel.classList.add('open');
+        trigger.classList.add('open');
+      }
+    };
+    syncLabel();
+
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    Object.defineProperty(sel, 'value', {
+      get() { return desc.get.call(sel); },
+      set(v) { desc.set.call(sel, v); syncLabel(); },
+      configurable: true
+    });
+    new MutationObserver(syncLabel).observe(sel, {childList:true, subtree:true});
+  }
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.hoc-select-panel.open').forEach(p=>p.classList.remove('open'));
+    document.querySelectorAll('.hoc-select-trigger.open').forEach(t=>t.classList.remove('open'));
+  });
+  document.addEventListener('scroll', () => {
+    document.querySelectorAll('.hoc-select-panel.open').forEach(p=>p.classList.remove('open'));
+    document.querySelectorAll('.hoc-select-trigger.open').forEach(t=>t.classList.remove('open'));
+  }, true);
 
   function formatFormula(val) {
     if (!val) return '';
@@ -794,6 +905,8 @@
     modoEdicao = modo;
     document.getElementById('btnEditarResultados').classList.toggle('ativo', modo==='resultados');
     document.getElementById('btnEditarEstrutura').classList.toggle('ativo', modo==='estrutura');
+    document.getElementById('btnEditarResultados').style.display = modo==='estrutura' ? 'none' : 'inline-block';
+    document.getElementById('btnEditarEstrutura').style.display = modo==='resultados' ? 'none' : 'inline-block';
     document.getElementById('btnSalvar').style.display = 'inline-block';
     document.getElementById('btnCancelar').style.display = 'inline-block';
     document.getElementById('btnAddLinha').style.display = modo==='estrutura' ? 'block' : 'none';
@@ -801,16 +914,15 @@
     if (modo === 'estrutura') {
       aviso.classList.add('ativo');
       aviso.innerHTML = `
-        <div style="display:flex;align-items:center;gap:6px">
-          <span>Sentido do indicador</span>
-          <div class="info-icon-wrap">
-            <button class="info-icon-btn" onclick="toggleInfoPopover('infoEstrutura',event)" title="Mais informações">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
-            </button>
-            <div class="info-popover" id="infoEstrutura" style="display:none">
-              <div>Indicador positivo: quanto maior o resultado em relação à meta, melhor.</div>
-              <div>Indicador negativo: quanto menor o resultado em relação à meta, melhor.</div>
-            </div>
+        <div class="info-icon-wrap">
+          <button class="info-icon-btn" onclick="toggleInfoPopover('infoEstrutura',event)" title="Mais informações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </button>
+          <div class="info-popover" id="infoEstrutura" style="display:none">
+            <div style="font-weight:700;color:#0B0B0F;margin-bottom:8px">Sentido do indicador</div>
+            <div style="border-top:1px solid #F1F2F5;margin:0 0 8px"></div>
+            <div style="margin-bottom:3px"><strong>Indicador positivo:</strong> quanto maior o resultado em relação à meta, melhor.</div>
+            <div><strong>Indicador negativo:</strong> quanto menor o resultado em relação à meta, melhor.</div>
           </div>
         </div>`;
     } else {
@@ -824,6 +936,8 @@
     modoEdicao = null;
     document.getElementById('btnEditarResultados').classList.remove('ativo');
     document.getElementById('btnEditarEstrutura').classList.remove('ativo');
+    document.getElementById('btnEditarResultados').style.display = 'inline-block';
+    document.getElementById('btnEditarEstrutura').style.display = 'inline-block';
     document.getElementById('btnSalvar').style.display = 'none';
     document.getElementById('btnCancelar').style.display = 'none';
     document.getElementById('btnAddLinha').style.display = 'none';
@@ -877,12 +991,11 @@
     renderBowler();
   }
 
-  function removerLinha(idx) { if (!confirm('Remover?')) return; bowlerData.splice(idx,1); renderBowler(); }
+  function removerLinha(idx) { bowlerData.splice(idx,1); renderBowler(); }
 
   function limparMetasFuturas(gi) {
     const proximo = new Date().getMonth() + 1; // mês seguinte ao atual (0-indexed)
     if (proximo >= 12) return; // dezembro: nada a limpar no ano corrente
-    if (!confirm(`Limpar as metas de ${MESES[proximo]} a ${MESES[11]} para este indicador?`)) return;
     for (let mi = proximo; mi < 12; mi++) {
       bowlerData[gi].meses[mi].plan = '';
     }
@@ -1533,12 +1646,12 @@
       btn.classList.add('vermelho');
       badge.style.display = 'flex';
       badge.className = 'notif-badge vermelho';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     } else if (resumo.temVencendo > 0 || resumo.naoLidas > 0) {
       btn.classList.add('amarelo');
       badge.style.display = 'flex';
       badge.className = 'notif-badge amarelo';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     }
   }
   const NOTIF_ICON = {
@@ -1611,6 +1724,7 @@
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
 </script>
+<script src="perfil-modal.js"></script>
 <script src="/sidebar-permissoes.js"></script>
 </body>
 </html>

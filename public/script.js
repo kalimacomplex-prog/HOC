@@ -60,12 +60,12 @@ document.getElementById('form').addEventListener('submit', async (e) => {
       btn.classList.add('vermelho');
       badge.style.display = 'flex';
       badge.className = 'notif-badge vermelho';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     } else if (resumo.temVencendo > 0 || resumo.naoLidas > 0) {
       btn.classList.add('amarelo');
       badge.style.display = 'flex';
       badge.className = 'notif-badge amarelo';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     }
   }
   const NOTIF_ICON = {

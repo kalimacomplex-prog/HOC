@@ -435,8 +435,6 @@
     .notif-btn:hover { background: #F1F2F5; }
     .notif-btn svg { color: var(--accent); }
     .notif-badge.cinza { background: var(--accent); }
-    .notif-btn.amarelo svg { color: #c05621; }
-    .notif-btn.vermelho svg { color: #c53030; }
 
     .tabs-central { display: inline-flex; align-items: center; background: #F1F2F5; border-radius: 10px; padding: 3px; gap: 2px; }
     .op-mod-tab { height: 32px; padding: 0 16px; border-radius: 8px; background: transparent; color: #6B7080; font-size: 12.5px; font-weight: 700; border: none; cursor: pointer; }
@@ -622,8 +620,7 @@
     <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
     <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
     <a class="menu-item active" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
-    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
-    <a class="menu-item" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Projetos</span></a>
     <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
@@ -10290,12 +10287,12 @@ senha = campos.get('senha', '')</pre>
       btn.classList.add('vermelho');
       badge.style.display = 'flex';
       badge.className = 'notif-badge vermelho';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     } else if (resumo.temVencendo > 0 || resumo.naoLidas > 0) {
       btn.classList.add('amarelo');
       badge.style.display = 'flex';
       badge.className = 'notif-badge amarelo';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     }
   }
   const NOTIF_ICON = {

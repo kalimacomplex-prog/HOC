@@ -48,7 +48,10 @@
     .dep-btn:hover { border-color: var(--accent); color: var(--accent); }
     .dep-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
     .time-acoes { display: flex; gap: 8px; }
-    .org-container { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 36px 24px; min-height: 480px; overflow-x: auto; overflow-y: visible; width: 100%; min-width: 0; box-sizing: border-box; }
+    .org-container { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 36px 24px; min-height: 480px; overflow-x: auto; overflow-y: visible; width: 100%; min-width: 0; box-sizing: border-box; position: relative; }
+    .org-zoom-ctrl { position: absolute; top: 12px; right: 12px; z-index: 5; display: flex; align-items: center; gap: 4px; background: white; border: 1.5px solid #ECEDF0; border-radius: 9px; padding: 3px 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .org-zoom-ctrl button { width: 22px; height: 22px; background: none; border: none; cursor: pointer; font-size: 15px; color: #6B7080; padding: 0; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    .org-zoom-ctrl span { font-size: 11px; font-weight: 600; color: #33363F; min-width: 32px; height: 22px; text-align: center; display: flex; align-items: center; justify-content: center; }
     .org-canvas { display: flex; flex-direction: column; align-items: center; width: max-content; min-width: 100%; }
     .org-tree-nivel { display: flex; flex-direction: column; align-items: center; }
     .org-conector-v { width: 2px; height: 16px; background: #AEB3BD; flex-shrink: 0; }
@@ -66,7 +69,7 @@
     .org-card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
     .org-card:hover .org-card-actions { opacity: 1; }
     .org-card-btn { width: 22px; height: 22px; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .org-card-btn.edit { background: white; color: var(--accent); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+    .org-card-btn.edit { background: white; color: #33363F; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
     .org-card-btn.del { background: white; color: #FF2E4D; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
     .org-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: #9CA0AC; gap: 12px; }
     .dep-cor-0 { background: var(--accent); border-color: var(--accent); }
@@ -75,7 +78,7 @@
     .dep-cor-3 { background: #e53e3e; border-color: #e53e3e; }
     .dep-cor-4 { background: #d69e2e; border-color: #d69e2e; }
     .dep-cor-5 { background: #00b5d8; border-color: #00b5d8; }
-    .bib-header { display: flex; align-items: center; justify-content: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 24px; }
+    .bib-header { display: flex; align-items: flex-end; justify-content: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 24px; }
     .bib-header .hoc-select-wrap { width: auto; flex-shrink: 0; }
     .bib-toolbar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 12px; }
     .pasta-sidebar-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; padding: 7px 8px 7px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent; color: #6B7080; margin-bottom: 2px; transition: all 0.2s; gap: 4px; }
@@ -91,11 +94,12 @@
     .upload-drop-zone { border: 2px dashed #E5E7EB; border-radius: 12px; padding: 22px; text-align: center; cursor: pointer; transition: all 0.15s; background: white; }
     .upload-drop-zone:hover, .upload-drop-zone.drag-over { border-color: var(--accent); background: #F7F9FF; }
     .bib-explorer { padding: 8px; }
-    .bib-breadcrumb { display: flex; align-items: center; gap: 4px; padding: 8px 10px; font-size: 11px; color: #6B7080; flex-wrap: wrap; border-bottom: 1px solid #F1F2F5; margin-bottom: 6px; }
+    .bib-breadcrumb { display: flex; align-items: center; gap: 4px; padding: 8px 10px; font-size: 12px; color: #6B7080; flex-wrap: wrap; border-bottom: 1px solid #F1F2F5; margin-bottom: 6px; }
     .bib-breadcrumb span { cursor: pointer; color: var(--accent); font-weight: 600; }
     .bib-breadcrumb span:hover { text-decoration: underline; }
     .bib-breadcrumb .sep { color: #cbd5e0; cursor: default; }
-    .pasta-explorer-item { display: flex; align-items: center; justify-content: space-between; padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; color: #33363F; transition: all 0.15s; margin-bottom: 2px; gap: 4px; }
+    .pasta-explorer-item { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; color: #33363F; transition: all 0.15s; margin-bottom: 1px; gap: 4px; }
+    input.pasta-nome-input[type="text"] { flex: 1; min-width: 0; border: none; border-radius: 0; background: transparent; outline: none; padding: 0; height: auto; font: inherit; color: inherit; cursor: text; }
     .pasta-explorer-item:hover { background: #FAFBFC; color: #0B0B0F; }
     .pasta-explorer-item:hover .pasta-acoes { opacity: 1; }
     .pasta-explorer-item.active { background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); font-weight: 700; }
@@ -137,27 +141,24 @@
     .editor-area p { margin: 0 0 8px; }
     .editor-area pre { background: #FAFBFC; border: 1px solid #ECEDF0; border-radius: 4px; padding: 10px 14px; font-size: 12px; overflow-x: auto; }
     .editor-meta { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; margin-top: 14px; }
-    .oraculo-wrap { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .oraculo-hero { text-align: center; margin-bottom: 28px; }
-    .oraculo-icon { font-size: 40px; margin-bottom: 10px; }
+    #tab-oraculo { height: calc(100vh - 112px); overflow: hidden; }
+    .oraculo-wrap { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); height: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
+    .oraculo-hero { text-align: center; margin-bottom: 16px; flex-shrink: 0; }
+    .oraculo-icon { width: 34px; height: 34px; margin: 0 auto 10px; border-radius: 11px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, black)); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 3px 10px color-mix(in srgb, var(--accent) 35%, transparent); }
     .oraculo-titulo { font-size: 20px; font-weight: 700; color: #0B0B0F; margin-bottom: 6px; }
-    .oraculo-sub { font-size: 13px; color: #6B7080; }
-    .oraculo-atalhos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
-    .atalho { background: #FAFBFC; border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; border: 1.5px solid #ECEDF0; transition: all 0.2s; }
-    .atalho:hover { border-color: var(--accent); background: color-mix(in srgb,var(--accent) 8%,white); }
-    .atalho-icon { font-size: 20px; margin-bottom: 6px; }
-    .atalho-label { font-size: 12px; font-weight: 600; color: #33363F; }
-    .chat-box { border: 1.5px solid #ECEDF0; border-radius: 8px; overflow: hidden; }
-    .chat-msgs { min-height: 180px; max-height: 280px; overflow-y: auto; padding: 14px; background: #FAFBFC; }
-    .chat-msg { margin-bottom: 10px; display: flex; gap: 8px; }
+    .oraculo-sub { font-size: 13px; font-weight: 400; color: #0B0B0F; }
+    .chat-box { border: 1.5px solid #ECEDF0; border-radius: 12px; overflow: hidden; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .chat-msgs { flex: 1; min-height: 0; overflow-y: auto; padding: 16px; background: #FAFBFC; display: flex; flex-direction: column; gap: 12px; }
+    .chat-msg { display: flex; gap: 8px; align-items: flex-end; }
     .chat-msg.user { flex-direction: row-reverse; }
-    .chat-bubble { padding: 10px 14px; border-radius: 10px; font-size: 13px; max-width: 75%; line-height: 1.5; }
-    .chat-msg.bot .chat-bubble { background: white; color: #0B0B0F; border: 1px solid #ECEDF0; }
-    .chat-msg.user .chat-bubble { background: var(--accent); color: white; }
+    .chat-avatar { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, black)); display: flex; align-items: center; justify-content: center; color: white; }
+    .chat-bubble { padding: 10px 14px; border-radius: 14px; font-size: 13px; max-width: 75%; line-height: 1.5; }
+    .chat-msg.bot .chat-bubble { background: color-mix(in srgb, var(--accent) 8%, white); color: #0B0B0F; border: 1px solid color-mix(in srgb, var(--accent) 16%, white); border-bottom-left-radius: 4px; }
+    .chat-msg.user .chat-bubble { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
     .chat-input-row { display: flex; gap: 8px; padding: 10px; border-top: 1px solid #ECEDF0; background: white; }
-    .chat-input { flex: 1; padding: 8px 12px; border: 1.5px solid #ECEDF0; border-radius: 6px; font-size: 13px; outline: none; font-family: inherit; }
-    .chat-send { padding: 8px 16px; background: var(--accent); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.5; }
-    .oraculo-aviso { text-align: center; margin-top: 12px; padding: 8px; background: #fffaf0; border-radius: 6px; font-size: 12px; color: #c05621; }
+    .chat-input { flex: 1; padding: 10px 14px; border: 1.5px solid #ECEDF0; border-radius: 20px; font-size: 13px; outline: none; font-family: inherit; }
+    .chat-send { width: 38px; height: 38px; flex-shrink: 0; background: var(--accent); color: white; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .chat-send:hover { background: color-mix(in srgb, var(--accent) 85%, black); }
 
     /* ===== OVERVIEW UX ===== */
     .header-search { display: none; }
@@ -166,6 +167,8 @@
     .section-header { display: flex; align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1.5px solid #F1F2F5; }
     .section-icon { width: 32px; height: 32px; border-radius: 8px; background: color-mix(in srgb,var(--accent) 8%,white); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
     .section-titulo-text { font-size: 11px; font-weight: 700; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.9px; }
+    .section-titulo-input { border: none; background: transparent; outline: none; padding: 2px 4px; border-radius: 4px; font-family: inherit; flex: 1; min-width: 0; }
+    .section-titulo-input:hover, .section-titulo-input:focus { background: #F4F5F7; }
     .timeline-rich-toolbar { display: flex; gap: 3px; padding: 6px; background: #FAFBFC; border-radius: 6px 6px 0 0; border: 1.5px solid #ECEDF0; border-bottom: none; flex-wrap: wrap; }
     .timeline-rich-editor { min-height: 90px; padding: 10px 12px; border: 1.5px solid #ECEDF0; border-radius: 0 0 6px 6px; outline: none; font-size: 13px; line-height: 1.7; color: #0B0B0F; font-family: inherit; }
     .timeline-rich-editor:focus { border-color: var(--accent); }
@@ -178,7 +181,7 @@
     .esg-card { border: 1px solid #edf2f7; }
     .timeline-item { cursor: default; }
     .timeline-item:hover .timeline-del { opacity: 1; }
-    .timeline-del { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: #FF2E4D; cursor: pointer; font-size: 12px; padding: 0 4px; }
+    .timeline-del { opacity: 0; transition: opacity 0.2s; background: #F1F2F5; border: none; border-radius: 4px; color: #FF2E4D; cursor: pointer; padding: 3px 5px; display: inline-flex; align-items: center; justify-content: center; }
     .timeline-edit { opacity: 0; transition: opacity 0.2s; background: none; border: none; color: var(--accent); cursor: pointer; font-size: 12px; padding: 0 4px; }
     .timeline-item:hover .timeline-edit { opacity: 1; }
     .rich-toolbar { display: none; gap: 3px; padding: 5px; background: #FAFBFC; border-radius: 6px 6px 0 0; border: 1.5px solid #ECEDF0; border-bottom: none; flex-wrap: wrap; margin-top: 8px; }
@@ -194,11 +197,12 @@
     .rich-editor ol, .timeline-rich-editor ol, .timeline-desc ol { list-style-type: decimal; }
     .rich-editor a, .timeline-desc a { color: var(--accent); text-decoration: underline; }
     .edit-barra-global { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
-    .dep-sidebar-row { display:flex; align-items:center; justify-content:space-between; padding:7px 8px; border-radius:6px; cursor:pointer; transition:all 0.2s; margin-bottom:2px; }
+    .dep-sidebar-row { display:flex; align-items:center; justify-content:space-between; gap:5px; padding:4px 8px; border-radius:6px; cursor:pointer; transition:all 0.2s; margin-bottom:1px; }
     .dep-sidebar-row:hover { background:#FAFBFC; }
     .dep-sidebar-row:hover .dep-row-acoes { opacity:1; }
     .dep-sidebar-row.active { background:color-mix(in srgb,var(--accent) 8%,white); }
     .dep-row-acoes { display:flex; gap:2px; opacity:0; transition:opacity 0.2s; flex-shrink:0; }
+    input.dep-nome-input[type="text"] { flex:1; min-width:0; border:none; border-radius:0; background:transparent; outline:none; padding:0; height:auto; font-family:inherit; cursor:text; }
     .org-container { overflow-x:auto !important; overflow-y:visible !important; }
     .org-nome-wrap { position:relative; }
     .secao-tbl { border-radius:8px; border:1px solid #ECEDF0; overflow:hidden; }
@@ -217,6 +221,9 @@
     .btn-fv.primary { background: var(--accent); color: white; border-color: var(--accent); }
     .btn-fv.primary:hover { background: #3d2b89; }
     .btn-fv.danger { background: color-mix(in srgb,#FF2E4D 8%,white); color: #FF2E4D; border-color: color-mix(in srgb,#FF2E4D 35%,white); }
+    #btnModoFv:hover { border-color: #ECEDF0; color: #33363F; background: white; }
+    #btnModoFv.primary:hover { background: var(--accent); border-color: var(--accent); color: white; }
+    #btnElemento:hover { border-color: var(--accent); color: white; background: var(--accent); }
     .modo-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
     .modo-edicao { background: color-mix(in srgb,var(--accent) 8%,white); color: var(--accent); }
     .modo-viz { background: #F1F2F5; color: #6B7080; }
@@ -319,6 +326,7 @@
     .colunas-filtro-wrap { position: relative; }
     .colunas-filtro-drop { position: absolute; top: calc(100% + 6px); left: 0; background: white; border: 1px solid #ECEDF0; border-radius: 12px; box-shadow: 0 8px 24px rgba(11,11,15,0.12); min-width: 210px; z-index: 200; padding: 6px; }
     .colunas-filtro-item { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; }
+    .colunas-filtro-item input[type="checkbox"] { accent-color: var(--accent); }
     .colunas-filtro-item:hover { background: #F1F2F5; }
     .colunas-filtro-item.travado { color: #9CA0AC; cursor: default; }
     .colunas-filtro-item.travado:hover { background: transparent; }
@@ -327,6 +335,7 @@
     .hoc-select-wrap { position: relative; display: inline-block; width: 100%; }
     .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
     .hoc-select-trigger { appearance: none; -webkit-appearance: none; -moz-appearance: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: white; cursor: pointer; font-family: inherit; }
+    .hoc-select-trigger:hover { background: #F1F2F5 !important; }
     .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
     .hoc-select-trigger.open svg { transform: rotate(180deg); }
     .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
@@ -334,7 +343,8 @@
     .hoc-select-panel.open { display: block; }
     .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
     .hoc-select-item:hover { background: #F1F2F5; }
-    .hoc-select-item.selected { background: color-mix(in srgb, #00B37E 14%, white); color: #00754F; }
+    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent) 12%, white); color: #0B0B0F; }
+    .btn-white-hover:hover { background: #F1F2F5 !important; }
   </style>
 </head>
 <body>
@@ -348,8 +358,7 @@
     <a class="menu-item active" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
     <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
     <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
-    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
-    <a class="menu-item" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Projetos</span></a>
     <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
@@ -391,7 +400,7 @@
         </button>
         <div class="notif-dropdown" id="notifDropdown">
           <div class="notif-drop-header">
-            <span class="notif-drop-titulo" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>Notificações</span>
+            <span class="notif-drop-titulo" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:block;flex-shrink:0"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span>Notificações</span></span>
             <div class="notif-drop-acoes">
               <button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar</button>
             </div>
@@ -407,15 +416,15 @@
   <div class="content">
     <!-- VISÃO GERAL -->
     <div class="tab-content active" id="tab-visao-geral">
-      <div style="background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));border-radius:16px;padding:28px 32px;color:white;margin-bottom:20px">
-        <div style="font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-bottom:8px">Boas Vindas!</div>
-        <div style="font-size:20px;font-weight:800;margin-bottom:8px">Tudo o que você precisa saber para começar</div>
+      <div style="background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));border-radius:16px;padding:18px 32px;color:white;margin-bottom:20px">
+        <div style="font-size:20px;font-weight:800;margin-bottom:6px">Boas-vindas à sua central de controle operacional</div>
         <div style="font-size:13px;opacity:.9;line-height:1.6;max-width:640px">Esta página reúne a história, a cultura e os compromissos da nossa empresa.</div>
       </div>
       <div class="edit-barra-global">
         <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()">Editar</button>
+        <button class="btn-white-hover" id="btnNovaSecao" onclick="abrirModalNovaSecao()" style="display:none;height:38px;padding:0 16px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Seção</button>
+        <button class="btn-white-hover" id="btnSairSemSalvar" onclick="sairSemSalvarInfo()" style="display:none;height:38px;padding:0 16px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;align-items:center">Cancelar</button>
         <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none">Salvar</button>
-        <button id="btnNovaSecao" onclick="abrirModalNovaSecao()" style="display:none;height:38px;padding:0 16px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Seção</button>
       </div>
       <!-- ===== FLUXO DE VALOR (gerenciado por renderSecoes) ===== -->
       <div id="fvSecaoWrap" style="display:none;margin-bottom:24px">
@@ -433,9 +442,8 @@
           <div id="fvSecaoInner">
             <div class="fv-toolbar">
               <div class="fv-toolbar-left" id="fvToolbarEdicao" style="display:none">
-                <button class="btn-fv primary" id="btnElemento" onclick="toggleElementoPicker()">+ Elemento ▾</button>
+                <button class="btn-fv primary" id="btnElemento" onclick="toggleElementoPicker()" style="gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Elemento ▾</button>
                 <div style="display:flex;align-items:center;gap:3px;border-left:1.5px solid #ECEDF0;margin-left:4px;padding-left:10px">
-                  <span style="font-size:10px;color:#9CA0AC;font-weight:700;letter-spacing:.4px;margin-right:2px">CONEXÃO</span>
                   <button class="btn-fv primary" id="btnConPush"  onclick="setConStyle('push')"  title="Push — fluxo empurrado (seta sólida)"
                     style="padding:5px 10px;font-size:11px;display:flex;align-items:center;gap:4px">
                     <svg width="22" height="10" viewBox="0 0 22 10"><line x1="1" y1="5" x2="16" y2="5" stroke="currentColor" stroke-width="2"/><polygon points="14,2 20,5 14,8" fill="currentColor"/></svg>Push
@@ -449,10 +457,9 @@
                     <svg width="22" height="10" viewBox="0 0 22 10"><polyline points="1,5 4,1 8,9 12,1 16,5" stroke="currentColor" stroke-width="2" fill="none"/><polygon points="14,2 20,5 14,8" fill="currentColor"/></svg>Sinal
                   </button>
                 </div>
-                <button class="btn-fv danger" onclick="limparCanvas()">🗑️ Limpar</button>
               </div>
               <div style="margin-left:auto">
-                <button class="btn-fv" id="btnModoFv" onclick="toggleModoFv()">✏️ Modo Edição</button>
+                <button class="btn-fv" id="btnModoFv" onclick="toggleModoFv()">Modo Edição</button>
               </div>
             </div>
 
@@ -489,7 +496,7 @@
                   <div id="fvElementoGrid" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
                   <div style="border-top:1px solid #F1F2F5;padding-top:14px">
                     <div id="fvPickerNomeRow" style="margin-bottom:10px">
-                      <div style="font-size:11px;font-weight:600;color:#33363F;margin-bottom:5px">Nome do Elemento *</div>
+                      <div style="font-size:11px;font-weight:700;color:#6B7080;margin-bottom:5px">Nome do Elemento *</div>
                       <input type="text" id="fvElNome" class="form-control" placeholder="Ex: Receber Pedido" style="font-size:12px">
                     </div>
                     <div id="fvPickerTabelaRow" style="display:none;margin-bottom:10px">
@@ -505,12 +512,12 @@
                       </div>
                     </div>
                     <div id="fvPickerObsRow">
-                      <div style="font-size:11px;font-weight:600;color:#33363F;margin-bottom:5px" id="fvPickerObsLabel">Observação</div>
+                      <div style="font-size:11px;font-weight:700;color:#6B7080;margin-bottom:5px" id="fvPickerObsLabel">Observação</div>
                       <textarea id="fvElObs" class="form-control" rows="2" placeholder="Anotação sobre o elemento..." style="font-size:12px;resize:vertical;margin-bottom:12px"></textarea>
                     </div>
-                    <div style="display:flex;gap:8px">
-                      <button class="btn-fv primary" onclick="confirmarElemento()" style="flex:1">Adicionar</button>
-                      <button class="btn-fv" onclick="fecharElementoPicker()" style="flex:1">Fechar</button>
+                    <div class="modal-footer">
+                      <button class="btn-cancelar" onclick="fecharElementoPicker()">Fechar</button>
+                      <button class="btn-confirmar" onclick="confirmarElemento()">Adicionar</button>
                     </div>
                   </div>
                 </div>
@@ -526,19 +533,14 @@
     <!-- NOSSO TIME -->
     <div class="tab-content" id="tab-nosso-time">
       <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:4px;background:white;border:1.5px solid #ECEDF0;border-radius:9px;padding:3px 8px">
-          <button onclick="ajustarZoom(-1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#6B7080;padding:0 2px;line-height:1" title="Diminuir">−</button>
-          <span id="zoomLabel" style="font-size:11px;font-weight:600;color:#33363F;min-width:32px;text-align:center">100%</span>
-          <button onclick="ajustarZoom(1)" style="background:none;border:none;cursor:pointer;font-size:16px;color:#6B7080;padding:0 2px;line-height:1" title="Aumentar">+</button>
-        </div>
-        <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12.5px;padding:0 16px;height:38px;border-radius:9px">+ Membro</button>
+        <button class="btn-primary" onclick="abrirModalMembro()" style="font-size:12.5px;padding:0 16px;height:38px;border-radius:9px;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Membro</button>
       </div>
       <div style="display:grid;grid-template-columns:220px 1fr;gap:16px;align-items:start">
         <!-- Sidebar Departamentos -->
         <div style="background:white;border:1px solid #ECEDF0;border-radius:14px;overflow:hidden;position:sticky;top:80px">
           <div style="height:44px;padding:0 14px;border-bottom:1px solid #F0F2F5;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box">
-            <span style="font-size:11px;font-weight:800;color:#0B0B0F;text-transform:uppercase;letter-spacing:.03em">Departamentos</span>
-            <button onclick="abrirModalDep()" style="padding:3px 8px;background:#F1F2F5;border:none;border-radius:6px;font-size:10.5px;cursor:pointer;color:#4A4E5A;font-weight:700">+ Novo</button>
+            <span style="font-size:13px;font-weight:700;color:#0B0B0F">Departamentos</span>
+            <button onclick="abrirModalDep()" style="height:28px;padding:0 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;display:inline-flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo</button>
           </div>
           <div id="depsSidebar" style="padding:8px">
             <div style="padding:12px 10px;font-size:12px;color:#9CA0AC;text-align:center">Nenhum departamento</div>
@@ -546,6 +548,11 @@
         </div>
         <!-- Canvas -->
         <div class="org-container">
+          <div class="org-zoom-ctrl">
+            <button onclick="ajustarZoom(-1)" title="Diminuir">−</button>
+            <span id="zoomLabel">100%</span>
+            <button onclick="ajustarZoom(1)" title="Aumentar">+</button>
+          </div>
           <div class="org-canvas" id="orgCanvas"></div>
           <div class="org-empty" id="orgEmpty" style="display:flex">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#C4C8D0" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.418 3.582-8 8-8s8 3.582 8 8"/></svg>
@@ -565,8 +572,8 @@
             <div style="height:38px;margin-bottom:16px" aria-hidden="true"></div>
             <div style="background:white;border:1px solid #ECEDF0;border-radius:14px;overflow:hidden;position:sticky;top:80px">
               <div style="height:44px;padding:0 14px;border-bottom:1px solid #F0F2F5;display:flex;align-items:center;justify-content:space-between;box-sizing:border-box">
-                <span style="font-size:11px;font-weight:800;color:#0B0B0F;text-transform:uppercase;letter-spacing:.03em">Pastas</span>
-                <button onclick="criarPasta()" style="padding:3px 8px;background:#F1F2F5;border:none;border-radius:6px;font-size:10.5px;cursor:pointer;color:#4A4E5A;font-weight:700">+ Nova</button>
+                <span style="font-size:13px;font-weight:700;color:#0B0B0F">Pastas</span>
+                <button onclick="criarPasta()" style="height:28px;padding:0 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;display:inline-flex;align-items:center;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova</button>
               </div>
               <div id="pastasSidebar" class="bib-explorer"></div>
             </div>
@@ -574,21 +581,24 @@
           <!-- Conteúdo -->
           <div>
             <div class="bib-header" style="margin-bottom:16px">
-              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;flex:1;min-width:0">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;flex:1;min-width:0">
                 <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()" style="max-width:360px">
-                <select id="filtroStatus" onchange="filtrarWikis()" style="height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;background:white;color:#33363F;width:170px">
-                  <option value="">Todos os Status</option>
-                  <option value="Rascunho">Rascunho</option>
-                  <option value="Aprovado">Aprovado</option>
-                  <option value="Pendente">Pendente</option>
-                </select>
+                <div style="width:170px">
+                  <label style="display:block;font-size:11px;font-weight:600;color:#6B7080;margin-bottom:4px">Status</label>
+                  <select id="filtroStatus" onchange="filtrarWikis()" style="height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;background:white;color:#0B0B0F;width:170px">
+                    <option value="">Todos</option>
+                    <option value="Rascunho">Rascunho</option>
+                    <option value="Aprovado">Aprovado</option>
+                    <option value="Pendente">Pendente</option>
+                  </select>
+                </div>
                 <div class="colunas-filtro-wrap">
                   <button class="btn-modo" onclick="toggleColunasWikiDrop()">Colunas</button>
                   <div class="colunas-filtro-drop" id="dropColunasWiki" style="display:none"></div>
                 </div>
               </div>
               <div class="bib-toolbar" style="margin-bottom:0">
-                <button class="btn-secondary" onclick="novoDocExterno()" style="font-size:12.5px;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Carregar arquivo</button>
+                <button class="btn-white-hover" onclick="novoDocExterno()" style="height:38px;padding:0 14px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Carregar arquivo</button>
                 <button class="btn-primary" onclick="novoWiki()">+ Novo Wiki</button>
               </div>
             </div>
@@ -600,7 +610,7 @@
                 <th data-col="responsavel">Responsável</th>
                 <th data-col="status">Status</th>
                 <th data-col="versao">Versão</th>
-                <th data-col="atualizado">Atualizado</th>
+                <th data-col="atualizado">Última atualização</th>
                 <th>Ações</th>
               </tr></thead>
               <tbody id="wikisBody"><tr><td colspan="7" style="text-align:center;padding:40px;color:#9CA0AC">Carregando wikis...</td></tr></tbody>
@@ -615,10 +625,10 @@
           <span id="editorTituloView" style="display:none;font-size:16px;font-weight:800;color:#0B0B0F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:auto"></span>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-left:auto">
             <span id="autoSaveIndicator" style="font-size:11px;color:#9CA0AC;min-width:60px;text-align:right"></span>
-            <button class="btn-secondary" id="btnHistorico" onclick="toggleHistorico()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>Versões</button>
-            <button class="btn-secondary" onclick="exportarPDF()" style="display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</button>
-            <button class="btn-primary" id="btnSolicitarAprovWiki" onclick="abrirModalSolicitarAprovWiki()" style="background:#00B37E;display:none">Enviar para Aprovação</button>
-            <button class="btn-primary" id="btnAprovarWiki" onclick="aprovarWiki()" style="background:#00B37E;display:none;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Aprovar</button>
+            <button class="btn-white-hover" id="btnHistorico" onclick="toggleHistorico()" style="height:38px;padding:0 14px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB">Versões</button>
+            <button class="btn-white-hover" onclick="exportarPDF()" style="height:38px;padding:0 14px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;display:flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Baixar PDF</button>
+            <button class="btn-primary" id="btnSolicitarAprovWiki" onclick="abrirModalSolicitarAprovWiki()" style="background:white;color:#0B0B0F;border:1.5px solid #00B37E;box-shadow:none;display:none">Enviar para Aprovação</button>
+            <button class="btn-primary" id="btnAprovarWiki" onclick="aprovarWiki()" style="background:#00B37E;color:white;box-shadow:none;display:none">Aprovar</button>
           </div>
         </div>
         <div class="editor-meta" id="editorMetaRow">
@@ -678,7 +688,7 @@
           <div class="versao-historia" id="versaoHistoria">
             <div class="versao-historia-header">
               <span>Histórico de Versões</span>
-              <button onclick="toggleHistorico()" style="background:none;border:none;cursor:pointer;font-size:16px;color:#9CA0AC">×</button>
+              <button onclick="toggleHistorico()" style="width:20px;height:20px;padding:0;background:none;border:none;cursor:pointer;color:#9CA0AC;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
             <div class="versao-historia-body" id="versaoHistoriaBody"></div>
           </div>
@@ -690,26 +700,19 @@
     <div class="tab-content" id="tab-oraculo">
       <div class="oraculo-wrap">
         <div class="oraculo-hero">
-          <div class="oraculo-icon">🔮</div>
-          <div class="oraculo-titulo">Olá! Sou o Oráculo ✨</div>
-          <div class="oraculo-sub">Como posso ajudar você hoje?</div>
-        </div>
-        <div class="oraculo-atalhos">
-          <div class="atalho"><div class="atalho-icon">📋</div><div class="atalho-label">Políticas de RH</div></div>
-          <div class="atalho"><div class="atalho-icon">📊</div><div class="atalho-label">Indicadores</div></div>
-          <div class="atalho"><div class="atalho-icon">💡</div><div class="atalho-label">Ideias</div></div>
-          <div class="atalho"><div class="atalho-icon">📄</div><div class="atalho-label">Documentos Internos</div></div>
+          <div class="oraculo-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.528c0 .96-.343 1.887-.966 2.615A5.98 5.98 0 0 0 4.5 11c0 .334.024.661.07.98A3.5 3.5 0 0 0 3 15a3.5 3.5 0 0 0 1.5 2.878A2.5 2.5 0 0 0 7 20.5v0A2.5 2.5 0 0 0 9.5 23v0A2.5 2.5 0 0 0 12 20.5V4.5A2.5 2.5 0 0 0 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.528c0 .96.343 1.887.966 2.615A5.98 5.98 0 0 1 19.5 11c0 .334-.024.661-.07.98A3.5 3.5 0 0 1 21 15a3.5 3.5 0 0 1-1.5 2.878A2.5 2.5 0 0 1 17 20.5v0A2.5 2.5 0 0 1 14.5 23v0A2.5 2.5 0 0 1 12 20.5V4.5A2.5 2.5 0 0 1 14.5 2Z"/><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" fill="currentColor" stroke="none" transform="translate(23,-0.3) scale(0.9) translate(-12,-9)"/></svg></div>
+          <div class="oraculo-titulo">Olá! Sou o Oráculo, seu assistente virtual do dia a dia.</div>
+          <div class="oraculo-sub">Como posso te ajudar hoje?</div>
         </div>
         <div class="chat-box">
           <div class="chat-msgs" id="chatMsgs">
-            <div class="chat-msg bot"><div class="chat-bubble">Olá! Sou o Oráculo do HOC System. Em breve poderei responder perguntas sobre os dados internos da sua empresa!</div></div>
+            <div class="chat-msg bot"><div class="chat-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.528c0 .96-.343 1.887-.966 2.615A5.98 5.98 0 0 0 4.5 11c0 .334.024.661.07.98A3.5 3.5 0 0 0 3 15a3.5 3.5 0 0 0 1.5 2.878A2.5 2.5 0 0 0 7 20.5v0A2.5 2.5 0 0 0 9.5 23v0A2.5 2.5 0 0 0 12 20.5V4.5A2.5 2.5 0 0 0 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.528c0 .96.343 1.887.966 2.615A5.98 5.98 0 0 1 19.5 11c0 .334-.024.661-.07.98A3.5 3.5 0 0 1 21 15a3.5 3.5 0 0 1-1.5 2.878A2.5 2.5 0 0 1 17 20.5v0A2.5 2.5 0 0 1 14.5 23v0A2.5 2.5 0 0 1 12 20.5V4.5A2.5 2.5 0 0 1 14.5 2Z"/><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" fill="currentColor" stroke="none" transform="translate(21,0.8) scale(0.55) translate(-12,-9)"/></svg></div><div class="chat-bubble">Ainda estou aprendendo, mas em breve vou conseguir responder com base nos dados internos da sua empresa!</div></div>
           </div>
           <div class="chat-input-row">
-            <input class="chat-input" type="text" placeholder="Digite sua pergunta... (em breve)" disabled>
-            <button class="chat-send" disabled>Enviar</button>
+            <input class="chat-input" type="text" id="chatInput" placeholder="Digite sua pergunta..." onkeydown="if(event.key==='Enter')oraculoEnviar()">
+            <button class="chat-send" onclick="oraculoEnviar()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(-1.95,2)"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></g></svg></button>
           </div>
         </div>
-        <div class="oraculo-aviso">⚙️ O Oráculo estará disponível em breve.</div>
       </div>
     </div>
   </div>
@@ -722,7 +725,7 @@
       <span class="modal-titulo">Enviar para Aprovação</span>
       <button class="btn-fechar" onclick="fecharModal('modalSolicitarAprovWiki')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <p style="font-size:12px;color:#9CA0AC;margin:0 0 14px">Selecione quem deve ser notificado.<br>A lista mostra apenas quem tem permissão para aprovar wikis.</p>
+    <p style="font-size:12px;color:#0B0B0F;margin:0 0 14px">Selecione quem deve ser notificado.<br>A lista mostra apenas quem tem permissão para aprovar wikis.</p>
     <div class="modal-user-lista" id="solicitarAprovWikiUserList"></div>
     <div class="modal-footer" style="margin-top:14px"><button class="btn-cancelar" onclick="fecharModal('modalSolicitarAprovWiki')">Cancelar</button><button class="btn-confirmar" onclick="_enviarSolicitacaoAprovWiki()">Enviar</button></div>
   </div>
@@ -806,7 +809,7 @@
       <div class="org-nome-dropdown" id="membroNomeDropdown"></div>
     </div>
     <div class="form-group"><label>Cargo / Função *</label><input type="text" id="membroCargo" placeholder="Ex: Desenvolvedor Sênior"></div>
-    <div class="form-group"><label>Email</label><input type="email" id="membroEmail" placeholder="email@empresa.com"></div>
+    <div class="form-group"><label>E-mail</label><input type="email" id="membroEmail" placeholder="email@empresa.com"></div>
     <div class="form-group"><label>Time</label><select id="membroDep" onchange="atualizarChefeDropdown()" style="width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;color:#0B0B0F"></select></div>
     <div class="form-group"><label>Abaixo de</label><select id="membroChefe" style="width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;color:#0B0B0F"></select></div>
     <input type="hidden" id="membroEditId">
@@ -1082,6 +1085,21 @@
     if (id === 'nosso-time') requestAnimationFrame(fitOrgNodes);
   }
 
+  // ===== ORÁCULO =====
+  const _oraculoSparkleSvg = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="overflow:visible"><path d="M9.5 2A2.5 2.5 0 0 0 7 4.5v.528c0 .96-.343 1.887-.966 2.615A5.98 5.98 0 0 0 4.5 11c0 .334.024.661.07.98A3.5 3.5 0 0 0 3 15a3.5 3.5 0 0 0 1.5 2.878A2.5 2.5 0 0 0 7 20.5v0A2.5 2.5 0 0 0 9.5 23v0A2.5 2.5 0 0 0 12 20.5V4.5A2.5 2.5 0 0 0 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 1 17 4.5v.528c0 .96.343 1.887.966 2.615A5.98 5.98 0 0 1 19.5 11c0 .334-.024.661-.07.98A3.5 3.5 0 0 1 21 15a3.5 3.5 0 0 1-1.5 2.878A2.5 2.5 0 0 1 17 20.5v0A2.5 2.5 0 0 1 14.5 23v0A2.5 2.5 0 0 1 12 20.5V4.5A2.5 2.5 0 0 1 14.5 2Z"/><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z" fill="currentColor" stroke="none" transform="translate(21,0.8) scale(0.55) translate(-12,-9)"/></svg>';
+  function oraculoEnviar() {
+    const input = document.getElementById('chatInput');
+    const texto = input.value.trim();
+    if (!texto) return;
+    const msgs = document.getElementById('chatMsgs');
+    msgs.insertAdjacentHTML('beforeend', `<div class="chat-msg user"><div class="chat-bubble">${_esc(texto)}</div></div>`);
+    input.value = '';
+    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(() => {
+      msgs.insertAdjacentHTML('beforeend', `<div class="chat-msg bot"><div class="chat-avatar">${_oraculoSparkleSvg}</div><div class="chat-bubble">Ainda estou aprendendo! Em breve vou conseguir responder com base nos dados da sua empresa.</div></div>`);
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 500);
+  }
   // ===== VISÃO GERAL — Sistema de Seções Dinâmicas =====
   let modoEdicao = false;
   let secoesData = [];
@@ -1157,10 +1175,20 @@
     if (!modoEdicao && !_podeEditarWiki) return;
     if (modoEdicao) coletarRichEditors();
     modoEdicao = !modoEdicao;
-    document.getElementById('btnEditar').style.display    = modoEdicao?'none':'inline-block';
-    document.getElementById('btnSalvar').style.display    = modoEdicao?'inline-block':'none';
-    document.getElementById('btnNovaSecao').style.display = modoEdicao?'inline-flex':'none';
+    document.getElementById('btnEditar').style.display        = modoEdicao?'none':'inline-block';
+    document.getElementById('btnSalvar').style.display        = modoEdicao?'inline-flex':'none';
+    document.getElementById('btnNovaSecao').style.display     = modoEdicao?'inline-flex':'none';
+    document.getElementById('btnSairSemSalvar').style.display = modoEdicao?'inline-flex':'none';
     renderSecoes();
+  }
+
+  async function sairSemSalvarInfo() {
+    modoEdicao = false;
+    document.getElementById('btnEditar').style.display        = 'inline-block';
+    document.getElementById('btnSalvar').style.display        = 'none';
+    document.getElementById('btnNovaSecao').style.display     = 'none';
+    document.getElementById('btnSairSemSalvar').style.display = 'none';
+    await carregarInfo();
   }
 
   async function salvarInfo() {
@@ -1175,14 +1203,16 @@
 
   // ===== RENDER =====
   const _sBtnBase = 'background:#F1F2F5;border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#33363F';
-  const _sBtnDel  = 'background:color-mix(in srgb,#FF2E4D 8%,white);border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#FF2E4D';
+  const _sBtnDel  = 'background:#F1F2F5;border:none;border-radius:4px;cursor:pointer;font-size:11px;padding:2px 7px;color:#FF2E4D';
   const _secCtrlBase = 'width:26px;height:26px;border-radius:6px;border:none;background:#F1F2F5;color:#6B7080;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
   const _secCtrlEdit = 'width:26px;height:26px;border-radius:6px;border:none;background:color-mix(in srgb,#FFAE00 16%,white);color:#B37800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
-  const _secCtrlDel  = 'width:26px;height:26px;border-radius:6px;border:none;background:color-mix(in srgb,#FF2E4D 12%,white);color:#FF2E4D;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+  const _secCtrlDel  = 'width:26px;height:26px;border-radius:6px;border:none;background:#F1F2F5;color:#FF2E4D;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
   const _secIconUp    = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
   const _secIconDown  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
   const _secIconEdit  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>';
-  const _secIconRemove = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  const _secIconRemove = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>';
+  // Ícone de lixeira padrão do sistema — reutilizado em todos os botões de remover deste arquivo.
+  const _ICO_TRASH = _secIconRemove;
 
   let fvLoaded = false;
   let _fvWrapNode = null; // cached ref — getElementById fails on detached nodes
@@ -1195,6 +1225,12 @@
   function renderSecoes() {
     const container = document.getElementById('secoesContainer');
     if (!container) return;
+    // Elemento focado (ex: botão clicado) some da tela na reconstrução abaixo;
+    // se ficar focado, o navegador pode rolar a página ao restaurar o foco em outro
+    // lugar. Tirar o foco antes evita esse salto de rolagem.
+    if (document.activeElement && container.contains(document.activeElement)) document.activeElement.blur();
+    const _scrollYAntes = window.scrollY;
+
     const fvWrap = _getFvWrap();
     // Detach fvWrap before clearing container so it isn't destroyed
     if (fvWrap && fvWrap.parentNode) fvWrap.parentNode.removeChild(fvWrap);
@@ -1216,6 +1252,11 @@
       item.addEventListener('mouseenter',()=>{const a=item.querySelector('.timeline-acoes');if(a)a.style.opacity='1';});
       item.addEventListener('mouseleave',()=>{const a=item.querySelector('.timeline-acoes');if(a)a.style.opacity='0';});
     });
+
+    // Restaura a posição de rolagem caso o navegador a desloque durante a reconstrução acima.
+    const _restaurarScroll = () => { if (Math.abs(window.scrollY - _scrollYAntes) > 1) window.scrollTo(0, _scrollYAntes); };
+    requestAnimationFrame(() => requestAnimationFrame(_restaurarScroll));
+    setTimeout(_restaurarScroll, 60);
   }
 
   function _insertFvWrap(s, vi, ri, total, container) {
@@ -1318,17 +1359,49 @@
   }
   document.addEventListener('click', e => { if (!e.target.closest('#secIconPickerPop') && !e.target.closest('[data-sec-icon-trigger]')) { const p = document.getElementById('secIconPickerPop'); if (p) p.style.display = 'none'; } });
 
+  function abrirSecIconPickerInline(ri, btnEl) {
+    let pop = document.getElementById('secIconPickerPop');
+    if (!pop) {
+      pop = document.createElement('div');
+      pop.id = 'secIconPickerPop';
+      pop.className = 'colunas-filtro-drop';
+      pop.style.cssText = 'position:fixed;display:none;grid-template-columns:repeat(5,1fr);gap:4px;width:190px;z-index:2000';
+      document.body.appendChild(pop);
+    }
+    if (pop._alvoRi === ri && pop.style.display === 'grid') { pop.style.display = 'none'; return; }
+    pop.innerHTML = _SEC_ICON_PICKER.map(k => `<button type="button" onclick="_secSelecionarIconeInline(${ri},'${k}')" title="${k}" style="width:34px;height:34px;border-radius:8px;border:none;background:#F1F2F5;cursor:pointer;display:flex;align-items:center;justify-content:center">${_secIconPreviewHtml(k)}</button>`).join('');
+    pop._alvoRi = ri;
+    const rect = btnEl.getBoundingClientRect();
+    pop.style.display = 'grid';
+    pop.style.top = (rect.bottom + 4) + 'px';
+    pop.style.left = rect.left + 'px';
+  }
+  function _secSelecionarIconeInline(ri, key) {
+    secoesData[ri].icone = key;
+    document.getElementById('secIconPickerPop').style.display = 'none';
+    renderSecoes();
+  }
+  function renomearSecaoInline(ri, val) {
+    secoesData[ri].nome = val.trim() || 'Seção';
+    renderSecoes();
+  }
+
   function renderSecao(s, vi, ri, total) {
     const isE = modoEdicao;
     const ctrl = isE ? `<div style="display:flex;gap:6px;align-items:center;margin-left:auto;flex-shrink:0">
       ${vi>0?`<button onclick="moverSecao(${ri},-1)" style="${_secCtrlBase}" title="Subir">${_secIconUp}</button>`:''}
       ${vi<total-1?`<button onclick="moverSecao(${ri},1)" style="${_secCtrlBase}" title="Descer">${_secIconDown}</button>`:''}
-      <button onclick="editarSecaoMeta(${ri})" style="${_secCtrlEdit}" title="Editar nome">${_secIconEdit}</button>
       <button onclick="removerSecao(${ri})" style="${_secCtrlDel}" title="Remover seção">${_secIconRemove}</button>
     </div>` : '';
+    const iconEl = isE
+      ? `<button type="button" data-sec-icon-trigger onclick="abrirSecIconPickerInline(${ri},this)" class="section-icon" style="cursor:pointer;border:1.5px dashed color-mix(in srgb,var(--accent) 35%,white);padding:0" title="Trocar ícone">${_secIconHtml(s)}</button>`
+      : `<div class="section-icon">${_secIconHtml(s)}</div>`;
+    const tituloEl = isE
+      ? `<input type="text" class="section-titulo-text section-titulo-input" value="${_esc(s.nome)}" onchange="renomearSecaoInline(${ri},this.value)" placeholder="Nome da seção">`
+      : `<span class="section-titulo-text">${s.nome}</span>`;
     const hdr = `<div class="section-header" style="display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:18px;border-bottom:1.5px solid #F1F2F5">
-      <div class="section-icon">${_secIconHtml(s)}</div>
-      <span class="section-titulo-text">${s.nome}</span>
+      ${iconEl}
+      ${tituloEl}
       ${ctrl}
     </div>`;
     const campos = s.campos||[];
@@ -1367,7 +1440,7 @@
 
   function _renderGrupoSimples(s, items, ri) {
     const html = items.map(({c,ci})=>{
-      const del = modoEdicao ? `<button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};padding:1px 5px;margin-left:4px">✕</button>` : '';
+      const del = modoEdicao ? `<button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};padding:3px 5px;margin-left:4px;display:inline-flex;align-items:center;justify-content:center" title="Remover">${_ICO_TRASH}</button>` : '';
       const inp = c.tipo==='textarea'
         ? `<textarea class="info-textarea" oninput="secoesData[${ri}].campos[${ci}].valor=this.value" placeholder="...">${_esc(c.valor)}</textarea>`
         : `<input type="text" class="info-input" oninput="secoesData[${ri}].campos[${ci}].valor=this.value" value="${_esc(c.valor)}" placeholder="...">`;
@@ -1389,7 +1462,7 @@
     const cards = items.map(({c,ci})=>{
       const eid = 'rich-'+s.id+'-'+ci;
       const labelLimpo = _stripLeadingEmoji(c.label);
-      const del = modoEdicao ? `<button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};padding:1px 5px;float:right;margin-left:6px">✕</button>` : '';
+      const del = modoEdicao ? `<button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};padding:3px 5px;float:right;margin-left:6px;display:inline-flex;align-items:center;justify-content:center" title="Remover">${_ICO_TRASH}</button>` : '';
       const titleEl = modoEdicao
         ? `${del}<input type="text" value="${_esc(labelLimpo)}" oninput="secoesData[${ri}].campos[${ci}].label=this.value" style="border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:12px;font-weight:700;color:#0B0B0F;background:transparent;padding:3px 0 6px 7px;width:calc(100% - 36px);font-family:inherit">`
         : labelLimpo;
@@ -1410,7 +1483,7 @@
     const items = (c.dados&&c.dados.items)||[];
     const addBtn = modoEdicao ? `<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
       <button onclick="abrirModalTimeline(${ri},${ci})" style="font-size:11px;color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white);border:1.5px solid color-mix(in srgb,var(--accent) 40%,white);border-radius:6px;padding:4px 12px;cursor:pointer;font-weight:600">+ Marco</button>
-      <button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel}">✕ Remover linha do tempo</button>
+      <button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};display:inline-flex;align-items:center;gap:4px;padding:4px 8px" title="Remover linha do tempo">${_ICO_TRASH} Remover linha do tempo</button>
     </div>` : '';
     if (!items.length) return addBtn+`<p style="color:#9CA0AC;font-size:13px">Nenhum marco adicionado ainda.</p>`;
     const html = items.map((item,i)=>`
@@ -1420,7 +1493,7 @@
           <div style="flex:1"><div class="timeline-ano">${item.ano}</div><div class="timeline-desc">${item.desc}</div></div>
           <div class="timeline-acoes" style="display:flex;gap:2px;opacity:0;transition:opacity 0.2s">
             <button class="timeline-edit" onclick="editarTimeline(${ri},${ci},${i})">✎</button>
-            <button class="timeline-del" onclick="removerTimelineItem(${ri},${ci},${i})">✕</button>
+            <button class="timeline-del" onclick="removerTimelineItem(${ri},${ci},${i})" title="Remover">${_ICO_TRASH}</button>
           </div>
         </div>
       </div>`).join('');
@@ -1431,7 +1504,7 @@
   const _iconDroplet = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>';
   const _iconPlus = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   const _sTblAddBtn = 'width:24px;height:24px;border-radius:6px;border:none;background:color-mix(in srgb,var(--accent) 10%,white);color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0';
-  const _sTblDelBtn = _sBtnDel+';padding:1px 4px';
+  const _sTblDelBtn = _sBtnDel+';padding:3px 4px;display:inline-flex;align-items:center;justify-content:center';
   const _TBL_ALIGN_ICON = {
     left:   '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>',
     center: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="10" x2="6" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="18" y1="18" x2="6" y2="18"/></svg>',
@@ -1467,7 +1540,7 @@
           <input type="text" value="${_esc(col.nome||'')}" oninput="secoesData[${ri}].campos[${ci}].dados.colunas[${coli}].nome=this.value" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-weight:700;font-size:12px;color:inherit;font-family:inherit">
           <button type="button" onclick="document.getElementById('${colBgId}').click()" title="Cor de fundo" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;display:flex;flex-shrink:0">${_iconDroplet}</button>
           <input type="color" id="${colBgId}" title="Cor de fundo" value="${col.bgColor||'#FAFBFC'}" onchange="_tblColCor(${ri},${ci},${coli},'bgColor',this.value,this.closest('th'))" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none">
-          <button onclick="removerColunaTabela(${ri},${ci},${coli})" style="${_sTblDelBtn}">✕</button>
+          <button onclick="removerColunaTabela(${ri},${ci},${coli})" style="${_sTblDelBtn}" title="Remover coluna">${_ICO_TRASH}</button>
         </div>`:(col.nome||'—')}
       </th>`;
       }).join('')}
@@ -1492,9 +1565,9 @@
           </div>`:`<div style="text-align:${align}">${cell.valor||'—'}</div>`}
         </td>`;
       }).join('')}
-      ${modoEdicao?`<td style="${bs};text-align:center;vertical-align:middle"><button onclick="removerLinhaTabela(${ri},${ci},${r})" style="${_sTblDelBtn}">✕</button></td>`:''}
+      ${modoEdicao?`<td style="${bs};text-align:center;vertical-align:middle"><button onclick="removerLinhaTabela(${ri},${ci},${r})" style="${_sTblDelBtn}" title="Remover linha">${_ICO_TRASH}</button></td>`:''}
     </tr>`).join('');
-    const delBtn = modoEdicao?`<div style="margin-bottom:8px"><button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel}">✕ Remover tabela</button></div>`:'';
+    const delBtn = modoEdicao?`<div style="margin-bottom:8px"><button onclick="removerCampo(${ri},${ci})" style="${_sBtnDel};display:inline-flex;align-items:center;gap:4px;padding:4px 8px" title="Remover tabela">${_ICO_TRASH} Remover tabela</button></div>`:'';
     const addRow = modoEdicao?`<div style="margin-top:8px"><button onclick="adicionarLinhaTabela(${ri},${ci})" title="Adicionar linha" style="${_sTblAddBtn}">${_iconPlus}</button></div>`:'';
     return `${delBtn}<div class="secao-tbl-wrap"><div class="secao-tbl"><table style="table-layout:fixed">${colgroup}<thead>${thead}</thead><tbody>${tbody}</tbody></table></div></div>${addRow}`;
   }
@@ -1693,6 +1766,13 @@
     setTimeout(() => document.getElementById('editDepNome').focus(), 100);
   }
 
+  async function renomearDepInline(depId, val) {
+    const nome = val.trim();
+    const dep = departamentos.find(d => d.id == depId);
+    if (dep && nome && dep.nome !== nome) { dep.nome = nome; await salvarOrg(); renderOrganograma(); }
+    renderDepSidebar();
+  }
+
   async function confirmarEditarDep() {
     const id = document.getElementById('editDepId').value;
     const nome = document.getElementById('editDepNome').value.trim();
@@ -1730,10 +1810,10 @@
       const cor = DEP_CORES[i % DEP_CORES.length];
       const isActive = depAtivo == dep.id;
       return `<div class="dep-sidebar-row${isActive ? ' active' : ''}" onclick="selecionarDepSidebar(${dep.id})">
-        <span style="font-size:12px;font-weight:500;color:${cor};flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">● ${dep.nome}</span>
+        <span style="font-size:12px;color:${cor};flex-shrink:0">●</span>
+        <input type="text" class="dep-nome-input" value="${_esc(dep.nome)}" onclick="event.stopPropagation()" onchange="renomearDepInline(${dep.id},this.value)" style="font-size:12px;font-weight:500;color:${cor}">
         <div class="dep-row-acoes">
-          <button onclick="editarDep(${dep.id},event)" style="background:#F1F2F5;border:none;border-radius:4px;cursor:pointer;padding:2px 4px;font-size:10px" title="Renomear">✏️</button>
-          <button onclick="deletarDep(${dep.id},event)" style="background:color-mix(in srgb,#FF2E4D 8%,white);border:none;border-radius:4px;cursor:pointer;padding:2px 4px;font-size:10px" title="Remover">🗑️</button>
+          <button onclick="deletarDep(${dep.id},event)" style="background:#F1F2F5;border:none;border-radius:4px;cursor:pointer;padding:3px 5px;color:#FF2E4D;display:inline-flex;align-items:center;justify-content:center" title="Remover">${_ICO_TRASH}</button>
         </div>
       </div>`;
     }).join('');
@@ -1758,7 +1838,7 @@
     const bloqueados = editId ? new Set([parseInt(editId), ..._descendentesDe(parseInt(editId))]) : new Set();
     const valorAtual = chefeSel.value;
     const candidatos = depId ? membros.filter(m => m.depId == depId && !bloqueados.has(m.id)) : [];
-    chefeSel.innerHTML = '<option value="">— Nenhum (topo da hierarquia) —</option>' + candidatos.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
+    chefeSel.innerHTML = '<option value="">Ninguém</option>' + candidatos.map(m => `<option value="${m.id}">${m.nome}</option>`).join('');
     chefeSel.value = candidatos.some(m => m.id == valorAtual) ? valorAtual : '';
   }
 
@@ -1909,7 +1989,7 @@
   function _popularSelectPastas(selectId, excluirId) {
     const sel = document.getElementById(selectId);
     if (!sel) return;
-    sel.innerHTML = '<option value="">— Raiz —</option>';
+    sel.innerHTML = '<option value="">Raiz</option>';
     pastas.filter(p => p.id !== excluirId).forEach(p => {
       sel.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
     });
@@ -1954,6 +2034,18 @@
     setTimeout(() => document.getElementById('editPastaNome').focus(), 100);
   }
 
+  async function renomearPastaInline(id, val) {
+    const nome = val.trim();
+    const p = pastas.find(p => p.id === id);
+    if (!p || !nome || p.nome === nome) { renderPastasSidebar(); return; }
+    try {
+      await fetch(`/api/pastas/${id}`, { method: 'PUT', headers: HEADERS, body: JSON.stringify({ nome, parentId: p.parentId || null }) });
+      p.nome = nome;
+    } catch(e) { console.error(e); }
+    renderPastasSidebar();
+    renderWikis();
+  }
+
   async function confirmarEditPasta() {
     const id = parseInt(document.getElementById('editPastaId').value);
     const nome = document.getElementById('editPastaNome').value.trim();
@@ -1978,11 +2070,11 @@
 
     const isRoot = pastaAtiva === null;
     const _iconHome = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
-    const _iconPasta = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>`;
+    const _iconPasta = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>`;
 
     // Breadcrumb
     let breadcrumb = `<div class="bib-breadcrumb">`;
-    breadcrumb += `<span onclick="navegarPasta(null,'')" style="display:flex;align-items:center;gap:5px${isRoot?';color:var(--accent);font-weight:700':''}">${_iconHome}Todos os Documentos</span>`;
+    breadcrumb += `<span onclick="navegarPasta(null,'')" style="display:flex;align-items:center;gap:8px${isRoot?';color:var(--accent);font-weight:700':''}">${_iconHome}Todos os Documentos</span>`;
     caminhoNavegacao.forEach((item, i) => {
       breadcrumb += `<span class="sep">›</span><span onclick="irBreadcrumb(${i})">${item.nome}</span>`;
     });
@@ -1995,10 +2087,9 @@
     } else {
       itens = subpastas.map(p => `
         <div class="pasta-explorer-item" onclick="navegarPasta(${p.id},'${p.nome.replace(/'/g,"\\'")}')">
-          <span style="display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${_iconPasta}${p.nome}</span>
+          <span style="display:flex;align-items:center;gap:8px;overflow:hidden;flex:1;min-width:0">${_iconPasta}<input type="text" class="pasta-nome-input" value="${_esc(p.nome)}" onclick="event.stopPropagation()" onchange="renomearPastaInline(${p.id},this.value)"></span>
           <span class="pasta-acoes">
-            <span class="pasta-acao-btn" onclick="abrirEditPasta(${p.id},event)" title="Renomear / Mover"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
-            <span class="pasta-acao-btn" onclick="removerPasta(${p.id},event)" title="Remover"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg></span>
+            <span class="pasta-acao-btn" style="background:#F1F2F5;border-radius:4px;color:#FF2E4D;padding:3px 5px" onclick="removerPasta(${p.id},event)" title="Remover">${_ICO_TRASH}</span>
           </span>
         </div>`).join('');
     }
@@ -2351,8 +2442,7 @@
   }
 
   function _renderHistoricoBody(versoes) {
-    const statusCor = { 'Aprovado':'#00754F', 'Rascunho':'#6B7080', 'Pendente':'#b7791f' };
-    const statusBg  = { 'Aprovado':'color-mix(in srgb,#00B37E 10%,white)', 'Rascunho':'#F1F2F5', 'Pendente':'#fffbeb' };
+    const statusCor = { 'Aprovado':'#00B37E', 'Rascunho':'#6B7080', 'Pendente':'#FFAE00' };
     const ordenadas = [...versoes].sort((a,b) => new Date(b.atualizadoEm||b.criadoEm) - new Date(a.atualizadoEm||a.criadoEm));
     const ativoIdx = ordenadas.findIndex(v => v.ativo);
     if (ativoIdx > 0) { const [at] = ordenadas.splice(ativoIdx,1); ordenadas.unshift(at); }
@@ -2362,15 +2452,15 @@
       const data = new Date(v.atualizadoEm || v.criadoEm).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
       return `<div class="versao-historia-item${isAtivo?' atual':''}">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span style="display:inline-block;background:${isAtivo?'var(--accent)':'#9CA0AC'};color:white;border-radius:999px;padding:3px 10px;font-size:10.5px;font-weight:800">${v.versao}</span>
+          <span style="font-size:12px;font-weight:800;color:#0B0B0F">${v.versao}</span>
           ${isAtivo ? '<span style="font-size:10.5px;color:var(--accent);font-weight:800">ATIVO</span>' : ''}
-          <span style="margin-left:auto;padding:2px 8px;border-radius:10px;font-size:10.5px;font-weight:700;background:${statusBg[v.status]||'#F1F2F5'};color:${statusCor[v.status]||'#6B7080'}">${v.status}</span>
+          <span style="margin-left:auto;display:inline-flex;align-items:center;justify-content:center;height:22px;box-sizing:border-box;padding:0 12px;font-size:11px;font-weight:700;border-radius:999px;background:white;border:1.5px solid;color:${statusCor[v.status]||'#6B7080'}">${v.status}</span>
         </div>
         <div style="font-size:12px;color:#33363F;font-weight:600;margin-top:9px">${data}</div>
         <div style="font-size:12px;color:#6B7080;font-weight:600">${v.responsavel||'—'}</div>
         ${(!isAtual || !isAtivo) ? `<div style="display:flex;gap:6px;margin-top:9px">
           ${!isAtual ? `<button onclick="editarWiki('${v._id}')" style="flex:1;padding:6px 8px;background:#F1F2F5;color:#33363F;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">Abrir</button>` : ''}
-          ${!isAtivo ? `<button onclick="ativarVersao('${v._id}')" style="flex:1;padding:6px 8px;background:color-mix(in srgb,#00B37E 10%,white);color:#00754F;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">Ativar</button>` : ''}
+          ${!isAtivo ? `<button onclick="ativarVersao('${v._id}')" style="flex:1;padding:6px 8px;background:#F1F2F5;color:#33363F;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">Ativar</button>` : ''}
         </div>` : ''}
       </div>`;
     }).join('');
@@ -2445,7 +2535,7 @@
     return ids;
   }
 
-  let colunasVisiveisWiki = { tags: false, responsavel: true, status: true, versao: true, atualizado: true };
+  let colunasVisiveisWiki = { tags: false, responsavel: true, status: true, versao: false, atualizado: true };
   try {
     const salvoWiki = JSON.parse(localStorage.getItem('ov_colunasVisiveisWiki') || 'null');
     if (salvoWiki) colunasVisiveisWiki = { ...colunasVisiveisWiki, ...salvoWiki };
@@ -2465,7 +2555,7 @@
       { key: 'responsavel', label: 'Responsável' },
       { key: 'status', label: 'Status' },
       { key: 'versao', label: 'Versão' },
-      { key: 'atualizado', label: 'Atualizado' },
+      { key: 'atualizado', label: 'Última atualização' },
     ];
     drop.innerHTML = `
       <label class="colunas-filtro-item travado"><input type="checkbox" checked disabled> Nome</label>
@@ -2506,15 +2596,15 @@
         <td data-col="tags">${w.tags ? w.tags.split(',').map(t=>`<span class="wiki-tag">${t.trim()}</span>`).join('') : '—'}</td>
         <td data-col="responsavel">${w.responsavel||'—'}</td>
         <td data-col="status"><span class="badge ${statusCor[w.status]||'badge-cinza'}">${w.status}</span></td>
-        <td data-col="versao"><span class="versao-badge">${w.versao}</span></td>
+        <td data-col="versao">${w.versao}</td>
         <td data-col="atualizado">${new Date(w.atualizadoEm||w.criadoEm).toLocaleDateString('pt-BR')}</td>
         <td style="white-space:nowrap">
           <div style="display:inline-flex;gap:6px">
-            ${_podeEditarWiki ? `<button onclick="abrirMoverPastaMenu(event,'${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:#6B7080;cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Mover para pasta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></button>` : ''}
+            ${_podeEditarWiki ? `<button onclick="abrirMoverPastaMenu(event,'${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:#33363F;cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Mover para pasta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></button>` : ''}
             ${w.tipo === 'externo'
-              ? `<a href="${w.urlExterno}" download="${(w.nomeArquivo||'').replace(/"/g,'&quot;')}" title="Baixar" style="width:28px;height:28px;border-radius:7px;background:#F1F2F5;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>`
-              : `<button onclick="editarWiki('${w._id}')" title="${w.status==='Aprovado'?'Visualizar':'Editar'}" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center">${w.status==='Aprovado' ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>` : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>`}</button>`}
-            <button onclick="deletarWiki('${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:#FF2E4D;cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
+              ? `<a href="${w.urlExterno}" download="${(w.nomeArquivo||'').replace(/"/g,'&quot;')}" title="Baixar" style="width:28px;height:28px;border-radius:7px;background:#F1F2F5;color:#33363F;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;text-decoration:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></a>`
+              : `<button onclick="editarWiki('${w._id}')" title="${w.status==='Aprovado'?'Visualizar':'Editar'}" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:#33363F;cursor:pointer;display:inline-flex;align-items:center;justify-content:center">${w.status==='Aprovado' ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>` : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>`}</button>`}
+            <button onclick="deletarWiki('${w._id}')" style="width:28px;height:28px;border-radius:7px;border:none;background:#F1F2F5;color:#FF2E4D;cursor:pointer;display:inline-flex;align-items:center;justify-content:center">${_ICO_TRASH}</button>
           </div>
         </td>
       </tr>`;
@@ -2820,12 +2910,12 @@
       btn.classList.add('vermelho');
       badge.style.display = 'flex';
       badge.className = 'notif-badge vermelho';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     } else if (resumo.temVencendo > 0 || resumo.naoLidas > 0) {
       btn.classList.add('amarelo');
       badge.style.display = 'flex';
       badge.className = 'notif-badge amarelo';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     }
   }
 
@@ -3340,7 +3430,7 @@
     fvModo = fvModo === 'viz' ? 'edicao' : 'viz';
     if (fvModo === 'viz') { document.getElementById('fvPickerPanel').classList.remove('open'); salvarFluxo(); }
     const btn = document.getElementById('btnModoFv');
-    btn.textContent = fvModo === 'edicao' ? '👁️ Modo Visualização' : '✏️ Modo Edição';
+    btn.textContent = fvModo === 'edicao' ? 'Modo Visualização' : 'Modo Edição';
     btn.className   = 'btn-fv' + (fvModo === 'edicao' ? ' primary' : '');
     document.getElementById('fvToolbarEdicao').style.display = fvModo === 'edicao' ? 'flex' : 'none';
     fvConectando = null;
@@ -3603,7 +3693,7 @@
     FV_CATEGORIAS.forEach(cat => {
       const items = FV_ELEMENTOS.filter(e => e.cat === cat.id);
       if (!items.length) return;
-      html += `<div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px">${cat.label}</div>`;
+      html += `<div style="font-size:11px;font-weight:700;color:#6B7080;margin:10px 0 4px">${cat.label}</div>`;
       items.forEach(el => {
         const sel = el.tipo === cur;
         const ico = _fvShapeIcon(el.tipo);

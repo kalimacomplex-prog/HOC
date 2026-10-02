@@ -67,8 +67,6 @@
     .notif-btn:hover { background: #F1F2F5; }
     .notif-btn svg { color: var(--accent); }
     .notif-badge.cinza { background: var(--accent); }
-    .notif-btn.amarelo svg { color: #c05621; }
-    .notif-btn.vermelho svg { color: #c53030; }
 
     /* ===== CONTENT ===== */
     .content { padding: 24px 40px 32px; max-width: 1440px; width: 100%; margin: 0 auto; }
@@ -89,11 +87,11 @@
     .lic-search-input { width: 100%; height: 38px; padding: 0 12px; border-radius: 9px; border: 1.5px solid #E5E7EB; font-size: 13px; outline: none; color: #0B0B0F; font-family: inherit; }
     .lic-search-input:focus { border-color: var(--accent); }
     .btn-mais-filtros { padding: 0 14px; height: 38px; background: white; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; color: #33363F; display: flex; align-items: center; gap: 6px; }
-    .btn-mais-filtros:hover { border-color: #0B0B0F; color: #33363F; }
+    .btn-mais-filtros:hover { background: #F1F2F5; }
     .toolbar-acoes-dir { margin-left: auto; display: flex; gap: 10px; flex-wrap: wrap; }
     .btn-lic { height: 38px; padding: 0 14px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
     .btn-lic-outline { background: white; color: #33363F; border: 1.5px solid #E5E7EB; }
-    .btn-lic-outline:hover { border-color: #0B0B0F; }
+    .btn-lic-outline:hover { background: #F1F2F5; }
     .btn-lic-add { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; padding: 0 16px; }
 
     .btn-secondary { background: white; border: 1.5px solid #E5E7EB; border-radius: 9px; color: #33363F; font-weight: 600; cursor: pointer; }
@@ -109,33 +107,28 @@
     .lic-table-wrap { background: white; border: 1px solid #ECEDF0; border-radius: 14px; box-shadow: none; overflow: auto; }
     .lic-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1100px; }
     .lic-table th { padding: 13px 16px; text-align: center; background: #0B0B0F; border-bottom: none; font-size: 11.5px; font-weight: 700; color: white; text-transform: none; letter-spacing: normal; white-space: nowrap; }
-    .lic-table td { padding: 14px 16px; border-bottom: 1px solid #F2F3F5; vertical-align: middle; text-align: center; }
+    .lic-table td { padding: 14px 16px; border-bottom: 1px solid #F2F3F5; vertical-align: middle; text-align: center; color: #0B0B0F; }
     .lic-table tr:hover td { background: #FAFBFF; }
     .lic-table tr:last-child td { border-bottom: none; }
     .lic-nome { font-weight: 700; color: #0B0B0F; }
-    .lic-cat { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 6px; background: #F1F2F5; color: #33363F; white-space: nowrap; }
+    .lic-cat { font-weight: 400; color: #0B0B0F; white-space: nowrap; }
     .validade-aviso { font-size: 11px; font-weight: 600; }
     .val-ok { color: #6B7080; }
     .val-vencendo { color: #FFAE00; }
     .val-vencida { color: #FF2E4D; }
 
-    .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; white-space: nowrap; color: white; }
-    .status-ativa { background: #00B37E; }
-    .status-vencendo { background: #FFAE00; }
-    .status-vencida { background: #FF2E4D; }
-    .status-renovacao { background: #2F5CFF; }
-    .status-em-breve { background: #7048e8; }
+    .status-badge { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 23px; box-sizing: border-box; padding: 0 12px; border-radius: 20px; font-size: 12px; font-weight: 700; white-space: nowrap; background: white; border: 1.5px solid; }
+    .status-ativa { color: #00B37E; }
+    .status-vencendo { color: #FFAE00; }
+    .status-vencida { color: #FF2E4D; }
+    .status-renovacao { color: #2F5CFF; }
+    .status-em-breve { color: #2F5CFF; }
 
-    .pen-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
-    .pen-financeira { background: #FFF6E0; color: #966000; }
-    .pen-reputacional { background: #F3EEFF; color: #6b46c1; }
-    .pen-juridica { background: #FFE9EC; color: #c53030; }
-    .pen-operacional { background: #F1F2F5; color: #33363F; }
-    .pen-comercial { background: #E3FBF2; color: #00875a; }
+    .pen-badge { font-weight: 400; color: #0B0B0F; white-space: nowrap; }
 
     .btn-acao { width: 30px; height: 30px; border: none; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; background: #F1F2F5; }
     .btn-acao:hover { background: #E5E7EB; }
-    .btn-acao-edit { color: var(--accent); }
+    .btn-acao-edit { color: #0B0B0F; }
     .btn-acao-del { color: #FF2E4D; }
     .btn-acao-det { color: #4A4E5A; }
 
@@ -156,7 +149,7 @@
     .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
     .form-group { margin-bottom: 0; }
     .form-group label { display: block; font-size: 12px; font-weight: 600; color: #4A4E5A; margin-bottom: 6px; }
-    .form-control { width: 100%; padding: 0 14px; height: 42px; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13.5px; outline: none; font-family: inherit; color: #0B0B0F; background: white; }
+    .form-control { width: 100%; padding: 0 12px; height: 38px; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 12.5px; outline: none; font-family: inherit; color: #0B0B0F; background: white; }
     .form-control:focus { border-color: var(--accent); }
     .form-full { grid-column: 1 / -1; }
     .renov-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 14px; }
@@ -215,6 +208,7 @@
     .hoc-select-wrap { position: relative; display: inline-block; width: 100%; }
     .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
     .hoc-select-trigger { appearance: none; -webkit-appearance: none; -moz-appearance: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: white; cursor: pointer; font-family: inherit; }
+    .hoc-select-trigger:hover { background: #F1F2F5 !important; }
     .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
     .hoc-select-trigger.open svg { transform: rotate(180deg); }
     .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
@@ -222,7 +216,7 @@
     .hoc-select-panel.open { display: block; }
     .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
     .hoc-select-item:hover { background: #F1F2F5; }
-    .hoc-select-item.selected { background: color-mix(in srgb, #00B37E 14%, white); color: #00754F; }
+    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent) 12%, white); color: #0B0B0F; }
   </style>
 </head>
 <body>
@@ -236,8 +230,7 @@
     <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
     <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
     <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
-    <a class="menu-item" href="/ideias-livres" title="Ideias Livres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 017 7c0 2.38-1.19 4.47-3 5.74V17H8v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 017-7z"/></svg><span class="side-label">Ideias Livres</span></a>
-    <a class="menu-item" href="/gestao-projetos" title="Gestão de Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Gestão de Projetos</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Projetos</span></a>
     <a class="menu-item active" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
@@ -467,8 +460,8 @@
     <input type="hidden" id="licEditId">
     </div>
     <div class="lic-drawer-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalLicenca')" style="flex:none">Cancelar</button>
-      <button class="btn-confirmar" onclick="salvarLicenca()" style="flex:none">Salvar Licença</button>
+      <button class="btn-cancelar" onclick="fecharModal('modalLicenca')" style="flex:1">Cancelar</button>
+      <button class="btn-confirmar" onclick="salvarLicenca()" style="flex:1">Salvar</button>
     </div>
   </div>
 </div>
@@ -607,7 +600,7 @@
     const dias = diasParaVencer(validade);
     if (dias === null) return '<span class="val-ok">—</span>';
     if (status === 'Vencida' || dias < 0) return `<span class="val-vencida">${fmtData(validade)}</span>`;
-    if (dias <= 30) return `<span class="val-vencendo">${fmtData(validade)}<br>Em ${dias} dias</span>`;
+    if (dias <= 30) return `<span class="val-vencendo">${fmtData(validade)}</span>`;
     return `<span class="val-ok">${fmtData(validade)}</span>`;
   }
 
@@ -692,7 +685,7 @@
     const dados = lista !== undefined ? lista : getLicencasFiltradas();
     if (dados.length === 0) { tbody.innerHTML = `<tr><td colspan="11" class="empty-state"><div>Nenhuma licença encontrada.</div><div style="font-size:12px;margin-top:6px">Clique em "Nova Licença" para começar!</div></td></tr>`; return; }
     const ICON_VER = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-    const ICON_EDITAR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg>';
+    const ICON_EDITAR = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
     const ICON_EXCLUIR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg>';
     tbody.innerHTML = dados.map(l => {
       const custoUnit = parseFloat(l.custoUnitario) || (parseFloat(l.custo) || 0);
@@ -712,7 +705,6 @@
         <td><span class="status-badge ${STATUS_CLASS[getStatusEfetivo(l)]||'status-ativa'}">${getStatusEfetivo(l)}</span></td>
         <td>
           <div style="display:flex;gap:6px;justify-content:center">
-          <button class="btn-acao btn-acao-det" onclick="verDetalhes('${l._id}')" title="Ver detalhes">${ICON_VER}</button>
           ${podeEditarLicencas ? `<button class="btn-acao btn-acao-edit" onclick="editarLicenca('${l._id}')" title="Editar">${ICON_EDITAR}</button>
           <button class="btn-acao btn-acao-del" onclick="deletarLicenca('${l._id}')" title="Excluir">${ICON_EXCLUIR}</button>` : ''}
           </div>
@@ -800,7 +792,7 @@
     const sorted = [...renovacoes].sort((a, b) => new Date(b.registradoEm) - new Date(a.registradoEm));
     el.innerHTML = sorted.map(r => `
       <div class="renov-item" id="renov-${r._id}">
-        <span style="font-size:18px;line-height:1">🔄</span>
+        <span style="color:var(--accent);flex-shrink:0;margin-top:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
         <div style="flex:1">
           <div class="renov-item-datas">${fmtDataBr(r.inicio)} → ${fmtDataBr(r.fim)}</div>
           <div class="renov-item-meta">Registrado em ${r.registradoEm ? new Date(r.registradoEm).toLocaleDateString('pt-BR') : '—'}${r.registradoPor ? ' · ' + r.registradoPor : ''}</div>
@@ -815,15 +807,18 @@
   function iniciarEditRenovacao(licId, renovId, inicio, fim) {
     const el = document.getElementById(`renov-${renovId}`);
     el.innerHTML = `
-      <span style="font-size:18px;line-height:1">🔄</span>
-      <div style="flex:1;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <input type="date" id="editRenInicio-${renovId}" value="${inicio}" class="form-control" style="width:140px;padding:4px 8px;font-size:12px">
-        <span style="font-size:12px">→</span>
-        <input type="date" id="editRenFim-${renovId}" value="${fim}" class="form-control" style="width:140px;padding:4px 8px;font-size:12px">
-      </div>
-      <div style="display:flex;gap:4px;flex-shrink:0">
-        <button class="btn-confirmar" onclick="salvarEditRenovacao('${licId}','${renovId}')" style="padding:4px 10px;font-size:12px">Salvar</button>
-        <button class="btn-cancelar-drawer" onclick="cancelarEditRenovacao('${licId}')" style="padding:4px 10px;font-size:12px">Cancelar</button>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="color:var(--accent);display:flex"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
+          <div style="display:flex;gap:4px">
+            <button class="btn-confirmar" onclick="salvarEditRenovacao('${licId}','${renovId}')" style="padding:0 14px;height:32px;font-size:12px;flex:none">Salvar</button>
+            <button class="btn-cancelar" onclick="cancelarEditRenovacao('${licId}')" style="padding:0 14px;height:32px;font-size:12px;flex:none">Cancelar</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group"><label>Data de Início</label><input type="date" id="editRenInicio-${renovId}" value="${inicio}" class="form-control"></div>
+          <div class="form-group"><label>Data de Fim</label><input type="date" id="editRenFim-${renovId}" value="${fim}" class="form-control"></div>
+        </div>
       </div>`;
   }
 
@@ -1127,12 +1122,12 @@
       btn.classList.add('vermelho');
       badge.style.display = 'flex';
       badge.className = 'notif-badge vermelho';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     } else if (resumo.temVencendo > 0 || resumo.naoLidas > 0) {
       btn.classList.add('amarelo');
       badge.style.display = 'flex';
       badge.className = 'notif-badge amarelo';
-      badge.textContent = resumo.naoLidas > 9 ? '9+' : resumo.naoLidas;
+      badge.textContent = resumo.naoLidas;
     }
   }
   const NOTIF_ICON = {
@@ -1333,6 +1328,7 @@ function copiarPixBloqueio(codigo) {
     document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
   });
   ['fCategoria','fStatus','fPenalidade'].forEach(id => hocEnhanceSelect(document.getElementById(id)));
+  ['licCategoria','licFrequencia','licStatus','licPenalidade'].forEach(id => hocEnhanceSelect(document.getElementById(id)));
 </script>
   <script src="/global.js"></script>
 <script src="perfil-modal.js"></script>

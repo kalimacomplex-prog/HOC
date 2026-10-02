@@ -35,7 +35,7 @@ body { font-family: 'Inter', sans-serif; background: #f0f2f5; display: flex; min
 .header-right { display: flex; align-items: center; gap: 16px; }
 .header-user { display: flex; align-items: center; gap: 10px; }
 .user-info { text-align: right; }
-.user-nome { font-size: 13px; font-weight: 600; color: #1e2a4a; }
+.user-nome { font-size: 13px; font-weight: 600; color: #0B0B0F; }
 .user-perfil { font-size: 11px; color: #718096; }
 .user-avatar { width: 32px; height: 32px; background: var(--accent, #2F5CFF); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; }
 
@@ -43,11 +43,7 @@ body { font-family: 'Inter', sans-serif; background: #f0f2f5; display: flex; min
 .notif-wrap { position: relative; }
 .notif-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f5f5f5; cursor: pointer; position: relative; border: none; transition: all 0.2s; }
 .notif-btn:hover { background: #e2e8f0; }
-.notif-btn svg { width: 18px; height: 18px; color: #718096; transition: color 0.2s; }
-.notif-btn.amarelo { background: #fffaf0; }
-.notif-btn.amarelo svg { color: #c05621; }
-.notif-btn.vermelho { background: #fff5f5; animation: pulse-red 2s infinite; }
-.notif-btn.vermelho svg { color: #c53030; }
+.notif-btn svg { width: 18px; height: 18px; color: #718096; transition: color 0.2s; transform: translateY(1.5px); }
 @keyframes pulse-red { 0%,100%{box-shadow:0 0 0 0 rgba(197,48,48,0.3)} 50%{box-shadow:0 0 0 6px rgba(197,48,48,0)} }
 .notif-badge { position: absolute; top: -3px; right: -3px; min-width: 16px; height: 16px; border-radius: 8px; font-size: 10px; font-weight: 700; color: white; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid white; }
 .notif-badge.cinza { background: #718096; }
@@ -115,11 +111,11 @@ body { font-family: 'Inter', sans-serif; background: #f0f2f5; display: flex; min
 
 /* ===== BADGES ===== */
 .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-.badge-verde { background: #f0fff4; color: #276749; }
-.badge-amarelo { background: #fffaf0; color: #c05621; }
+.badge-verde { display:inline-flex; align-items:center; justify-content:center; height:22px; box-sizing:border-box; background: white; color: #00B37E; border: 1.5px solid; border-radius: 20px; padding: 0 12px; font-weight: 700; }
+.badge-amarelo { display:inline-flex; align-items:center; justify-content:center; height:22px; box-sizing:border-box; background: white; color: #FFAE00; border: 1.5px solid; border-radius: 20px; padding: 0 12px; font-weight: 700; }
 .badge-vermelho { background: #fff5f5; color: #c53030; }
 .badge-azul { background: #ebf0ff; color: #3b5bdb; }
-.badge-cinza { background: #f0f2f5; color: #718096; }
+.badge-cinza { display:inline-flex; align-items:center; justify-content:center; height:22px; box-sizing:border-box; background: white; color: #6B7080; border: 1.5px solid; border-radius: 20px; padding: 0 12px; font-weight: 700; }
 .badge-roxo { background: #faf5ff; color: #6b46c1; }
 
 /* ===== TABLE ===== */

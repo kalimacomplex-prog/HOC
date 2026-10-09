@@ -221,15 +221,17 @@ async function enviarEmailTarefa(tarefaId, empresa, assinaturaHtml) {
   if (!template) throw new Error('Template não encontrado.');
   const smtpCfg = await SmtpConfig.findOne({ empresa }).lean();
   if (!smtpCfg || !smtpCfg.servidor) throw new Error('SMTP não configurado.');
-  const contatosIds = tarefa.contatosIds || (tarefa.contatoId ? [tarefa.contatoId] : []);
+  // Destinatários: cada contato individual recebe o seu e-mail; os membros dos grupos seguem o "agrupamento de e-mail para grupo"
+  const contatosIds = (tarefa.contatosIds && tarefa.contatosIds.length) ? tarefa.contatosIds : (tarefa.contatoId ? [tarefa.contatoId] : []);
   const gruposIds = tarefa.gruposIds || [];
-  let contatos = await Contato.find({ empresa, _id: { $in: contatosIds } }).lean();
-  if (gruposIds.length) {
-    const grupoContatos = await Contato.find({ empresa, grupo: { $in: gruposIds } }).lean();
-    const existingIds = new Set(contatos.map(c => c._id.toString()));
-    grupoContatos.forEach(c => { if (!existingIds.has(c._id.toString())) contatos.push(c); });
+  const individuais = contatosIds.length ? await Contato.find({ empresa, _id: { $in: contatosIds } }).lean() : [];
+  const idsIndividuais = new Set(individuais.map(c => c._id.toString()));
+  const gruposEnvio = [];
+  for (const g of gruposIds) {
+    const membros = (await Contato.find({ empresa, grupo: g }).lean()).filter(c => !idsIndividuais.has(c._id.toString()));
+    if (membros.length) gruposEnvio.push({ nome: g, membros });
   }
-  if (!contatos.length) throw new Error('Nenhum contato associado.');
+  if (!individuais.length && !gruposEnvio.length) throw new Error('Nenhum contato associado.');
   const anexos = tarefa.anexos || [];
   const baseUrl = PUBLIC_URL;
   // Generate tracking tokens per doc
@@ -262,26 +264,50 @@ async function enviarEmailTarefa(tarefaId, empresa, assinaturaHtml) {
     tls: { rejectUnauthorized: false }
   });
   const dataConclusao = tarefa.dataConclusao ? new Date(tarefa.dataConclusao).toLocaleDateString('pt-BR') : '';
-  const docLinks = anexos.map((d,i) => {
+  const docLinkArr = anexos.map((d,i) => {
     const texto = d.nome || d.nomeOriginal || 'Documento';
     return `<a href="${baseUrl}/link/${tokens[i]}" style="color:#2d1b69">${texto}</a>`;
-  }).join('<br>');
+  });
+  const docLinks = docLinkArr.join('<br>');
   const variavelDoc = anexos.map(d => d.obs||'').filter(Boolean).join('; ');
-  const variavelAvulsa = tarefa.observacao || tarefa.variavelAvulsa || '';
+  // Competência (MM/AAAA) e vencimento (DD/MM/AAAA) informados em cada documento anexado — distintos dos da tarefa
+  const _fmtMes = v => { const m = /^(\d{4})-(\d{2})/.exec(v||''); return m ? `${m[2]}/${m[1]}` : (v||''); };
+  const _fmtDia = v => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(v||''); return m ? `${m[3]}/${m[2]}/${m[1]}` : (v||''); };
+  const competenciaDoc = anexos.map(d => _fmtMes(d.competencia)).filter(Boolean).join('; ');
+  const vencimentoDoc = anexos.map(d => _fmtDia(d.vencimento)).filter(Boolean).join('; ');
+  const _escHtml = v => String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Bloco que se repete para cada documento: {#documentos} ... {/documentos}. Dentro dele, as variáveis de documento
+  // ({documentos}, {variavelAvulsaDocumento}, {competenciaDoc}, {vencimentoDoc}) valem para o documento da vez; fora, juntam todos.
+  const expandirBlocoDocs = (html) => html.replace(/\{#documentos\}([\s\S]*?)\{\/documentos\}/g, (_, bloco) =>
+    anexos.map((d,i) => bloco
+      .replace(/\{documentos\}/g, () => docLinkArr[i])
+      .replace(/\{variavelAvulsaDocumento\}/g, () => _escHtml(d.obs))
+      .replace(/\{variavelDoc\}/g, () => _escHtml(d.obs)) // nome antigo
+      .replace(/\{competenciaDoc\}/g, _fmtMes(d.competencia))
+      .replace(/\{vencimentoDoc\}/g, _fmtDia(d.vencimento))
+    ).join(''));
+  const variavelAvulsa = tarefa.observacao || ''; // campo Observação da tarefa (não confundir com o Detalhamento)
   const assinHtml = assinaturaHtml || '';
-  const buildCorpo = (contato) => {
-    const primeiroNome = (contato.nome||'').split(' ')[0];
-    let corpo = (template.corpo||'')
+  // grupoUnico: e-mail único para todos os membros do grupo — nesse caso {nomeCompleto}/{primeiroNome}/{cliente} mostram o nome do grupo
+  const buildCorpo = (contato, grupoNome, grupoUnico) => {
+    if (grupoUnico) contato = { nome: grupoNome, cpfCnpj: '', empresa_contato: '', grupo: grupoNome };
+    const primeiroNome = grupoUnico ? grupoNome : (contato.nome||'').split(' ')[0];
+    let corpo = expandirBlocoDocs(template.corpo||'')
       .replace(/\{nomeCompleto\}/g, contato.nome||'')
       .replace(/\{primeiroNome\}/g, primeiroNome)
       .replace(/\{cpfCnpj\}/g, contato.cpfCnpj||'')
+      .replace(/\{nomeGrupo\}/g, grupoNome || contato.grupo || '')
       .replace(/\{prazo\}/g, tarefa.prazo||'')
       .replace(/\{competencia\}/g, tarefa.competenciaFixa||tarefa.competencia||'')
       .replace(/\{dataEfetivacao\}/g, dataConclusao)
       .replace(/\{vencimento\}/g, vencData)
       .replace(/\{documentos\}/g, docLinks)
-      .replace(/\{variavelDoc\}/g, variavelDoc)
-      .replace(/\{variavelAvulsa\}/g, variavelAvulsa)
+      .replace(/\{variavelAvulsaDocumento\}/g, variavelDoc)
+      .replace(/\{variavelDoc\}/g, variavelDoc) // nome antigo
+      .replace(/\{competenciaDoc\}/g, competenciaDoc)
+      .replace(/\{vencimentoDoc\}/g, vencimentoDoc)
+      .replace(/\{variavelAvulsaTarefa\}/g, variavelAvulsa)
+      .replace(/\{variavelAvulsa\}/g, variavelAvulsa) // nome antigo
       .replace(/\{cliente\}/g, contato.nome||'')
       .replace(/\{empresa\}/g, contato.empresa_contato||'')
       .replace(/\{data\}/g, new Date().toLocaleDateString('pt-BR'))
@@ -291,36 +317,38 @@ async function enviarEmailTarefa(tarefaId, empresa, assinaturaHtml) {
     }
     return corpo;
   };
-  if (gruposIds.length) {
-    // Group task: ONE email with all group contacts, first in TO rest in CC
-    const comEmail = contatos.filter(c => c.email);
-    if (!comEmail.length) throw new Error('Nenhum contato do grupo possui e-mail.');
-    const [primeiro, ...resto] = comEmail;
-    const corpo = buildCorpo(primeiro);
+  const enviarUm = (corpo, para, cc) => {
     const mailOpts = {
       from: smtpCfg.remetente || smtpCfg.usuario,
-      to: primeiro.email,
+      to: para,
       subject: template.assunto||'',
       html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">${corpo}</div>`,
     };
-    if (resto.length) mailOpts.cc = resto.map(c => c.email).join(', ');
+    if (cc && cc.length) mailOpts.cc = cc.join(', ');
     if (tarefa.bccEmails) mailOpts.bcc = tarefa.bccEmails;
-    await transporter.sendMail(mailOpts);
-  } else {
-    // Individual contacts: one email per contact
-    for (const contato of contatos) {
-      if (!contato.email) continue;
-      const corpo = buildCorpo(contato);
-      const mailOpts = {
-        from: smtpCfg.remetente || smtpCfg.usuario,
-        to: contato.email,
-        subject: template.assunto||'',
-        html: `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">${corpo}</div>`,
-      };
-      if (tarefa.bccEmails) mailOpts.bcc = tarefa.bccEmails;
-      await transporter.sendMail(mailOpts);
+    return transporter.sendMail(mailOpts);
+  };
+  let enviados = 0;
+  // contatos individuais: um e-mail para cada
+  for (const contato of individuais) {
+    if (!contato.email) continue;
+    await enviarUm(buildCorpo(contato), contato.email);
+    enviados++;
+  }
+  // grupos: um e-mail único para todos os membros, ou um e-mail para cada membro
+  const agrupado = tarefa.agrupamento === 'agrupado';
+  for (const g of gruposEnvio) {
+    const comEmail = g.membros.filter(c => c.email);
+    if (!comEmail.length) continue;
+    if (agrupado) {
+      const [primeiro, ...resto] = comEmail;
+      await enviarUm(buildCorpo(primeiro, g.nome, true), primeiro.email, resto.map(c => c.email));
+      enviados++;
+    } else {
+      for (const c of comEmail) { await enviarUm(buildCorpo(c, g.nome), c.email); enviados++; }
     }
   }
+  if (!enviados) throw new Error('Nenhum dos contatos associados possui e-mail.');
   await Tarefa.findByIdAndUpdate(tarefaId, { emailEnviado:true, emailEnviadoEm:new Date() }, { strict:false });
 }
 
@@ -552,7 +580,7 @@ const tarefaSchema = new mongoose.Schema({
   titulo: { type: String, required: true }, descricao: { type: String, default: '' },
   responsaveis: { type: Array, default: [] }, areas: { type: Array, default: [] },
   prazo: { type: String, default: '' }, competencia: { type: String, default: '' },
-  tags: { type: Array, default: [] }, status: { type: String, default: 'Pendente', enum: ['Pendente', 'Em Progresso', 'Concluída', 'Dispensada', 'Concluída Atrasada'] },
+  tags: { type: Array, default: [] }, status: { type: String, default: 'Pendente', enum: ['Pendente', 'Em Progresso', 'Concluída', 'Dispensada', 'Concluída Atrasada', 'Concluída com Pendência'] },
   prioridade: { type: String, default: 'Media', enum: ['Baixa', 'Media', 'Alta', 'Urgente'] },
   progresso: { type: Number, default: 0 }, grupo: { type: String, default: '' },
   recorrente: { type: Boolean, default: false }, frequencia: { type: String, default: '' },
@@ -2310,15 +2338,18 @@ app.put('/api/tarefas/:id', authMiddleware, verificarAssinatura, permOperacoes('
       await notificarResponsaveisNovos(req.usuario.empresa, `Tarefa associada: ${tarefa.titulo}`, `Você foi associado à tarefa "${tarefa.titulo}".`, 'info', '📋', '/operacoes', anterior?.responsaveis, tarefa.responsaveis);
     }
     // Sincroniza baixa/dispensa com a etapa do processo que gerou esta tarefa (se houver).
-    const _statusEtapaMap = { 'Concluída': 'Concluído', 'Concluída Atrasada': 'Concluído', 'Dispensada': 'Dispensado' };
+    const _statusEtapaMap = { 'Concluída': 'Concluído', 'Concluída Atrasada': 'Concluído', 'Concluída com Pendência': 'Concluído com Pendência', 'Dispensada': 'Dispensado' };
     if (req.body.status && _statusEtapaMap[req.body.status] && tarefa.processoExecId && tarefa.processoElementoId) {
       const exec = await ProExec.findOne({ _id: tarefa.processoExecId, empresa: req.usuario.empresa });
       if (exec) {
         const etapas = exec.etapas || [];
         const etapa = etapas.find(e => e.elementoId === tarefa.processoElementoId);
-        if (etapa && etapa.status !== _statusEtapaMap[req.body.status]) {
+        const _abertos = etapa ? await Tarefa.countDocuments({ _id: { $ne: tarefa._id }, processoExecId: tarefa.processoExecId, processoElementoId: tarefa.processoElementoId, status: { $nin: ['Concluída', 'Concluída Atrasada', 'Concluída com Pendência', 'Dispensada'] } }) : 0;
+        if (etapa && !_abertos && etapa.status !== _statusEtapaMap[req.body.status]) {
           etapa.status = _statusEtapaMap[req.body.status];
           etapa.completadoEm = new Date().toISOString();
+          if (!Array.isArray(etapa.historico)) etapa.historico = [];
+          etapa.historico.push({ status: etapa.status, em: etapa.completadoEm, por: req.usuario?.nome || '', nota: 'Pela Lista de Tarefas' });
           const allDone = etapas.length && etapas.every(e => ['Concluído', 'Dispensado', 'Concluído com Pendência', 'Erro'].includes(e.status));
           const update = { etapas };
           if (allDone && !['Concluído com Sucesso', 'Concluído com Pendência'].includes(exec.status)) { update.status = 'Concluído com Sucesso'; update.concluidoEm = new Date(); }

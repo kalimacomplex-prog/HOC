@@ -218,7 +218,7 @@
     .ec-editor-toolbar { display: flex; gap: 2px; flex-wrap: wrap; padding: 8px 16px; border-bottom: 1px solid #F1F2F5; background: #FAFBFC; }
     /* Modal template EC */
     .ec-modal-campo { background: #FAFBFC; border-radius: 9px; padding: 12px; margin-bottom: 8px; }
-    .ec-modal-campo-label { font-size: 11px; font-weight: 600; color: #6B7080; margin-bottom: 4px; }
+    .ec-modal-campo-label { display: block; font-size: 12px; font-weight: 600; color: #4A4E5A; margin-bottom: 6px; }
     .ec-modal-campo-input { width: 100%; border: none; background: none; outline: none; font-size: 13px; color: #0B0B0F; font-family: inherit; resize: vertical; }
     /* Editor toolbar buttons */
     .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 5px; cursor: pointer; font-size: 12px; color: #33363F; }
@@ -465,8 +465,8 @@
 
 <div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8"/><text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="800">H</text></svg>
-    <span class="logo-text side-label">Business Manager</span>
+    <img class="logo-full" src="/img/logo-escuro.png?v=3" alt="Hub of Control">
+    <img class="logo-mini" src="/img/simbolo-escuro.png?v=3" alt="Hub of Control">
   </div>
   <nav class="sidebar-menu">
     <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
@@ -1881,7 +1881,7 @@
     if (!m.dados) m.dados = _ecInitDados(m.templateId);
     const mid=m.id; const d=m.dados;
     const sec=(lbl,html)=>`<div class="ec-tpl-sec"><div class="ec-tpl-sec-lbl">${lbl}</div>${html}</div>`;
-    const fld=(key,lbl,multi)=>`<div style="margin-bottom:8px"><label style="font-size:12px;font-weight:600;color:#4A4E5A;display:block;margin-bottom:6px">${lbl}</label>${multi
+    const fld=(key,lbl,multi)=>`<div style="margin-bottom:8px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">${lbl}</label>${multi
       ?`<textarea class="ec-tpl-field" rows="3" oninput="_ecDadosField(${mid},'${key}',this.value)">${d[key]||''}</textarea>`
       :`<input class="ec-tpl-field" value="${String(d[key]||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}" oninput="_ecDadosField(${mid},'${key}',this.value)">`
     }</div>`;

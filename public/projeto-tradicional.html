@@ -164,7 +164,7 @@
     .hoc-select-panel.open { display: block; }
     .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
     .hoc-select-item:hover { background: #F1F2F5; }
-    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent) 14%, white); color: var(--accent); }
+    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent) 12%, white); color: #0B0B0F; }
 
     /* Content */
     .proj-content { padding: 24px 40px 32px; max-width: 1440px; width: 100%; margin: 0 auto; overflow-x: hidden; box-sizing: border-box; }
@@ -305,7 +305,7 @@
     .cr-campo { margin-bottom:4px; }
     .cr-campo-label { font-size:10px; font-weight:700; color:#9CA0AC; text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px; }
     .btn-mais-filtros { padding: 0 14px; height: 38px; background: white; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; color: #33363F; display: flex; align-items: center; gap: 6px; }
-    .btn-mais-filtros:hover { border-color: #0B0B0F; color: #33363F; }
+    .btn-mais-filtros:hover { background: #F1F2F5; }
     .cr-doc-item { display:flex; align-items:center; gap:6px; padding:4px 6px; background:#FAFBFC; border-radius:4px; margin-bottom:3px; font-size:11px; color:#33363F; }
     .cr-historico { margin-top:8px; border-top:1px solid #F1F2F5; padding-top:8px; }
     .cr-hist-item { display:flex; gap:6px; align-items:flex-start; margin-bottom:5px; font-size:11px; }
@@ -420,6 +420,11 @@
 
     /* ===== Estudo de Caso Biblioteca ===== */
     .ec-layout { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: start; }
+    /* Qualidade: checklist em uso / modelo em edição ocupa a tela toda (sem a coluna de pastas/modelos) */
+    .qual-area-top { display: flex; justify-content: flex-end; align-items: center; height: 32px; margin-bottom: 12px; }
+    #qualLayoutUso:not(.qual-full) > .ec-sidebar { margin-top: 44px; }
+    .ec-layout.qual-full { grid-template-columns: 1fr; }
+    .ec-layout.qual-full > .ec-sidebar { display: none; }
     .ec-sidebar { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; position: sticky; top: 120px; }
     .ec-sidebar-header { padding: 10px 14px; border-bottom: 1px solid #F1F2F5; display: flex; align-items: center; justify-content: space-between; }
     .ec-sidebar-header span { font-size: 12px; font-weight: 700; color: #0B0B0F; }
@@ -493,7 +498,7 @@
     .ec-editor-toolbar { display: flex; gap: 2px; flex-wrap: wrap; padding: 8px 16px; border-bottom: 1px solid #F1F2F5; background: #FAFBFC; }
     /* Modal template EC */
     .ec-modal-campo { background: #FAFBFC; border-radius: 9px; padding: 12px; margin-bottom: 8px; }
-    .ec-modal-campo-label { font-size: 11px; font-weight: 600; color: #6B7080; margin-bottom: 4px; }
+    .ec-modal-campo-label { display: block; font-size: 12px; font-weight: 600; color: #4A4E5A; margin-bottom: 6px; }
     .ec-modal-campo-input { width: 100%; border: none; background: none; outline: none; font-size: 13px; color: #0B0B0F; font-family: inherit; resize: vertical; }
     /* Editor toolbar buttons */
     .toolbar-btn { padding: 5px 8px; border: none; background: none; border-radius: 5px; cursor: pointer; font-size: 12px; color: #33363F; }
@@ -585,8 +590,8 @@
 
 <div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
-    <span class="logo-text side-label">Business Manager</span>
+    <img class="logo-full" src="/img/logo-escuro.png?v=3" alt="Hub of Control">
+    <img class="logo-mini" src="/img/simbolo-escuro.png?v=3" alt="Hub of Control">
   </div>
   <nav class="sidebar-menu">
     <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
@@ -897,7 +902,7 @@
         <!-- Toolbar -->
         <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:white;border-bottom:1px solid #F1F2F5;flex-wrap:wrap;flex-shrink:0">
           <button id="eapBtnAddCard" class="btn-lic" onclick="eapAddCard()" style="background:var(--accent);color:white;font-weight:700">+ Card</button>
-          <button id="eapBtnViewToggle" class="btn-lic" onclick="eapToggleViewMode()" style="background:color-mix(in srgb, var(--accent) 8%, white);color:var(--accent);border:1.5px solid color-mix(in srgb, var(--accent) 20%, white);font-weight:700">Modo Visualização</button>
+          <button id="eapBtnViewToggle" class="btn-lic btn-lic-outline" onclick="eapToggleViewMode()" style="font-weight:700">Modo Visualização</button>
           <span id="eapStatusBadge"></span>
           <div style="flex:1"></div>
           <button id="eapBtnHistorico" class="btn-lic btn-lic-outline" onclick="toggleEscopoHistorico()">Versões</button>
@@ -948,7 +953,7 @@
                 Visão: <span id="ganttVisaoLabel">Mês</span>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
               </button>
-              <div id="ganttVisaoMenu" style="display:none;position:fixed;background:white;border:1px solid #ECEDF0;border-radius:14px;box-shadow:0 12px 32px rgba(11,11,15,0.16);padding:8px;z-index:9500;width:max-content;min-width:140px;text-align:left"></div>
+              <div id="ganttVisaoMenu" class="hoc-select-panel"></div>
             </div>
             <div style="width:1px;height:20px;background:#E5E7EB;flex-shrink:0"></div>
             <div style="display:flex;align-items:center;gap:2px;background:white;border:1.5px solid #E5E7EB;border-radius:9px;height:38px;box-sizing:border-box;padding:0 2px">
@@ -1146,13 +1151,13 @@
           </div>
           <div id="riscoFiltrosPanel" style="display:none;background:#FAFBFC;border:1.5px solid #E5E7EB;border-radius:8px;padding:14px;margin-bottom:12px">
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-              <div style="flex:1;min-width:130px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Tipo</label><select id="riscoFiltroTipo" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option value="Negativo">Negativo</option><option value="Positivo">Positivo</option></select></div>
-              <div style="flex:1;min-width:130px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Categoria</label><input type="text" id="riscoFiltroCategoria" placeholder="Buscar..." oninput="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
-              <div style="flex:1;min-width:130px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Probabilidade</label><select id="riscoFiltroProb" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todas</option><option>Muito Alto</option><option>Alto</option><option>Médio</option><option>Baixo</option><option>Muito Baixo</option></select></div>
-              <div style="flex:1;min-width:130px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Impacto</label><select id="riscoFiltroImpacto" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option>Muito Alto</option><option>Alto</option><option>Médio</option><option>Baixo</option><option>Muito Baixo</option></select></div>
-              <div style="flex:1;min-width:150px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Resp. pela Gestão</label><input type="text" id="riscoFiltroResponsavel" placeholder="Nome..." oninput="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
-              <div style="flex:1;min-width:150px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Status Ocorrência</label><select id="riscoFiltroStatus" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option value="Não Ocorreu">Não Ocorreu</option><option value="Em Monitoramento">Em Monitoramento</option><option value="Ocorreu">Ocorreu</option><option value="Mitigado">Mitigado</option><option value="Dispensado">Dispensado</option></select></div>
-              <div style="flex:1;min-width:130px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Plano de Resposta</label><select id="riscoFiltroPlano" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option value="sim">Sim</option><option value="nao">Não</option></select></div>
+              <div style="flex:1;min-width:130px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Tipo</label><select id="riscoFiltroTipo" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option value="Negativo">Negativo</option><option value="Positivo">Positivo</option></select></div>
+              <div style="flex:1;min-width:130px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Categoria</label><input type="text" id="riscoFiltroCategoria" placeholder="Buscar..." oninput="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
+              <div style="flex:1;min-width:130px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Probabilidade</label><select id="riscoFiltroProb" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todas</option><option>Muito Alto</option><option>Alto</option><option>Médio</option><option>Baixo</option><option>Muito Baixo</option></select></div>
+              <div style="flex:1;min-width:130px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Impacto</label><select id="riscoFiltroImpacto" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option>Muito Alto</option><option>Alto</option><option>Médio</option><option>Baixo</option><option>Muito Baixo</option></select></div>
+              <div style="flex:1;min-width:150px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Resp. pela Gestão</label><input type="text" id="riscoFiltroResponsavel" placeholder="Nome..." oninput="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
+              <div style="flex:1;min-width:150px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Status Ocorrência</label><select id="riscoFiltroStatus" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option value="Não Ocorreu">Não Ocorreu</option><option value="Em Monitoramento">Em Monitoramento</option><option value="Ocorreu">Ocorreu</option><option value="Mitigado">Mitigado</option><option value="Dispensado">Dispensado</option></select></div>
+              <div style="flex:1;min-width:130px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Plano de Resposta</label><select id="riscoFiltroPlano" onchange="renderRiscosDetalhados()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option value="sim">Sim</option><option value="nao">Não</option></select></div>
             </div>
             <div style="display:flex;gap:8px;margin-top:10px">
               <button onclick="limparFiltrosRiscos()" style="background:white;border:1.5px solid #E5E7EB;border-radius:9px;color:#33363F;font-weight:600;cursor:pointer;height:34px;padding:0 14px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box">Limpar</button>
@@ -1169,13 +1174,13 @@
       <!-- Qualidade -->
       <div id="subtab-qualidade" style="display:none">
         <!-- Sub-tabs bar -->
-        <div style="display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid #E5E7EB">
+        <div id="qualSubtabBar" style="display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid #E5E7EB">
           <button class="qual-subtab active" id="qualTabUso" onclick="qualMudarSubTab('uso')">Uso</button>
           <button class="qual-subtab" id="qualTabTemplates" onclick="qualMudarSubTab('templates')">Modelos</button>
         </div>
         <!-- USO -->
         <div id="qual-sub-uso">
-          <div class="ec-layout">
+          <div class="ec-layout" id="qualLayoutUso">
             <div class="ec-sidebar" style="position:static">
               <div class="ec-sidebar-header">
                 <span>Pastas</span>
@@ -1191,7 +1196,7 @@
         </div>
         <!-- TEMPLATES -->
         <div id="qual-sub-templates" style="display:none">
-          <div class="ec-layout">
+          <div class="ec-layout" id="qualLayoutTpl">
             <div class="ec-sidebar" style="position:static">
               <div class="ec-sidebar-header">
                 <span>Modelos</span>
@@ -1225,16 +1230,16 @@
       </div>
       <div id="crFiltrosPanel" style="display:none;background:#FAFBFC;border:1.5px solid #E5E7EB;border-radius:8px;padding:14px;margin-bottom:12px">
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-          <div style="min-width:130px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Categoria</label><select id="crFiltroCategoria" onchange="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todas</option><option>Escopo</option><option>Correção</option><option>Repriorização</option><option>Prazo</option><option>Custo / Orçamento</option><option>Requisitos / Regras de negócio</option><option>Qualidade</option><option>Compliance / Legal</option><option>Recursos / Capacidade</option><option>Integrações / Dependências</option><option>Estratégia / Direcionamento</option><option>Outros</option></select></div>
-          <div style="min-width:130px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Status</label><select id="crFiltroStatus" onchange="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option value="rascunho">Rascunho</option><option value="em_aprovacao">Aguardando</option><option value="aprovado">Aprovado</option><option value="reprovado">Reprovado</option><option value="dispensado">Dispensado</option></select></div>
-          <div style="min-width:130px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Solicitante</label><input type="text" id="crFiltroSolicitante" placeholder="Nome..." oninput="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
-          <div style="flex:1;min-width:140px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Motivo</label><input type="text" id="crFiltroMotivo" placeholder="Buscar no motivo..." oninput="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
-          <div style="flex:1;min-width:140px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Descrição</label><input type="text" id="crFiltroDesc" placeholder="Buscar na descrição..." oninput="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
-          <div style="flex:1;min-width:140px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Impacto</label><input type="text" id="crFiltroImpacto" placeholder="Buscar no impacto..." oninput="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
+          <div style="min-width:130px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Categoria</label><select id="crFiltroCategoria" onchange="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todas</option><option>Escopo</option><option>Correção</option><option>Repriorização</option><option>Prazo</option><option>Custo / Orçamento</option><option>Requisitos / Regras de negócio</option><option>Qualidade</option><option>Compliance / Legal</option><option>Recursos / Capacidade</option><option>Integrações / Dependências</option><option>Estratégia / Direcionamento</option><option>Outros</option></select></div>
+          <div style="min-width:130px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Status</label><select id="crFiltroStatus" onchange="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;background:white;box-sizing:border-box"><option value="">Todos</option><option value="rascunho">Rascunho</option><option value="em_aprovacao">Aguardando</option><option value="aprovado">Aprovado</option><option value="reprovado">Reprovado</option><option value="dispensado">Dispensado</option></select></div>
+          <div style="min-width:130px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Solicitante</label><input type="text" id="crFiltroSolicitante" placeholder="Nome..." oninput="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
+          <div style="flex:1;min-width:140px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Motivo</label><input type="text" id="crFiltroMotivo" placeholder="Buscar no motivo..." oninput="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
+          <div style="flex:1;min-width:140px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Descrição</label><input type="text" id="crFiltroDesc" placeholder="Buscar na descrição..." oninput="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
+          <div style="flex:1;min-width:140px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Impacto</label><input type="text" id="crFiltroImpacto" placeholder="Buscar no impacto..." oninput="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:10px">
-          <div style="min-width:110px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Data De</label><input type="date" id="crFiltroDataDe" onchange="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
-          <div style="min-width:110px"><label style="font-size:11px;font-weight:600;color:#6B7080;display:block;margin-bottom:3px">Data Até</label><input type="date" id="crFiltroDataAte" onchange="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
+          <div style="min-width:110px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Data De</label><input type="date" id="crFiltroDataDe" onchange="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
+          <div style="min-width:110px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Data Até</label><input type="date" id="crFiltroDataAte" onchange="renderCRs()" style="width:100%;height:36px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:8px;font-size:12.5px;outline:none;box-sizing:border-box"></div>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px">
           <button onclick="limparFiltrosCR()" style="background:white;border:1.5px solid #E5E7EB;border-radius:9px;color:#33363F;font-weight:600;cursor:pointer;height:34px;padding:0 14px;font-size:12px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box">Limpar</button>
@@ -1801,23 +1806,39 @@
 </div>
 <!-- Modal Qual Picker -->
 <div class="modal-overlay" id="modalQualPicker">
-  <div class="modal" style="max-width:500px;max-height:88vh;display:flex;flex-direction:column">
-    <div class="modal-header">
-      <span class="modal-titulo">Novo Checklist</span>
-      <button class="btn-fechar" onclick="fecharModal('modalQualPicker')">×</button>
+  <div class="modal" style="max-width:500px;padding:0;max-height:88vh;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;border-bottom:1px solid #ECEDF0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div class="modal-titulo">Novo Checklist</div>
+      <button class="btn-fechar" onclick="fecharModal('modalQualPicker')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div style="padding:0 0 8px">
-      <div class="form-group" style="padding:0 20px;margin-bottom:12px">
-        <label>Nome do checklist</label>
-        <input type="text" id="qualPickerNome" placeholder="Ex: Checklist de abertura Q1" style="width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:6px;font-size:13px;outline:none;font-family:inherit">
-      </div>
-      <div style="padding:0 20px 6px;font-size:11px;font-weight:700;color:#6B7080;text-transform:uppercase;letter-spacing:.5px">Selecione um modelo</div>
-      <div id="qualPickerLista" style="padding:0 20px;max-height:340px;overflow-y:auto"></div>
-      <input type="hidden" id="qualPickerTemplateId">
+    <div style="flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+      <div><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Nome do Checklist</label>
+        <input type="text" id="qualPickerNome" placeholder="Ex: Checklist de Fechamento" style="width:100%;height:38px;padding:0 12px;border-radius:9px;border:1.5px solid #E5E7EB;font-size:12.5px;box-sizing:border-box;font-family:inherit;outline:none"></div>
+      <div><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Responsável</label>
+        <input type="text" id="qualPickerResp" placeholder="Nome do responsável" style="width:100%;height:38px;padding:0 12px;border-radius:9px;border:1.5px solid #E5E7EB;font-size:12.5px;box-sizing:border-box;font-family:inherit;outline:none"></div>
+      <div><div style="font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Começar a partir de</div>
+        <div id="qualPickerLista" style="max-height:300px;overflow-y:auto"></div></div>
+    </div>
+    <div class="modal-footer" style="padding:16px 24px;border-top:1px solid #ECEDF0;justify-content:flex-end;flex-shrink:0;margin-top:0">
+      <button class="btn-cancelar" onclick="fecharModal('modalQualPicker')" style="flex:none;padding:0 18px;height:40px">Cancelar</button>
+      <button class="btn-confirmar" onclick="qualConfirmarNovoChecklist()" style="flex:none;padding:0 20px;height:40px">Criar Checklist</button>
+    </div>
+  </div>
+</div>
+<!-- Modal Nome da Pasta (Qualidade) -->
+<div class="modal-overlay" id="modalQualPasta">
+  <div class="modal" style="max-width:420px;display:flex;flex-direction:column">
+    <div class="modal-header">
+      <span class="modal-titulo">Nova Pasta</span>
+      <button class="btn-fechar" onclick="fecharModal('modalQualPasta')">×</button>
+    </div>
+    <div class="form-group" style="margin-bottom:6px">
+      <label>Nome da pasta</label>
+      <input type="text" id="qualPastaNome" placeholder="Ex: Inspeções de março" onkeydown="if(event.key==='Enter')qualSalvarPasta();if(event.key==='Escape')fecharModal('modalQualPasta')" style="width:100%;padding:9px 12px;border:1.5px solid #E5E7EB;border-radius:6px;font-size:13px;outline:none;font-family:inherit">
     </div>
     <div class="modal-footer">
-      <button class="btn-cancelar" onclick="fecharModal('modalQualPicker')">Cancelar</button>
-      <button class="btn-confirmar" onclick="qualConfirmarNovoChecklist()">Criar Checklist</button>
+      <button class="btn-cancelar" onclick="fecharModal('modalQualPasta')">Cancelar</button>
+      <button class="btn-confirmar" onclick="qualSalvarPasta()">Criar Pasta</button>
     </div>
   </div>
 </div>
@@ -2055,7 +2076,6 @@
   let qualTemplates = [];
   let qualTemplatesExternos = []; // modelos públicos de outros projetos, visíveis aqui para edição
   let qualPastaAtual = null;
-  let qualCaminhoNav = [];
   let qualChecklistAbertoId = null;
   let qualTemplateEditandoId = null;
   let qualSubTab = 'uso';
@@ -3816,7 +3836,7 @@
     if (!m.dados) m.dados = _ecInitDados(m.templateId);
     const mid=m.id; const d=m.dados;
     const sec=(lbl,html)=>`<div class="ec-tpl-sec"><div class="ec-tpl-sec-lbl">${lbl}</div>${html}</div>`;
-    const fld=(key,lbl,multi)=>`<div style="margin-bottom:8px"><label style="font-size:12px;font-weight:600;color:#4A4E5A;display:block;margin-bottom:6px">${lbl}</label>${multi
+    const fld=(key,lbl,multi)=>`<div style="margin-bottom:8px"><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">${lbl}</label>${multi
       ?`<textarea class="ec-tpl-field" rows="3" oninput="_ecDadosField(${mid},'${key}',this.value)">${d[key]||''}</textarea>`
       :`<input class="ec-tpl-field" value="${String(d[key]||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}" oninput="_ecDadosField(${mid},'${key}',this.value)">`
     }</div>`;
@@ -5260,9 +5280,6 @@
     if (btnVT) {
       btnVT.style.display = rascunho ? '' : 'none';
       btnVT.textContent = _eapViewMode ? 'Modo Edição' : 'Modo Visualização';
-      btnVT.style.background = _eapViewMode ? 'color-mix(in srgb, #00B37E 6%, white)' : 'color-mix(in srgb, var(--accent) 8%, white)';
-      btnVT.style.color = _eapViewMode ? '#00754F' : 'var(--accent)';
-      btnVT.style.borderColor = _eapViewMode ? 'color-mix(in srgb, #00B37E 20%, white)' : 'color-mix(in srgb, var(--accent) 20%, white)';
     }
   }
   function _eapEsc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -6271,20 +6288,20 @@
     if(e)e.stopPropagation();
     const menu=document.getElementById('ganttVisaoMenu');
     if(!menu)return;
-    if(menu.style.display==='block'){menu.style.display='none';return;}
+    if(menu.classList.contains('open')){menu.classList.remove('open');return;}
+    document.querySelectorAll('.hoc-select-panel.open').forEach(p=>p.classList.remove('open'));
     const itens=[{id:'semana',nome:'Semana'},{id:'mes',nome:'Mês'},{id:'trimestre',nome:'Trimestre'}];
-    menu.innerHTML=itens.map(it=>`
-      <div onclick="toggleGanttVisaoMenu();ganttSetZoom('${it.id}')" style="padding:9px 14px;border-radius:10px;cursor:pointer;margin-bottom:2px;font-size:12.5px;font-weight:700;color:${it.id===_ganttZoom?'var(--accent)':'#0B0B0F'};white-space:nowrap" onmouseover="this.style.background='color-mix(in srgb, var(--accent) 10%, white)'" onmouseout="this.style.background='transparent'">${it.nome}</div>`).join('');
+    menu.innerHTML=itens.map(it=>`<div class="hoc-select-item${it.id===_ganttZoom?' selected':''}" onclick="toggleGanttVisaoMenu();ganttSetZoom('${it.id}')">${it.nome}</div>`).join('');
     const btn=e?e.currentTarget:document.getElementById('ganttVisaoBtn');
     if(btn){
       const r=btn.getBoundingClientRect();
-      menu.style.top=(r.bottom+6)+'px';
+      menu.style.top=(r.bottom+4)+'px';
       menu.style.left=r.left+'px';
+      menu.style.minWidth=r.width+'px';
     }
-    menu.style.display='block';
+    menu.classList.add('open');
   }
-  document.addEventListener('click', e => { if (!e.target.closest('#ganttVisaoMenu') && !e.target.closest('#ganttVisaoBtn')) { const m = document.getElementById('ganttVisaoMenu'); if (m) m.style.display = 'none'; } });
-  document.addEventListener('scroll', () => { const m = document.getElementById('ganttVisaoMenu'); if (m) m.style.display = 'none'; }, true);
+  // (o fechamento ao clicar fora / rolar é feito pelos listeners globais de .hoc-select-panel)
 
   function ganttAddTarefa(){
     const td=_gf(new Date()),tf=_gf(_gadd(new Date(),7));
@@ -6880,11 +6897,9 @@
   }
   function _riscosToggleFiltros() {
     const panel = document.getElementById('riscoFiltrosPanel');
-    const btn = document.getElementById('riscoBtnMaisFiltros');
     if (!panel) return;
     const open = panel.style.display === 'none';
     panel.style.display = open ? '' : 'none';
-    if (btn) { btn.style.borderColor = open ? 'var(--accent)' : ''; btn.style.color = open ? 'var(--accent)' : ''; }
   }
   function limparFiltrosRiscos() {
     ['riscoFiltroNome','riscoFiltroTipo','riscoFiltroCategoria','riscoFiltroProb','riscoFiltroImpacto','riscoFiltroResponsavel','riscoFiltroStatus','riscoFiltroPlano'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -6917,6 +6932,16 @@
     renderQualTemplatesArea();
   }
 
+  // Modo tela cheia: checklist aberto (Uso) ou modelo em edição (Modelos) esconde pastas/modelos e a barra Uso/Modelos.
+  function _qualAplicarModoTela() {
+    const usoFull = !!qualChecklistAbertoId;
+    const tplFull = !!qualTemplateEditandoId;
+    document.getElementById('qualLayoutUso')?.classList.toggle('qual-full', usoFull);
+    document.getElementById('qualLayoutTpl')?.classList.toggle('qual-full', tplFull);
+    const bar = document.getElementById('qualSubtabBar');
+    if (bar) bar.style.display = ((qualSubTab === 'uso' && usoFull) || (qualSubTab === 'templates' && tplFull)) ? 'none' : 'flex';
+  }
+
   function qualMudarSubTab(tab) {
     qualSubTab = tab;
     document.getElementById('qual-sub-uso').style.display = tab === 'uso' ? '' : 'none';
@@ -6925,74 +6950,68 @@
     document.getElementById(tab === 'uso' ? 'qualTabUso' : 'qualTabTemplates').classList.add('active');
     if (tab === 'uso') { renderQualSidebar(); renderQualAreaPrincipal(); }
     else { renderQualTemplatesSidebar(); renderQualTemplatesArea(); }
+    _qualAplicarModoTela();
   }
 
   // --- PASTAS ---
   function renderQualSidebar() {
     const sb = document.getElementById('qualPastasSidebar');
     if (!sb) return;
-    const curParentId = qualCaminhoNav.length > 0 ? qualCaminhoNav[qualCaminhoNav.length-1].id : null;
-    let html = '';
-    if (qualCaminhoNav.length > 0) {
-      html += `<div class="ec-breadcrumb">
-        <button class="ec-bc-btn" onclick="qualVoltarPasta()">← Voltar</button>
-        <div class="ec-bc-path">${qualCaminhoNav.map((it,idx) =>
-          `<span class="ec-bc-item" onclick="qualIrBreadcrumb(${idx})">${it.nome}</span>${idx < qualCaminhoNav.length-1 ? ' › ' : ''}`
-        ).join('')}</div>
-      </div>`;
-    }
-    const subs = qualPastas.filter(p => (p.parentId||null) === curParentId);
-    html += subs.map(p => {
-      const esc = s => s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-      return `<button class="ec-pasta-btn ${qualPastaAtual===p.id?'active':''}" onclick="qualNavegarPasta('${esc(p.id)}','${esc(p.nome)}')">
-        <span style="flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.nome}</span>
+    const esc = s => s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    sb.innerHTML = qualPastas.map(p => {
+      const ativa = qualPastaAtual === p.id;
+      return `<div class="ec-pasta-btn ${ativa?'active':''}" onclick="qualClickPasta('${esc(p.id)}')">
+        <span style="flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap${ativa?';cursor:text':''}"${ativa?` title="Clique para renomear" onclick="event.stopPropagation();qualEditarNomePasta(this,'${esc(p.id)}')"`:''}>${p.nome}</span>
         <span class="ec-pasta-acoes">
-          <span class="ec-pasta-del" onclick="event.stopPropagation();renomearPastaQual('${esc(p.id)}')" title="Renomear" style="font-size:10px"></span>
           <span class="ec-pasta-del" onclick="event.stopPropagation();deletarPastaQual('${esc(p.id)}')" title="Remover">${ICO_TASK_TRASH}</span>
         </span>
-      </button>`;
+      </div>`;
     }).join('');
-    sb.innerHTML = html;
   }
 
-  function qualNavegarPasta(id, nome) {
-    qualCaminhoNav.push({id, nome});
+  // Seleciona a pasta; clicar de novo no texto da pasta selecionada deixa o nome editável ali mesmo
+  function qualClickPasta(id) {
+    if (id === qualPastaAtual && !qualChecklistAbertoId) return;
     qualPastaAtual = id;
     qualChecklistAbertoId = null;
     renderQualSidebar();
     renderQualAreaPrincipal();
   }
-  function qualVoltarPasta() {
-    qualCaminhoNav.pop();
-    const cur = qualCaminhoNav[qualCaminhoNav.length-1];
-    qualPastaAtual = cur ? cur.id : (qualPastas[0]?.id || null);
-    qualChecklistAbertoId = null;
-    renderQualSidebar();
-    renderQualAreaPrincipal();
-  }
-  function qualIrBreadcrumb(idx) {
-    qualCaminhoNav = qualCaminhoNav.slice(0, idx+1);
-    qualPastaAtual = qualCaminhoNav[idx].id;
-    qualChecklistAbertoId = null;
-    renderQualSidebar();
-    renderQualAreaPrincipal();
-  }
   function criarPastaQual() {
-    const nome = prompt('Nome da nova pasta:');
-    if (!nome?.trim()) return;
-    const parentId = qualCaminhoNav.length > 0 ? qualCaminhoNav[qualCaminhoNav.length-1].id : null;
-    qualPastas.push({ id: 'qp-' + Date.now(), nome: nome.trim(), parentId });
+    const inp = document.getElementById('qualPastaNome');
+    inp.value = '';
+    document.getElementById('modalQualPasta').classList.add('aberto');
+    setTimeout(() => inp.focus(), 30);
+  }
+  function qualSalvarPasta() {
+    const inp = document.getElementById('qualPastaNome');
+    const nome = inp.value.trim();
+    if (!nome) { inp.focus(); return; }
+    qualPastas.push({ id: 'qp-' + Date.now(), nome, parentId: null });
+    fecharModal('modalQualPasta');
     salvarQual(); renderQualSidebar();
   }
-  function renomearPastaQual(id) {
-    const p = qualPastas.find(x => x.id === id);
-    if (!p) return;
-    const novo = prompt('Novo nome:', p.nome);
-    if (!novo?.trim() || novo.trim() === p.nome) return;
-    p.nome = novo.trim();
-    const bc = qualCaminhoNav.find(n => n.id === id);
-    if (bc) bc.nome = p.nome;
-    salvarQual(); renderQualSidebar();
+  // Clicar no texto da pasta selecionada deixa o nome editável ali mesmo
+  function qualEditarNomePasta(span, id) {
+    if (span.tagName === 'INPUT') return;
+    const p = qualPastas.find(x => x.id === id); if (!p) return;
+    const inp = document.createElement('input');
+    inp.value = p.nome;
+    inp.style.cssText = 'width:100%;box-sizing:border-box;border:none;outline:1.5px solid var(--accent);border-radius:4px;background:white;padding:1px 4px;font:inherit;color:#0B0B0F';
+    let feito = false;
+    const fim = (salvar) => {
+      if (feito) return; feito = true;
+      const v = inp.value.trim();
+      if (salvar && v && v !== p.nome) {
+        p.nome = v;
+        salvarQual();
+      }
+      renderQualSidebar();
+    };
+    inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); fim(true); } else if (e.key === 'Escape') fim(false); };
+    inp.onblur = () => fim(true);
+    inp.onclick = e => e.stopPropagation();
+    span.replaceWith(inp); inp.focus(); inp.select();
   }
   function deletarPastaQual(id) {
     if (!confirm('Remover pasta? Os checklists dentro serão perdidos.')) return;
@@ -7000,8 +7019,7 @@
     qualPastas.forEach(p => { if ((p.parentId||null) === id) p.parentId = null; });
     qualPastas = qualPastas.filter(p => p.id !== id);
     if (qualPastaAtual === id) {
-      qualCaminhoNav = qualCaminhoNav.filter(n => n.id !== id);
-      qualPastaAtual = qualCaminhoNav.length ? qualCaminhoNav[qualCaminhoNav.length-1].id : (qualPastas[0]?.id || null);
+      qualPastaAtual = qualPastas[0]?.id || null;
       qualChecklistAbertoId = null;
     }
     salvarQual(); renderQualSidebar(); renderQualAreaPrincipal();
@@ -7011,15 +7029,15 @@
   function renderQualAreaPrincipal() {
     const area = document.getElementById('qualAreaPrincipal');
     if (!area) return;
+    _qualAplicarModoTela();
     if (qualChecklistAbertoId) { renderQualChecklistViewer(); return; }
     if (!qualPastaAtual) {
-      area.innerHTML = `<div style="text-align:center;padding:40px;color:#9CA0AC;font-size:13px;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06)"><div style="font-size:32px;margin-bottom:6px"></div>Selecione uma pasta na lateral.</div>`;
+      area.innerHTML = `<div class="qual-area-top"></div><div style="text-align:center;padding:40px;color:#9CA0AC;font-size:13px;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06)"><div style="font-size:32px;margin-bottom:6px"></div>Selecione uma pasta na lateral.</div>`;
       return;
     }
     const lista = qualChecklists.filter(c => c.pasta === qualPastaAtual);
-    let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <div style="font-size:13px;font-weight:600;color:var(--accent)">${_qualNomePasta(qualPastaAtual)}</div>
-      <button onclick="qualAbrirPickerTemplate()" style="font-size:12px;padding:7px 14px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600">+ Novo Checklist</button>
+    let html = `<div class="qual-area-top">
+      <button onclick="qualAbrirPickerTemplate()" style="height:32px;font-size:12px;padding:0 14px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-family:inherit">+ Novo Checklist</button>
     </div>`;
     if (!lista.length) {
       html += `<div style="text-align:center;padding:32px;color:#9CA0AC;font-size:13px;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06)"><div style="font-size:28px;margin-bottom:6px"></div>Nenhum checklist nesta pasta.<br><span style="font-size:12px">Clique em "+ Novo Checklist" para começar.</span></div>`;
@@ -7032,7 +7050,7 @@
           <div style="display:flex;align-items:center;gap:10px">
             <div style="flex:1;min-width:0">
               <div style="font-size:13px;font-weight:700;color:#0B0B0F;margin-bottom:4px">${cl.nome}</div>
-              <div style="font-size:11px;color:#9CA0AC">${cl.criadoPor ? cl.criadoPor+' · ' : ''}${formatarData(cl.criadoEm)}</div>
+              <div style="font-size:11px;color:#9CA0AC">${[cl.responsavel, cl.criadoPor, formatarData(cl.criadoEm)].filter(Boolean).join(' · ')}</div>
             </div>
             <div style="text-align:right;flex-shrink:0">
               <div style="font-size:13px;font-weight:700;color:${pct===100?'#00754F':'var(--accent)'}">${pct}%</div>
@@ -7078,63 +7096,81 @@
     salvarQual(); renderQualAreaPrincipal();
   }
 
-  // --- TEMPLATE PICKER ---
-  function qualAbrirPickerTemplate() {
-    // All templates from this project (public or not — they were created here)
+  // --- TEMPLATE PICKER --- (mesmo formulário do Novo Checklist da Auditoria em Operações)
+  let _qualPickerTplId = null; // null = em branco
+  function _qualModelosDisponiveis() {
+    // Modelos deste projeto + modelos públicos de todos os projetos (sem repetir)
     const todos = [...qualTemplates];
-    // Public templates from ALL projects (localStorage), skip ones already in this project
     let publicos = [];
     try { publicos = JSON.parse(localStorage.getItem('hoc_qualTemplatesPublicos') || '[]'); } catch(e){}
     publicos.forEach(t => { if (!todos.find(x => x.id == t.id)) todos.push({...t}); });
-    console.log('[Qual Picker] qualTemplates:', qualTemplates.length, 'localStorage publicos:', publicos.length, 'todos:', todos.length, publicos);
-    document.getElementById('qualPickerLista').innerHTML = todos.length ? todos.map(t => {
-      const secs = t.secoes || [];
-      const nItens = secs.reduce((a,s) => a + (s.itens||[]).length, 0);
-      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;border:1.5px solid #E5E7EB;background:white;margin-bottom:6px;transition:border-color .15s" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='#E5E7EB'" onclick="qualCriarDeTemplate('${t.id}')">
-        <div style="flex:1"><div style="font-size:13px;font-weight:600;color:#0B0B0F">${t.nome}</div>
-          <div style="font-size:11px;color:#9CA0AC">${secs.length} seção(ões) · ${nItens} itens${t.publico?' · Público':''}</div>
-        </div>
-      </div>`;
-    }).join('') : `<div style="text-align:center;padding:24px;color:#9CA0AC;font-size:13px">Nenhum modelo disponível.<br>Crie um na aba <b>Templates</b>.</div>`;
+    return todos;
+  }
+  function qualAbrirPickerTemplate() {
+    _qualPickerTplId = null;
     document.getElementById('qualPickerNome').value = '';
-    document.getElementById('qualPickerTemplateId').value = '';
+    document.getElementById('qualPickerResp').value = '';
+    _qualRenderPickerLista();
     document.getElementById('modalQualPicker').classList.add('aberto');
+  }
+  function _qualRenderPickerLista() {
+    const el = document.getElementById('qualPickerLista'); if (!el) return;
+    const modelos = _qualModelosDisponiveis();
+    const base = 'padding:10px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;border:1.5px solid #E5E7EB;background:white;margin-bottom:6px';
+    const sel = 'border-color:var(--accent);background:color-mix(in srgb,var(--accent) 8%,white)';
+    const radio = (active)=>`<div style="width:16px;height:16px;border-radius:50%;border:2px solid ${active?'var(--accent)':'#D8DBE0'};background:${active?'var(--accent)':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0">${active?'<span style="color:white;font-size:9px;font-weight:700">✓</span>':''}</div>`;
+    let html = `<div onclick="qualCriarDeTemplate(null)" style="${base}${_qualPickerTplId===null?';'+sel:''}">
+      ${radio(_qualPickerTplId===null)}
+      <div style="font-size:12px;font-weight:700;color:${_qualPickerTplId===null?'var(--accent)':'#33363F'}">Em branco</div>
+    </div>`;
+    modelos.forEach(t => {
+      const active = _qualPickerTplId!==null && _qualPickerTplId==t.id;
+      const n = (t.secoes||[]).reduce((a,s) => a + (s.itens||[]).length, 0);
+      html += `<div onclick="qualCriarDeTemplate('${t.id}')" style="${base}${active?';'+sel:''}">
+        ${radio(active)}
+        <div style="font-size:12px;font-weight:700;color:${active?'var(--accent)':'#0B0B0F'};flex:1">${_gesc(t.nome)}</div>
+        <div style="font-size:10px;color:#9CA0AC;flex-shrink:0">${n} ${n!==1?'itens':'item'}</div>
+      </div>`;
+    });
+    if (!modelos.length) html += '<div style="font-size:11px;color:#9CA0AC;padding:4px">Nenhum modelo. Crie na aba Modelos.</div>';
+    el.innerHTML = html;
   }
 
   function qualCriarDeTemplate(tplId) {
-    document.getElementById('qualPickerTemplateId').value = tplId;
-    document.querySelectorAll('#qualPickerLista > div').forEach(d => d.style.background = 'white');
-    event.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 8%, white)';
-    event.currentTarget.style.borderColor = 'var(--accent)';
+    _qualPickerTplId = tplId;
+    _qualRenderPickerLista();
+    const ni = document.getElementById('qualPickerNome');
+    if (tplId===null || !ni || ni.value) return;
+    const tpl = _qualModelosDisponiveis().find(t => t.id == tplId);
+    if (tpl) ni.value = tpl.nome;
   }
 
   function qualConfirmarNovoChecklist() {
     const nome = document.getElementById('qualPickerNome').value.trim();
-    const tplId = document.getElementById('qualPickerTemplateId').value;
-    if (!nome) { alert('Informe o nome do checklist.'); return; }
-    if (!tplId) { alert('Selecione um modelo.'); return; }
-    let tpl = qualTemplates.find(t => t.id == tplId);
-    if (!tpl) {
-      try { tpl = JSON.parse(localStorage.getItem('hoc_qualTemplatesPublicos') || '[]').find(t => t.id == tplId); } catch(e){}
-    }
-    if (!tpl) { alert('Modelo não encontrado.'); return; }
+    if (!nome) { alert('Informe um nome para o checklist.'); return; }
+    const responsavel = document.getElementById('qualPickerResp').value.trim();
+    const tpl = _qualPickerTplId!==null ? _qualModelosDisponiveis().find(t => t.id == _qualPickerTplId) : null;
+    if (_qualPickerTplId!==null && !tpl) { alert('Modelo não encontrado.'); return; }
     const cl = {
       id: Date.now(),
       nome,
+      responsavel,
       pasta: qualPastaAtual,
-      templateId: tplId,
+      templateId: tpl ? tpl.id : '',
       criadoEm: new Date().toISOString().split('T')[0],
       criadoPor: usuario.nome || '',
-      secoes: tpl.secoes.map(s => ({
-        id: Date.now() + Math.random(),
-        nome: s.nome,
-        itens: s.itens.map(it => ({
-          id: Date.now() + Math.random(),
-          texto: it.texto,
-          checked: false,
-          comentario: ''
-        }))
-      }))
+      secoes: tpl
+        ? tpl.secoes.map(s => ({
+            id: Date.now() + Math.random(),
+            nome: s.nome,
+            itens: s.itens.map(it => ({
+              id: Date.now() + Math.random(),
+              texto: it.texto,
+              checked: false,
+              comentario: ''
+            }))
+          }))
+        : [{ id: Date.now() + Math.random(), nome: 'Seção 1', itens: [] }]
     };
     qualChecklists.push(cl);
     salvarQual();
@@ -7153,6 +7189,7 @@
     if (!area) return;
     const cl = qualChecklists.find(x => x.id == qualChecklistAbertoId);
     if (!cl) { qualChecklistAbertoId = null; renderQualAreaPrincipal(); return; }
+    _qualAplicarModoTela();
     const total = cl.secoes.reduce((a,s) => a + s.itens.length, 0);
     const done = cl.secoes.reduce((a,s) => a + s.itens.filter(i => i.checked).length, 0);
     const pct = total ? Math.round(done/total*100) : 0;
@@ -7168,7 +7205,7 @@
         <button class="btn-fechar" onclick="qualChecklistAbertoId=null;renderQualAreaPrincipal()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:700;color:#0B0B0F">${cl.nome}</div>
-          <div style="font-size:11px;color:#9CA0AC;margin-top:2px">${done}/${total} itens concluídos</div>
+          ${cl.responsavel?`<div style="font-size:11px;color:#9CA0AC;margin-top:2px">Responsável: ${_gesc(cl.responsavel)}</div>`:''}
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div style="font-size:14px;font-weight:800;color:${pct===100?'#00754F':'var(--accent)'}">${pct}%</div>
@@ -7293,6 +7330,7 @@
   function renderQualTemplatesArea() {
     const area = document.getElementById('qualTemplatesArea');
     if (!area) return;
+    _qualAplicarModoTela();
     if (!qualTemplateEditandoId) {
       area.innerHTML = `<div style="text-align:center;padding:40px;color:#9CA0AC;font-size:13px;background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06)"><div style="font-size:32px;margin-bottom:6px"></div>Selecione um modelo na lateral ou crie um novo.</div>`;
       return;
@@ -7301,7 +7339,8 @@
     if (!tpl) { qualTemplateEditandoId = null; renderQualTemplatesArea(); return; }
     const tid = tpl.id;
     area.innerHTML = `<div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden">
-      <div style="padding:14px 18px;border-bottom:1px solid #F1F2F5;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div style="padding:14px 18px;border-bottom:1px solid #F1F2F5;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="btn-fechar" onclick="qualVoltarTemplate()" title="Voltar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
         <input id="qualTplNome" value="${tpl.nome.replace(/"/g,'&quot;')}" oninput="_qualTplNome(this.value)" style="flex:1;border:none;outline:none;font-size:15px;font-weight:700;color:#0B0B0F;font-family:inherit;min-width:160px">
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
           <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#0B0B0F;cursor:pointer;white-space:nowrap;margin:0;padding:0">
@@ -7335,6 +7374,11 @@
     qualTemplates.unshift(tpl);
     qualTemplateEditandoId = tpl.id;
     salvarQual();
+    renderQualTemplatesSidebar();
+    renderQualTemplatesArea();
+  }
+  function qualVoltarTemplate() {
+    qualTemplateEditandoId = null;
     renderQualTemplatesSidebar();
     renderQualTemplatesArea();
   }
@@ -7635,7 +7679,7 @@
       const hist = cr.historico || [];
       const histExpandido = _crHistoricoExpandido.has(cr.id);
       const histHtml = hist.length ? `<div class="cr-historico">
-        <button onclick="_crToggleHistorico(${cr.id})" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.4px">
+        <button onclick="_crToggleHistorico(${cr.id})" style="background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#6B7080;text-transform:uppercase;letter-spacing:.4px">
           ${histExpandido?'Ocultar Histórico':'Exibir Histórico'}
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="transition:transform .15s${histExpandido?';transform:rotate(180deg)':''}"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
@@ -7677,11 +7721,9 @@
   }
   function _crToggleFiltros() {
     const panel = document.getElementById('crFiltrosPanel');
-    const btn = document.getElementById('crBtnMaisFiltros');
     if (!panel) return;
     const open = panel.style.display === 'none';
     panel.style.display = open ? '' : 'none';
-    if (btn) { btn.style.borderColor = open ? 'var(--accent)' : ''; btn.style.color = open ? 'var(--accent)' : ''; }
   }
   function limparFiltrosCR() {
     ['crFiltroTitulo','crFiltroCategoria','crFiltroStatus','crFiltroSolicitante','crFiltroDataDe','crFiltroDataAte','crFiltroMotivo','crFiltroDesc','crFiltroImpacto'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -8517,7 +8559,7 @@
             <div style="font-size:11.5px;color:#9CA0AC;line-height:1.3">${_gesc(p.papel||'—')}</div>
           </div>
           <div style="position:relative;flex-shrink:0">
-            <button onclick="toggleAvalMenuEc(event,${i_orig})" style="background:none;border:none;cursor:pointer;padding:0;color:var(--accent);font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:4px">
+            <button onclick="toggleAvalMenuEc(event,${i_orig})" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:4px">
               Avaliações (${notasP.length})
               <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
             </button>

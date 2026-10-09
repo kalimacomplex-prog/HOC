@@ -151,8 +151,8 @@
       const expirando = diasTrialRestantes <= 5;
       banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
       banner.innerHTML = `
-        <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${diasTrialRestantes} dia(s) restante(s)</strong></span>
-        <button class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}" onclick="window.location.href='/plano-usuarios'">Ver planos</button>
+        <span>Período de teste: <strong>${diasTrialRestantes} dia(s) restante(s)</strong></span>
+        <button class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}" onclick="window.location.href='/plano-usuarios?tab=assinatura'">Ver planos</button>
         <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
       banner.style.display = 'flex';
       const main = document.querySelector('.main');
@@ -161,8 +161,8 @@
     } else if (status === 'inadimplente') {
       banner.className = 'banner-assinatura inadimplente';
       banner.innerHTML = `
-        <span>⚠️ Fatura <strong>${diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
-        <button class="banner-assinatura-btn inadimplente" onclick="window.location.href='/plano-usuarios'">Pagar agora</button>
+        <span>Fatura <strong>${diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
+        <button class="banner-assinatura-btn inadimplente" onclick="window.location.href='/plano-usuarios?tab=assinatura'">Pagar agora</button>
         <button class="banner-fechar" onclick="fecharBanner()" title="Fechar">×</button>`;
       banner.style.display = 'flex';
       const main = document.querySelector('.main');
@@ -186,9 +186,9 @@
   // ===== TOAST DE SUCESSO =====
   function mostrarToastSucesso() {
     const toast = criarToast(
-      '🎉 Pagamento confirmado!',
+      'Pagamento confirmado',
       'Seu plano foi ativado. Todos os módulos estão liberados.',
-      '#276749', '#f0fff4', '#9ae6b4'
+      '#00754F', '#F2FBF7', '#9ADBC2'
     );
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 6000);
@@ -197,9 +197,9 @@
   // ===== TOAST DE INADIMPLENTE =====
   function mostrarToastInadimplente(diasAtraso) {
     const toast = criarToast(
-      '⚠️ Pagamento em atraso',
-      `Sua fatura está ${diasAtraso || 0} dia(s) em atraso. Acesse Plano e Usuários para regularizar.`,
-      '#c05621', '#fffaf0', '#f6ad55'
+      'Pagamento em atraso',
+      `Sua fatura está ${diasAtraso || 0} dia(s) em atraso. Acesse Planos para regularizar.`,
+      '#8A5D00', '#FFF9EC', '#F2CE80'
     );
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 8000);
@@ -215,16 +215,16 @@
       background: ${corFundo};
       border: 1.5px solid ${corBorda};
       border-radius: 12px;
-      padding: 16px 20px;
+      padding: 14px 18px;
       max-width: 360px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 24px rgba(11,11,15,0.12);
       z-index: 99999;
       animation: slideInToast 0.3s ease;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     `;
     toast.innerHTML = `
-      <div style="font-size:14px;font-weight:700;color:${corTexto};margin-bottom:4px">${titulo}</div>
-      <div style="font-size:12px;color:#4a5568;line-height:1.5">${mensagem}</div>
+      <div style="font-size:13px;font-weight:700;color:${corTexto};margin-bottom:4px">${titulo}</div>
+      <div style="font-size:12px;color:#33363F;line-height:1.5">${mensagem}</div>
     `;
 
     // Animação CSS inline

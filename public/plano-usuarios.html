@@ -3,147 +3,289 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HOC - Plano e Usuários</title>
+  <title>HOC - Planos e Usuários</title>
   <link rel="stylesheet" href="style-global.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root { --accent: #2F5CFF; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background: #F6F7F9; overflow-x: hidden; }
+    * { scrollbar-width: thin; scrollbar-color: rgba(11,11,15,0.35) transparent; }
+    ::-webkit-scrollbar { height: 10px; width: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(11,11,15,0.18); border-radius: 10px; border: 3px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(11,11,15,0.4); background-clip: padding-box; }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar { width: max-content; min-width: 200px; max-width: 320px; background: #0B0B0F; padding: 0; transition: width 0.18s ease; overflow: hidden; }
+    .sidebar.recolhida { width: 68px; min-width: 68px; }
+    .sidebar-logo { height: 64px; padding: 0 20px; border-bottom: none; margin-bottom: 0; }
+    .sidebar-logo rect { fill: var(--accent); }
+    .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+    .sidebar.recolhida .logo-text, .sidebar.recolhida .side-label, .sidebar.recolhida .sidebar-sistema-label, .sidebar.recolhida .btn-sidebar-label { display: none; }
+    .sidebar-menu { display: flex; flex-direction: column; padding: 12px; gap: 3px; }
+    .menu-item { width: 100%; gap: 14px; padding: 9px 12px; border-radius: 9px; color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 600; margin-bottom: 0; white-space: nowrap; }
+    .menu-item:hover { background: rgba(255,255,255,0.08); color: white; }
+    .menu-item.active { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; }
+    .menu-item svg { width: 18px; height: 18px; opacity: 1; stroke-width: 2; }
+    .sidebar-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,0.08); position: relative; }
+    .sidebar-sistema { position: relative; margin-bottom: 4px; }
+    .sidebar-sistema > summary { border-radius: 9px; padding: 9px 12px; gap: 10px; background: transparent; color: rgba(255,255,255,0.65); font-size: 12.5px; font-weight: 600; }
+    .sidebar-sistema > summary:hover { background: rgba(255,255,255,0.08); color: white; }
+    .sidebar-sistema > summary svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-sistema.ativa > summary { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; }
+    .sidebar-sistema-items { position: absolute; bottom: calc(100% + 8px); left: 0; width: max-content; min-width: 220px; background: #17171A; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); padding: 8px; z-index: 50; border: none; }
+    .sidebar-sistema-items .menu-item { font-size: 12px; padding: 8px 12px; width: 100%; border: none; background: transparent; font-family: inherit; text-align: left; cursor: pointer; }
+    .sidebar-sistema-items .menu-item.active { background: rgba(255,255,255,0.12); box-shadow: none; color: white; }
+    .btn-sair { border-radius: 6px; padding: 8px 12px; font-size: 12px; background: transparent; }
+    .btn-sair:hover { background: rgba(255,255,255,0.08); }
+    .btn-recolher { width: 100%; height: 38px; border-radius: 9px; background: transparent; border: none; color: rgba(255,255,255,0.65); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12.5px; font-weight: 600; margin-top: 4px; }
+    .btn-recolher:hover { background: rgba(255,255,255,0.08); color: white; }
+    .color-picker-back { display: flex; align-items: center; gap: 6px; width: 100%; padding: 8px 12px; border-radius: 6px; border: none; background: transparent; color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 4px; }
+    .color-picker-back:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border-radius: 6px; border: none; background: transparent; cursor: pointer; font-family: inherit; }
+    .color-swatch:hover { background: rgba(255,255,255,0.08); }
+    .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+    .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
+    .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
+    .sidebar-sistema-items input.color-hex-input { width: 100%; height: auto; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
+
+    /* ===== MAIN / TOPBAR ===== */
+    .main { min-width: 0; }
+    .header { padding: 0 24px; height: 56px; box-shadow: none; border-bottom: 1px solid #ECEDF0; justify-content: flex-end; }
+    .header-right { gap: 14px; }
+    .header-user { gap: 10px; cursor: pointer; padding: 6px 10px 6px 6px; border-radius: 10px; }
+    .header-user:hover { background: #F1F2F5; }
+    .user-info { text-align: left; line-height: 1.25; }
+    .user-nome { font-size: 12.5px; font-weight: 700; color: #0B0B0F; }
+    .user-perfil { font-size: 11px; color: #9CA0AC; }
+    .user-avatar { width: 32px; height: 32px; background: #0B0B0F; font-size: 12px; font-weight: 700; }
+    .notif-btn { width: 34px; height: 34px; border-radius: 8px; background: transparent; }
+    .notif-btn:hover { background: #F1F2F5; }
+    .notif-btn svg { color: var(--accent); }
+    .notif-badge.cinza { background: var(--accent); }
+
+    /* ===== CONTENT ===== */
+    .content { padding: 24px 40px 32px; max-width: 1440px; width: 100%; margin: 0 auto; }
+    .sec-head { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .sec-titulo { font-size: 16px; font-weight: 800; color: #0B0B0F; margin-bottom: 16px; }
+    .sec-head .sec-titulo { margin-bottom: 0; }
+
+    /* ===== BOTÕES ===== */
+    .btn-lic { height: 38px; padding: 0 14px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; font-family: inherit; text-decoration: none; }
+    .btn-lic-outline { background: white; color: #33363F; border: 1.5px solid #E5E7EB; }
+    .btn-lic-outline:hover { background: #F1F2F5; }
+    .btn-lic-add { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; font-weight: 700; padding: 0 16px; }
+    .btn-lic:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-azul { background: linear-gradient(135deg, #2F5CFF, #1E44D6); box-shadow: 0 2px 8px rgba(47,92,255,0.35); color: white; font-weight: 700; }
+    .btn-acao { width: 30px; height: 30px; border: none; border-radius: 7px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; background: #F1F2F5; }
+    .btn-acao:hover { background: #E5E7EB; }
+    .btn-acao-edit { color: #0B0B0F; }
+    .btn-acao-del { color: #FF2E4D; }
+
+    /* ===== TABELAS ===== */
+    .lic-table-wrap { background: white; border: 1px solid #ECEDF0; border-radius: 14px; box-shadow: none; overflow: auto; }
+    .lic-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .lic-table th { padding: 13px 16px; text-align: center; background: #0B0B0F; border-bottom: none; font-size: 11.5px; font-weight: 700; color: white; text-transform: none; letter-spacing: normal; white-space: nowrap; }
+    .lic-table td { padding: 14px 16px; border-bottom: 1px solid #F2F3F5; vertical-align: middle; text-align: center; color: #0B0B0F; font-size: 12px; }
+    .lic-table tr:hover td { background: #FAFBFF; }
+    .lic-table tr:last-child td { border-bottom: none; }
+    .lic-table .col-nome { font-weight: 700; }
+    #tab-assinatura .lic-table th { padding: 9px 16px; font-size: 12.5px; }
+    #tab-assinatura .lic-table td { font-size: 12.5px; }
+    .tbl-vazio { text-align: center; padding: 40px 16px; color: #9CA0AC; font-size: 12.5px; }
+    .tag-dono { display: inline-flex; align-items: center; height: 20px; padding: 0 9px; margin-left: 8px; border-radius: 999px; background: #F1F2F5; color: #4A4E5A; font-size: 10.5px; font-weight: 700; vertical-align: middle; }
+    .acoes-linha { display: inline-flex; gap: 6px; }
+
+    /* ===== STATUS (tags) ===== */
+    .status-badge { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; height: 24px; padding: 0 12px 1px; vertical-align: middle; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; background: white; box-shadow: inset 0 0 0 1.5px currentColor; }
+    .tag-txt { display: block; line-height: 1; }
+    .st-verde { color: #00B37E; }
+    .st-amarelo { color: #FFAE00; }
+    .st-vermelho { color: #FF2E4D; }
+    .st-azul { color: #2F5CFF; }
+    .st-cinza { color: #6B7080; }
+
+    /* ===== CARDS DE RESUMO (assinatura) ===== */
+    .resumo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .resumo-card { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 12px 18px; box-shadow: none; text-align: center; display: flex; flex-direction: column; justify-content: center; }
+    .resumo-card-lbl { font-size: 12px; font-weight: 600; color: #6B7080; margin-bottom: 6px; }
+    .resumo-card-val { font-size: 22px; font-weight: 800; color: #0B0B0F; letter-spacing: -0.02em; min-height: 28px; display: flex; align-items: center; justify-content: center; }
+    .resumo-card-val .status-badge { height: 28px; padding: 0 18px; font-size: 13px; letter-spacing: 0; }
+    .resumo-card-sub { font-size: 11.5px; font-weight: 600; color: #6B7080; margin-top: 4px; }
+    .resumo-card-sub:empty { display: none; }
+
+    /* ===== PAINEL (fatura) ===== */
+    .fatura-tabela { margin-bottom: 12px; }
+    .hist-mais { display: flex; justify-content: center; margin-top: 12px; }
+    .painel { background: white; border: 1px solid #ECEDF0; border-radius: 14px; padding: 20px; margin-bottom: 24px; }
+    .painel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #ECEDF0; }
+    .painel-titulo { font-size: 14px; font-weight: 800; color: #0B0B0F; }
+    .det-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+    .det-item label { display: block; font-size: 10px; font-weight: 700; color: #9CA0AC; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+    .det-item span { font-size: 13px; color: #0B0B0F; font-weight: 500; }
+    .pix-box { background: #F6F7F9; border: 1px solid #ECEDF0; border-radius: 12px; padding: 14px; margin-top: 10px; }
+    .pix-titulo { font-size: 12px; font-weight: 700; color: #0B0B0F; margin-bottom: 8px; }
+    .pix-code { font-size: 11px; color: #33363F; word-break: break-all; background: white; padding: 8px 10px; border-radius: 9px; border: 1px solid #ECEDF0; margin-bottom: 10px; line-height: 1.5; }
+    .acoes-fatura { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+
+    /* ===== AGUARDANDO CONFIRMAÇÃO ===== */
+    .aguardando-card { background: color-mix(in srgb, #FFAE00 8%, white); border: 1.5px solid color-mix(in srgb, #FFAE00 45%, white); border-radius: 14px; padding: 20px; margin-bottom: 24px; text-align: center; }
+    .aguardando-titulo { font-size: 14px; font-weight: 800; color: #0B0B0F; margin: 10px 0 6px; }
+    .aguardando-sub { font-size: 12px; color: #33363F; line-height: 1.6; }
+    .aguardando-nota { font-size: 11.5px; color: #6B7080; margin-top: 8px; }
+
     /* ===== PLANOS ===== */
-    .planos-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 28px; }
-    .plano-card { background: white; border-radius: 12px; padding: 24px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 2px solid transparent; position: relative; transition: all 0.2s; }
-    .plano-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-    .plano-card.popular { border-color: #2d1b69; }
-    .plano-card.ativo { border-color: #38a169; background: #f0fff4; }
-    .popular-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #2d1b69; color: white; font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
-    .ativo-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #38a169; color: white; font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
-    .plano-nome { font-size: 16px; font-weight: 700; color: #1e2a4a; margin-bottom: 6px; }
-    .plano-preco { font-size: 26px; font-weight: 700; color: #2d1b69; margin-bottom: 3px; }
-    .plano-preco span { font-size: 13px; font-weight: 400; color: #718096; }
-    .plano-preco.enterprise { font-size: 16px; color: #1e2a4a; }
-    .plano-divider { height: 1px; background: #f0f2f5; margin: 12px 0; }
-    .plano-features { list-style: none; margin-bottom: 18px; }
-    .plano-features li { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #4a5568; margin-bottom: 8px; }
-    .plano-features li::before { content: '✓'; color: #38a169; font-weight: 700; }
-    .btn-plano { width: 100%; padding: 10px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .btn-plano.primario { background: #2d1b69; color: white; }
-    .btn-plano.primario:hover { background: #3d2b89; }
-    .btn-plano.secundario { background: #f0f2f5; color: #4a5568; }
-    .btn-plano.secundario:hover { background: #e2e8f0; }
-    .btn-plano.ativo-btn { background: #f0fff4; color: #38a169; border: 1.5px solid #9ae6b4; cursor: default; }
-    .btn-plano.comercial { background: #1e2a4a; color: white; }
-    /* ===== STATUS ASSINATURA ===== */
-    .status-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; }
-    .status-card { background: white; border-radius: 10px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-    .status-card-label { font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .status-card-valor { font-size: 20px; font-weight: 700; color: #1e2a4a; margin-bottom: 3px; }
-    .status-card-sub { font-size: 12px; color: #718096; }
-    .status-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
-    .pill-trial { background: #f5f0ff; color: #2d1b69; }
-    .pill-ativa { background: #f0fff4; color: #276749; }
-    .pill-inadimplente { background: #fff5f5; color: #c53030; }
-    /* ===== FATURA ===== */
-    .fatura-card { background: white; border-radius: 10px; padding: 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 24px; }
-    .fatura-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f2f5; }
-    .fatura-titulo { font-size: 15px; font-weight: 700; color: #1e2a4a; }
-    .fatura-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    .fatura-item label { font-size: 11px; font-weight: 600; color: #a0aec0; text-transform: uppercase; display: block; margin-bottom: 3px; }
-    .fatura-item span { font-size: 14px; font-weight: 600; color: #1e2a4a; }
-    .pix-box { background: #f8fafc; border-radius: 8px; padding: 14px; border: 1.5px solid #e2e8f0; margin-top: 10px; }
-    .pix-titulo { font-size: 12px; font-weight: 700; color: #1e2a4a; margin-bottom: 7px; }
-    .pix-code { font-size: 11px; color: #4a5568; word-break: break-all; background: white; padding: 8px 10px; border-radius: 5px; border: 1px solid #e2e8f0; font-family: monospace; margin-bottom: 8px; }
-    .btn-copiar { padding: 6px 12px; background: #2d1b69; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .btn-boleto { padding: 6px 12px; background: #f0f2f5; color: #1e2a4a; border: none; border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; margin-left: 8px; }
-    /* ===== USUÁRIOS ===== */
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .section-title { font-size: 16px; font-weight: 700; color: #1e2a4a; }
-    .btn-acao { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
-    .btn-editar { background: #f5f0ff; color: #2d1b69; }
-    .btn-editar:hover { background: #ede9fe; }
-    .btn-deletar { background: #fff5f5; color: #c53030; }
-    .btn-deletar:hover { background: #fed7d7; }
-    .badge.dono { background: #edf2f7; color: #4a5568; margin-left: 6px; }
-    .badge.ativo { background: #f0fff4; color: #276749; }
-    .badge.pendente { background: #fffaf0; color: #c05621; }
-    .badge.inativo { background: #fff5f5; color: #c53030; }
-    .empty { text-align: center; padding: 32px; color: #a0aec0; font-size: 13px; }
+    .planos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+    .plano-card { background: white; border: 1.5px solid #ECEDF0; border-radius: 14px; padding: 22px 20px; display: flex; flex-direction: column; transition: border-color 0.15s; }
+    .plano-card:hover { border-color: #D8DBE0; }
+    .plano-card.popular { border-color: #2F5CFF; }
+    .plano-card.ativo { border-color: #00B37E; background: color-mix(in srgb, #00B37E 5%, white); }
+    .plano-tag-linha { height: 23px; margin-bottom: 12px; }
+    .plano-nome { font-size: 16px; font-weight: 800; color: #0B0B0F; margin-bottom: 6px; }
+    .plano-preco { font-size: 26px; font-weight: 800; color: #0B0B0F; letter-spacing: -0.02em; margin-bottom: 3px; }
+    .plano-preco span { font-size: 12.5px; font-weight: 500; color: #6B7080; letter-spacing: 0; }
+    .plano-preco.enterprise { font-size: 18px; }
+    .plano-divider { height: 1px; background: #ECEDF0; margin: 14px 0; }
+    .plano-features { list-style: none; margin-bottom: 18px; flex: 1; }
+    .plano-features li { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: #33363F; margin-bottom: 9px; }
+    .plano-features li svg { flex-shrink: 0; color: var(--accent); }
+    .plano-card .btn-lic { width: 100%; }
+
+    /* ===== PERMISSÕES ===== */
+    .form-sec-titulo { font-size: 11.5px; font-weight: 700; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.05em; margin: 18px 0 14px; padding-bottom: 8px; border-bottom: 1px solid #ECEDF0; }
+    .perm-modulo { margin-bottom: 10px; background: white; border-radius: 12px; overflow: hidden; border: 1px solid #ECEDF0; }
+    .perm-modulo-header { padding: 10px 14px; background: #F6F7F9; border-bottom: 1px solid #ECEDF0; font-size: 12.5px; font-weight: 700; color: #0B0B0F; }
+    .perm-modulo-body { padding: 10px 14px; }
+    .perm-acoes { display: flex; gap: 18px; flex-wrap: wrap; }
+    .perm-acao { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: #33363F; cursor: pointer; margin: 0; }
+    .perm-acao input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; margin: 0; }
+
+    /* ===== ALERTAS DENTRO DOS MODAIS ===== */
+    .alerta { display: none; padding: 10px 12px; border-radius: 9px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+    .alerta-erro { background: #FFF0F0; border: 1px solid color-mix(in srgb, #FF2E4D 35%, white); color: #B3123A; }
+    .alerta-ok { background: color-mix(in srgb, #00B37E 8%, white); border: 1px solid color-mix(in srgb, #00B37E 35%, white); color: #00754F; }
+    .alerta-aviso { background: color-mix(in srgb, #FFAE00 10%, white); border: 1px solid color-mix(in srgb, #FFAE00 45%, white); color: #8A5D00; display: flex; gap: 8px; align-items: flex-start; }
+    .nota { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 9px; font-size: 12px; line-height: 1.5; margin-top: 12px; background: #F6F7F9; border: 1px solid #ECEDF0; color: #33363F; }
+    .nota svg { flex-shrink: 0; margin-top: 1px; }
+    .nota-ok { background: color-mix(in srgb, #00B37E 8%, white); border-color: color-mix(in srgb, #00B37E 35%, white); color: #00754F; }
+
+    /* ===== ACESSO RESTRITO ===== */
     .acesso-negado { text-align: center; padding: 60px 40px; }
-    .acesso-negado h2 { font-size: 20px; color: #1e2a4a; margin-bottom: 10px; }
-    .acesso-negado p { color: #718096; font-size: 13px; }
-    /* ===== TOGGLE ===== */
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #f8fafc; }
-    .toggle-row:last-child { border-bottom: none; }
-    .toggle-label { font-size: 13px; color: #1e2a4a; }
-    .toggle-desc { font-size: 11px; color: #718096; margin-top: 1px; }
-    .toggle { position: relative; width: 38px; height: 20px; flex-shrink: 0; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; inset: 0; background: #e2e8f0; border-radius: 20px; cursor: pointer; transition: background 0.2s; }
-    .toggle-slider:before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: transform 0.2s; }
-    .toggle input:checked + .toggle-slider { background: #2d1b69; }
-    .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
-    /* ===== PERMISSÕES GRANULARES ===== */
-    .perm-modulo { margin-bottom: 10px; background: #f8fafc; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
-    .perm-modulo-header { padding: 9px 14px; background: #f0f2f5; font-size: 12px; font-weight: 700; color: #1e2a4a; }
-    .perm-modulo-body { padding: 8px 14px; }
-    .perm-acoes { display: flex; gap: 20px; flex-wrap: wrap; }
-    .perm-acao { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4a5568; }
-    .perm-acao input[type="checkbox"] { accent-color: #2d1b69; width: 14px; height: 14px; cursor: pointer; }
-    .perm-titulo { font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 8px; }
-    .mestre-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 4px; border-bottom: 1px solid #f0f2f5; }
-    /* ===== HISTÓRICO ===== */
-    .historico-card { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+    .acesso-negado svg { color: #9CA0AC; margin-bottom: 12px; }
+    .acesso-negado h2 { font-size: 18px; font-weight: 800; color: #0B0B0F; margin-bottom: 8px; }
+    .acesso-negado p { color: #6B7080; font-size: 12.5px; }
 
-    /* ===== MODAL DE PAGAMENTO ===== */
-    .pag-modal-valor { font-size: 28px; font-weight: 700; color: #2d1b69; text-align: center; margin: 8px 0 20px; }
-    .pag-modal-plano { font-size: 13px; color: #718096; text-align: center; margin-bottom: 20px; }
+    /* ===== MODAIS ===== */
+    .modal-overlay { background: rgba(11,11,15,0.45); }
+    .modal { border-radius: 16px; box-shadow: 0 8px 32px rgba(11,11,15,0.12); border: 1px solid #ECEDF0; padding: 0; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+    .modal-corpo { flex: 1; min-height: 0; overflow-y: auto; margin: 12px 6px 12px 0; padding: 12px 14px 12px 28px; scrollbar-width: auto; scrollbar-color: auto; }
+    .modal-corpo::-webkit-scrollbar { width: 10px; }
+    .modal-corpo::-webkit-scrollbar-track { background: transparent; }
+    .modal-corpo::-webkit-scrollbar-thumb { background: rgba(11,11,15,0.2); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+    .modal-corpo::-webkit-scrollbar-thumb:hover { background: rgba(11,11,15,0.4); background-clip: padding-box; }
+    .modal-corpo::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+    .modal-titulo { font-size: 17px; font-weight: 800; color: #0B0B0F; }
+    .btn-fechar { width: 34px; height: 34px; box-sizing: border-box; border-radius: 9px; background: #F1F2F5; color: #4A4E5A; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding: 0; }
+    .btn-fechar:hover { background: #E5E7EB; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #4A4E5A; margin-bottom: 6px; }
+    .form-control, input[type="text"], input[type="email"], input[type="date"], input[type="number"], input[type="password"], select, textarea { width: 100%; padding: 0 12px; height: 38px; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 12.5px; outline: none; font-family: inherit; color: #0B0B0F; background: white; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+    .modal-footer .btn-cancelar, .modal-footer .btn-confirmar { box-sizing: border-box; flex: 1 1 0; height: 40px; padding: 0 10px; border-width: 1.5px; border-style: solid; }
+    .modal-footer .btn-confirmar { border-color: transparent; }
+    .btn-cancelar { flex: 1; padding: 10px; background: white; color: #33363F; border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .btn-cancelar:hover { background: #F1F2F5; }
+    .btn-confirmar { flex: 1; padding: 10px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); border: none; color: white; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+    .btn-confirmar:disabled { opacity: 0.6; cursor: not-allowed; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+    /* ===== PAGAMENTO ===== */
+    .pag-modal-plano { font-size: 12.5px; font-weight: 600; color: #6B7080; text-align: center; margin-bottom: 4px; }
+    .pag-modal-valor { font-size: 26px; font-weight: 800; color: #0B0B0F; text-align: center; margin: 0 0 20px; letter-spacing: -0.02em; }
     .pag-secao { margin-bottom: 18px; }
-    .pag-secao-titulo { font-size: 11px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f0f2f5; }
-    .pag-pix-box { background: #f5f0ff; border-radius: 10px; padding: 16px; text-align: center; }
-    .pag-pix-chave { font-size: 15px; font-weight: 700; color: #2d1b69; margin: 8px 0; word-break: break-all; }
-    .pag-pix-info { font-size: 11px; color: #718096; }
-    .pag-instrucoes { background: #f8fafc; border-radius: 8px; padding: 14px; }
-    .pag-instrucao-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: #4a5568; margin-bottom: 8px; line-height: 1.5; }
+    .pag-secao-titulo { font-size: 11.5px; font-weight: 700; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ECEDF0; }
+    .pag-formas { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .pag-forma-btn { background: white; border: 1.5px solid #E5E7EB; border-radius: 12px; padding: 16px 10px; cursor: pointer; transition: all 0.15s; text-align: center; width: 100%; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .pag-forma-btn svg { color: var(--accent); }
+    .pag-forma-btn:hover, .pag-forma-btn.selecionado { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, white); }
+    .pag-forma-nome { font-size: 13px; font-weight: 700; color: #0B0B0F; }
+    .pag-forma-desc { font-size: 11px; font-weight: 500; color: #6B7080; }
+    .pag-carregando { text-align: center; padding: 32px; }
+    .spinner { width: 28px; height: 28px; border: 3px solid #ECEDF0; border-top-color: var(--accent); border-radius: 50%; animation: girar 0.8s linear infinite; margin: 0 auto 12px; }
+    .pag-carregando-titulo { font-size: 13px; font-weight: 700; color: #0B0B0F; }
+    .pag-carregando-sub { font-size: 12px; color: #6B7080; margin-top: 4px; }
+    .pag-pix-grid { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; }
+    .qr-box { width: 140px; height: 140px; background: #F6F7F9; border-radius: 12px; border: 1px solid #ECEDF0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .qr-legenda { font-size: 10.5px; font-weight: 500; color: #6B7080; margin-top: 6px; text-align: center; }
+    .pag-cola-label { font-size: 12px; font-weight: 600; color: #4A4E5A; margin-bottom: 6px; }
+    .pag-cola-code { font-size: 10.5px; word-break: break-all; background: white; padding: 8px 10px; border-radius: 9px; border: 1px solid #ECEDF0; margin-bottom: 10px; min-height: 48px; line-height: 1.5; color: #33363F; }
+    .pag-instrucoes { background: #F6F7F9; border: 1px solid #ECEDF0; border-radius: 12px; padding: 14px; }
+    .pag-instrucao-item { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: #33363F; margin-bottom: 8px; line-height: 1.5; }
     .pag-instrucao-item:last-child { margin-bottom: 0; }
-    .pag-instrucao-num { width: 20px; height: 20px; background: #2d1b69; color: white; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-    .pag-aviso { background: #fffaf0; border: 1px solid #f6e05e; border-radius: 7px; padding: 10px 12px; font-size: 12px; color: #744210; margin-top: 14px; display: flex; gap: 8px; align-items: flex-start; }
-    /* ===== CARD AGUARDANDO CONFIRMAÇÃO ===== */
-    .aguardando-card { background: #fffaf0; border: 2px solid #f6ad55; border-radius: 10px; padding: 20px; margin-bottom: 20px; text-align: center; }
-    .aguardando-icone { font-size: 36px; margin-bottom: 8px; }
-    .aguardando-titulo { font-size: 16px; font-weight: 700; color: #744210; margin-bottom: 6px; }
-    .aguardando-sub { font-size: 12px; color: #c05621; margin-bottom: 14px; line-height: 1.5; }
-    .aguardando-acoes { display: flex; gap: 10px; justify-content: center; }
+    .pag-instrucao-num { width: 20px; height: 20px; background: var(--accent); color: white; border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .pag-boleto-box { background: #F6F7F9; border: 1px solid #ECEDF0; border-radius: 12px; padding: 14px; }
+    .pag-boleto-linha { font-size: 11px; color: #33363F; word-break: break-all; margin-bottom: 10px; background: white; padding: 8px 10px; border-radius: 9px; border: 1px solid #ECEDF0; line-height: 1.5; }
+    .pag-status { text-align: center; padding: 8px; font-size: 12px; font-weight: 600; color: #6B7080; margin-top: 4px; }
+    .pag-sucesso { text-align: center; padding: 32px; }
+    .pag-sucesso svg { color: #00B37E; margin-bottom: 12px; }
+    .pag-sucesso-titulo { font-size: 17px; font-weight: 800; color: #0B0B0F; margin-bottom: 6px; }
+    .pag-sucesso-sub { font-size: 12.5px; color: #6B7080; }
 
-    /* ===== FORMA DE PAGAMENTO ===== */
-    .pag-forma-btn { background: white; border: 2px solid #e2e8f0; border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s; text-align: center; width: 100%; }
-    .pag-forma-btn:hover { border-color: #2d1b69; background: #f5f0ff; }
-    .pag-forma-btn.selecionado { border-color: #2d1b69; background: #f5f0ff; }
-    .btn-secondary { background: #f0f2f5; color: #4a5568; border: none; border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .btn-secondary:hover { background: #e2e8f0; }
+    /* ===== BLOQUEIO POR INADIMPLÊNCIA ===== */
+    .bloqueio-icone { display: flex; justify-content: center; margin-bottom: 14px; color: #FF2E4D; }
 
-    @media (max-width: 900px) { .planos-grid { grid-template-columns: repeat(2,1fr); } .status-grid { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 600px) { .planos-grid { grid-template-columns: 1fr; } .status-grid { grid-template-columns: 1fr; } }
+    /* ===== LISTAS SUSPENSAS ===== */
+    .hoc-select-wrap { position: relative; display: inline-block; width: 100%; }
+    .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
+    .hoc-select-trigger { appearance: none; -webkit-appearance: none; -moz-appearance: none; margin: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: white; cursor: pointer; font-family: inherit; }
+    .hoc-select-trigger:hover { background: #F1F2F5 !important; }
+    .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
+    .hoc-select-trigger.open svg { transform: rotate(180deg); }
+    .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+    .hoc-select-panel { display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 100%; background: white; border: 1px solid #ECEDF0; border-radius: 10px; box-shadow: 0 12px 32px rgba(11,11,15,0.16); padding: 6px; z-index: 60; max-height: 260px; overflow-y: auto; }
+    .hoc-select-panel.open { display: block; }
+    .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
+    .hoc-select-item:hover { background: #F1F2F5; }
+    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent) 12%, white); color: #0B0B0F; }
+
+    @media (max-width: 1100px) { .planos-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 700px) { .planos-grid, .resumo-grid, .det-grid { grid-template-columns: 1fr; } .content { padding: 20px 16px; } }
   </style>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect width="28" height="28" rx="6" fill="rgba(255,255,255,0.15)"/><text x="14" y="19" text-anchor="middle" fill="white" font-size="14" font-weight="700">H</text></svg>
-    <span class="logo-text">Business Manager</span>
+    <img class="logo-full" src="/img/logo-escuro.png?v=3" alt="Hub of Control">
+    <img class="logo-mini" src="/img/simbolo-escuro.png?v=3" alt="Hub of Control">
   </div>
   <nav class="sidebar-menu">
-    <a class="menu-item" href="/overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Nivelamento de Conhecimento</a>
-    <a class="menu-item" href="/gestao-metas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Gestão de Metas e Resultados</a>
-    <a class="menu-item" href="/operacoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>Operações</a>
-    <a class="menu-item" href="/gestao-projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Projetos</a>
-    <a class="menu-item" href="/gestao-licencas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Gestão de Licenças</a>
+    <a class="menu-item" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
+    <a class="menu-item" href="/gestao-metas" title="Gestão de Metas e Resultados"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg><span class="side-label">Gestão de Metas e Resultados</span></a>
+    <a class="menu-item" href="/operacoes" title="Operações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="side-label">Operações</span></a>
+    <a class="menu-item" href="/gestao-projetos" title="Projetos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><span class="side-label">Projetos</span></a>
+    <a class="menu-item" href="/gestao-licencas" title="Gestão de Licenças"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="side-label">Gestão de Licenças</span></a>
   </nav>
   <div class="sidebar-footer">
-    <details class="sidebar-sistema" id="sistemaMenu">
-      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Sistema<svg class="sidebar-sistema-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
-      <div class="sidebar-sistema-items">
+    <details class="sidebar-sistema ativa" id="sistemaMenu">
+      <summary><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="side-label sidebar-sistema-label">Sistema</span><svg class="sidebar-sistema-chevron side-label" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg></summary>
+      <div class="sidebar-sistema-items" id="sistemaItemsWrap">
+        <button class="menu-item" onclick="mostrarCorSistemaNoMenu()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Cor do Sistema</button>
         <a class="menu-item" id="sidebarPlanos" href="/plano-usuarios?tab=assinatura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Planos</a>
         <a class="menu-item" id="sidebarUsuarios" href="/plano-usuarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Usuários e Permissões</a>
         <button class="btn-sair" onclick="sair()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sair</button>
       </div>
     </details>
+    <button class="btn-recolher" id="btnRecolher" onclick="toggleSidebarRecolhida()" title="Recolher/Expandir">
+      <svg id="iconRecolher" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+      <span class="side-label btn-sidebar-label" id="lblRecolher">Recolher</span>
+    </button>
   </div>
 </div>
 
@@ -152,6 +294,10 @@
   <div class="header">
     <div></div>
     <div class="header-right">
+      <div class="header-user">
+        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
+        <div class="user-avatar" id="userAvatar">?</div>
+      </div>
       <div class="notif-wrap" id="notifWrap">
         <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
@@ -163,140 +309,131 @@
             <div class="notif-drop-acoes"><button class="btn-ler-todas" onclick="limparNotificacoes()">Limpar</button></div>
           </div>
           <div class="notif-lista" id="notifLista">
-            <div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Carregando...</div></div>
+            <div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Carregando...</div></div>
           </div>
         </div>
-      </div>
-      <div class="header-user">
-        <div class="user-info"><div class="user-nome" id="userNome">-</div><div class="user-perfil" id="userPerfil">-</div></div>
-        <div class="user-avatar" id="userAvatar">?</div>
       </div>
     </div>
   </div>
 
   <div class="content" id="conteudo">
 
-    <!-- ===== ABA USUÁRIOS ===== -->
+    <!-- ===== USUÁRIOS E PERMISSÕES ===== -->
     <div id="tab-usuarios">
-      <div class="section-header">
-        <span class="section-title">Usuários da Empresa</span>
-        <button class="btn-primary" onclick="abrirModalConvite()" style="font-size:12px;padding:8px 14px">+ Convidar Usuário</button>
+      <div class="sec-head">
+        <button class="btn-lic btn-lic-add" onclick="abrirModalConvite()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Convidar Usuário
+        </button>
       </div>
-      <div class="table-card">
-        <table>
+      <div class="lic-table-wrap">
+        <table class="lic-table">
           <thead>
-            <tr><th>Nome</th><th>Email</th><th>Perfil</th><th>Status</th><th>Ações</th></tr>
+            <tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Ações</th></tr>
           </thead>
           <tbody id="tabelaUsuarios">
-            <tr><td colspan="5" class="empty">Carregando...</td></tr>
+            <tr><td colspan="5" class="tbl-vazio">Carregando...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- ===== ABA ASSINATURA ===== -->
+    <!-- ===== PLANOS (ASSINATURA) ===== -->
     <div id="tab-assinatura" style="display:none">
-      <div class="status-grid">
-        <div class="status-card">
-          <div class="status-card-label">Status</div>
-          <div class="status-card-valor" id="statusValor">—</div>
-          <div class="status-card-sub" id="statusSub"></div>
+      <div class="resumo-grid">
+        <div class="resumo-card">
+          <div class="resumo-card-lbl">Status da Licença</div>
+          <div class="resumo-card-val" id="statusValor">—</div>
+          <div class="resumo-card-sub" id="statusSub"></div>
         </div>
-        <div class="status-card">
-          <div class="status-card-label">Plano Atual</div>
-          <div class="status-card-valor" id="planoValor">—</div>
-          <div class="status-card-sub" id="planoSub"></div>
+        <div class="resumo-card">
+          <div class="resumo-card-lbl">Plano Atual</div>
+          <div class="resumo-card-val" id="planoValor">—</div>
+          <div class="resumo-card-sub" id="planoSub"></div>
         </div>
-        <div class="status-card">
-          <div class="status-card-label">Próximo Vencimento</div>
-          <div class="status-card-valor" id="vencimentoValor">—</div>
-          <div class="status-card-sub" id="vencimentoSub"></div>
-        </div>
-      </div>
-
-      <div id="faturaSection" style="display:none">
-        <div class="fatura-card">
-          <div class="fatura-header">
-            <span class="fatura-titulo">💳 Fatura Atual</span>
-            <span id="faturaStatusBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#fffaf0;color:#c05621">Pendente</span>
-          </div>
-          <div class="fatura-grid">
-            <div class="fatura-item"><label>Plano</label><span id="faturaPlano">—</span></div>
-            <div class="fatura-item"><label>Valor</label><span id="faturaValor">—</span></div>
-            <div class="fatura-item"><label>Vencimento</label><span id="faturaVencimento">—</span></div>
-          </div>
-          <div id="faturaAcoes"></div>
+        <div class="resumo-card">
+          <div class="resumo-card-lbl">Próximo Vencimento</div>
+          <div class="resumo-card-val" id="vencimentoValor">—</div>
+          <div class="resumo-card-sub" id="vencimentoSub"></div>
         </div>
       </div>
 
-      <div style="font-size:15px;font-weight:700;color:#1e2a4a;margin-bottom:14px">📦 Escolha seu Plano</div>
-      <div class="planos-grid" id="planosGrid"></div>
+      <div id="faturaSection" style="display:none"></div>
 
-      <div style="font-size:15px;font-weight:700;color:#1e2a4a;margin-bottom:14px;margin-top:8px">📋 Histórico de Faturas</div>
-      <div class="historico-card">
-        <table>
-          <thead><tr><th>Plano</th><th>Valor</th><th>Vencimento</th><th>Pago em</th></tr></thead>
+      <div class="sec-titulo">Histórico de Faturas</div>
+      <div class="lic-table-wrap">
+        <table class="lic-table">
+          <thead><tr><th>Plano</th><th>Valor</th><th>Vencimento</th><th>Pago em</th><th>Status</th></tr></thead>
           <tbody id="historicoBody">
-            <tr><td colspan="4" class="empty">Nenhuma fatura encontrada.</td></tr>
+            <tr><td colspan="5" class="tbl-vazio">Nenhuma fatura encontrada.</td></tr>
           </tbody>
         </table>
       </div>
+      <div class="hist-mais" id="historicoMais" style="display:none"></div>
+
+      <div class="sec-titulo" style="margin-top:28px">Altere seu Plano</div>
+      <div class="planos-grid" id="planosGrid"></div>
     </div>
   </div>
 </div>
 
 <!-- Modal Convidar -->
 <div class="modal-overlay" id="modalConvite">
-  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-corpo">
     <div class="modal-header">
       <span class="modal-titulo">Convidar Usuário</span>
-      <button class="btn-fechar" onclick="fecharModal('modalConvite')">×</button>
+      <button class="btn-fechar" onclick="fecharModal('modalConvite')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="conviteErro"></div>
-    <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="conviteSucesso"></div>
-    <div class="form-group"><label>Nome</label><input type="text" id="conviteNome" placeholder="Nome completo"></div>
-    <div class="form-group"><label>Email *</label><input type="email" id="conviteEmail" placeholder="email@empresa.com"></div>
-    <div class="form-group"><label>Perfil</label><select id="convitePerfil" onchange="onConvitePerfilChange()"><option>Usuário</option><option>Admin</option></select></div>
+    <div class="alerta alerta-erro" id="conviteErro"></div>
+    <div class="alerta alerta-ok" id="conviteSucesso"></div>
+    <div class="form-group"><label>Nome</label><input type="text" class="form-control" id="conviteNome" placeholder="Nome completo"></div>
+    <div class="form-group"><label>E-mail *</label><input type="email" class="form-control" id="conviteEmail" placeholder="email@empresa.com"></div>
+    <div class="form-group"><label>Perfil</label><select class="form-control" id="convitePerfil" onchange="onConvitePerfilChange()"><option>Usuário</option><option>Admin</option></select></div>
     <div id="permissoesConvite">
-      <div class="perm-titulo">Permissões por Módulo</div>
+      <div class="form-sec-titulo">Permissões por Módulo</div>
       <div id="permModulosConvite"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalConvite')">Cancelar</button>
-      <button class="btn-confirmar" id="btnEnviar" onclick="enviarConvite()">✓ Enviar Convite</button>
+      <button class="btn-confirmar" id="btnEnviar" onclick="enviarConvite()">Enviar Convite</button>
+    </div>
     </div>
   </div>
 </div>
 
 <!-- Modal Editar Usuário -->
 <div class="modal-overlay" id="modalEditar">
-  <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-corpo">
     <div class="modal-header">
       <span class="modal-titulo">Editar Usuário</span>
-      <button class="btn-fechar" onclick="fecharModal('modalEditar')">×</button>
+      <button class="btn-fechar" onclick="fecharModal('modalEditar')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="editarErro"></div>
-    <div style="background:#f0fff4;border:1px solid #9ae6b4;color:#276749;padding:10px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:none" id="editarSucesso"></div>
+    <div class="alerta alerta-erro" id="editarErro"></div>
+    <div class="alerta alerta-ok" id="editarSucesso"></div>
     <input type="hidden" id="editarId">
-    <div class="form-group"><label>Perfil</label><select id="editarPerfil" onchange="onEditarPerfilChange()"><option>Usuário</option><option>Admin</option></select></div>
-    <div class="form-group"><label>Status</label><select id="editarStatus"><option>Ativo</option><option>Pendente</option><option>Inativo</option></select></div>
+    <div class="form-group"><label>Perfil</label><select class="form-control" id="editarPerfil" onchange="onEditarPerfilChange()"><option>Usuário</option><option>Admin</option></select></div>
+    <div class="form-group"><label>Status</label><select class="form-control" id="editarStatus"><option>Ativo</option><option>Pendente</option><option>Inativo</option></select></div>
     <div id="permissoesEditar">
-      <div class="perm-titulo">Permissões por Módulo</div>
+      <div class="form-sec-titulo">Permissões por Módulo</div>
       <div id="editarPermModulos"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="fecharModal('modalEditar')">Cancelar</button>
       <button class="btn-confirmar" id="btnSalvar" onclick="salvarEdicao()">Salvar</button>
     </div>
+    </div>
   </div>
 </div>
 
-<!-- Modal de Pagamento Asaas -->
+<!-- Modal de Pagamento -->
 <div class="modal-overlay" id="modalPagamento">
-  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-corpo">
     <div class="modal-header">
-      <span class="modal-titulo">💳 Assinar Plano</span>
-      <button class="btn-fechar" onclick="fecharModal('modalPagamento')">×</button>
+      <span class="modal-titulo">Assinar Plano</span>
+      <button class="btn-fechar" onclick="fecharModal('modalPagamento')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="pag-modal-plano" id="pagModalPlanoNome">Plano Básico</div>
     <div class="pag-modal-valor" id="pagModalValor">R$ 49,00/mês</div>
@@ -304,49 +441,48 @@
     <!-- Seleção de forma de pagamento -->
     <div class="pag-secao" id="pagSecaoEscolha">
       <div class="pag-secao-titulo">Como você quer pagar?</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px">
+      <div class="pag-formas">
         <button class="pag-forma-btn" id="btnEscolhaPix" onclick="selecionarFormaPag('PIX')">
-          <div style="font-size:24px;margin-bottom:4px">📱</div>
-          <div style="font-size:13px;font-weight:700;color:#1e2a4a">PIX</div>
-          <div style="font-size:11px;color:#718096">Aprovação imediata</div>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.5l4.5 4.5-4.5 4.5L7.5 7z"/><path d="M12 12.5l4.5 4.5-4.5 4.5L7.5 17z"/><path d="M2.5 12L7 7.5M2.5 12L7 16.5M21.5 12L17 7.5M21.5 12L17 16.5"/></svg>
+          <span class="pag-forma-nome">PIX</span>
+          <span class="pag-forma-desc">Aprovação imediata</span>
         </button>
         <button class="pag-forma-btn" id="btnEscolhaBoleto" onclick="selecionarFormaPag('BOLETO')">
-          <div style="font-size:24px;margin-bottom:4px">🧾</div>
-          <div style="font-size:13px;font-weight:700;color:#1e2a4a">Boleto</div>
-          <div style="font-size:11px;color:#718096">Até 3 dias úteis</div>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>
+          <span class="pag-forma-nome">Boleto</span>
+          <span class="pag-forma-desc">Até 3 dias úteis</span>
         </button>
         <button class="pag-forma-btn" id="btnEscolhaCartao" onclick="selecionarFormaPag('CREDIT_CARD')">
-          <div style="font-size:24px;margin-bottom:4px">💳</div>
-          <div style="font-size:13px;font-weight:700;color:#1e2a4a">Cartão</div>
-          <div style="font-size:11px;color:#718096">Até 12x</div>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          <span class="pag-forma-nome">Cartão</span>
+          <span class="pag-forma-desc">Até 12x</span>
         </button>
       </div>
     </div>
 
-    <!-- Loading -->
-    <div id="pagLoading" style="display:none;text-align:center;padding:32px">
-      <div style="font-size:32px;margin-bottom:12px">⏳</div>
-      <div style="font-size:14px;font-weight:600;color:#1e2a4a">Gerando cobrança...</div>
-      <div style="font-size:12px;color:#718096;margin-top:4px">Aguarde, estamos processando via Asaas</div>
+    <!-- Carregando -->
+    <div id="pagLoading" class="pag-carregando" style="display:none">
+      <div class="spinner"></div>
+      <div class="pag-carregando-titulo">Gerando cobrança...</div>
+      <div class="pag-carregando-sub">Aguarde, estamos processando o pagamento</div>
     </div>
 
     <!-- Resultado PIX -->
     <div id="pagResultadoPix" style="display:none">
       <div class="pag-secao">
-        <div class="pag-secao-titulo">📱 Pagamento via PIX</div>
-        <div style="display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start">
-          <!-- QR Code -->
-          <div style="text-align:center;flex-shrink:0">
-            <div id="pagPixQrCode" style="width:140px;height:140px;background:#f8fafc;border-radius:10px;border:1.5px solid #e2e8f0;display:flex;align-items:center;justify-content:center;overflow:hidden">
-              <span style="font-size:11px;color:#a0aec0;text-align:center;padding:8px">⏳ Gerando QR Code...</span>
-            </div>
-            <div style="font-size:10px;color:#718096;margin-top:6px">Escaneie com o app do banco</div>
-          </div>
-          <!-- Copia e Cola -->
+        <div class="pag-secao-titulo">Pagamento via PIX</div>
+        <div class="pag-pix-grid">
           <div>
-            <div style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;margin-bottom:6px">Ou use o Pix Copia e Cola:</div>
-            <div id="pagPixCopiaCola" style="font-size:10px;word-break:break-all;background:white;padding:8px;border-radius:5px;border:1px solid #e2e8f0;font-family:monospace;margin-bottom:8px;min-height:48px;line-height:1.5"></div>
-            <button class="btn-copiar" onclick="copiarPixCopiaECola()">📋 Copiar código PIX</button>
+            <div class="qr-box" id="pagPixQrCode"></div>
+            <div class="qr-legenda">Escaneie com o app do banco</div>
+          </div>
+          <div>
+            <div class="pag-cola-label">Ou use o PIX Copia e Cola</div>
+            <div class="pag-cola-code" id="pagPixCopiaCola"></div>
+            <button class="btn-lic btn-lic-outline" onclick="copiarPixCopiaECola()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copiar código PIX
+            </button>
           </div>
         </div>
       </div>
@@ -354,26 +490,33 @@
         <div class="pag-secao-titulo">Como pagar</div>
         <div class="pag-instrucoes">
           <div class="pag-instrucao-item"><div class="pag-instrucao-num">1</div><span>Abra o app do seu banco</span></div>
-          <div class="pag-instrucao-item"><div class="pag-instrucao-num">2</div><span>Escaneie o <strong>QR Code</strong> ou use <strong>PIX Copia e Cola</strong></span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">2</div><span>Escaneie o <strong>QR Code</strong> ou use o <strong>PIX Copia e Cola</strong></span></div>
           <div class="pag-instrucao-item"><div class="pag-instrucao-num">3</div><span>Confirme o pagamento</span></div>
-          <div class="pag-instrucao-item"><div class="pag-instrucao-num">4</div><span>Seu plano será ativado <strong>automaticamente</strong>! ✅</span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">4</div><span>Seu plano será ativado <strong>automaticamente</strong></span></div>
         </div>
       </div>
-      <div style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:7px;padding:10px 12px;font-size:12px;color:#276749;margin-top:8px">
-        ✅ <strong>Ativação automática!</strong> Assim que confirmado pelo Asaas, seu plano é ativado instantaneamente.
+      <div class="nota nota-ok">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>
+        <span><strong>Ativação automática.</strong> Assim que o pagamento for confirmado, seu plano é ativado na hora.</span>
       </div>
-      <div id="pagStatusPix" style="text-align:center;padding:8px;font-size:12px;color:#718096;margin-top:4px"></div>
+      <div class="pag-status" id="pagStatusPix"></div>
     </div>
 
     <!-- Resultado Boleto -->
     <div id="pagResultadoBoleto" style="display:none">
       <div class="pag-secao">
-        <div class="pag-secao-titulo">🧾 Boleto Bancário</div>
-        <div style="background:#f8fafc;border-radius:8px;padding:14px;border:1.5px solid #e2e8f0">
-          <div id="pagBoletoLinha" style="font-size:11px;color:#4a5568;word-break:break-all;font-family:monospace;margin-bottom:10px;background:white;padding:8px;border-radius:4px;border:1px solid #e2e8f0"></div>
+        <div class="pag-secao-titulo">Boleto Bancário</div>
+        <div class="pag-boleto-box">
+          <div class="pag-boleto-linha" id="pagBoletoLinha"></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn-copiar" onclick="copiarLinhaDigitavel()">📋 Copiar linha digitável</button>
-            <a id="pagBoletoUrl" href="#" target="_blank" class="btn-boleto">🔗 Abrir boleto</a>
+            <button class="btn-lic btn-lic-outline" onclick="copiarLinhaDigitavel()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copiar linha digitável
+            </button>
+            <a id="pagBoletoUrl" href="#" target="_blank" class="btn-lic btn-lic-outline">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Abrir boleto
+            </a>
           </div>
         </div>
       </div>
@@ -383,73 +526,52 @@
           <div class="pag-instrucao-item"><div class="pag-instrucao-num">1</div><span>Clique em <strong>"Abrir boleto"</strong> ou copie a linha digitável</span></div>
           <div class="pag-instrucao-item"><div class="pag-instrucao-num">2</div><span>Pague no seu banco, lotérica ou app bancário</span></div>
           <div class="pag-instrucao-item"><div class="pag-instrucao-num">3</div><span>O vencimento é em <strong>1 dia útil</strong></span></div>
-          <div class="pag-instrucao-item"><div class="pag-instrucao-num">4</div><span>Após compensação, seu plano é ativado automaticamente ✅</span></div>
+          <div class="pag-instrucao-item"><div class="pag-instrucao-num">4</div><span>Após a compensação, seu plano é ativado automaticamente</span></div>
         </div>
       </div>
-      <div class="pag-aviso">⚠️ <span>Boletos levam até <strong>3 dias úteis</strong> para compensar. Após a compensação, o plano é ativado automaticamente.</span></div>
+      <div class="alerta alerta-aviso" style="display:flex">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Boletos levam até <strong>3 dias úteis</strong> para compensar. Depois da compensação, o plano é ativado automaticamente.</span>
+      </div>
     </div>
 
     <!-- Resultado Cartão -->
     <div id="pagResultadoCartao" style="display:none">
       <div class="pag-secao">
-        <div class="pag-secao-titulo">💳 Dados do Cartão</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div class="form-group" style="margin:0">
-            <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Nome no Cartão *</label>
-            <input type="text" id="ccNome" placeholder="Nome igual ao cartão" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box" oninput="this.value=this.value.toUpperCase()">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Número do Cartão *</label>
-            <input type="text" id="ccNumero" placeholder="0000 0000 0000 0000" maxlength="19" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;font-family:monospace" oninput="mascaraCartao(this)">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-            <div class="form-group" style="margin:0">
-              <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Mês *</label>
-              <input type="text" id="ccMes" placeholder="MM" maxlength="2" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;text-align:center" oninput="this.value=this.value.replace(/\D/g,'')">
-            </div>
-            <div class="form-group" style="margin:0">
-              <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Ano *</label>
-              <input type="text" id="ccAno" placeholder="AAAA" maxlength="4" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;text-align:center" oninput="this.value=this.value.replace(/\D/g,'')">
-            </div>
-            <div class="form-group" style="margin:0">
-              <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">CVV *</label>
-              <input type="text" id="ccCvv" placeholder="000" maxlength="4" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;text-align:center;font-family:monospace" oninput="this.value=this.value.replace(/\D/g,'')">
-            </div>
-          </div>
-          <div class="form-group" style="margin:0">
-            <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">CPF/CNPJ do Titular *</label>
-            <input type="text" id="ccCpfCnpj" placeholder="000.000.000-00" maxlength="18" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box" oninput="mascaraCpfCnpj(this)">
-          </div>
-          <div class="form-group" style="margin:0">
-            <label style="font-size:11px;font-weight:700;color:#a0aec0;text-transform:uppercase;display:block;margin-bottom:4px">Parcelamento</label>
-            <select id="ccParcelas" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;box-sizing:border-box;background:white">
-              <option value="1">1x sem juros</option>
-              <option value="2">2x sem juros</option>
-              <option value="3">3x sem juros</option>
-              <option value="4">4x sem juros</option>
-              <option value="5">5x sem juros</option>
-              <option value="6">6x sem juros</option>
-              <option value="7">7x sem juros</option>
-              <option value="8">8x sem juros</option>
-              <option value="9">9x sem juros</option>
-              <option value="10">10x sem juros</option>
-              <option value="11">11x sem juros</option>
-              <option value="12">12x sem juros</option>
-            </select>
-          </div>
+        <div class="pag-secao-titulo">Dados do Cartão</div>
+        <div class="form-group"><label>Nome no Cartão *</label><input type="text" class="form-control" id="ccNome" placeholder="Nome igual ao cartão" oninput="this.value=this.value.toUpperCase()"></div>
+        <div class="form-group"><label>Número do Cartão *</label><input type="text" class="form-control" id="ccNumero" placeholder="0000 0000 0000 0000" maxlength="19" oninput="mascaraCartao(this)"></div>
+        <div class="grid-3">
+          <div class="form-group"><label>Mês *</label><input type="text" class="form-control" id="ccMes" placeholder="MM" maxlength="2" style="text-align:center" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+          <div class="form-group"><label>Ano *</label><input type="text" class="form-control" id="ccAno" placeholder="AAAA" maxlength="4" style="text-align:center" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+          <div class="form-group"><label>CVV *</label><input type="text" class="form-control" id="ccCvv" placeholder="000" maxlength="4" style="text-align:center" oninput="this.value=this.value.replace(/\D/g,'')"></div>
         </div>
-        <div style="background:#f5f0ff;border-radius:7px;padding:10px 12px;font-size:11px;color:#4a5568;margin-top:10px;display:flex;gap:6px;align-items:center">
-          🔒 <span>Seus dados são transmitidos com criptografia SSL diretamente para o Asaas. O HOC System não armazena dados do cartão.</span>
+        <div class="form-group"><label>CPF/CNPJ do Titular *</label><input type="text" class="form-control" id="ccCpfCnpj" placeholder="000.000.000-00" maxlength="18" oninput="mascaraCpfCnpj(this)"></div>
+        <div class="form-group">
+          <label>Parcelamento</label>
+          <select class="form-control" id="ccParcelas">
+            <option value="1">1x sem juros</option><option value="2">2x sem juros</option><option value="3">3x sem juros</option><option value="4">4x sem juros</option>
+            <option value="5">5x sem juros</option><option value="6">6x sem juros</option><option value="7">7x sem juros</option><option value="8">8x sem juros</option>
+            <option value="9">9x sem juros</option><option value="10">10x sem juros</option><option value="11">11x sem juros</option><option value="12">12x sem juros</option>
+          </select>
         </div>
-        <button class="btn-confirmar" onclick="enviarPagamentoCartao()" id="btnPagarCartao" style="width:100%;margin-top:12px;padding:12px">💳 Pagar agora</button>
+        <div class="nota">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span>Seus dados são transmitidos com criptografia SSL diretamente para o processador de pagamento. O HOC System não armazena dados do cartão.</span>
+        </div>
+        <button class="btn-confirmar" onclick="enviarPagamentoCartao()" id="btnPagarCartao" style="width:100%;margin-top:14px;padding:12px">Pagar agora</button>
       </div>
     </div>
 
-    <div style="background:#fff5f5;border:1px solid #feb2b2;color:#c53030;padding:10px 12px;border-radius:6px;font-size:12px;margin-top:12px;display:none" id="pagErro"></div>
+    <div class="alerta alerta-erro" id="pagErro" style="margin-top:12px"></div>
 
     <div class="modal-footer" style="margin-top:16px">
       <button class="btn-cancelar" onclick="fecharModal('modalPagamento')">Fechar</button>
-      <button class="btn-secondary" id="btnVoltarEscolha" style="display:none" onclick="voltarEscolhaPagamento()">← Mudar forma</button>
+      <button class="btn-lic btn-lic-outline" id="btnVoltarEscolha" style="display:none" onclick="voltarEscolhaPagamento()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Mudar forma
+      </button>
+    </div>
     </div>
   </div>
 </div>
@@ -457,13 +579,13 @@
 <!-- Overlay de bloqueio -->
 <div class="bloqueio-overlay" id="bloqueioOverlay">
   <div class="bloqueio-card">
-    <button class="bloqueio-fechar" onclick="fecharOverlayInadimplente()" title="Fechar e ir para Assinatura">×</button>
-    <div class="bloqueio-icone">🔒</div>
+    <button class="bloqueio-fechar" onclick="fecharOverlayInadimplente()" title="Fechar e ir para Planos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <div class="bloqueio-icone"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
     <div class="bloqueio-titulo">Acesso suspenso</div>
     <div class="bloqueio-subtitulo">Sua fatura está em atraso. Regularize para continuar usando o HOC System.</div>
     <div class="bloqueio-dias" id="bloqueioDias"></div>
     <div class="bloqueio-acoes" id="bloqueioAcoes"></div>
-    <div class="bloqueio-aviso-parcial">Ao fechar, apenas a aba <strong>Assinatura</strong> permanece disponível.<br>As demais funções ficam bloqueadas até a regularização.</div>
+    <div class="bloqueio-aviso-parcial">Ao fechar, apenas a página de <strong>Planos</strong> permanece disponível.<br>As demais funções ficam bloqueadas até a regularização.</div>
   </div>
 </div>
 
@@ -476,19 +598,122 @@
   document.getElementById('userAvatar').textContent = (usuario.nome || '?')[0].toUpperCase();
 
   const HEADERS = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
-  // Detectar tab pela URL e isolar conteúdo conforme entrada
+  // ===== TEMA: sidebar recolhida + cor de destaque =====
+  const CORES_SISTEMA = [
+    { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
+    { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
+    { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
+    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
+  ];
+  function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
+  function setAccentColor(hex) {
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+    if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
+  }
+  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+
+  const sidebarEl = document.getElementById('sidebarEl');
+  function aplicarSidebarRecolhida(recolhida) {
+    sidebarEl.classList.toggle('recolhida', recolhida);
+    document.getElementById('iconRecolher').innerHTML = recolhida
+      ? '<polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>'
+      : '<polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>';
+    const lbl = document.getElementById('lblRecolher');
+    if (lbl) lbl.textContent = recolhida ? 'Expandir' : 'Recolher';
+  }
+  function toggleSidebarRecolhida() {
+    const recolhida = !sidebarEl.classList.contains('recolhida');
+    localStorage.setItem('sidebarRecolhida', recolhida ? '1' : '0');
+    aplicarSidebarRecolhida(recolhida);
+  }
+  aplicarSidebarRecolhida(localStorage.getItem('sidebarRecolhida') === '1');
+
+  const SISTEMA_ITEMS_HTML = document.getElementById('sistemaItemsWrap').innerHTML;
+  function mostrarCorSistemaNoMenu() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = 'cor';
+    const atual = (localStorage.getItem('accentColor') || '#2F5CFF').toLowerCase();
+    wrap.innerHTML = `
+      <button class="color-picker-back" onclick="voltarMenuSistema()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Cor do Sistema
+      </button>
+      ${CORES_SISTEMA.map(c => `
+        <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
+          <span class="color-swatch-rect" style="background:${c.hex}"></span>
+          <span class="color-swatch-label">${c.nome}</span>
+        </button>`).join('')}
+      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+  }
+  function voltarMenuSistema() {
+    const wrap = document.getElementById('sistemaItemsWrap');
+    wrap.dataset.modo = '';
+    wrap.innerHTML = SISTEMA_ITEMS_HTML;
+    marcarMenuSistemaAtivo();
+  }
+  document.getElementById('sistemaMenu').addEventListener('toggle', (e) => { if (!e.target.open) voltarMenuSistema(); });
+
+  // ===== AVISOS (substitui alert/confirm do navegador) =====
+  function hocToast(msg, tipo = 'info', duracao = 3500) {
+    const cores = { info: 'var(--accent)', ok: '#00754F', erro: '#B3123A', aviso: '#8A5D00' };
+    const t = document.createElement('div');
+    t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;background:${cores[tipo]||cores.info};color:white;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.25);max-width:340px;line-height:1.4;transition:opacity .3s`;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, duracao);
+  }
+  function hocConfirm(msg, onSim) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(11,11,15,.45);z-index:8000;display:flex;align-items:center;justify-content:center';
+    overlay.innerHTML = `<div style="background:white;border-radius:16px;padding:24px 28px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(11,11,15,.18);border:1px solid #ECEDF0">
+      <div style="font-size:14px;font-weight:700;color:#0B0B0F;margin-bottom:20px;line-height:1.5">${msg}</div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button id="_hcNo" class="btn-cancelar" style="flex:none;padding:0 18px;height:38px">Cancelar</button>
+        <button id="_hcYes" class="btn-confirmar" style="flex:none;padding:0 18px;height:38px">Confirmar</button>
+      </div>
+    </div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#_hcNo').onclick  = () => overlay.remove();
+    overlay.querySelector('#_hcYes').onclick = () => { overlay.remove(); onSim(); };
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+  }
+
+  // Tag de status: o texto fica num span próprio (a centralização vertical é ajustada por padding no CSS, igual em qualquer navegador)
+  const tagStatus = (texto, cor) => `<span class="status-badge ${cor}"><span class="tag-txt">${texto}</span></span>`;
+
+  // ===== ÍCONES =====
+  const ICON_EDITAR  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+  const ICON_EXCLUIR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg>';
+  const ICON_CHECK   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const ICON_RELOGIO = '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFAE00" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>';
+  const ICON_COPIAR  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+  const ICON_BOLETO  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  const ICON_CARTAO  = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+  const ICON_ALERTA  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+  // ===== VISÕES (Usuários e Permissões / Planos) =====
+  function marcarMenuSistemaAtivo() {
+    const isAssinatura = document.getElementById('tab-assinatura').style.display !== 'none';
+    const p = document.getElementById('sidebarPlanos'), u = document.getElementById('sidebarUsuarios');
+    if (p) p.classList.toggle('active', isAssinatura);
+    if (u) u.classList.toggle('active', !isAssinatura);
+  }
+  function mostrarVisao(id) {
+    document.getElementById('tab-usuarios').style.display = id === 'usuarios' ? 'block' : 'none';
+    document.getElementById('tab-assinatura').style.display = id === 'assinatura' ? 'block' : 'none';
+    marcarMenuSistemaAtivo();
+    if (id === 'assinatura') carregarAssinatura();
+  }
   function aplicarTabURL() {
     const tab = new URLSearchParams(window.location.search).get('tab');
-    const isAssinatura = tab === 'assinatura';
-    document.getElementById('sidebarPlanos').classList.toggle('active', isAssinatura);
-    document.getElementById('sidebarUsuarios').classList.toggle('active', !isAssinatura);
-    if (isAssinatura) {
-      document.getElementById('tab-usuarios').style.display = 'none';
-      document.getElementById('tab-assinatura').style.display = 'block';
-      carregarAssinatura();
-    }
+    mostrarVisao(tab === 'assinatura' ? 'assinatura' : 'usuarios');
   }
+  marcarMenuSistemaAtivo();
 
   // Checa a permissão de verdade no servidor (não só o `perfil` em cache no localStorage) —
   // quem tem editarUsuarios/convidarUsuarios sem ser Admin também deve conseguir entrar aqui.
@@ -505,7 +730,7 @@
       }
     } catch(e) {}
     if (!temAcesso) {
-      document.getElementById('conteudo').innerHTML = `<div class="acesso-negado"><h2>🔒 Acesso Restrito</h2><p>Você não tem permissão para acessar esta página.</p></div>`;
+      document.getElementById('conteudo').innerHTML = `<div class="acesso-negado"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><h2>Acesso Restrito</h2><p>Você não tem permissão para acessar esta página.</p></div>`;
       return;
     }
     const btnConvidar = document.querySelector('button[onclick="abrirModalConvite()"]');
@@ -514,24 +739,15 @@
     aplicarTabURL();
   })();
 
-  // ===== TABS =====
-  function mudarTab(id, btn) {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-usuarios').style.display = id === 'usuarios' ? 'block' : 'none';
-    document.getElementById('tab-assinatura').style.display = id === 'assinatura' ? 'block' : 'none';
-    if (id === 'assinatura') carregarAssinatura();
-  }
-
   // ===== DEFINIÇÃO DOS MÓDULOS =====
   const MODULOS = [
-    { id: 'overview',       nome: '🏠 Nivelamento de Conhecimento', acoes: ['acessar', 'editar', 'aprovar'] },
-    { id: 'gestaoMetas',    nome: '🎯 Gestão de Metas e Resultados', acoes: ['acessar', 'editar'] },
-    { id: 'operacoes',      nome: '⚙️ Operações',                    acoes: ['acessar'] },
-    { id: 'ideiasLivres',   nome: '💡 Ideias Livres',               acoes: ['acessar', 'aprovar'] },
-    { id: 'gestaoProjetos', nome: '📁 Gestão de Projetos',           acoes: ['acessar', 'aprovarCriacao', 'aprovarExecucao'] },
-    { id: 'gestaoLicencas', nome: '📋 Gestão de Licenças',           acoes: ['acessar', 'editar'] },
-    { id: 'planoUsuarios',  nome: '👥 Usuários e Permissões',        acoes: ['acessar', 'editarUsuarios', 'convidarUsuarios'] },
+    { id: 'overview',       nome: 'Nivelamento de Conhecimento',   acoes: ['acessar', 'editar', 'aprovar'] },
+    { id: 'gestaoMetas',    nome: 'Gestão de Metas e Resultados',  acoes: ['acessar', 'editar'] },
+    { id: 'operacoes',      nome: 'Operações',                     acoes: ['acessar'] },
+    { id: 'ideiasLivres',   nome: 'Ideias Livres',                 acoes: ['acessar', 'aprovar'] },
+    { id: 'gestaoProjetos', nome: 'Gestão de Projetos',            acoes: ['acessar', 'aprovarCriacao', 'aprovarExecucao'] },
+    { id: 'gestaoLicencas', nome: 'Gestão de Licenças',            acoes: ['acessar', 'editar'] },
+    { id: 'planoUsuarios',  nome: 'Usuários e Permissões',         acoes: ['acessar', 'editarUsuarios', 'convidarUsuarios'] },
   ];
 
   const LABELS_ACAO = { acessar: 'Acessar', editar: 'Editar', aprovar: 'Aprovar', editarUsuarios: 'Editar/Remover Usuários', convidarUsuarios: 'Convidar Usuários', aprovarCriacao: 'Aprovar Criação de Projetos (inclui publicar o próprio projeto direto, sem fila)', aprovarExecucao: 'Aprovar Execução (TAP, Cronograma, Escopo, Mudanças, Encerramento)' };
@@ -619,29 +835,30 @@
   };
 
   // ===== USUÁRIOS =====
+  const STATUS_USUARIO_COR = { ativo: 'st-verde', pendente: 'st-amarelo', inativo: 'st-cinza' };
+  let _usuarios = [];
   async function carregarUsuarios() {
     try {
       const res = await fetch('/api/usuarios', { headers: HEADERS });
       if (res.status === 401) { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; return; }
       const usuarios = await res.json();
+      _usuarios = usuarios;
       const tbody = document.getElementById('tabelaUsuarios');
       if (!usuarios.length) {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty">Nenhum usuário cadastrado ainda.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="tbl-vazio">Nenhum usuário cadastrado ainda.</td></tr>';
         return;
       }
       tbody.innerHTML = usuarios.map(u => {
-        const permStr = encodeURIComponent(JSON.stringify(u.permissoes || {}));
+        const podeAgir = !u.usuarioMestre && _podeEditarUsuarios;
         return `<tr>
-          <td><strong>${u.nome}</strong>${u.usuarioMestre ? ' <span class="badge dono" title="Dono original da empresa: não pode ser alterado ou removido">🔒 Dono</span>' : ''}</td>
-          <td>${u.email}</td>
-          <td>${u.perfil}</td>
-          <td><span class="badge ${u.status.toLowerCase()}">${u.status}</span></td>
-          <td>
-            ${u.usuarioMestre || !_podeEditarUsuarios ? '' : `
-            <button class="btn-acao btn-editar" onclick="abrirModalEditar('${u._id}','${u.nome}','${u.perfil}','${u.status}','${permStr}')">✏️ Editar</button>
-            <button class="btn-acao btn-deletar" onclick="deletarUsuario('${u._id}','${u.nome}')">Remover</button>
-            `}
-          </td>
+          <td class="col-nome">${esc(u.nome)}${u.usuarioMestre ? '<span class="tag-dono" title="Dono original da empresa: não pode ser alterado ou removido">Dono</span>' : ''}</td>
+          <td>${esc(u.email)}</td>
+          <td>${esc(u.perfil)}</td>
+          <td>${tagStatus(esc(u.status), STATUS_USUARIO_COR[String(u.status).toLowerCase()] || 'st-cinza')}</td>
+          <td>${podeAgir ? `<span class="acoes-linha">
+            <button class="btn-acao btn-acao-edit" title="Editar" onclick="abrirModalEditar('${esc(u._id)}')">${ICON_EDITAR}</button>
+            <button class="btn-acao btn-acao-del" title="Remover" onclick="deletarUsuario('${esc(u._id)}')">${ICON_EXCLUIR}</button>
+          </span>` : ''}</td>
         </tr>`;
       }).join('');
     } catch(err) { console.error(err); }
@@ -668,16 +885,17 @@
     document.getElementById('modalConvite').classList.add('aberto');
   }
 
-  function abrirModalEditar(id, nome, perfil, status, permEnc) {
-    let permissoes = {};
-    try { permissoes = JSON.parse(decodeURIComponent(permEnc)); } catch(e) {}
+  function abrirModalEditar(id) {
+    const u = _usuarios.find(x => x._id === id);
+    if (!u) return;
+    const permissoes = u.permissoes || {};
     document.getElementById('editarId').value = id;
-    document.getElementById('editarPerfil').value = perfil === 'Gerente' ? 'Usuário' : perfil;
-    document.getElementById('editarStatus').value = status;
+    document.getElementById('editarPerfil').value = u.perfil === 'Gerente' ? 'Usuário' : u.perfil;
+    document.getElementById('editarStatus').value = u.status;
     document.getElementById('editarErro').style.display = 'none';
     document.getElementById('editarSucesso').style.display = 'none';
     renderPermModulos('editarPermModulos', permissoes, 'edit');
-    setPermissoesEditar(perfil === 'Admin');
+    setPermissoesEditar(u.perfil === 'Admin');
     document.getElementById('modalEditar').classList.add('aberto');
   }
 
@@ -705,7 +923,7 @@
     const erro = document.getElementById('conviteErro');
     const sucesso = document.getElementById('conviteSucesso');
     erro.style.display = 'none'; sucesso.style.display = 'none';
-    if (!email) { erro.textContent = 'Email é obrigatório.'; erro.style.display = 'block'; return; }
+    if (!email) { erro.textContent = 'E-mail é obrigatório.'; erro.style.display = 'block'; return; }
     const permissoes = lerPermModulos('conv');
     btn.disabled = true; btn.textContent = 'Enviando...';
     try {
@@ -719,7 +937,7 @@
       sucesso.style.display = 'block';
       setTimeout(() => { fecharModal('modalConvite'); carregarUsuarios(); }, 2000);
     } catch(err) { erro.textContent = 'Erro de conexão.'; erro.style.display = 'block'; }
-    finally { btn.disabled = false; btn.textContent = '✓ Enviar Convite'; }
+    finally { btn.disabled = false; btn.textContent = 'Enviar Convite'; }
   }
 
   async function salvarEdicao() {
@@ -745,13 +963,16 @@
     finally { btn.disabled = false; btn.textContent = 'Salvar'; }
   }
 
-  async function deletarUsuario(id, nome) {
-    if (!confirm(`Deletar "${nome}"?`)) return;
-    try {
-      const res = await fetch(`/api/usuarios/${id}`, { method: 'DELETE', headers: HEADERS });
-      if (!res.ok) { alert('Erro ao deletar.'); return; }
-      carregarUsuarios();
-    } catch(err) { alert('Erro de conexão.'); }
+  function deletarUsuario(id) {
+    const u = _usuarios.find(x => x._id === id);
+    hocConfirm(`Remover o usuário "${esc(u ? u.nome : '')}"?`, async () => {
+      try {
+        const res = await fetch(`/api/usuarios/${id}`, { method: 'DELETE', headers: HEADERS });
+        if (!res.ok) { hocToast('Erro ao remover o usuário.', 'erro'); return; }
+        hocToast('Usuário removido.', 'ok');
+        carregarUsuarios();
+      } catch(err) { hocToast('Erro de conexão.', 'erro'); }
+    });
   }
 
   // ===== ASSINATURA =====
@@ -763,7 +984,6 @@
   ];
 
   const NOME_PLANO  = { basico:'Básico', intermediario:'Intermediário', avancado:'Avançado', enterprise:'Enterprise' };
-  const PRECO_PLANO = { basico:'R$ 49/mês', intermediario:'R$ 149/mês', avancado:'R$ 349/mês', enterprise:'Sob consulta' };
   const VALOR_PLANO = { basico:'R$ 49,00', intermediario:'R$ 149,00', avancado:'R$ 349,00', enterprise:'Sob consulta' };
 
   let assinaturaAtual = null;
@@ -784,17 +1004,17 @@
     if (!assinaturaAtual) return;
     const { status, plano, vencimento, trialFim, diasTrialRestantes, diasAtraso } = assinaturaAtual;
     const statusLabel = { trial:'Período de Teste', ativa:'Ativa', inadimplente:'Inadimplente', cancelada:'Cancelada', aguardando_confirmacao:'Aguardando Confirmação' };
-    const statusPill  = { trial:'pill-trial', ativa:'pill-ativa', inadimplente:'pill-inadimplente', cancelada:'pill-trial', aguardando_confirmacao:'pill-trial' };
-    document.getElementById('statusValor').innerHTML = `<span class="status-pill ${statusPill[status]||'pill-trial'}">${statusLabel[status]||status}</span>`;
+    const statusCor   = { trial:'st-azul', ativa:'st-verde', inadimplente:'st-vermelho', cancelada:'st-cinza', aguardando_confirmacao:'st-amarelo' };
+    document.getElementById('statusValor').innerHTML = tagStatus(esc(statusLabel[status]||status), statusCor[status]||'st-cinza');
     document.getElementById('statusSub').textContent =
       status === 'trial' ? `${diasTrialRestantes} dia(s) restante(s)` :
       status === 'inadimplente' ? `${diasAtraso} dia(s) em atraso` :
-      status === 'aguardando_confirmacao' ? `Plano ${NOME_PLANO[assinaturaAtual?.planoSolicitado]} solicitado` : '';
+      status === 'aguardando_confirmacao' ? `Plano ${NOME_PLANO[assinaturaAtual?.planoSolicitado] || ''} solicitado` : '';
     document.getElementById('planoValor').textContent = NOME_PLANO[plano] || '—';
-    document.getElementById('planoSub').textContent = PRECO_PLANO[plano] || '';
+    document.getElementById('planoSub').textContent = '';
     const dataFim = vencimento || trialFim;
     document.getElementById('vencimentoValor').textContent = dataFim ? new Date(dataFim).toLocaleDateString('pt-BR') : '—';
-    document.getElementById('vencimentoSub').textContent = status === 'trial' ? 'Fim do trial' : 'Próxima cobrança';
+    document.getElementById('vencimentoSub').textContent = status === 'trial' ? 'Fim do trial' : '';
   }
 
   function renderizarPlanos() {
@@ -805,24 +1025,20 @@
     grid.innerHTML = PLANOS.map(p => {
       const isAtivo = planoAtual === p.id && status === 'ativa';
       const cardClass = 'plano-card' + (p.popular ? ' popular' : '') + (isAtivo ? ' ativo' : '');
-      const badge = isAtivo ? '<div class="ativo-badge">✓ Plano Atual</div>' : p.popular ? '<div class="popular-badge">Mais Popular</div>' : '';
-      const btnClass = 'btn-plano ' + (isAtivo ? 'ativo-btn' :
-      (isAguardando && planoAtual === p.id) ? 'secundario' :
-      p.enterprise ? 'comercial' : p.popular ? 'primario' : 'secundario');
-      const btnTexto = isAtivo ? '✓ Plano Atual' :
-      (isAguardando && planoAtual === p.id) ? '⏳ Aguardando confirmação' :
-      p.enterprise ? 'Falar com Comercial' : 'Selecionar Plano';
-      const onclick = isAtivo ? '' :
-      isAguardando ? `onclick="alert('Pagamento em análise. Aguarde a confirmação do administrador.')"` :
-      p.enterprise ? `onclick="alert('Entre em contato: comercial@hoc.com.br')"` :
-      `onclick="abrirModalPagamento('${p.id}')"`;
+      const tag = isAtivo ? tagStatus('Atual','st-verde') : p.popular ? tagStatus('Mais Popular','st-azul') : '';
+      const aguardandoEste = isAguardando && planoAtual === p.id;
+      const btnClass = aguardandoEste ? 'btn-lic btn-lic-outline' : 'btn-lic btn-azul';
+      const btnTexto = aguardandoEste ? 'Aguardando confirmação' : p.enterprise ? 'Falar com Comercial' : 'Selecionar Plano';
+      const onclick = isAguardando ? `onclick="hocToast('Pagamento em análise. Aguarde a confirmação do administrador.', 'aviso', 5000)"` :
+        p.enterprise ? `onclick="hocToast('Entre em contato: comercial@hoc.com.br', 'info', 6000)"` :
+        `onclick="abrirModalPagamento('${p.id}')"`;
       return `<div class="${cardClass}">
-        ${badge}
+        <div class="plano-tag-linha">${tag}</div>
         <div class="plano-nome">${p.nome}</div>
         <div class="plano-preco ${p.enterprise?'enterprise':''}">${p.preco}<span>${p.periodo}</span></div>
         <div class="plano-divider"></div>
-        <ul class="plano-features">${p.features.map(f=>`<li>${f}</li>`).join('')}</ul>
-        <button class="${btnClass}" ${onclick} ${isAtivo?'disabled':''}>${btnTexto}</button>
+        <ul class="plano-features">${p.features.map(f=>`<li>${ICON_CHECK}${f}</li>`).join('')}</ul>
+        ${isAtivo ? '' : `<button class="${btnClass}" ${onclick}>${btnTexto}</button>`}
       </div>`;
     }).join('');
   }
@@ -830,7 +1046,6 @@
   function renderizarFatura() {
     if (!assinaturaAtual) return;
     const { status, plano, planoSolicitado, solicitadoPor, solicitadoEm, vencimento, coraBoletoUrl, coraPixCopiaECola } = assinaturaAtual;
-    const isAdmin = usuario.perfil === 'Admin';
 
     // Card de aguardando confirmação
     const faturaSection = document.getElementById('faturaSection');
@@ -839,55 +1054,89 @@
       const nomePlanoSol = NOME_PLANO[planoSolicitado] || planoSolicitado;
       const valorPlanoSol = VALOR_PLANO[planoSolicitado] || '—';
       const dataHora = solicitadoEm ? new Date(solicitadoEm).toLocaleString('pt-BR') : '—';
-      document.getElementById('faturaSection').innerHTML = `
+      faturaSection.innerHTML = `
         <div class="aguardando-card">
-          <div class="aguardando-icone">⏳</div>
+          ${ICON_RELOGIO}
           <div class="aguardando-titulo">Pagamento aguardando confirmação</div>
           <div class="aguardando-sub">
-            <strong>${solicitadoPor || 'Usuário'}</strong> solicitou o <strong>Plano ${nomePlanoSol} (${valorPlanoSol}/mês)</strong><br>
-            em ${dataHora}
+            <strong>${esc(solicitadoPor || 'Usuário')}</strong> solicitou o <strong>Plano ${esc(nomePlanoSol)} (${esc(valorPlanoSol)}/mês)</strong><br>
+            em ${esc(dataHora)}
           </div>
-          <p style="font-size:12px;color:#718096;margin-top:4px">Aguarde a confirmação do administrador. Você será notificado quando o acesso for liberado.</p>
+          <div class="aguardando-nota">Aguarde a confirmação do administrador. Você será notificado quando o acesso for liberado.</div>
         </div>`;
       return;
     }
 
-    if (status !== 'ativa' && status !== 'inadimplente') return;
+    if (status !== 'ativa' && status !== 'inadimplente') { faturaSection.style.display = 'none'; return; }
     faturaSection.style.display = 'block';
-    faturaSection.innerHTML = `
-      <div class="fatura-card">
-        <div class="fatura-header">
-          <span class="fatura-titulo">💳 Fatura Atual</span>
-          <span id="faturaStatusBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#fffaf0;color:#c05621">Pendente</span>
-        </div>
-        <div class="fatura-grid">
-          <div class="fatura-item"><label>Plano</label><span>${NOME_PLANO[plano] || plano}</span></div>
-          <div class="fatura-item"><label>Valor</label><span>${VALOR_PLANO[plano] || '—'}</span></div>
-          <div class="fatura-item"><label>Vencimento</label><span>${vencimento ? new Date(vencimento).toLocaleDateString('pt-BR') : '—'}</span></div>
-        </div>
-        <div id="faturaAcoes"></div>
-      </div>`;
-    const acoes = document.getElementById('faturaAcoes');
-    if (acoes) {
-      if (coraPixCopiaECola) {
-        acoes.innerHTML += `<div class="pix-box"><div class="pix-titulo">📱 PIX Copia e Cola</div><div class="pix-code">${coraPixCopiaECola}</div><button class="btn-copiar" onclick="copiarPix('${coraPixCopiaECola}')">📋 Copiar código</button></div>`;
-      }
-      if (coraBoletoUrl) {
-        acoes.innerHTML += `<a href="${coraBoletoUrl}" target="_blank" class="btn-boleto" style="margin-top:8px;display:inline-block">🧾 Abrir Boleto</a>`;
-      }
+
+    // Faturas em aberto: a fatura do ciclo só aparece quando chega o mês do vencimento
+    // (em setembro, a que vence em outubro ainda não é exibida). Atrasada = inadimplente ou vencimento já passado.
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const venc = vencimento ? new Date(vencimento) : null;
+    const mesChegou = venc && (venc.getFullYear() * 12 + venc.getMonth()) <= (hoje.getFullYear() * 12 + hoje.getMonth());
+    const abertas = [];
+    if (mesChegou) {
+      const atrasada = status === 'inadimplente' || venc < hoje;
+      abertas.push({ plano, valor: VALOR_PLANO[plano], venc, st: atrasada ? ['Atrasado','st-vermelho'] : ['Pendente','st-amarelo'] });
     }
+    faturaSection.innerHTML = `
+      <div class="sec-titulo">Faturas em Aberto</div>
+      <div class="lic-table-wrap fatura-tabela">
+        <table class="lic-table">
+          <thead><tr><th>Plano</th><th>Valor</th><th>Vencimento</th><th>Status</th></tr></thead>
+          <tbody>${abertas.length ? abertas.map(f => `<tr>
+            <td class="col-nome">${esc(NOME_PLANO[f.plano] || f.plano || '—')}</td>
+            <td>${esc(f.valor || '—')}</td>
+            <td>${f.venc.toLocaleDateString('pt-BR')}</td>
+            <td>${tagStatus(f.st[0], f.st[1])}</td>
+          </tr>`).join('') : '<tr><td colspan="4" class="tbl-vazio">Nenhuma fatura em aberto.</td></tr>'}</tbody>
+        </table>
+      </div>
+      <div class="acoes-fatura" id="faturaAcoes" style="margin-bottom:28px"></div>`;
+    const acoes = document.getElementById('faturaAcoes');
+    if (abertas.length && coraPixCopiaECola) {
+      acoes.innerHTML += `<button class="btn-lic btn-lic-outline" data-codigo="${esc(coraPixCopiaECola)}" onclick="copiarPix(this.dataset.codigo)">${ICON_COPIAR}Copiar PIX Copia e Cola</button>`;
+    }
+    if (abertas.length && coraBoletoUrl) {
+      acoes.innerHTML += `<a href="${esc(coraBoletoUrl)}" target="_blank" rel="noopener" class="btn-lic btn-lic-outline">${ICON_BOLETO}Abrir Boleto</a>`;
+    }
+    if (!acoes.children.length) { acoes.style.display = 'none'; faturaSection.querySelector('.fatura-tabela').style.marginBottom = '28px'; }
   }
 
+  const HIST_VISIVEIS = 2;
+  let _histExpandido = false;
+  function alternarHistorico() { _histExpandido = !_histExpandido; renderizarHistorico(); }
   function renderizarHistorico() {
-    if (!assinaturaAtual?.historicoFaturas?.length) return;
     const tbody = document.getElementById('historicoBody');
-    tbody.innerHTML = [...assinaturaAtual.historicoFaturas].reverse().map(f => `
+    const mais = document.getElementById('historicoMais');
+    const faturas = assinaturaAtual?.historicoFaturas || [];
+    if (!faturas.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="tbl-vazio">Nenhuma fatura encontrada.</td></tr>';
+      mais.style.display = 'none';
+      return;
+    }
+    const lista = [...faturas].reverse();
+    const exibidas = _histExpandido ? lista : lista.slice(0, HIST_VISIVEIS);
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const dataBR = d => new Date(d).toLocaleDateString('pt-BR');
+    tbody.innerHTML = exibidas.map(f => {
+      const atrasada = !f.pagoEm && f.vencimento && new Date(f.vencimento) < hoje;
+      const st = f.pagoEm ? ['Pago','st-verde'] : atrasada ? ['Atrasado','st-vermelho'] : ['Pendente','st-amarelo'];
+      return `
       <tr>
-        <td>${NOME_PLANO[f.plano] || f.plano || '—'}</td>
+        <td class="col-nome">${esc(NOME_PLANO[f.plano] || f.plano || '—')}</td>
         <td>${f.valor ? 'R$ ' + (f.valor/100).toFixed(2).replace('.',',') : '—'}</td>
-        <td>${f.vencimento ? new Date(f.vencimento).toLocaleDateString('pt-BR') : '—'}</td>
-        <td><span style="background:#f0fff4;color:#276749;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600">${f.pagoEm ? new Date(f.pagoEm).toLocaleDateString('pt-BR') : 'Pendente'}</span></td>
-      </tr>`).join('');
+        <td>${f.vencimento ? dataBR(f.vencimento) : '—'}</td>
+        <td>${f.pagoEm ? dataBR(f.pagoEm) : '—'}</td>
+        <td>${tagStatus(st[0], st[1])}</td>
+      </tr>`; }).join('');
+    if (lista.length > HIST_VISIVEIS) {
+      mais.style.display = 'flex';
+      mais.innerHTML = `<button class="btn-lic btn-lic-outline" onclick="alternarHistorico()">${_histExpandido ? 'Mostrar menos' : 'Ver todas as faturas'}</button>`;
+    } else {
+      mais.style.display = 'none';
+    }
   }
 
   // ===== CHECKOUT ASAAS =====
@@ -933,7 +1182,7 @@
     // Cartão: só mostrar formulário, sem chamar API ainda
     if (forma === 'CREDIT_CARD') {
       document.getElementById('pagResultadoCartao').style.display = 'block';
-      document.getElementById('btnVoltarEscolha').style.display = 'inline-block';
+      document.getElementById('btnVoltarEscolha').style.display = 'flex';
       // Limpar campos
       ['ccNome','ccNumero','ccMes','ccAno','ccCvv','ccCpfCnpj'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
       document.getElementById('ccParcelas').value = '1';
@@ -948,7 +1197,7 @@
       });
       const data = await res.json();
       document.getElementById('pagLoading').style.display = 'none';
-      document.getElementById('btnVoltarEscolha').style.display = 'inline-block';
+      document.getElementById('btnVoltarEscolha').style.display = 'flex';
       if (!res.ok) {
         document.getElementById('pagErro').textContent = data.erro || 'Erro ao gerar cobrança.';
         document.getElementById('pagErro').style.display = 'block';
@@ -970,11 +1219,6 @@
         linkBoleto.href = data.boletoUrl || '#';
         linkBoleto.style.opacity = data.boletoUrl ? '1' : '0.5';
         if (!data.boletoLinhaDigitavel) iniciarPollingBoleto();
-      } else if (forma === 'CREDIT_CARD') {
-        // Cartão: não chama /checkout ainda, mostra formulário
-        document.getElementById('pagResultadoCartao').style.display = 'block';
-        document.getElementById('btnVoltarEscolha').style.display = 'inline-block';
-        return; // Não continua para carregarAssinatura
       }
       await carregarAssinatura();
     } catch(err) {
@@ -987,7 +1231,7 @@
 
   function iniciarPollingPix() {
     let tentativas = 0;
-    document.getElementById('pagStatusPix').textContent = '⏳ Aguardando geração do PIX...';
+    document.getElementById('pagStatusPix').textContent = 'Aguardando geração do PIX...';
     _pollingInterval = setInterval(async () => {
       tentativas++;
       if (tentativas > 20) { clearInterval(_pollingInterval); document.getElementById('pagStatusPix').textContent = ''; return; }
@@ -997,7 +1241,7 @@
         if (data.pixCopiaECola) {
           document.getElementById('pagPixCopiaCola').textContent = data.pixCopiaECola;
           exibirQrCode(data.pixQrCodeBase64 || null);
-          document.getElementById('pagStatusPix').textContent = '✅ PIX gerado! Escaneie o QR Code ou copie o código.';
+          document.getElementById('pagStatusPix').textContent = 'PIX gerado. Escaneie o QR Code ou copie o código.';
           clearInterval(_pollingInterval);
           iniciarPollingConfirmacao();
         }
@@ -1015,7 +1259,7 @@
         const data = await res.json();
         if (data.status === 'RECEIVED' || data.status === 'CONFIRMED') {
           clearInterval(_pollingInterval);
-          document.getElementById('pagStatusPix').textContent = '🎉 Pagamento confirmado! Ativando plano...';
+          document.getElementById('pagStatusPix').textContent = 'Pagamento confirmado. Ativando plano...';
           setTimeout(async () => { fecharModal('modalPagamento'); await carregarAssinatura(); }, 2000);
         }
       } catch(e) {}
@@ -1049,18 +1293,18 @@
     if (base64) {
       container.innerHTML = `<img src="data:image/png;base64,${base64}" style="width:100%;height:100%;object-fit:contain;border-radius:8px" alt="QR Code PIX">`;
     } else {
-      container.innerHTML = '<span style="font-size:11px;color:#a0aec0;text-align:center;padding:8px">⏳ Gerando QR Code...</span>';
+      container.innerHTML = '<span style="font-size:11px;font-weight:600;color:#9CA0AC;text-align:center;padding:8px">Gerando QR Code...</span>';
     }
   }
 
   function copiarPixCopiaECola() {
     const codigo = document.getElementById('pagPixCopiaCola').textContent;
-    copiarPix(codigo);
+    copiarPix(codigo, 'Código PIX copiado.');
   }
 
   function copiarLinhaDigitavel() {
     const linha = document.getElementById('pagBoletoLinha').textContent;
-    copiarPix(linha);
+    copiarPix(linha, 'Linha digitável copiada.');
   }
 
   // ===== CARTÃO DE CRÉDITO =====
@@ -1108,7 +1352,7 @@
 
     const btn = document.getElementById('btnPagarCartao');
     btn.disabled = true;
-    btn.textContent = '⏳ Processando...';
+    btn.textContent = 'Processando...';
 
     try {
       const res = await fetch('/api/assinatura/checkout-cartao', {
@@ -1123,38 +1367,36 @@
       if (!res.ok) {
         erro.textContent = data.erro || 'Erro ao processar pagamento.';
         erro.style.display = 'block';
-        btn.disabled = false; btn.textContent = '💳 Pagar agora';
+        btn.disabled = false; btn.textContent = 'Pagar agora';
         return;
       }
       // Sucesso
       document.getElementById('pagResultadoCartao').innerHTML = `
-        <div style="text-align:center;padding:32px">
-          <div style="font-size:48px;margin-bottom:12px">🎉</div>
-          <div style="font-size:18px;font-weight:700;color:#276749;margin-bottom:8px">Pagamento aprovado!</div>
-          <div style="font-size:13px;color:#718096">Seu plano foi ativado com sucesso.</div>
+        <div class="pag-sucesso">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/></svg>
+          <div class="pag-sucesso-titulo">Pagamento aprovado</div>
+          <div class="pag-sucesso-sub">Seu plano foi ativado com sucesso.</div>
         </div>`;
       setTimeout(async () => { fecharModal('modalPagamento'); await carregarAssinatura(); }, 2500);
     } catch(err) {
       erro.textContent = 'Erro de conexão. Tente novamente.';
       erro.style.display = 'block';
-      btn.disabled = false; btn.textContent = '💳 Pagar agora';
+      btn.disabled = false; btn.textContent = 'Pagar agora';
     }
   }
 
-
-
-  function copiarPix(codigo) {
+  function copiarPix(codigo, msg = 'PIX copiado.') {
     navigator.clipboard.writeText(codigo)
-      .then(() => alert('PIX copiado!'))
+      .then(() => hocToast(msg, 'ok'))
       .catch(() => {
         const el = document.createElement('textarea');
         el.value = codigo; document.body.appendChild(el); el.select();
         document.execCommand('copy'); document.body.removeChild(el);
-        alert('PIX copiado!');
+        hocToast(msg, 'ok');
       });
   }
 
-  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); window.location.href = '/'; }
+  function sair() { localStorage.removeItem('token'); localStorage.removeItem('usuario'); sessionStorage.removeItem('bannerFechado'); window.location.href = '/'; }
 
   // ===== NOTIFICAÇÕES =====
   async function carregarNotificacoes() {
@@ -1186,16 +1428,29 @@
     }
   }
 
+  const NOTIF_ICON = {
+    sucesso: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 12.5 11 15.5 16 9"/>', color:'#00754F'},
+    erro: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+    aviso: {svg:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', color:'#8A6200'},
+    info: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>', color:'var(--accent)'},
+    licenca_vencendo: {svg:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>', color:'#8A6200'},
+    licenca_vencida: {svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', color:'#B3123A'},
+  };
+  function _notifIconHtml(tipo) {
+    const cfg = NOTIF_ICON[tipo] || NOTIF_ICON.info;
+    return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${cfg.color}" stroke-width="2">${cfg.svg}</svg>`;
+  }
+
   function renderNotificacoes(notifs) {
     const lista = document.getElementById('notifLista');
     if (!lista) return;
     if (!notifs || notifs.length === 0) {
-      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon">🔔</div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
+      lista.innerHTML = '<div class="notif-empty"><div class="notif-empty-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA0AC" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg></div><div class="notif-empty-txt">Nenhuma notificação.</div></div>';
       return;
     }
     lista.innerHTML = notifs.map(n => `
       <div class="notif-item ${!n.lida?'nao-lida':''} tipo-${n.tipo}" onclick="abrirNotif('${n._id}','${n.link||''}')">
-        <div class="notif-icone ${n.tipo}">${n.icone||'🔔'}</div>
+        <div class="notif-icone ${n.tipo}">${_notifIconHtml(n.tipo)}</div>
         <div class="notif-corpo">
           <div class="notif-titulo-item">${n.titulo}</div>
           <div class="notif-msg">${n.mensagem}</div>
@@ -1248,6 +1503,7 @@
     }
   });
 
+  // ===== BANNER / BLOQUEIO POR INADIMPLÊNCIA =====
   function verificarBloqueio(assinatura) {
     if (!assinatura) return;
     const overlay = document.getElementById('bloqueioOverlay');
@@ -1258,14 +1514,14 @@
         const expirando = assinatura.diasTrialRestantes <= 5;
         banner.className = `banner-assinatura ${expirando ? 'trial-expirando' : 'trial'}`;
         banner.innerHTML = `
-          <span>${expirando ? '⚠️' : '🎉'} Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
-          <button class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1])">Ver planos</button>`;
+          <span>Período de teste: <strong>${assinatura.diasTrialRestantes} dia(s) restante(s)</strong></span>
+          <button class="banner-assinatura-btn ${expirando ? 'trial-expirando' : 'trial'}" onclick="mostrarVisao('assinatura')">Ver planos</button>`;
         banner.style.display = 'flex';
       } else if (assinatura.status === 'inadimplente') {
         banner.className = 'banner-assinatura inadimplente';
         banner.innerHTML = `
-          <span>⚠️ Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
-          <button class="banner-assinatura-btn inadimplente" onclick="mudarTab('assinatura',document.querySelectorAll('.tab')[1])">Pagar agora</button>`;
+          <span>Fatura <strong>${assinatura.diasAtraso} dia(s) em atraso</strong>. Regularize agora.</span>
+          <button class="banner-assinatura-btn inadimplente" onclick="mostrarVisao('assinatura')">Pagar agora</button>`;
         banner.style.display = 'flex';
       } else { banner.style.display = 'none'; }
     }
@@ -1273,10 +1529,10 @@
       document.getElementById('bloqueioDias').textContent = `${assinatura.diasAtraso} dia(s) em atraso`;
       const acoes = document.getElementById('bloqueioAcoes');
       acoes.innerHTML = '';
-      if (assinatura.pixCopiaECola) acoes.innerHTML += `<button class="bloqueio-btn-pix" onclick="copiarPix('${assinatura.pixCopiaECola}')">📋 Copiar PIX Copia e Cola</button>`;
-      if (assinatura.boletoUrl) acoes.innerHTML += `<a href="${assinatura.boletoUrl}" target="_blank" class="bloqueio-btn-boleto">🧾 Abrir Boleto</a>`;
-      // Botão principal: fecha overlay e abre aba Assinatura
-      acoes.innerHTML += `<button class="bloqueio-btn-pix" style="margin-top:8px;width:100%" onclick="fecharOverlayInadimplente()">💳 Ver opções de pagamento</button>`;
+      if (assinatura.pixCopiaECola) acoes.innerHTML += `<button class="bloqueio-btn-pix" data-codigo="${esc(assinatura.pixCopiaECola)}" onclick="copiarPix(this.dataset.codigo)">Copiar PIX Copia e Cola</button>`;
+      if (assinatura.boletoUrl) acoes.innerHTML += `<a href="${esc(assinatura.boletoUrl)}" target="_blank" rel="noopener" class="bloqueio-btn-boleto">Abrir Boleto</a>`;
+      // Botão principal: fecha overlay e abre Planos
+      acoes.innerHTML += `<button class="bloqueio-btn-pix" onclick="fecharOverlayInadimplente()">Ver opções de pagamento</button>`;
       // Marcar sistema como inadimplente (para manter bloqueio após fechar overlay)
       window._sistemaInadimplente = true;
       overlay.classList.add('ativo');
@@ -1290,63 +1546,115 @@
   function fecharOverlayInadimplente() {
     const overlay = document.getElementById('bloqueioOverlay');
     overlay.classList.remove('ativo');
-    // Redirecionar para aba Assinatura
-    mudarTab('assinatura', document.querySelectorAll('.tab')[1]);
-    // Aplicar bloqueio parcial: desabilitar tudo exceto aba Assinatura
+    // Redirecionar para Planos
+    mostrarVisao('assinatura');
+    // Aplicar bloqueio parcial: desabilitar tudo exceto Planos / Usuários
     aplicarBloqueioParcial();
-    // Carregar assinatura automaticamente
-    carregarAssinatura();
   }
 
   function aplicarBloqueioParcial() {
     if (!window._sistemaInadimplente) return;
-    // Bloquear aba Usuários (tab button)
-    const tabUsuarios = document.querySelectorAll('.tab')[0];
-    if (tabUsuarios) tabUsuarios.classList.add('tab-bloqueada');
-    // Bloquear conteúdo da aba usuários
+    // Bloquear conteúdo da visão de usuários
     const tabContent = document.getElementById('tab-usuarios');
     if (tabContent) tabContent.classList.add('inadimplente-bloqueado');
-    // Bloquear menu lateral exceto Plano e Usuários
-    document.querySelectorAll('.menu-item').forEach(item => {
-      if (item.href && item.href.includes('plano-usuarios')) return;
-      item.classList.add('menu-inadimplente-bloqueado');
-    });
-    // Mostrar aviso no topo da aba assinatura
+    // Bloquear menu lateral exceto o submenu Sistema (que contém Planos e Usuários)
+    document.querySelectorAll('.sidebar-menu .menu-item').forEach(item => item.classList.add('menu-inadimplente-bloqueado'));
+    // Mostrar aviso no topo de Planos
     const tabAssinatura = document.getElementById('tab-assinatura');
     if (tabAssinatura && !document.getElementById('avisoInadimplente')) {
       const aviso = document.createElement('div');
       aviso.id = 'avisoInadimplente';
-      aviso.className = 'aviso-inadimplente';
-      aviso.innerHTML = '⚠️ Sistema bloqueado por inadimplência. Regularize sua assinatura abaixo para restaurar o acesso completo.';
+      aviso.className = 'alerta alerta-aviso';
+      aviso.style.display = 'flex';
+      aviso.innerHTML = ICON_ALERTA + '<span>Sistema bloqueado por inadimplência. Regularize sua assinatura abaixo para restaurar o acesso completo.</span>';
       tabAssinatura.insertBefore(aviso, tabAssinatura.firstChild);
     }
   }
 
   function liberarInterface() {
     window._sistemaInadimplente = false;
-    // Liberar aba Usuários
-    const tabUsuarios = document.querySelectorAll('.tab')[0];
-    if (tabUsuarios) tabUsuarios.classList.remove('tab-bloqueada');
-    // Liberar conteúdo
     const tabContent = document.getElementById('tab-usuarios');
     if (tabContent) tabContent.classList.remove('inadimplente-bloqueado');
-    // Liberar menu lateral
-    document.querySelectorAll('.menu-item').forEach(item => {
-      item.classList.remove('menu-inadimplente-bloqueado');
-    });
-    // Remover aviso
+    document.querySelectorAll('.menu-inadimplente-bloqueado').forEach(item => item.classList.remove('menu-inadimplente-bloqueado'));
     const aviso = document.getElementById('avisoInadimplente');
     if (aviso) aviso.remove();
-    // Fechar overlay se ainda estiver aberto
     const overlay = document.getElementById('bloqueioOverlay');
     if (overlay) overlay.classList.remove('ativo');
   }
 
-  function copiarPixBloqueio(codigo) { copiarPix(codigo); }
-
   // INIT
   carregarNotificacoes();
   setInterval(carregarNotificacoes, 60000);
+
+  // ===== LISTAS SUSPENSAS no padrão do sistema =====
+  function hocEnhanceSelect(sel) {
+    if (!sel || sel._hocEnhanced) return;
+    sel._hocEnhanced = true;
+    const originalStyle = sel.getAttribute('style') || '';
+    const originalClass = sel.className || '';
+
+    const wrap = document.createElement('span');
+    wrap.className = 'hoc-select-wrap';
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    sel.classList.add('hoc-select-native');
+    sel.tabIndex = -1;
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = ('hoc-select-trigger ' + originalClass).trim();
+    trigger.setAttribute('style', originalStyle);
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'hoc-select-trigger-label';
+    trigger.appendChild(labelSpan);
+    trigger.insertAdjacentHTML('beforeend', '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>');
+
+    const panel = document.createElement('div');
+    panel.className = 'hoc-select-panel';
+
+    wrap.appendChild(trigger);
+    wrap.appendChild(panel);
+
+    function syncLabel() {
+      const opt = sel.options[sel.selectedIndex];
+      labelSpan.textContent = opt ? opt.textContent : '';
+    }
+    function renderPanel() {
+      panel.innerHTML = '';
+      [...sel.options].forEach((opt, i) => {
+        const item = document.createElement('div');
+        item.className = 'hoc-select-item' + (i === sel.selectedIndex ? ' selected' : '');
+        item.textContent = opt.textContent;
+        item.onclick = () => {
+          sel.selectedIndex = i;
+          syncLabel();
+          panel.classList.remove('open');
+          trigger.classList.remove('open');
+          sel.dispatchEvent(new Event('change', {bubbles:true}));
+        };
+        panel.appendChild(item);
+      });
+    }
+    trigger.onclick = (e) => {
+      e.stopPropagation();
+      const willOpen = !panel.classList.contains('open');
+      document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+      if (willOpen) { renderPanel(); panel.classList.add('open'); trigger.classList.add('open'); }
+    };
+    syncLabel();
+
+    const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+    Object.defineProperty(sel, 'value', {
+      get() { return desc.get.call(sel); },
+      set(v) { desc.set.call(sel, v); syncLabel(); },
+      configurable: true
+    });
+    new MutationObserver(syncLabel).observe(sel, {childList:true, subtree:true});
+  }
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.hoc-select-panel.open').forEach(p=>{ p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+  });
+  ['convitePerfil','editarPerfil','editarStatus','ccParcelas'].forEach(id => hocEnhanceSelect(document.getElementById(id)));
 </script>
   <script src="/global.js"></script>
 <script src="perfil-modal.js"></script>

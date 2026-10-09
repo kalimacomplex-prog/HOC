@@ -1,5 +1,5 @@
 (function () {
-  var LBL = 'font-size:11px;font-weight:600;color:#6B7080;margin-bottom:5px;display:block;';
+  var LBL = 'display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px;';
   var INP = 'width:100%;height:38px;padding:0 12px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:13px;color:#0B0B0F;outline:none;font-family:inherit;background:white;box-sizing:border-box;';
   var MODAL_HTML = `
 <div id="modalPerfilOverlay" style="position:fixed;inset:0;background:rgba(11,11,15,0.45);display:none;align-items:center;justify-content:center;z-index:2000;">

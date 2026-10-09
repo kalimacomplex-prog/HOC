@@ -3,58 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
   <title>HOC - Recuperar Senha</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; align-items: center; justify-content: center; padding: 20px; }
-    .card { background: white; border-radius: 12px; padding: 48px 40px; width: 100%; max-width: 400px; box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
-    .logo { width: 48px; height: 48px; background: #2d1b69; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; margin-bottom: 24px; }
-    h2 { font-size: 22px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
-    .subtitulo { font-size: 13px; color: #718096; margin-bottom: 28px; line-height: 1.5; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+    html {
+      min-height: 100%;
+      background:
+        radial-gradient(900px 520px at 12% 8%, rgba(47,92,255,.055), transparent 70%),
+        radial-gradient(800px 480px at 92% 96%, rgba(11,11,15,.045), transparent 70%),
+        linear-gradient(165deg, #FFFFFF 0%, #F3F4F7 50%, #E0E3E9 100%);
+      background-attachment: fixed;
+    }
+    body { min-height: 100vh; display: flex; padding: 24px; -webkit-font-smoothing: antialiased; }
+    a { color: #2F5CFF; text-decoration: none; font-weight: 700; transition: color .15s; border-radius: 4px; }
+    a:hover { color: #1E44D6; text-decoration: underline; text-underline-offset: 3px; }
+    a:focus-visible { outline: 2px solid #2F5CFF; outline-offset: 3px; }
+
+    .wrap { margin: auto; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-logo { display: block; width: 420px; max-width: 100%; height: auto; }
+    .card { width: 100%; max-width: 400px; background: rgba(255,255,255,.9); border: 1px solid rgba(255,255,255,.95); border-radius: 18px; box-shadow: 0 0 0 1px rgba(11,11,15,.05), 0 32px 70px -26px rgba(11,11,15,.24); padding: 34px 32px 28px; }
+    .card h1 { font-size: 19px; font-weight: 800; color: #0B0B0F; margin-bottom: 4px; letter-spacing: -.01em; }
+    .card p.sub { font-size: 12.5px; line-height: 1.5; color: #6B7080; margin-bottom: 24px; }
+
     .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 12px; font-weight: 600; color: #4a5568; margin-bottom: 5px; }
-    input { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 6px; font-size: 13px; color: #1e2a4a; outline: none; transition: border-color 0.2s; }
-    input:focus { border-color: #2d1b69; }
-    .btn { width: 100%; padding: 12px; background: #2d1b69; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .btn:hover { background: #3d2b89; }
-    .btn:disabled { background: #a0aec0; cursor: not-allowed; }
-    .erro { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 10px 14px; border-radius: 6px; font-size: 12px; margin-bottom: 14px; display: none; }
-    .link { text-align: center; margin-top: 20px; font-size: 13px; color: #718096; }
-    .link a { color: #2d1b69; font-weight: 600; text-decoration: none; }
-    .link a:hover { text-decoration: underline; }
-    .sucesso-wrap { text-align: center; display: none; }
-    .sucesso-wrap .icone { font-size: 56px; margin-bottom: 16px; }
-    .sucesso-wrap h3 { font-size: 20px; font-weight: 700; color: #1e2a4a; margin-bottom: 8px; }
-    .sucesso-wrap p { font-size: 13px; color: #718096; line-height: 1.6; margin-bottom: 24px; }
-    .sucesso-wrap a { color: #2d1b69; font-weight: 600; text-decoration: none; font-size: 13px; }
+    label { display: block; font-size: 11.5px; font-weight: 700; color: #33363F; margin-bottom: 7px; }
+    input { width: 100%; height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #E3E5EA; background: rgba(255,255,255,.95); color: #0B0B0F; font-size: 13px; outline: none; transition: border-color .18s, box-shadow .18s; }
+    input::placeholder { color: #A3A8B5; }
+    input:hover { border-color: #D2D5DC; }
+    input:focus { border-color: #2F5CFF; box-shadow: 0 0 0 4px rgba(47,92,255,.12); }
+
+    .btn { display: block; width: 180px; max-width: 100%; margin-left: auto; margin-right: auto; height: 38px; border-radius: 10px; border: none; background: #2F5CFF; box-shadow: 0 8px 18px -6px rgba(47,92,255,.5); color: #fff; font-size: 13px; font-weight: 700; letter-spacing: .005em; cursor: pointer; transition: transform .15s, box-shadow .2s; }
+    .btn:hover { background: #1E44D6; transform: translateY(-1px); box-shadow: 0 10px 22px -6px rgba(47,92,255,.55); }
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible { outline: 2px solid #2F5CFF; outline-offset: 3px; }
+    .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .link { text-align: center; margin-top: 16px; font-size: 12px; }
+    .link a { display: inline-flex; align-items: center; gap: 5px; }
+
+    .erro { display: none; padding: 10px 13px; border-radius: 10px; font-size: 12px; font-weight: 600; line-height: 1.4; margin-bottom: 14px; background: #FFF0F0; border: 1px solid #F3B7C2; color: #B3123A; }
+
+    .sucesso-wrap { text-align: center; display: none; padding-top: 8px; }
+    .sucesso-wrap .icone { width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 14px; background: rgba(47,92,255,.1); color: #2F5CFF; display: flex; align-items: center; justify-content: center; }
+    .sucesso-wrap h3 { font-size: 19px; font-weight: 800; color: #0B0B0F; margin-bottom: 8px; letter-spacing: -.01em; }
+    .sucesso-wrap p { font-size: 12.5px; line-height: 1.6; color: #6B7080; margin-bottom: 14px; }
   </style>
 </head>
 <body>
-  <div class="card">
+  <main class="wrap">
+    <div class="brand"><img class="brand-logo" src="/img/logo-claro.png?v=3" width="420" height="41" alt="Hub of Control"></div>
+    <div class="card">
 
-    <!-- Formulário -->
-    <div id="formRecuperar">
-      <div class="logo">H</div>
-      <h2>Recuperar senha</h2>
-      <p class="subtitulo">Informe seu email cadastrado e enviaremos um link para você criar uma nova senha.</p>
-      <div class="erro" id="erro"></div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="seu@email.com">
+      <!-- Formulário -->
+      <div id="formRecuperar">
+        <h1>Recuperar senha</h1>
+        <p class="sub">Informe seu e-mail cadastrado e enviaremos um link para você criar uma nova senha.</p>
+        <div class="erro" id="erro"></div>
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+        </div>
+        <button class="btn" id="btnEnviar" onclick="enviarRecuperacao()">Enviar</button>
+        <div class="link"><a href="/"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Voltar para o login</a></div>
       </div>
-      <button class="btn" id="btnEnviar" onclick="enviarRecuperacao()">Enviar link de recuperação</button>
-      <div class="link"><a href="/">← Voltar para o login</a></div>
-    </div>
 
-    <!-- Sucesso -->
-    <div class="sucesso-wrap" id="telaEnviado">
-      <div class="icone">📧</div>
-      <h3>Email enviado!</h3>
-      <p>Se este email estiver cadastrado, você receberá as instruções para redefinir sua senha em breve.<br><br>Verifique também sua pasta de spam.</p>
-      <a href="/">← Voltar para o login</a>
-    </div>
+      <!-- Sucesso -->
+      <div class="sucesso-wrap" id="telaEnviado">
+        <div class="icone"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
+        <h3>E-mail enviado</h3>
+        <p>Se este e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha em breve.<br><br>Verifique também sua pasta de spam.</p>
+        <div class="link"><a href="/"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Voltar para o login</a></div>
+      </div>
 
-  </div>
+    </div>
+  </main>
 
   <script>
     async function enviarRecuperacao() {
@@ -81,7 +105,7 @@
       } catch(err) {
         erro.textContent = 'Erro de conexão. Tente novamente.'; erro.style.display = 'block';
       } finally {
-        btn.disabled = false; btn.textContent = 'Enviar link de recuperação';
+        btn.disabled = false; btn.textContent = 'Enviar';
       }
     }
 

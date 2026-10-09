@@ -113,7 +113,7 @@
     .toolbar-sep { width: 1px; background: #ECEDF0; margin: 0 2px; align-self: stretch; }
     .wiki-table { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow: hidden; }
     .wiki-table table { width: 100%; border-collapse: collapse; }
-    .wiki-table th { text-align: center; padding: 11px 12px; font-size: 10.5px; font-weight: 700; color: white; background: #0B0B0F; text-transform: none; letter-spacing: normal; }
+    .wiki-table th { text-align: center; padding: 13px 12px; font-size: 11.5px; font-weight: 700; color: white; background: #0B0B0F; text-transform: none; letter-spacing: normal; }
     .wiki-table td { text-align: center; padding: 11px 12px; font-size: 12.5px; color: #33363F; border-bottom: 1px solid #F2F3F5; }
     .wiki-table tr:last-child td { border-bottom: none; }
     .wiki-table tr:hover td { background: #FAFBFF; }
@@ -304,9 +304,9 @@
     .btn-primary { height: 38px; padding: 0 16px; background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 35%, transparent); color: white; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: none; display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
     .btn-primary:hover { background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black)); }
     .btn-secondary { height: 38px; padding: 0 16px; background: #F1F2F5; color: #4A4E5A; border: none; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
-    label { font-size: 11px; font-weight: 600; color: #6B7080; }
+    label { font-size: 12px; font-weight: 600; color: #4A4E5A; }
     .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 11px; font-weight: 700; color: #6B7080; margin-bottom: 5px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #4A4E5A; margin-bottom: 6px; }
     input[type="text"], input[type="email"], input[type="date"], input[type="number"], input[type="password"], select, textarea { border: 1.5px solid #E5E7EB; border-radius: 9px; font-size: 13px; color: #0B0B0F; font-family: inherit; }
     input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
     .modal-overlay { background: rgba(11,11,15,0.45); }
@@ -351,8 +351,8 @@
 
 <div class="sidebar" id="sidebarEl">
   <div class="sidebar-logo">
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none"><rect width="30" height="30" rx="8"/><text x="15" y="20" text-anchor="middle" fill="white" font-size="14" font-weight="800">H</text></svg>
-    <span class="logo-text side-label">Business Manager</span>
+    <img class="logo-full" src="/img/logo-escuro.png?v=3" alt="Hub of Control">
+    <img class="logo-mini" src="/img/simbolo-escuro.png?v=3" alt="Hub of Control">
   </div>
   <nav class="sidebar-menu">
     <a class="menu-item active" href="/overview" title="Nivelamento de Conhecimento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span class="side-label">Nivelamento de Conhecimento</span></a>
@@ -496,7 +496,7 @@
                   <div id="fvElementoGrid" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px"></div>
                   <div style="border-top:1px solid #F1F2F5;padding-top:14px">
                     <div id="fvPickerNomeRow" style="margin-bottom:10px">
-                      <div style="font-size:11px;font-weight:700;color:#6B7080;margin-bottom:5px">Nome do Elemento *</div>
+                      <div style="font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Nome do Elemento *</div>
                       <input type="text" id="fvElNome" class="form-control" placeholder="Ex: Receber Pedido" style="font-size:12px">
                     </div>
                     <div id="fvPickerTabelaRow" style="display:none;margin-bottom:10px">
@@ -512,7 +512,7 @@
                       </div>
                     </div>
                     <div id="fvPickerObsRow">
-                      <div style="font-size:11px;font-weight:700;color:#6B7080;margin-bottom:5px" id="fvPickerObsLabel">Observação</div>
+                      <div style="font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px" id="fvPickerObsLabel">Observação</div>
                       <textarea id="fvElObs" class="form-control" rows="2" placeholder="Anotação sobre o elemento..." style="font-size:12px;resize:vertical;margin-bottom:12px"></textarea>
                     </div>
                     <div class="modal-footer">
@@ -584,7 +584,7 @@
               <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;flex:1;min-width:0">
                 <input class="bib-search" type="text" id="searchWiki" placeholder="Buscar por nome, tag ou responsável..." oninput="filtrarWikis()" style="max-width:360px">
                 <div style="width:170px">
-                  <label style="display:block;font-size:11px;font-weight:600;color:#6B7080;margin-bottom:4px">Status</label>
+                  <label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Status</label>
                   <select id="filtroStatus" onchange="filtrarWikis()" style="height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;outline:none;background:white;color:#0B0B0F;width:170px">
                     <option value="">Todos</option>
                     <option value="Rascunho">Rascunho</option>

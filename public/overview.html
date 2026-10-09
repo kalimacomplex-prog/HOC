@@ -13,9 +13,11 @@
     .sobre-card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 16px; }
     .sobre-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .sobre-titulo { font-size: 15px; font-weight: 700; color: #0B0B0F; }
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 1100px) { .info-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 700px) { .info-grid { grid-template-columns: 1fr; } }
     .info-item { margin-bottom: 12px; }
-    .info-label { font-size: 11px; font-weight: 600; color: #9CA0AC; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .info-label { font-size: 11px; font-weight: 600; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
     .info-value { font-size: 13px; color: #0B0B0F; line-height: 1.5; }
     .info-input { width: 100%; padding: 8px 12px; border: 1.5px solid #ECEDF0; border-radius: 6px; font-size: 13px; color: #0B0B0F; outline: none; font-family: inherit; }
     .info-input:focus { border-color: var(--accent); }
@@ -23,14 +25,14 @@
     .info-textarea:focus { border-color: var(--accent); }
     .mvv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
     .mvv-card { background: #FAFBFC; border: 1px solid #ECEDF0; border-top: 3px solid var(--accent); border-radius: 12px; padding: 18px; }
-    .mvv-titulo { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .mvv-titulo { font-size: 11px; font-weight: 700; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     .mvv-texto { font-size: 13px; color: #33363F; line-height: 1.5; }
     .mvv-textarea { width: 100%; border: none; outline: none; font-size: 13px; color: #33363F; line-height: 1.5; font-family: inherit; resize: none; min-height: 60px; background: transparent; }
     .timeline { position: relative; padding-left: 20px; }
     .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 1.5px; background: #ECEDF0; }
     .timeline-item { position: relative; margin-bottom: 16px; }
     .timeline-dot { position: absolute; left: -17px; top: 3px; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 2px var(--accent); }
-    .timeline-ano { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 2px; }
+    .timeline-ano { font-size: 11px; font-weight: 700; color: #0B0B0F; margin-bottom: 2px; }
     .timeline-desc { font-size: 13px; color: #33363F; line-height: 1.4; }
     .btn-add-timeline { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #F1F2F5; color: #6B7080; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 8px; display: none; }
     .btn-add-timeline:hover { background: #ECEDF0; }
@@ -163,10 +165,11 @@
     /* ===== OVERVIEW UX ===== */
     .header-search { display: none; }
     .header-right { flex: 1; display: flex; align-items: center; justify-content: flex-end; }
-    .section-bloco { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid #edf2f7; }
+    .section-bloco { position: relative; background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); margin-bottom: 20px; border: 1px solid #edf2f7; }
     .section-header { display: flex; align-items: center; gap: 10px; padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1.5px solid #F1F2F5; }
-    .section-icon { width: 32px; height: 32px; border-radius: 8px; background: color-mix(in srgb,var(--accent) 8%,white); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .section-titulo-text { font-size: 11px; font-weight: 700; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.9px; }
+    .section-icon { width: 38px; height: 38px; border-radius: 10px; background: color-mix(in srgb,var(--accent) 8%,white); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .section-titulo-text { font-size: 13.5px; font-weight: 700; color: #0B0B0F; text-transform: uppercase; letter-spacing: 0.8px; }
+    .section-icon svg { width: 20px; height: 20px; }
     .section-titulo-input { border: none; background: transparent; outline: none; padding: 2px 4px; border-radius: 4px; font-family: inherit; flex: 1; min-width: 0; }
     .section-titulo-input:hover, .section-titulo-input:focus { background: #F4F5F7; }
     .timeline-rich-toolbar { display: flex; gap: 3px; padding: 6px; background: #FAFBFC; border-radius: 6px 6px 0 0; border: 1.5px solid #ECEDF0; border-bottom: none; flex-wrap: wrap; }
@@ -197,6 +200,10 @@
     .rich-editor ol, .timeline-rich-editor ol, .timeline-desc ol { list-style-type: decimal; }
     .rich-editor a, .timeline-desc a { color: var(--accent); text-decoration: underline; }
     .edit-barra-global { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
+    .sec-edit-toggle { position: absolute; left: calc(100% + 7px); top: -1px; width: 26px; height: 26px; border: none; border-radius: 7px; background: #F1F2F5; color: #6B7080; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background .15s; }
+    .sec-edit-toggle:hover { background: #E5E7EB; }
+    .sec-edit-toggle svg { transition: transform .2s; }
+    .sec-edit-toggle.aberto svg { transform: rotate(180deg); }
     .dep-sidebar-row { display:flex; align-items:center; justify-content:space-between; gap:5px; padding:4px 8px; border-radius:6px; cursor:pointer; transition:all 0.2s; margin-bottom:1px; }
     .dep-sidebar-row:hover { background:#FAFBFC; }
     .dep-sidebar-row:hover .dep-row-acoes { opacity:1; }
@@ -289,7 +296,6 @@
     .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
     .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
     .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
-    .color-hex-input { width: 100%; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
 
     /* ===== Topbar + abas + conteúdo ===== */
     .main { min-width: 0; }
@@ -416,15 +422,13 @@
   <div class="content">
     <!-- VISÃO GERAL -->
     <div class="tab-content active" id="tab-visao-geral">
-      <div style="background:linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 80%, black));border-radius:16px;padding:18px 32px;color:white;margin-bottom:20px">
-        <div style="font-size:20px;font-weight:800;margin-bottom:6px">Boas-vindas à sua central de controle operacional</div>
-        <div style="font-size:13px;opacity:.9;line-height:1.6;max-width:640px">Esta página reúne a história, a cultura e os compromissos da nossa empresa.</div>
-      </div>
+      <div id="editBarraWrap" style="display:none">
       <div class="edit-barra-global">
         <button class="btn-secondary" id="btnEditar" onclick="toggleEdicao()">Editar</button>
         <button class="btn-white-hover" id="btnNovaSecao" onclick="abrirModalNovaSecao()" style="display:none;height:38px;padding:0 16px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nova Seção</button>
         <button class="btn-white-hover" id="btnSairSemSalvar" onclick="sairSemSalvarInfo()" style="display:none;height:38px;padding:0 16px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:white;color:#33363F;border:1.5px solid #E5E7EB;align-items:center">Cancelar</button>
         <button class="btn-primary" id="btnSalvar" onclick="salvarInfo()" style="display:none">Salvar</button>
+      </div>
       </div>
       <!-- ===== FLUXO DE VALOR (gerenciado por renderSecoes) ===== -->
       <div id="fvSecaoWrap" style="display:none;margin-bottom:24px">
@@ -943,17 +947,23 @@
     { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
     { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
     { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
-    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#E6A800', nome: 'Amarelo Forte' },
     { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
   ];
   function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
   function setAccentColor(hex) {
-    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    if (!CORES_SISTEMA.some(c => c.hex.toLowerCase() === String(hex).toLowerCase())) return;
     localStorage.setItem('accentColor', hex);
     aplicarAccentColor(hex);
     if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
   }
-  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+  (function () {
+    const salvo = (localStorage.getItem('accentColor') || '').toLowerCase();
+    const cor = salvo === '#ffcc00' ? CORES_SISTEMA.find(c => c.nome === 'Amarelo Forte') : CORES_SISTEMA.find(c => c.hex.toLowerCase() === salvo);
+    const hex = (cor || CORES_SISTEMA[0]).hex;
+    if (localStorage.getItem('accentColor') !== hex) localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+  })();
 
   const sidebarEl = document.getElementById('sidebarEl');
   function aplicarSidebarRecolhida(recolhida) {
@@ -985,8 +995,7 @@
         <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
           <span class="color-swatch-rect" style="background:${c.hex}"></span>
           <span class="color-swatch-label">${c.nome}</span>
-        </button>`).join('')}
-      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+        </button>`).join('')}`;
   }
   function voltarMenuSistema() {
     const wrap = document.getElementById('sistemaItemsWrap');
@@ -1111,14 +1120,16 @@
   function migrarLegacyParaSecoes(data) {
     const info=data.info||{},mvv=data.mvv||{},esg=data.esg||{};
     const camposSobre=[
-      {id:'definicao',tipo:'textarea',label:'Resumo',valor:info.definicao||''},
       {id:'fundacao',tipo:'texto',label:'Data de Fundação',valor:info.fundacao||''},
       {id:'setor',tipo:'texto',label:'Setor de Atuação',valor:info.setor||''},
       {id:'site',tipo:'texto',label:'Site / Contato',valor:info.site||''},
-      ...(info.customCampos||[]).map((c,i)=>({id:'custom_'+i,tipo:'texto',label:c.label,valor:c.value||''}))
+      {id:'cnpj',tipo:'texto',label:'CNPJ',valor:info.cnpj||''},
+      {id:'sede',tipo:'texto',label:'Sede',valor:info.sede||''},
+      ...(info.customCampos||[]).map((c,i)=>({id:'custom_'+i,tipo:'texto',label:c.label,valor:c.value||''})),
+      {id:'definicao',tipo:'texto',label:'Público-alvo',valor:info.definicao||''}
     ];
     return [
-      {id:'resumo',emoji:'🏢',nome:'Sobre a Empresa',campos:camposSobre},
+      {id:'resumo',emoji:'🏢',nome:'Sobre a Empresa',padraoV2:true,campos:camposSobre},
       {id:'mvv',emoji:'🎯',nome:'Missão, Visão e Valores',campos:[
         {id:'missao',tipo:'rich',label:'Missão',valor:mvv.missao||''},
         {id:'visao',tipo:'rich',label:'Visão',valor:mvv.visao||''},
@@ -1148,13 +1159,46 @@
     });
   }
 
+  // Seções já salvas: inclui CNPJ/Sede no "Sobre a Empresa" e troca "Resumo" por "Público-alvo" (último campo).
+  // Roda uma vez por seção (marca padraoV2); depois disso o que o usuário apagar/reordenar é respeitado.
+  function aplicarPadraoSobreEmpresa(secoes) {
+    secoes.forEach(sec => {
+      if (sec.id !== 'resumo') return;
+      if (!sec.padraoV2) {
+      const campos = sec.campos || [];
+      const ids = new Set(campos.map(c => c.id));
+      const def = campos.find(c => c.id === 'definicao');
+      if (def && /^resumo$/i.test((def.label || '').trim())) def.label = 'Público-alvo';
+      const resto = campos.filter(c => c.id !== 'definicao');
+      const novos = [['cnpj','CNPJ'],['sede','Sede']].filter(([id]) => !ids.has(id)).map(([id,label]) => ({id,tipo:'texto',label,valor:''}));
+      let pos = 0;
+      resto.forEach((c, i) => { if (['fundacao','setor','site'].includes(c.id)) pos = i + 1; });
+      resto.splice(pos, 0, ...novos);
+      sec.campos = def ? [...resto, def] : resto;
+      sec.padraoV2 = true;
+      }
+      // v3: "Slogan" deixou de ser campo padrão — some das seções já salvas quando está vazio (se tiver conteúdo, fica)
+      if (!sec.padraoV3) {
+        sec.campos = (sec.campos || []).filter(c => !(c.id === 'slogan' && !String(c.valor || '').trim()));
+        sec.padraoV3 = true;
+      }
+      // v4: "Público-alvo" passou a ser texto curto (entra na grade, ao lado dos demais) em vez de texto longo na linha inteira
+      if (!sec.padraoV4) {
+        const pa = (sec.campos || []).find(c => c.id === 'definicao');
+        if (pa && pa.tipo === 'textarea') pa.tipo = 'texto';
+        sec.padraoV4 = true;
+      }
+    });
+    return secoes;
+  }
+
   async function carregarInfo() {
     try {
       const res = await fetch('/api/overview', {headers:HEADERS});
       if (res.status===401){localStorage.removeItem('token');localStorage.removeItem('usuario');window.location.href='/';return;}
       const data = await res.json();
       if (!data) return;
-      secoesData = (data.secoes && data.secoes.length) ? migrarSecoesAnteriores(data.secoes) : migrarLegacyParaSecoes(data);
+      secoesData = (data.secoes && data.secoes.length) ? aplicarPadraoSobreEmpresa(migrarSecoesAnteriores(data.secoes)) : migrarLegacyParaSecoes(data);
       ensureFvEntry();
       renderSecoes();
     } catch(err){console.error(err);}
@@ -1171,10 +1215,20 @@
     });
   }
 
+  // Barra com os botões de edição fica recolhida; a setinha ao lado da 1ª seção abre/fecha (e empurra as seções para baixo).
+  let _barraEdicaoAberta = false;
+  function _aplicarBarraEdicao() {
+    const w = document.getElementById('editBarraWrap');
+    if (w) w.style.display = (modoEdicao || _barraEdicaoAberta) ? '' : 'none';
+    document.querySelectorAll('.sec-edit-toggle').forEach(b => b.classList.toggle('aberto', _barraEdicaoAberta));
+  }
+  function toggleBarraEdicao() { _barraEdicaoAberta = !_barraEdicaoAberta; _aplicarBarraEdicao(); }
+
   function toggleEdicao() {
     if (!modoEdicao && !_podeEditarWiki) return;
     if (modoEdicao) coletarRichEditors();
     modoEdicao = !modoEdicao;
+    if (!modoEdicao) _barraEdicaoAberta = false;
     document.getElementById('btnEditar').style.display        = modoEdicao?'none':'inline-block';
     document.getElementById('btnSalvar').style.display        = modoEdicao?'inline-flex':'none';
     document.getElementById('btnNovaSecao').style.display     = modoEdicao?'inline-flex':'none';
@@ -1184,6 +1238,7 @@
 
   async function sairSemSalvarInfo() {
     modoEdicao = false;
+    _barraEdicaoAberta = false;
     document.getElementById('btnEditar').style.display        = 'inline-block';
     document.getElementById('btnSalvar').style.display        = 'none';
     document.getElementById('btnNovaSecao').style.display     = 'none';
@@ -1238,12 +1293,13 @@
     const toShow = secoesData.map((s,i)=>({...s,_ri:i})).filter(s=>modoEdicao || s.visivel!==false);
     container.innerHTML = '';
 
+    const idxPrimeira = toShow.findIndex(x => x.tipo !== 'fluxo-valor'); // a setinha de edição fica na primeira seção de conteúdo
     toShow.forEach((s, vi) => {
       if (s.tipo === 'fluxo-valor') {
         _insertFvWrap(s, vi, s._ri, toShow.length, container);
       } else {
         const tmp = document.createElement('div');
-        tmp.innerHTML = renderSecao(s, vi, s._ri, toShow.length);
+        tmp.innerHTML = renderSecao(s, vi, s._ri, toShow.length, vi === idxPrimeira);
         while (tmp.firstChild) container.appendChild(tmp.firstChild);
       }
     });
@@ -1252,6 +1308,8 @@
       item.addEventListener('mouseenter',()=>{const a=item.querySelector('.timeline-acoes');if(a)a.style.opacity='1';});
       item.addEventListener('mouseleave',()=>{const a=item.querySelector('.timeline-acoes');if(a)a.style.opacity='0';});
     });
+
+    _aplicarBarraEdicao();
 
     // Restaura a posição de rolagem caso o navegador a desloque durante a reconstrução acima.
     const _restaurarScroll = () => { if (Math.abs(window.scrollY - _scrollYAntes) > 1) window.scrollTo(0, _scrollYAntes); };
@@ -1294,7 +1352,14 @@
   }
 
   function ensureFvEntry() {
-    if (!secoesData.find(s => s.tipo === 'fluxo-valor')) {
+    // Só pode existir UMA seção de Fluxo de Valor: mantém a primeira e descarta repetições
+    // (inclusive seções vazias criadas à mão com esse mesmo nome).
+    const norm = t => String(t||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase();
+    const primeiraFv = secoesData.find(s => s.tipo === 'fluxo-valor');
+    secoesData = secoesData.filter(s => s.tipo === 'fluxo-valor'
+      ? s === primeiraFv
+      : !(['fluxo de valor','fluxo de valor do negocio'].includes(norm(s.nome)) && !(s.campos||[]).length));
+    if (!primeiraFv) {
       secoesData.push({id:'fluxo-valor', tipo:'fluxo-valor', emoji:'🗺️', nome:'Fluxo de Valor', visivel:true, campos:[]});
     }
   }
@@ -1386,7 +1451,7 @@
     renderSecoes();
   }
 
-  function renderSecao(s, vi, ri, total) {
+  function renderSecao(s, vi, ri, total, comToggleEdicao) {
     const isE = modoEdicao;
     const ctrl = isE ? `<div style="display:flex;gap:6px;align-items:center;margin-left:auto;flex-shrink:0">
       ${vi>0?`<button onclick="moverSecao(${ri},-1)" style="${_secCtrlBase}" title="Subir">${_secIconUp}</button>`:''}
@@ -1399,6 +1464,8 @@
     const tituloEl = isE
       ? `<input type="text" class="section-titulo-text section-titulo-input" value="${_esc(s.nome)}" onchange="renomearSecaoInline(${ri},this.value)" placeholder="Nome da seção">`
       : `<span class="section-titulo-text">${s.nome}</span>`;
+    const toggleEd = (comToggleEdicao && !isE && _podeEditarWiki)
+      ? `<button type="button" class="sec-edit-toggle${_barraEdicaoAberta?' aberto':''}" onclick="toggleBarraEdicao()" title="Editar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>` : '';
     const hdr = `<div class="section-header" style="display:flex;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:18px;border-bottom:1.5px solid #F1F2F5">
       ${iconEl}
       ${tituloEl}
@@ -1409,7 +1476,7 @@
       ? _renderCamposAgrupados(s, campos, ri)
       : (modoEdicao ? '<p style="color:#9CA0AC;font-size:12px;margin:0 0 8px">Use "+ Adicionar" abaixo para incluir conteúdo.</p>' : '');
     const addBar = modoEdicao ? _renderAddBar(ri) : '';
-    return `<div class="section-bloco" data-ri="${ri}">${hdr}${body}${addBar}</div>`;
+    return `<div class="section-bloco" data-ri="${ri}">${hdr}${body}${addBar}${toggleEd}</div>`;
   }
 
   function _renderCamposAgrupados(s, campos, ri) {
@@ -1436,7 +1503,7 @@
     }).join('');
   }
 
-  const _labelInputStyle = 'flex:1;min-width:0;border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:11px;font-weight:700;color:#33363F;text-transform:uppercase;letter-spacing:0.5px;background:transparent;padding:3px 0 6px 7px;font-family:inherit';
+  const _labelInputStyle = 'flex:1;min-width:0;border:none;border-bottom:1.5px solid color-mix(in srgb,var(--accent) 40%,white);outline:none;font-size:11px;font-weight:700;color:#0B0B0F;text-transform:uppercase;letter-spacing:0.5px;background:transparent;padding:3px 0 6px 7px;font-family:inherit';
 
   function _renderGrupoSimples(s, items, ri) {
     const html = items.map(({c,ci})=>{
@@ -1444,12 +1511,13 @@
       const inp = c.tipo==='textarea'
         ? `<textarea class="info-textarea" oninput="secoesData[${ri}].campos[${ci}].valor=this.value" placeholder="...">${_esc(c.valor)}</textarea>`
         : `<input type="text" class="info-input" oninput="secoesData[${ri}].campos[${ci}].valor=this.value" value="${_esc(c.valor)}" placeholder="...">`;
-      if (modoEdicao) return `<div class="info-item">
+      const largo = c.tipo==='textarea' ? ' style="grid-column:1/-1"' : '';
+      if (modoEdicao) return `<div class="info-item"${largo}>
         <div class="info-label" style="display:flex;align-items:center;justify-content:space-between">
           <input type="text" value="${_esc(c.label)}" oninput="secoesData[${ri}].campos[${ci}].label=this.value" style="${_labelInputStyle}">${del}
         </div>${inp}
       </div>`;
-      return `<div class="info-item"><div class="info-label">${c.label}</div><div class="info-value">${c.valor||'—'}</div></div>`;
+      return `<div class="info-item"${largo}><div class="info-label">${c.label}</div><div class="info-value">${c.valor||'—'}</div></div>`;
     }).join('');
     return `<div class="info-grid">${html}</div>`;
   }
@@ -1535,9 +1603,11 @@
     const thead = `<tr>
       ${cols.map((col,coli)=>{
         const colBgId = `tblColBg-${ri}-${ci}-${coli}`;
-        return `<th style="${bs};font-weight:700;background:${col.bgColor||'#FAFBFC'};color:${col.textColor||'#0B0B0F'}">
+        const colAlign = col.align||'left';
+        return `<th style="${bs};font-weight:700;background:${col.bgColor||'#FAFBFC'};color:${col.textColor||'#0B0B0F'};text-align:${colAlign}">
         ${modoEdicao?`<div style="display:flex;gap:4px;align-items:center">
-          <input type="text" value="${_esc(col.nome||'')}" oninput="secoesData[${ri}].campos[${ci}].dados.colunas[${coli}].nome=this.value" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-weight:700;font-size:12px;color:inherit;font-family:inherit">
+          <input type="text" value="${_esc(col.nome||'')}" oninput="secoesData[${ri}].campos[${ci}].dados.colunas[${coli}].nome=this.value" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-weight:700;font-size:12px;color:inherit;font-family:inherit;text-align:${colAlign}">
+          <button type="button" onclick="_tblColAlign(${ri},${ci},${coli})" title="Alinhar a coluna inteira: ${colAlign}" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;display:flex;flex-shrink:0">${_TBL_ALIGN_ICON[colAlign]}</button>
           <button type="button" onclick="document.getElementById('${colBgId}').click()" title="Cor de fundo" style="background:none;border:none;cursor:pointer;padding:0;color:#6B7080;display:flex;flex-shrink:0">${_iconDroplet}</button>
           <input type="color" id="${colBgId}" title="Cor de fundo" value="${col.bgColor||'#FAFBFC'}" onchange="_tblColCor(${ri},${ci},${coli},'bgColor',this.value,this.closest('th'))" style="position:absolute;width:0;height:0;opacity:0;pointer-events:none">
           <button onclick="removerColunaTabela(${ri},${ci},${coli})" style="${_sTblDelBtn}" title="Remover coluna">${_ICO_TRASH}</button>
@@ -1551,7 +1621,7 @@
         const cell=(row&&row[coli])||{valor:'',bgColor:'',textColor:''};
         const textColorId = `tblTextColor-${ri}-${ci}-${r}-${coli}`;
         const bgColorId = `tblBgColor-${ri}-${ci}-${r}-${coli}`;
-        const align = cell.align||'left';
+        const align = cell.align||col.align||'left';
         return `<td style="${bs};background:${cell.bgColor||'transparent'};color:${cell.textColor||'inherit'}">
           ${modoEdicao?`<div style="display:flex;gap:4px;align-items:flex-start">
             <textarea oninput="_tblCellVal(${ri},${ci},${r},${coli},this.value);this.style.height='auto';this.style.height=this.scrollHeight+'px'" style="border:none;outline:none;background:transparent;min-width:0;flex:1;font-family:inherit;font-size:inherit;color:inherit;resize:none;overflow:hidden;line-height:1.4;text-align:${align}" rows="1">${_esc(cell.valor||'')}</textarea>
@@ -1585,6 +1655,15 @@
   }
 
   // table helpers
+  // Alinha a coluna inteira (título + todos os valores) em esquerda → centro → direita; cada valor ainda pode ser ajustado depois.
+  function _tblColAlign(ri,ci,coli){
+    coletarRichEditors();
+    const d=secoesData[ri].campos[ci].dados, col=d.colunas[coli];
+    const prox=_TBL_ALIGN_NEXT[col.align||'left'];
+    col.align=prox;
+    (d.linhas||[]).forEach(row=>{ row[coli]=row[coli]||{valor:'',bgColor:'',textColor:''}; row[coli].align=prox; });
+    renderSecoes();
+  }
   function _tblColCor(ri,ci,coli,campo,val,th){secoesData[ri].campos[ci].dados.colunas[coli][campo]=val;if(th&&campo==='bgColor')th.style.background=val;}
   function _tblCellVal(ri,ci,r,c,val){const row=secoesData[ri].campos[ci].dados.linhas[r]=secoesData[ri].campos[ci].dados.linhas[r]||[];row[c]=row[c]||{valor:'',bgColor:'',textColor:''};row[c].valor=val;}
   function _tblCellCor(ri,ci,r,c,campo,val,td){const row=secoesData[ri].campos[ci].dados.linhas[r]=secoesData[ri].campos[ci].dados.linhas[r]||[];row[c]=row[c]||{valor:'',bgColor:'',textColor:''};row[c][campo]=val;if(td){if(campo==='bgColor')td.style.background=val;else if(campo==='textColor')td.style.color=val;}}
@@ -1615,7 +1694,7 @@
   // ===== TABELA CRUD =====
   function adicionarColunaTabela(ri,ci){secoesData[ri].campos[ci].dados.colunas.push({nome:'Nova Coluna',bgColor:'#FAFBFC',textColor:'#0B0B0F'});(secoesData[ri].campos[ci].dados.linhas||[]).forEach(row=>row.push({valor:'',bgColor:'',textColor:''}));renderSecoes();}
   function removerColunaTabela(ri,ci,coli){secoesData[ri].campos[ci].dados.colunas.splice(coli,1);(secoesData[ri].campos[ci].dados.linhas||[]).forEach(row=>row.splice(coli,1));renderSecoes();}
-  function adicionarLinhaTabela(ri,ci){const row=(secoesData[ri].campos[ci].dados.colunas||[]).map(()=>({valor:'',bgColor:'',textColor:''}));(secoesData[ri].campos[ci].dados.linhas=secoesData[ri].campos[ci].dados.linhas||[]).push(row);renderSecoes();}
+  function adicionarLinhaTabela(ri,ci){const row=(secoesData[ri].campos[ci].dados.colunas||[]).map(col=>({valor:'',bgColor:'',textColor:'',align:col.align||'left'}));(secoesData[ri].campos[ci].dados.linhas=secoesData[ri].campos[ci].dados.linhas||[]).push(row);renderSecoes();}
   function removerLinhaTabela(ri,ci,r){secoesData[ri].campos[ci].dados.linhas.splice(r,1);renderSecoes();}
 
   // ===== TIMELINE =====
@@ -2170,6 +2249,7 @@
             .forEach(fn => document.querySelectorAll(`button[onclick="${fn}"]`).forEach(b => b.style.display = 'none'));
         }
         _atualizarBotoesEditor(wikiEditando ? wikis.find(w => w._id === wikiEditando) : null);
+        if (secoesData.length) renderSecoes();
         // A tabela/lista de documentos já pode ter renderizado antes desta permissão chegar —
         // atualiza de novo agora que _podeEditarWiki é conhecido (ex.: dropdown de mover pasta).
         if (wikis.length) filtrarWikis();
@@ -3114,9 +3194,9 @@
     </tr>`).join('');
 
     el.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1.5px solid #ECEDF0;background:color-mix(in srgb,var(--accent) 8%,white);border-radius:10px 10px 0 0">
-        <div style="font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px">
-          <svg width="13" height="13" viewBox="0 0 40 40" fill="none"><rect x="4" y="6" width="32" height="28" rx="1" stroke="var(--accent)" stroke-width="2.5"/><line x1="4" y1="14" x2="36" y2="14" stroke="var(--accent)" stroke-width="2"/><line x1="4" y1="22" x2="36" y2="22" stroke="var(--accent)" stroke-width="2"/><line x1="18" y1="6" x2="18" y2="34" stroke="var(--accent)" stroke-width="2"/></svg>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1.5px solid #ECEDF0;background:#F1F2F5;border-radius:10px 10px 0 0">
+        <div style="font-size:12px;font-weight:700;color:#0B0B0F;display:flex;align-items:center;gap:6px">
+          <svg width="13" height="13" viewBox="0 0 40 40" fill="none"><rect x="4" y="6" width="32" height="28" rx="1" stroke="#0B0B0F" stroke-width="2.5"/><line x1="4" y1="14" x2="36" y2="14" stroke="#0B0B0F" stroke-width="2"/><line x1="4" y1="22" x2="36" y2="22" stroke="#0B0B0F" stroke-width="2"/><line x1="18" y1="6" x2="18" y2="34" stroke="#0B0B0F" stroke-width="2"/></svg>
           ${edt ? `<span contenteditable="true" onblur="event.stopPropagation();fvTabelaEditNome(this,'${b.id}')" style="outline:none;cursor:text;border-bottom:1px dashed #9b72ef" title="Clique para editar o título">${_gesc(b.nome||'Tabela')}</span>` : _gesc(b.nome||'Tabela')}
         </div>
         ${edt ? `<button class="fv-block-del" onclick="event.stopPropagation();removerBloco('${b.id}')">&#x2715;</button>` : ''}
@@ -3161,10 +3241,10 @@
     el.style.padding = '0';
     el.innerHTML = `
       ${portsHtml}
-      <div style="background:#f0ebff;padding:16px;display:flex;align-items:center;justify-content:center;position:relative;border-radius:8px 8px 0 0">
+      <div style="background:#F1F2F5;padding:16px;display:flex;align-items:center;justify-content:center;position:relative;border-radius:8px 8px 0 0">
         ${iconSvg}
         ${fvModo==='edicao' ? `
-          <button class="fv-block-del" onclick="event.stopPropagation();abrirEditarFvBloco('${b.id}')" title="Editar" style="position:absolute;top:6px;left:6px;background:color-mix(in srgb,var(--accent) 14%,white);border-color:#c4b5fd;color:var(--accent);font-size:11px">✏</button>
+          <button class="fv-block-del" onclick="event.stopPropagation();abrirEditarFvBloco('${b.id}')" title="Editar" style="position:absolute;top:6px;left:6px;background:white;color:#33363F;font-size:11px">✏</button>
           <button class="fv-block-del" onclick="event.stopPropagation();removerBloco('${b.id}')" style="position:absolute;top:6px;right:6px">&#x2715;</button>` : ''}
       </div>
       <div style="padding:9px 13px;border-top:1.5px solid #ECEDF0">
@@ -3483,173 +3563,173 @@
   function _fvShapeIcon(tipo) {
     const icons = {
       'supplier': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="18" width="32" height="18" rx="1" stroke="var(--accent)" stroke-width="2"/>
-        <rect x="8" y="10" width="8" height="8" stroke="var(--accent)" stroke-width="2"/>
-        <rect x="24" y="10" width="8" height="8" stroke="var(--accent)" stroke-width="2"/>
-        <rect x="8" y="6" width="4" height="4" fill="var(--accent)"/>
-        <rect x="24" y="6" width="4" height="4" fill="var(--accent)"/>
-        <rect x="16" y="24" width="8" height="12" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="10" y1="24" x2="10" y2="36" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="30" y1="24" x2="30" y2="36" stroke="var(--accent)" stroke-width="1.5"/>
+        <rect x="4" y="18" width="32" height="18" rx="1" stroke="#0B0B0F" stroke-width="2"/>
+        <rect x="8" y="10" width="8" height="8" stroke="#0B0B0F" stroke-width="2"/>
+        <rect x="24" y="10" width="8" height="8" stroke="#0B0B0F" stroke-width="2"/>
+        <rect x="8" y="6" width="4" height="4" fill="#0B0B0F"/>
+        <rect x="24" y="6" width="4" height="4" fill="#0B0B0F"/>
+        <rect x="16" y="24" width="8" height="12" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="10" y1="24" x2="10" y2="36" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="30" y1="24" x2="30" y2="36" stroke="#0B0B0F" stroke-width="1.5"/>
       </svg>`,
       'processo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="10" width="32" height="20" rx="2" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="12" y1="10" x2="12" y2="30" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="28" y1="10" x2="28" y2="30" stroke="var(--accent)" stroke-width="1.5"/>
+        <rect x="4" y="10" width="32" height="20" rx="2" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="12" y1="10" x2="12" y2="30" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="28" y1="10" x2="28" y2="30" stroke="#0B0B0F" stroke-width="1.5"/>
       </svg>`,
       'tabela': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="6" width="32" height="28" rx="1" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="4" y1="14" x2="36" y2="14" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="4" y1="22" x2="36" y2="22" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="18" y1="6" x2="18" y2="34" stroke="var(--accent)" stroke-width="1.5"/>
+        <rect x="4" y="6" width="32" height="28" rx="1" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="4" y1="14" x2="36" y2="14" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="4" y1="22" x2="36" y2="22" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="18" y1="6" x2="18" y2="34" stroke="#0B0B0F" stroke-width="1.5"/>
       </svg>`,
       'manual-info': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="7" y="7" width="26" height="31" rx="2" stroke="var(--accent)" stroke-width="2"/>
-        <rect x="14" y="3" width="12" height="7" rx="2" stroke="var(--accent)" stroke-width="1.8"/>
-        <line x1="12" y1="17" x2="28" y2="17" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="12" y1="23" x2="28" y2="23" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="12" y1="29" x2="22" y2="29" stroke="var(--accent)" stroke-width="1.5"/>
-        <path d="M25 28 L30 33 L28 36 L23 31 Z" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="29" y1="28" x2="32" y2="25" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="7" y="7" width="26" height="31" rx="2" stroke="#0B0B0F" stroke-width="2"/>
+        <rect x="14" y="3" width="12" height="7" rx="2" stroke="#0B0B0F" stroke-width="1.8"/>
+        <line x1="12" y1="17" x2="28" y2="17" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="12" y1="23" x2="28" y2="23" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="12" y1="29" x2="22" y2="29" stroke="#0B0B0F" stroke-width="1.5"/>
+        <path d="M25 28 L30 33 L28 36 L23 31 Z" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="29" y1="28" x2="32" y2="25" stroke="#0B0B0F" stroke-width="1.8" stroke-linecap="round"/>
       </svg>`,
       'electronic-info': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="5" width="32" height="22" rx="2" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="20" y1="27" x2="20" y2="34" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="13" y1="34" x2="27" y2="34" stroke="var(--accent)" stroke-width="2"/>
-        <path d="M10 20 C12 13 28 13 30 20" stroke="var(--accent)" stroke-width="1.8" fill="none"/>
-        <path d="M14 22 C16 17 24 17 26 22" stroke="var(--accent)" stroke-width="1.8" fill="none"/>
-        <circle cx="20" cy="24" r="2" fill="var(--accent)"/>
+        <rect x="4" y="5" width="32" height="22" rx="2" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="20" y1="27" x2="20" y2="34" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="13" y1="34" x2="27" y2="34" stroke="#0B0B0F" stroke-width="2"/>
+        <path d="M10 20 C12 13 28 13 30 20" stroke="#0B0B0F" stroke-width="1.8" fill="none"/>
+        <path d="M14 22 C16 17 24 17 26 22" stroke="#0B0B0F" stroke-width="1.8" fill="none"/>
+        <circle cx="20" cy="24" r="2" fill="#0B0B0F"/>
       </svg>`,
       'inventory': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <polygon points="20,3 39,36 1,36" stroke="var(--accent)" stroke-width="2.5"/>
-        <rect x="15" y="24" width="5" height="5" fill="var(--accent)" opacity=".5" rx="1"/>
-        <rect x="21" y="24" width="5" height="5" fill="var(--accent)" opacity=".5" rx="1"/>
-        <rect x="18" y="18" width="5" height="5" fill="var(--accent)" opacity=".5" rx="1"/>
+        <polygon points="20,3 39,36 1,36" stroke="#0B0B0F" stroke-width="2.5"/>
+        <rect x="15" y="24" width="5" height="5" fill="#0B0B0F" opacity=".5" rx="1"/>
+        <rect x="21" y="24" width="5" height="5" fill="#0B0B0F" opacity=".5" rx="1"/>
+        <rect x="18" y="18" width="5" height="5" fill="#0B0B0F" opacity=".5" rx="1"/>
       </svg>`,
       'fifo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="2" y="13" width="36" height="14" rx="2" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="12" y1="13" x2="12" y2="27" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="22" y1="13" x2="22" y2="27" stroke="var(--accent)" stroke-width="1.5"/>
-        <text x="6" y="24" font-size="9" fill="var(--accent)">1</text>
-        <text x="16" y="24" font-size="9" fill="var(--accent)">2</text>
-        <text x="26" y="24" font-size="9" fill="var(--accent)">3</text>
-        <polygon points="34,17 38,20 34,23" fill="var(--accent)"/>
+        <rect x="2" y="13" width="36" height="14" rx="2" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="12" y1="13" x2="12" y2="27" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="22" y1="13" x2="22" y2="27" stroke="#0B0B0F" stroke-width="1.5"/>
+        <text x="6" y="24" font-size="9" fill="#0B0B0F">1</text>
+        <text x="16" y="24" font-size="9" fill="#0B0B0F">2</text>
+        <text x="26" y="24" font-size="9" fill="#0B0B0F">3</text>
+        <polygon points="34,17 38,20 34,23" fill="#0B0B0F"/>
       </svg>`,
       'supermarket': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="3" y="4" width="34" height="30" rx="1" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="3" y1="15" x2="37" y2="15" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="3" y1="25" x2="37" y2="25" stroke="var(--accent)" stroke-width="1.5"/>
-        <rect x="7"  y="6"  width="5" height="7" rx="1" fill="var(--accent)" opacity=".45"/>
-        <rect x="15" y="6"  width="5" height="7" rx="1" fill="var(--accent)" opacity=".45"/>
-        <rect x="23" y="6"  width="5" height="7" rx="1" fill="var(--accent)" opacity=".45"/>
-        <rect x="31" y="6"  width="4" height="7" rx="1" fill="var(--accent)" opacity=".45"/>
-        <rect x="7"  y="17" width="7" height="6" rx="1" fill="var(--accent)" opacity=".3"/>
-        <rect x="18" y="17" width="7" height="6" rx="1" fill="var(--accent)" opacity=".3"/>
-        <rect x="29" y="17" width="5" height="6" rx="1" fill="var(--accent)" opacity=".3"/>
-        <text x="20" y="34" text-anchor="middle" font-size="9" font-weight="800" fill="var(--accent)">SM</text>
+        <rect x="3" y="4" width="34" height="30" rx="1" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="3" y1="15" x2="37" y2="15" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="3" y1="25" x2="37" y2="25" stroke="#0B0B0F" stroke-width="1.5"/>
+        <rect x="7"  y="6"  width="5" height="7" rx="1" fill="#0B0B0F" opacity=".45"/>
+        <rect x="15" y="6"  width="5" height="7" rx="1" fill="#0B0B0F" opacity=".45"/>
+        <rect x="23" y="6"  width="5" height="7" rx="1" fill="#0B0B0F" opacity=".45"/>
+        <rect x="31" y="6"  width="4" height="7" rx="1" fill="#0B0B0F" opacity=".45"/>
+        <rect x="7"  y="17" width="7" height="6" rx="1" fill="#0B0B0F" opacity=".3"/>
+        <rect x="18" y="17" width="7" height="6" rx="1" fill="#0B0B0F" opacity=".3"/>
+        <rect x="29" y="17" width="5" height="6" rx="1" fill="#0B0B0F" opacity=".3"/>
+        <text x="20" y="34" text-anchor="middle" font-size="9" font-weight="800" fill="#0B0B0F">SM</text>
       </svg>`,
       'kaizen': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
         <path d="M20,3 L23,14 L34,9 L27,18 L38,20 L27,22 L34,31 L23,26 L20,37 L17,26 L6,31 L13,22 L2,20 L13,18 L6,9 L17,14 Z"
-          stroke="var(--accent)" stroke-width="1.8" fill="none"/>
+          stroke="#0B0B0F" stroke-width="1.8" fill="none"/>
       </svg>`,
       'papel': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="12" r="8" stroke="var(--accent)" stroke-width="2"/>
-        <path d="M6 36 C6 28 34 28 34 36" stroke="var(--accent)" stroke-width="2" fill="none"/>
+        <circle cx="20" cy="12" r="8" stroke="#0B0B0F" stroke-width="2"/>
+        <path d="M6 36 C6 28 34 28 34 36" stroke="#0B0B0F" stroke-width="2" fill="none"/>
       </svg>`,
       'handoff': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M4 14 L24 14" stroke="var(--accent)" stroke-width="2"/>
-        <polygon points="22,10 30,14 22,18" fill="var(--accent)"/>
-        <path d="M36 26 L16 26" stroke="var(--accent)" stroke-width="2"/>
-        <polygon points="18,22 10,26 18,30" fill="var(--accent)"/>
+        <path d="M4 14 L24 14" stroke="#0B0B0F" stroke-width="2"/>
+        <polygon points="22,10 30,14 22,18" fill="#0B0B0F"/>
+        <path d="M36 26 L16 26" stroke="#0B0B0F" stroke-width="2"/>
+        <polygon points="18,22 10,26 18,30" fill="#0B0B0F"/>
       </svg>`,
       'aprovacao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="16" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="20" y1="10" x2="20" y2="20" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="20" y1="20" x2="28" y2="24" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
-        <line x1="14" y1="4" x2="14" y2="8" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="26" y1="4" x2="26" y2="8" stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="20" cy="20" r="16" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="20" y1="10" x2="20" y2="20" stroke="#0B0B0F" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="20" y1="20" x2="28" y2="24" stroke="#0B0B0F" stroke-width="2" stroke-linecap="round"/>
+        <line x1="14" y1="4" x2="14" y2="8" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="26" y1="4" x2="26" y2="8" stroke="#0B0B0F" stroke-width="2"/>
       </svg>`,
       'decisao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <polygon points="20,4 38,20 20,36 2,20" stroke="var(--accent)" stroke-width="2"/>
+        <polygon points="20,4 38,20 20,36 2,20" stroke="#0B0B0F" stroke-width="2"/>
       </svg>`,
       'sistema-ti': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="4" y="6" width="32" height="22" rx="2" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="14" y1="34" x2="26" y2="34" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="20" y1="28" x2="20" y2="34" stroke="var(--accent)" stroke-width="2"/>
+        <rect x="4" y="6" width="32" height="22" rx="2" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="14" y1="34" x2="26" y2="34" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="20" y1="28" x2="20" y2="34" stroke="#0B0B0F" stroke-width="2"/>
       </svg>`,
       'integracao': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="10" cy="20" r="8" stroke="var(--accent)" stroke-width="2"/>
-        <circle cx="30" cy="20" r="8" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="18" y1="20" x2="22" y2="20" stroke="var(--accent)" stroke-width="2"/>
-        <polygon points="20,17 24,20 20,23" fill="var(--accent)"/>
+        <circle cx="10" cy="20" r="8" stroke="#0B0B0F" stroke-width="2"/>
+        <circle cx="30" cy="20" r="8" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="18" y1="20" x2="22" y2="20" stroke="#0B0B0F" stroke-width="2"/>
+        <polygon points="20,17 24,20 20,23" fill="#0B0B0F"/>
       </svg>`,
       'documento': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M8 4 L28 4 L36 12 L36 36 L8 36 Z" stroke="var(--accent)" stroke-width="2"/>
-        <path d="M28 4 L28 12 L36 12" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="14" y1="20" x2="30" y2="20" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="14" y1="26" x2="26" y2="26" stroke="var(--accent)" stroke-width="1.5"/>
+        <path d="M8 4 L28 4 L36 12 L36 36 L8 36 Z" stroke="#0B0B0F" stroke-width="2"/>
+        <path d="M28 4 L28 12 L36 12" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="14" y1="20" x2="30" y2="20" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="14" y1="26" x2="26" y2="26" stroke="#0B0B0F" stroke-width="1.5"/>
       </svg>`,
       'trigger': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M22 4 L14 20 L20 20 L18 36 L30 16 L23 16 Z" stroke="var(--accent)" stroke-width="2" fill="none"/>
+        <path d="M22 4 L14 20 L20 20 L18 36 L30 16 L23 16 Z" stroke="#0B0B0F" stroke-width="2" fill="none"/>
       </svg>`,
       'rpa': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <rect x="10" y="16" width="20" height="18" rx="2" stroke="var(--accent)" stroke-width="2"/>
-        <circle cx="20" cy="9" r="5" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="20" y1="14" x2="20" y2="16" stroke="var(--accent)" stroke-width="2"/>
-        <circle cx="16" cy="24" r="2" fill="var(--accent)"/>
-        <circle cx="24" cy="24" r="2" fill="var(--accent)"/>
-        <line x1="14" y1="30" x2="26" y2="30" stroke="var(--accent)" stroke-width="1.5"/>
+        <rect x="10" y="16" width="20" height="18" rx="2" stroke="#0B0B0F" stroke-width="2"/>
+        <circle cx="20" cy="9" r="5" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="20" y1="14" x2="20" y2="16" stroke="#0B0B0F" stroke-width="2"/>
+        <circle cx="16" cy="24" r="2" fill="#0B0B0F"/>
+        <circle cx="24" cy="24" r="2" fill="#0B0B0F"/>
+        <line x1="14" y1="30" x2="26" y2="30" stroke="#0B0B0F" stroke-width="1.5"/>
       </svg>`,
       'agente-ia': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <ellipse cx="20" cy="18" rx="12" ry="12" stroke="var(--accent)" stroke-width="2"/>
-        <path d="M14 18 C14 14 26 14 26 18" stroke="var(--accent)" stroke-width="1.5"/>
-        <path d="M12 22 C10 18 10 14 14 12" stroke="var(--accent)" stroke-width="1.5"/>
-        <path d="M28 22 C30 18 30 14 26 12" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="20" y1="30" x2="20" y2="34" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="14" y1="34" x2="26" y2="34" stroke="var(--accent)" stroke-width="2"/>
+        <ellipse cx="20" cy="18" rx="12" ry="12" stroke="#0B0B0F" stroke-width="2"/>
+        <path d="M14 18 C14 14 26 14 26 18" stroke="#0B0B0F" stroke-width="1.5"/>
+        <path d="M12 22 C10 18 10 14 14 12" stroke="#0B0B0F" stroke-width="1.5"/>
+        <path d="M28 22 C30 18 30 14 26 12" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="20" y1="30" x2="20" y2="34" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="14" y1="34" x2="26" y2="34" stroke="#0B0B0F" stroke-width="2"/>
       </svg>`,
       'hibrido': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="13" cy="12" r="6" stroke="var(--accent)" stroke-width="1.8"/>
-        <path d="M4 32 C4 26 22 26 22 32" stroke="var(--accent)" stroke-width="1.8" fill="none"/>
-        <circle cx="30" cy="26" r="7" stroke="var(--accent)" stroke-width="1.8"/>
-        <circle cx="30" cy="26" r="3" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="30" y1="16" x2="30" y2="19" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="30" y1="33" x2="30" y2="36" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="20" y1="26" x2="23" y2="26" stroke="var(--accent)" stroke-width="1.5"/>
-        <line x1="37" y1="26" x2="40" y2="26" stroke="var(--accent)" stroke-width="1.5"/>
+        <circle cx="13" cy="12" r="6" stroke="#0B0B0F" stroke-width="1.8"/>
+        <path d="M4 32 C4 26 22 26 22 32" stroke="#0B0B0F" stroke-width="1.8" fill="none"/>
+        <circle cx="30" cy="26" r="7" stroke="#0B0B0F" stroke-width="1.8"/>
+        <circle cx="30" cy="26" r="3" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="30" y1="16" x2="30" y2="19" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="30" y1="33" x2="30" y2="36" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="20" y1="26" x2="23" y2="26" stroke="#0B0B0F" stroke-width="1.5"/>
+        <line x1="37" y1="26" x2="40" y2="26" stroke="#0B0B0F" stroke-width="1.5"/>
       </svg>`,
       'retrabalho': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M32 20 A12 12 0 1 0 20 32" stroke="var(--accent)" stroke-width="2.5" fill="none"/>
-        <polygon points="18,28 26,32 22,40" fill="var(--accent)"/>
+        <path d="M32 20 A12 12 0 1 0 20 32" stroke="#0B0B0F" stroke-width="2.5" fill="none"/>
+        <polygon points="18,28 26,32 22,40" fill="#0B0B0F"/>
       </svg>`,
       'falha': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="16" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="12" y1="12" x2="28" y2="28" stroke="var(--accent)" stroke-width="2.5"/>
-        <line x1="28" y1="12" x2="12" y2="28" stroke="var(--accent)" stroke-width="2.5"/>
+        <circle cx="20" cy="20" r="16" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="12" y1="12" x2="28" y2="28" stroke="#0B0B0F" stroke-width="2.5"/>
+        <line x1="28" y1="12" x2="12" y2="28" stroke="#0B0B0F" stroke-width="2.5"/>
       </svg>`,
       'sla': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="16" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="20" y1="10" x2="20" y2="20" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="20" y1="20" x2="28" y2="26" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="20" cy="20" r="16" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="20" y1="10" x2="20" y2="20" stroke="#0B0B0F" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="20" y1="20" x2="28" y2="26" stroke="#0B0B0F" stroke-width="2" stroke-linecap="round"/>
       </svg>`,
       'paralelo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <line x1="8" y1="4" x2="8" y2="36" stroke="var(--accent)" stroke-width="3"/>
-        <line x1="20" y1="4" x2="20" y2="36" stroke="var(--accent)" stroke-width="3"/>
-        <line x1="32" y1="4" x2="32" y2="36" stroke="var(--accent)" stroke-width="3"/>
-        <line x1="4" y1="12" x2="36" y2="12" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3"/>
-        <line x1="4" y1="28" x2="36" y2="28" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="8" y1="4" x2="8" y2="36" stroke="#0B0B0F" stroke-width="3"/>
+        <line x1="20" y1="4" x2="20" y2="36" stroke="#0B0B0F" stroke-width="3"/>
+        <line x1="32" y1="4" x2="32" y2="36" stroke="#0B0B0F" stroke-width="3"/>
+        <line x1="4" y1="12" x2="36" y2="12" stroke="#0B0B0F" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="4" y1="28" x2="36" y2="28" stroke="#0B0B0F" stroke-width="1.5" stroke-dasharray="3,3"/>
       </svg>`,
       'arquivo': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <path d="M4 12 L4 34 L36 34 L36 16 L18 16 L14 12 Z" stroke="var(--accent)" stroke-width="2"/>
-        <line x1="4" y1="20" x2="36" y2="20" stroke="var(--accent)" stroke-width="1.5"/>
+        <path d="M4 12 L4 34 L36 34 L36 16 L18 16 L14 12 Z" stroke="#0B0B0F" stroke-width="2"/>
+        <line x1="4" y1="20" x2="36" y2="20" stroke="#0B0B0F" stroke-width="1.5"/>
       </svg>`,
       'texto': `<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
-        <line x1="8" y1="10" x2="32" y2="10" stroke="var(--accent)" stroke-width="2.5"/>
-        <line x1="20" y1="10" x2="20" y2="34" stroke="var(--accent)" stroke-width="2.5"/>
-        <line x1="12" y1="34" x2="28" y2="34" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <line x1="8" y1="10" x2="32" y2="10" stroke="#0B0B0F" stroke-width="2.5"/>
+        <line x1="20" y1="10" x2="20" y2="34" stroke="#0B0B0F" stroke-width="2.5"/>
+        <line x1="12" y1="34" x2="28" y2="34" stroke="#0B0B0F" stroke-width="1.5" stroke-dasharray="3,3"/>
       </svg>`,
     };
-    return icons[tipo] || `<svg width="36" height="36" viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="28" height="28" rx="3" stroke="var(--accent)" stroke-width="2"/></svg>`;
+    return icons[tipo] || `<svg width="36" height="36" viewBox="0 0 40 40" fill="none"><rect x="6" y="6" width="28" height="28" rx="3" stroke="#0B0B0F" stroke-width="2"/></svg>`;
   }
 
   let fvElSelecionado = null;

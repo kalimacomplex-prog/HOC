@@ -486,6 +486,7 @@ const overviewSchema = new mongoose.Schema({
   empresa: { type: mongoose.Schema.Types.ObjectId, ref: 'Empresa', required: true, unique: true },
   info: { type: Object, default: {} }, mvv: { type: Object, default: {} }, timeline: { type: Array, default: [] },
   esg: { type: Object, default: {} }, organograma: { type: Object, default: {} },
+  secoes: { type: Array, default: [] }, // seções da Visão Geral (sem este campo o Mongoose as descartava ao salvar)
   pastas: { type: Array, default: [] },
   atualizadoEm: { type: Date, default: Date.now }
 });

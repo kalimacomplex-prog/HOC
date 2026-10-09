@@ -456,7 +456,6 @@
     .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
     .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
     .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
-    .color-hex-input { width: 100%; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
 
     /* ===== TOPBAR (com abas centralizadas) ===== */
     .main { min-width: 0; }
@@ -2374,17 +2373,23 @@ senha = campos.get('senha', '')</pre>
     { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
     { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
     { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
-    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#E6A800', nome: 'Amarelo Forte' },
     { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
   ];
   function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
   function setAccentColor(hex) {
-    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    if (!CORES_SISTEMA.some(c => c.hex.toLowerCase() === String(hex).toLowerCase())) return;
     localStorage.setItem('accentColor', hex);
     aplicarAccentColor(hex);
     if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
   }
-  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+  (function () {
+    const salvo = (localStorage.getItem('accentColor') || '').toLowerCase();
+    const cor = salvo === '#ffcc00' ? CORES_SISTEMA.find(c => c.nome === 'Amarelo Forte') : CORES_SISTEMA.find(c => c.hex.toLowerCase() === salvo);
+    const hex = (cor || CORES_SISTEMA[0]).hex;
+    if (localStorage.getItem('accentColor') !== hex) localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+  })();
 
   const sidebarEl = document.getElementById('sidebarEl');
   function aplicarSidebarRecolhida(recolhida) {
@@ -2416,8 +2421,7 @@ senha = campos.get('senha', '')</pre>
         <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
           <span class="color-swatch-rect" style="background:${c.hex}"></span>
           <span class="color-swatch-label">${c.nome}</span>
-        </button>`).join('')}
-      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+        </button>`).join('')}`;
   }
   function voltarMenuSistema() {
     const wrap = document.getElementById('sistemaItemsWrap');
@@ -5365,7 +5369,8 @@ senha = campos.get('senha', '')</pre>
     const stCor = _ETAPA_ST_COR[etapa.status]||'#94a3b8';
     const isDone = _ETAPA_DONE.includes(etapa.status);
     const hasStatus = _PRC_HAS_STATUS.has(tipo);
-    const bs=(bg,col,bdr)=>`display:inline-block;box-sizing:border-box;height:24px;padding:6px 10px 7px;line-height:11px;text-align:center;font-size:10.5px;font-weight:700;background:${bg};color:#0B0B0F;border:0;box-shadow:inset 0 0 0 1.5px ${bdr};border-radius:999px;cursor:pointer;white-space:nowrap`;
+    // Botões de ação: cantos dos botões pequenos do sistema (7px, não pílula — pílula é das tags de status), sem borda e com tons mais fortes
+    const bs=(bg)=>`display:inline-block;box-sizing:border-box;height:24px;padding:6px 12px;line-height:11px;text-align:center;font-size:10.5px;font-weight:700;background:${bg.replace(/(\d+)%,white\)/,(m,n)=>Math.min(60,Math.round(n*2.4))+'%,white)').replace('#F6F7F9','#E3E5EA')};color:#0B0B0F;border:0;border-radius:7px;cursor:pointer;white-space:nowrap`;
     const isAuto = tipo==='mudar_var';
     // Calculadora: os status são "Condição atendida" (verde) e "Condição não atendida" (vermelho)
     const calcFeito = tipo==='calculo' && _ETAPA_DONE.includes(etapa.status);
@@ -5484,12 +5489,12 @@ senha = campos.get('senha', '')</pre>
     let resetBtn = '';
     if (interactive && etapa.status!=='Pendente' && !isAuto && tipo!=='calculo') {
       if (tipo==='robo' && etapa.status==='Em Andamento' && etapa.execucaoRoboId) {
-        resetBtn = `<button onclick="prcInterromperRoboEtapa('${exec._id}','${eid}')" style="display:inline-block;box-sizing:border-box;height:24px;padding:6px 10px 7px;line-height:11px;text-align:center;font-size:10.5px;font-weight:700;background:color-mix(in srgb,#FF2E4D 8%,white);color:#FF2E4D;border:0;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#FF2E4D 35%,white);border-radius:999px;cursor:pointer;white-space:nowrap">⏹ Interromper</button>`;
+        resetBtn = `<button onclick="prcInterromperRoboEtapa('${exec._id}','${eid}')" style="${bs('color-mix(in srgb,#FF2E4D 8%,white)')}">⏹ Interromper</button>`;
       } else if (tipo==='ia' && etapa.status==='Em Andamento') {
         resetBtn = `<span style="font-size:10.5px;color:#9CA0AC;padding:2px 6px">aguardando...</span>`;
       } else {
         const resetFn = tipo==='robo' ? `prcResetRoboEtapa('${exec._id}','${eid}')` : `prcEtapaStatus('${exec._id}','${eid}','Pendente')`;
-        resetBtn = `<button onclick="${resetFn}" style="display:inline-block;box-sizing:border-box;height:24px;padding:6px 10px 7px;line-height:11px;text-align:center;font-size:10.5px;font-weight:600;background:none;color:#0B0B0F;border:0;box-shadow:inset 0 0 0 1.5px #E5E7EB;border-radius:999px;cursor:pointer" title="Resetar status">Resetar</button>`;
+        resetBtn = `<button onclick="${resetFn}" style="${bs('#F6F7F9')}" title="Resetar status">Resetar</button>`;
       }
     }
     // Pendente com ações disponíveis: sem tag, os botões ocupam o lugar dela. Nos demais status a tag vem em cima e os botões embaixo.
@@ -5634,7 +5639,6 @@ senha = campos.get('senha', '')</pre>
               </div>
               ${histHtml?`<div style="padding:0 16px;background:white">${histHtml}</div>`:''}
               <div style="padding:14px 16px;border-top:1px solid #ECEDF0">
-                <div style="font-size:10.5px;font-weight:700;color:#8A6200;margin-bottom:10px">VOLTA ATUAL${history.length?` (${history.length+1}ª)`:''}</div>
                 ${renderSteps(body, true)}
                 ${novaVoltaBtn}
               </div>
@@ -5719,7 +5723,6 @@ senha = campos.get('senha', '')</pre>
                     <div style="font-size:12.5px;color:#33363F">${lDesc}</div>
                   </div>
                   <div style="padding:14px 16px;border-top:1px solid #ECEDF0">
-                    <div style="font-size:10.5px;font-weight:700;color:#8A6200;margin-bottom:10px">VOLTA ATUAL</div>
                     ${renderSubCompound(body)}
                   </div>
                 </div>

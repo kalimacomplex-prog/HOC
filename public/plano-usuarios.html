@@ -52,7 +52,6 @@
     .color-swatch-rect { width: 28px; height: 14px; border-radius: 4px; flex-shrink: 0; }
     .color-swatch-label { font-size: 11.5px; color: rgba(255,255,255,0.85); font-weight: 600; }
     .color-swatch.selecionado { background: rgba(255,255,255,0.1); }
-    .sidebar-sistema-items input.color-hex-input { width: 100%; height: auto; margin-top: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: white; font-size: 11.5px; outline: none; font-family: inherit; }
 
     /* ===== MAIN / TOPBAR ===== */
     .main { min-width: 0; }
@@ -605,17 +604,23 @@
     { hex: '#2F5CFF', nome: 'Azul Sistema' }, { hex: '#0A3A52', nome: 'Azul Petróleo' }, { hex: '#00CFE8', nome: 'Azul Água' },
     { hex: '#0A5544', nome: 'Verde Petróleo' }, { hex: '#00CC99', nome: 'Verde Água' },
     { hex: '#8B1A1A', nome: 'Vermelho Vinho' }, { hex: '#DD0000', nome: 'Vermelho Ferrari' },
-    { hex: '#FFCC00', nome: 'Amarelo Forte' },
+    { hex: '#E6A800', nome: 'Amarelo Forte' },
     { hex: '#FF77BB', nome: 'Rosa' }, { hex: '#AA33FF', nome: 'Roxo' },
   ];
   function aplicarAccentColor(hex) { document.documentElement.style.setProperty('--accent', hex); }
   function setAccentColor(hex) {
-    if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) return;
+    if (!CORES_SISTEMA.some(c => c.hex.toLowerCase() === String(hex).toLowerCase())) return;
     localStorage.setItem('accentColor', hex);
     aplicarAccentColor(hex);
     if (document.getElementById('sistemaItemsWrap').dataset.modo === 'cor') mostrarCorSistemaNoMenu();
   }
-  aplicarAccentColor(localStorage.getItem('accentColor') || '#2F5CFF');
+  (function () {
+    const salvo = (localStorage.getItem('accentColor') || '').toLowerCase();
+    const cor = salvo === '#ffcc00' ? CORES_SISTEMA.find(c => c.nome === 'Amarelo Forte') : CORES_SISTEMA.find(c => c.hex.toLowerCase() === salvo);
+    const hex = (cor || CORES_SISTEMA[0]).hex;
+    if (localStorage.getItem('accentColor') !== hex) localStorage.setItem('accentColor', hex);
+    aplicarAccentColor(hex);
+  })();
 
   const sidebarEl = document.getElementById('sidebarEl');
   function aplicarSidebarRecolhida(recolhida) {
@@ -647,8 +652,7 @@
         <button class="color-swatch${c.hex.toLowerCase()===atual?' selecionado':''}" onclick="setAccentColor('${c.hex}')">
           <span class="color-swatch-rect" style="background:${c.hex}"></span>
           <span class="color-swatch-label">${c.nome}</span>
-        </button>`).join('')}
-      <input type="text" class="color-hex-input" placeholder="#2F5CFF" value="${atual}" onchange="setAccentColor(this.value)">`;
+        </button>`).join('')}`;
   }
   function voltarMenuSistema() {
     const wrap = document.getElementById('sistemaItemsWrap');

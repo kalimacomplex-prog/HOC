@@ -59,6 +59,16 @@ except ImportError:
     print("        Execute: pip install psutil")
 
 # ── Estado ───────────────────────────────────────────────────────────────────
+def _decodificar_saida(dados):
+    """Decodifica uma linha da saída do robô sem perder acentos: UTF-8 primeiro; se não for UTF-8 válido
+    (comando do Windows/cmd), tenta as codepages do Windows em vez de trocar por "�"."""
+    for enc in ('utf-8', 'cp1252', 'cp850'):
+        try:
+            return dados.decode(enc)
+        except UnicodeDecodeError:
+            continue
+    return dados.decode('utf-8', 'replace')
+
 running_procs = {}  # execId (str) -> subprocess.Popen
 _lock = threading.Lock()
 
@@ -303,10 +313,14 @@ def run_robot(exec_id, command, timeout_min=30, git_url=None, git_branch='main',
             'HOC_ROBO_ID':     str(robo_id or ''),
             'HOC_ROBO_NOME':   robo_nome,
         })
+        # Robôs em Python no Windows imprimiam em cp1252 (a codepage do sistema) e o Agent lia como UTF-8,
+        # trocando cada acento por "�" nos logs. Força UTF-8 no robô e, para o que não for Python,
+        # a leitura abaixo decodifica os bytes com fallback (utf-8 -> cp1252 -> cp850).
+        child_env['PYTHONUTF8'] = '1'
+        child_env['PYTHONIOENCODING'] = 'utf-8'
         proc = subprocess.Popen(
             command, shell=True,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            text=True, encoding='utf-8', errors='replace',
             cwd=workdir, env=child_env, **extra
         )
         with _lock:
@@ -337,8 +351,8 @@ def run_robot(exec_id, command, timeout_min=30, git_url=None, git_branch='main',
 
         def _reader():
             try:
-                for line in iter(proc.stdout.readline, ''):
-                    stdout_q.put(line)
+                for linha_bytes in iter(proc.stdout.readline, b''):
+                    stdout_q.put(_decodificar_saida(linha_bytes))
             except Exception:
                 pass
             stdout_q.put(None)  # sentinel: fim do stream

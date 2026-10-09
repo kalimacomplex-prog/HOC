@@ -555,6 +555,7 @@ function rbRenderStepList(steps, numeros, containerId, branchKey) {
   let html = rbZoneHtml(containerId, branchKey, 0);
   if (!steps.length) {
     html += `<div class="rb-empty-branch" ondragover="rbZoneDragOver(event)" ondrop="rbZoneDrop(event,'${containerId}','${branchKey}',0)">Arraste uma ação aqui</div>`;
+    if (containerId === 'root') html += rbZoneHtml(containerId, branchKey, 0); // liga o quadro vazio ao FIM
     return html;
   }
   steps.forEach((step, i) => {
@@ -565,7 +566,7 @@ function rbRenderStepList(steps, numeros, containerId, branchKey) {
 }
 
 function rbZoneHtml(containerId, branchKey, index) {
-  return `<div class="rb-zone" ondragover="rbZoneDragOver(event)" ondragleave="rbZoneDragLeave(event)" ondrop="rbZoneDrop(event,'${containerId}','${branchKey}',${index})"><div class="rb-zone-line"></div></div>`;
+  return `<div class="rb-zone" ondragover="rbZoneDragOver(event)" ondragleave="rbZoneDragLeave(event)" ondrop="rbZoneDrop(event,'${containerId}','${branchKey}',${index})"><svg class="rb-zone-line" width="10" height="28" viewBox="0 0 10 28"><line x1="5" y1="4" x2="5" y2="17" stroke="#b0bec5" stroke-width="1.5" stroke-linecap="round"/><polygon points="1,17 9,17 5,24" fill="#b0bec5"/></svg></div>`;
 }
 
 function rbRenderStepCard(step, numeros) {
@@ -644,6 +645,12 @@ function rbResumoStep(step) {
 function rbSelectStep(id, ev) {
   if (ev) ev.stopPropagation();
   rbSelectedId = id;
+  rbRenderCanvas();
+  rbRenderProps();
+}
+
+function rbFecharProps() {
+  rbSelectedId = null;
   rbRenderCanvas();
   rbRenderProps();
 }
@@ -870,9 +877,11 @@ function rbRenderAiOpenForm(step, c) {
 
 function rbRenderProps() {
   const el = document.getElementById('rbProps');
-  if (!rbSelectedId) { el.innerHTML = '<div class="rb-props-placeholder">Selecione um step no canvas pra configurar, ou clique numa ação da paleta pra adicionar.</div>'; return; }
+  // O painel só aparece quando um step está selecionado (clique no step do canvas); o X o fecha.
+  if (!rbSelectedId) { el.innerHTML = ''; el.style.display = 'none'; return; }
   const step = rbFindStep(rbSelectedId);
-  if (!step) { el.innerHTML = ''; return; }
+  if (!step) { el.innerHTML = ''; el.style.display = 'none'; return; }
+  el.style.display = '';
   const acao = RB_ACOES_MAP[step.type] || { label: step.type, icone: 'gear', cor: '#718096' };
   const c = step.config || {};
   const id = step.id;
@@ -973,7 +982,7 @@ function rbRenderProps() {
       : RB_HINT_MAQUINA;
   }
 
-  el.innerHTML = `<div class="rb-props-titulo"><span class="rb-step-icone" style="background:${acao.cor}22;color:${acao.cor}">${_rbIcon(acao.icone, 14, acao.cor)}</span> ${escapeHtmlRb(acao.label)}</div>${form}`;
+  el.innerHTML = `<div class="rb-props-titulo" style="justify-content:space-between"><span style="display:flex;align-items:center;gap:8px;min-width:0"><span class="rb-step-icone" style="background:${acao.cor}22;color:${acao.cor}">${_rbIcon(acao.icone, 14, acao.cor)}</span> ${escapeHtmlRb(acao.label)}</span><button type="button" class="rb-props-fechar" onclick="rbFecharProps()" title="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>${form}`;
 }
 
 function rbRenderBrowserActions(step) {
@@ -1100,7 +1109,7 @@ function rbParamsUrl() {
   return new URLSearchParams(location.search);
 }
 
-async function rbCarregar() {
+async function rbCarregarDados() {
   rbCarregarDadosIA(); // em paralelo — só alimenta os seletores de credencial/provedor da sessão de IA
   const params = rbParamsUrl();
   rbAutomacaoId = params.get('automacaoId');
@@ -1220,5 +1229,20 @@ function rbPollRun(runId, painel) {
 }
 
 // ==================== Boot ====================
+
+// Só mostra a tela depois que os dados chegaram e as fontes carregaram (com limite de espera para nunca travar).
+async function rbCarregar() {
+  const liberar = () => document.body.classList.remove('rb-carregando');
+  const seguranca = setTimeout(liberar, 8000);
+  try {
+    await rbCarregarDados();
+    await Promise.race([document.fonts ? document.fonts.ready : null, new Promise((r) => setTimeout(r, 1500))]);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    clearTimeout(seguranca);
+    liberar();
+  }
+}
 
 document.addEventListener('DOMContentLoaded', rbCarregar);

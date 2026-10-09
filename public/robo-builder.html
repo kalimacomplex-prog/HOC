@@ -19,7 +19,25 @@
     .rb-nome { border: none; outline: none; font-size: 15px; font-weight: 700; color: #1e2a4a; background: none; padding: 6px 8px; border-radius: 6px; min-width: 200px; }
     .rb-nome:focus { background: #f5f0ff; }
     .rb-desc { border: none; outline: none; font-size: 12px; color: #a0aec0; background: none; flex: 1; }
-    .rb-ambiente { height: 34px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0 8px; font-size: 12px; color: #2d3748; background: white; cursor: pointer; }
+    .rb-ambiente { height: 38px; border: 1.5px solid #E5E7EB; border-radius: 9px; padding: 0 12px; font-size: 12.5px; font-weight: 600; color: #33363F; background: white; cursor: pointer; font-family: inherit; box-sizing: border-box; min-width: 190px; }
+    /* Botões e lista suspensa no padrão do sistema */
+    .btn-lic { height: 38px; padding: 0 14px; border-radius: 9px; font-size: 12.5px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; font-family: inherit; }
+    .btn-lic-outline { background: white; color: #33363F; border: 1.5px solid #E5E7EB; }
+    .btn-lic-outline:hover { background: #F1F2F5; }
+    .btn-lic-add { background: linear-gradient(135deg, var(--accent, #2F5CFF), color-mix(in srgb, var(--accent, #2F5CFF) 80%, black)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent, #2F5CFF) 35%, transparent); color: white; font-weight: 700; padding: 0 16px; }
+    .btn-lic:disabled { opacity: 0.5; cursor: not-allowed; }
+    .hoc-select-wrap { position: relative; display: inline-block; }
+    .hoc-select-native { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; overflow: hidden; }
+    .hoc-select-trigger { appearance: none; -webkit-appearance: none; margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: white; cursor: pointer; }
+    .hoc-select-trigger:hover { background: #F1F2F5 !important; }
+    .hoc-select-trigger svg { flex-shrink: 0; color: #9CA0AC; transition: transform .15s; }
+    .hoc-select-trigger.open svg { transform: rotate(180deg); }
+    .hoc-select-trigger-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: left; }
+    .hoc-select-panel { display: none; position: absolute; top: calc(100% + 4px); right: 0; min-width: 100%; background: white; border: 1px solid #ECEDF0; border-radius: 10px; box-shadow: 0 12px 32px rgba(11,11,15,0.16); padding: 6px; z-index: 60; max-height: 260px; overflow-y: auto; }
+    .hoc-select-panel.open { display: block; }
+    .hoc-select-item { padding: 8px 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #33363F; cursor: pointer; white-space: nowrap; }
+    .hoc-select-item:hover { background: #F1F2F5; }
+    .hoc-select-item.selected { background: color-mix(in srgb, var(--accent, #2F5CFF) 12%, white); color: #0B0B0F; }
     .rb-acoes { display: flex; gap: 8px; align-items: center; }
     .rb-status { font-size: 11px; color: #a0aec0; margin-right: 6px; }
 
@@ -33,13 +51,13 @@
     .rb-acao-icone { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
     .rb-canvas-wrap { flex: 1; overflow: auto; background: #f0f2f5; padding: 28px; display: flex; flex-direction: column; align-items: center; }
-    .rb-marker { padding: 7px 18px; border-radius: 20px; font-size: 12px; font-weight: 700; color: white; margin: 4px 0; }
+    .rb-marker { display: inline-block; min-width: 96px; text-align: center; padding: 7px 18px; border-radius: 20px; font-size: 12px; font-weight: 800; letter-spacing: .02em; color: white; margin: 0; }
     .rb-marker.inicio { background: #38a169; }
     .rb-marker.fim { background: #718096; }
     .rb-canvas { width: 100%; max-width: 640px; }
 
-    .rb-zone { height: 14px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: center; }
-    .rb-zone-line { width: 2px; height: 100%; background: #cbd5e0; }
+    .rb-zone { height: 28px; margin: 0 auto; width: 100%; display: flex; align-items: center; justify-content: center; }
+    .rb-zone-line { display: block; flex-shrink: 0; pointer-events: none; } /* seta no estilo do builder de processos (#b0bec5, 1,5px, 4px de folga) */
     .rb-zone.rb-over { background: #ede8ff; border-radius: 6px; }
 
     .rb-step { background: white; border: 1.5px solid #e2e8f0; border-radius: 9px; padding: 10px 12px; margin: 2px 0; display: flex; align-items: center; gap: 9px; cursor: pointer; }
@@ -69,6 +87,14 @@
     .rb-empty-branch { font-size: 11px; color: #cbd5e0; text-align: center; padding: 10px; border: 1.5px dashed #e2e8f0; border-radius: 6px; }
 
     .rb-props { width: 320px; flex-shrink: 0; background: white; border-left: 1px solid #e2e8f0; overflow-y: auto; padding: 16px; }
+    /* Enquanto o robô e as ações carregam, a tela fica oculta atrás de um indicador (evita abrir em branco, com os botões desalinhados) */
+    .rb-carregando .rb-topbar, .rb-carregando .rb-layout { visibility: hidden; }
+    .rb-loader { display: none; position: fixed; inset: 0; align-items: center; justify-content: center; background: #f0f2f5; z-index: 100; }
+    .rb-carregando .rb-loader { display: flex; }
+    .rb-spinner { width: 30px; height: 30px; border: 3px solid #E5E7EB; border-top-color: var(--accent, #2F5CFF); border-radius: 50%; animation: rb-gira .8s linear infinite; }
+    @keyframes rb-gira { to { transform: rotate(360deg); } }
+    .rb-props-fechar { width: 28px; height: 28px; border: none; border-radius: 8px; background: #F1F2F5; color: #4A4E5A; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .rb-props-fechar:hover { background: #E5E7EB; }
     .rb-props-placeholder { color: #a0aec0; font-size: 12.5px; text-align: center; margin-top: 40px; }
     .rb-props-titulo { font-size: 13px; font-weight: 700; color: #1e2a4a; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
     .rb-field { margin-bottom: 12px; }
@@ -88,7 +114,8 @@
     .rb-main-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   </style>
 </head>
-<body>
+<body class="rb-carregando">
+  <div class="rb-loader"><div class="rb-spinner"></div></div>
   <div class="rb-topbar">
     <button class="rb-voltar" onclick="rbVoltar()" title="Voltar">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -101,8 +128,8 @@
         <option value="local">Rodar: Local (Agent)</option>
         <option value="nuvem">Rodar: Nuvem (GitHub)</option>
       </select>
-      <button class="btn-secondary" onclick="rbExecutarInline()">▶ Rodar</button>
-      <button class="btn-primary" onclick="rbSalvar()" id="rbBtnSalvar">Salvar</button>
+      <button class="btn-lic btn-lic-outline" onclick="rbExecutarInline()"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>Rodar</button>
+      <button class="btn-lic btn-lic-add" onclick="rbSalvar()" id="rbBtnSalvar">Salvar</button>
     </div>
   </div>
 
@@ -115,19 +142,82 @@
     <div class="rb-main-col">
       <div class="rb-canvas-wrap">
         <div class="rb-canvas">
-          <div style="text-align:center"><span class="rb-marker inicio">▶ INÍCIO</span></div>
+          <div style="text-align:center"><span class="rb-marker inicio">INÍCIO</span></div>
           <div id="rbCanvasSteps"></div>
-          <div style="text-align:center"><span class="rb-marker fim">■ FIM</span></div>
+          <div style="text-align:center"><span class="rb-marker fim">FIM</span></div>
         </div>
       </div>
       <div class="rb-log-panel" id="rbLogPanel"></div>
     </div>
 
-    <div class="rb-props" id="rbProps">
-      <div class="rb-props-placeholder">Selecione um step no canvas pra configurar, ou arraste uma ação da paleta.</div>
-    </div>
+    <div class="rb-props" id="rbProps" style="display:none"></div>
   </div>
 
+  <script>
+    // Cor do sistema escolhida pelo usuário (só as cores da paleta)
+    (function () {
+      const PALETA = ['#2F5CFF','#0A3A52','#00CFE8','#0A5544','#00CC99','#8B1A1A','#DD0000','#E6A800','#FF77BB','#AA33FF'];
+      let c = (localStorage.getItem('accentColor') || '').toLowerCase();
+      if (c === '#ffcc00') c = '#e6a800';
+      if (!PALETA.some(p => p.toLowerCase() === c)) c = '#2f5cff';
+      document.documentElement.style.setProperty('--accent', c);
+    })();
+
+    // Lista suspensa no padrão do sistema (substitui a lista nativa do navegador)
+    function hocEnhanceSelect(sel) {
+      if (!sel || sel._hocEnhanced) return;
+      sel._hocEnhanced = true;
+      const originalStyle = sel.getAttribute('style') || '';
+      const originalClass = sel.className || '';
+      const wrap = document.createElement('span');
+      wrap.className = 'hoc-select-wrap';
+      sel.parentNode.insertBefore(wrap, sel);
+      wrap.appendChild(sel);
+      sel.classList.add('hoc-select-native');
+      sel.tabIndex = -1;
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = ('hoc-select-trigger ' + originalClass).trim();
+      trigger.setAttribute('style', originalStyle);
+      const labelSpan = document.createElement('span');
+      labelSpan.className = 'hoc-select-trigger-label';
+      trigger.appendChild(labelSpan);
+      trigger.insertAdjacentHTML('beforeend', '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>');
+      const panel = document.createElement('div');
+      panel.className = 'hoc-select-panel';
+      wrap.appendChild(trigger);
+      wrap.appendChild(panel);
+      function syncLabel() { const opt = sel.options[sel.selectedIndex]; labelSpan.textContent = opt ? opt.textContent : ''; }
+      function renderPanel() {
+        panel.innerHTML = '';
+        [...sel.options].forEach((opt, i) => {
+          const item = document.createElement('div');
+          item.className = 'hoc-select-item' + (i === sel.selectedIndex ? ' selected' : '');
+          item.textContent = opt.textContent;
+          item.onclick = () => {
+            sel.selectedIndex = i; syncLabel();
+            panel.classList.remove('open'); trigger.classList.remove('open');
+            sel.dispatchEvent(new Event('change', {bubbles:true}));
+          };
+          panel.appendChild(item);
+        });
+      }
+      trigger.onclick = (e) => {
+        e.stopPropagation();
+        const willOpen = !panel.classList.contains('open');
+        document.querySelectorAll('.hoc-select-panel.open').forEach(p => { p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+        if (willOpen) { renderPanel(); panel.classList.add('open'); trigger.classList.add('open'); }
+      };
+      syncLabel();
+      const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+      Object.defineProperty(sel, 'value', { get() { return desc.get.call(sel); }, set(v) { desc.set.call(sel, v); syncLabel(); }, configurable: true });
+      new MutationObserver(syncLabel).observe(sel, {childList:true, subtree:true});
+    }
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.hoc-select-panel.open').forEach(p => { p.classList.remove('open'); p.closest('.hoc-select-wrap')?.querySelector('.hoc-select-trigger')?.classList.remove('open'); });
+    });
+    hocEnhanceSelect(document.getElementById('rbAmbiente'));
+  </script>
   <script src="robo-builder.js"></script>
 </body>
 </html>

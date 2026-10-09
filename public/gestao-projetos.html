@@ -1925,7 +1925,7 @@
   hocEnhanceSelect(document.getElementById('projCategoria'));
   ['filtroStatus','filtroTipo','filtroCategoriaProj'].forEach(id => hocEnhanceSelect(document.getElementById(id)));
   function hocEnhanceSelects(ids) { ids.forEach(id => hocEnhanceSelect(document.getElementById(id))); }
-  hocEnhanceSelects(['ideaComplexidade','ideaPeriodo']);
+  hocEnhanceSelects(['ideaComplexidade','ideaPeriodo','filtroCategoria','filtroAprovacao','filtroStatusIdeia','filtroComplexidade']);
 
   carregarProjetos();
   carregarIdeias();

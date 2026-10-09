@@ -288,9 +288,9 @@
     .robo-nome { font-size: 14px; font-weight: 700; color: #0B0B0F; margin-bottom: 2px; }
     .robo-sub  { font-size: 11.5px; color: #6B7080; font-weight: 600; margin-top: 6px; }
     .robo-status-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; display: inline-block; }
-    .robo-ativo-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; display: inline-block; color: white; }
-    .robo-ativo-badge.ativa { background: #00B37E; }
-    .robo-ativo-badge.inativa { background: #9CA0AC; }
+    .robo-ativo-badge { display: inline-block; box-sizing: border-box; height: 24px; padding: 6px 12px 0; line-height: 11px; text-align: center; vertical-align: middle; font-size: 11px; font-weight: 700; border-radius: 999px; background: white; box-shadow: inset 0 0 0 1.5px currentColor; white-space: nowrap; transform: rotate(0.001deg); }
+    .robo-ativo-badge.ativa { color: #00B37E; }
+    .robo-ativo-badge.inativa { color: #6B7080; }
     .rst-executando { background: color-mix(in srgb,#00B37E 14%,white); color: #00754F; }
     .rst-pausado    { background: color-mix(in srgb,#FFAE00 16%,white); color: #8A5D00; }
     .rst-erro       { background: color-mix(in srgb,#FF2E4D 12%,white); color: #B3123A; }
@@ -312,7 +312,6 @@
     .robo-detalhe-painel { display:none; }
     .rdp-header-left { flex:1;min-width:0; }
     .rdp-titulo { font-size:16px;font-weight:800;color:#0B0B0F; }
-    .rdp-subtitulo { font-size:11px;color:#9CA0AC; }
     .rdp-secao-titulo { font-size:11px;font-weight:800;color:#0B0B0F;padding:6px 0;border-bottom:1.5px solid #ECEDF0;margin-bottom:14px;text-transform:uppercase;letter-spacing:0.6px; }
     .versao-hist-item { display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #F2F3F5;font-size:11px; }
     .versao-hist-item:last-child { border-bottom:none; }
@@ -338,37 +337,51 @@
     .cred-alerta { background: color-mix(in srgb,#FFAE00 12%,white); border: 1px solid color-mix(in srgb,#FFAE00 40%,white); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
     .cred-alerta-txt { font-size: 12px; color: #8A5D00; flex: 1; }
     .cred-table-wrap { background: white; border: 1px solid #ECEDF0; border-radius: 14px; overflow: hidden; }
-    .cred-status { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; color: white; }
-    .cst-valida { background: #00B37E; }
-    .cst-expirando { background: #FFAE00; }
-    .cst-expirada { background: #FF2E4D; }
+    .cred-status { display: inline-block; box-sizing: border-box; height: 24px; padding: 6px 12px 0; line-height: 11px; text-align: center; vertical-align: middle; font-size: 11px; font-weight: 700; border-radius: 999px; background: white; box-shadow: inset 0 0 0 1.5px currentColor; white-space: nowrap; transform: rotate(0.001deg); }
+    .cst-valida { color: #00B37E; }
+    .cst-expirando { color: #FFAE00; }
+    .cst-expirada { color: #FF2E4D; }
+    /* Barra de rolagem sem setinhas, com folga nas bordas arredondadas (popups com rolagem interna) */
+    .hoc-scroll { scrollbar-width: auto; scrollbar-color: auto; }
+    .hoc-scroll::-webkit-scrollbar { width: 10px; }
+    .hoc-scroll::-webkit-scrollbar-track { background: transparent; }
+    .hoc-scroll::-webkit-scrollbar-thumb { background: rgba(11,11,15,0.2); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+    .hoc-scroll::-webkit-scrollbar-thumb:hover { background: rgba(11,11,15,0.4); background-clip: padding-box; }
+    .hoc-scroll::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+    /* Cards de resumo do Ambiente: título (padrão do sistema) acima do número */
+    .stat-mini-topo { font-size: 12px; font-weight: 600; color: #6B7080; margin-bottom: 10px; }
+    #robo-ambiente .stat-mini-val { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
 
     /* Calendário semanal */
     .cal-nav { display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .cal-nav .cal-nav-btn { height:38px; padding:0 16px; display:inline-flex; align-items:center; justify-content:center; }
     .cal-nav-btn { background:white; border:1.5px solid #E5E7EB; border-radius:9px; padding:6px 16px; font-size:13px; font-weight:600; color:#33363F; cursor:pointer; transition:all .15s; line-height:1.4; }
-    .cal-nav-btn:hover { border-color:#0B0B0F; }
+    .cal-nav-btn:hover { background:#F1F2F5; }
+    .cal-hoje-btn:hover { background:#F1F2F5; border-color:color-mix(in srgb,var(--accent) 40%,white); }
     .cal-hoje-btn { color:var(--accent); border-color:color-mix(in srgb,var(--accent) 40%,white); }
     .cal-periodo-txt { font-size:14px; font-weight:700; color:#0B0B0F; }
-    .cal-date-input { padding:6px 10px; border:1.5px solid #E5E7EB; border-radius:9px; font-size:12px; color:#33363F; outline:none; }
+    body .cal-nav input.cal-date-input { width:160px; flex:none; }
+    body input.cal-date-input { width:auto; height:38px; padding:0 10px; border:1.5px solid #E5E7EB; border-radius:9px; font-size:12.5px; color:#33363F; background:white; outline:none; font-family:inherit; box-sizing:border-box; }
     .cal-wrapper { background:white; border:1px solid #ECEDF0; border-radius:14px; overflow:hidden; }
     .cal-day-headers { display:grid; grid-template-columns:52px repeat(7,1fr); border-bottom:1.5px solid #ECEDF0; background:#FAFBFC; position:sticky; top:0; z-index:2; }
-    .cal-gutter-top { border-right:1px solid #ECEDF0; min-height:54px; }
-    .cal-day-head { padding:10px 6px; text-align:center; border-right:1px solid #ECEDF0; }
+    .cal-gutter-top { border-right:1px solid #ECEDF0; min-height:40px; }
+    .cal-day-head { padding:6px 6px 7px; text-align:center; border-right:1px solid #ECEDF0; }
     .cal-day-head:last-child { border-right:none; }
-    .cal-day-head-today { background:color-mix(in srgb,var(--accent) 12%,white); }
-    .cal-day-name { font-size:11px; font-weight:600; color:#6B7080; text-transform:uppercase; letter-spacing:.5px; }
-    .cal-day-num { font-size:18px; font-weight:700; color:#33363F; margin-top:2px; }
-    .cal-day-num-today { background:var(--accent); color:white; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; margin:2px auto 0; }
-    .cal-body-scroll { overflow-y:auto; max-height:580px; }
+    .cal-day-head-today { background:color-mix(in srgb,#2F5CFF 7%,white); }
+    .cal-day-name { font-size:10.5px; font-weight:600; color:#33363F; text-transform:uppercase; letter-spacing:.5px; }
+    .cal-day-num { font-size:16px; font-weight:600; color:#0B0B0F; margin-top:1px; }
+    .cal-day-num-today { font-weight:800; }
+    .cal-body-scroll { overflow-y:auto; max-height:580px; } /* a altura real é ajustada por _calAjustarAltura() para a rolagem ficar só no calendário */
     .cal-body-grid { display:grid; grid-template-columns:52px repeat(7,1fr); }
     .cal-time-gutter { border-right:1px solid #ECEDF0; }
-    .cal-hour-label { height:64px; padding:2px 6px 0; font-size:10px; color:#9CA0AC; text-align:right; border-bottom:1px solid #F2F3F5; box-sizing:border-box; transform:translateY(-6px); }
+    .cal-hour-label { height:44px; padding:2px 6px 0; font-size:10px; color:#0B0B0F; text-align:right; border-bottom:1px solid #F2F3F5; box-sizing:border-box; transform:translateY(-6px); }
+    .cal-hour-label:first-child { transform:none; }
     .cal-day-col { position:relative; border-right:1px solid #ECEDF0; box-sizing:border-box; }
     .cal-day-col:last-child { border-right:none; }
-    .cal-day-col-today { background:color-mix(in srgb,var(--accent) 9%,white); }
+    .cal-day-col-today { background:color-mix(in srgb,#2F5CFF 4%,white); }
     .cal-hour-line { position:absolute; left:0; right:0; border-top:1px solid #F2F3F5; pointer-events:none; }
-    .cal-now-line { position:absolute; left:0; right:0; height:2px; background:#FF2E4D; z-index:2; pointer-events:none; }
-    .cal-now-line::before { content:''; position:absolute; left:-4px; top:-4px; width:10px; height:10px; border-radius:50%; background:#FF2E4D; }
+    .cal-now-line { position:absolute; left:0; right:0; height:1px; background:#FF2E4D; z-index:2; pointer-events:none; }
+    .cal-now-line::before { content:''; position:absolute; left:-3px; top:-2.5px; width:6px; height:6px; border-radius:50%; background:#FF2E4D; }
     .cal-event { position:absolute; left:2px; right:2px; border-radius:5px; padding:3px 5px; overflow:hidden; cursor:pointer; z-index:1; box-sizing:border-box; }
     .cal-event:hover { filter:brightness(.93); }
     .cal-event-nome { font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -1460,7 +1473,8 @@
         <div class="robo-secao active" id="robo-producao">
           <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px">
             <input type="text" id="execFiltroNome" placeholder="Buscar robô..." oninput="filtrarExecucoesRobos()" style="height:38px;padding:0 12px;border-radius:9px;border:1.5px solid #E5E7EB;font-size:12.5px;width:220px;box-sizing:border-box">
-            <input type="date" id="execFiltroData" onchange="filtrarExecucoesRobos()" style="width:auto;height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;color:#33363F;background:white;outline:none;font-family:inherit">
+            <div><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Data de início</label>
+              <input type="date" id="execFiltroData" onchange="filtrarExecucoesRobos()" style="width:auto;height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;color:#33363F;background:white;outline:none;font-family:inherit"></div>
             <div><label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Máquina</label>
               <select id="execFiltroMaquina" onchange="filtrarExecucoesRobos()" style="width:auto;height:38px;padding:0 10px;border:1.5px solid #E5E7EB;border-radius:9px;font-size:12.5px;color:#33363F;background:white;outline:none;cursor:pointer;font-family:inherit">
                 <option value="">Todas</option>
@@ -1722,7 +1736,6 @@
                 <button onclick="fecharDetalheRobo()" style="width:34px;height:34px;border-radius:9px;background:#F1F2F5;border:none;color:#33363F;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                 <div class="rdp-header-left">
                   <div class="rdp-titulo" id="rdpTitulo">Detalhes</div>
-                  <div class="rdp-subtitulo" id="rdpSubtitulo"></div>
                 </div>
                 <button onclick="dpSalvarConfigs()" class="btn-lic btn-lic-add">Salvar</button>
               </div>
@@ -1929,21 +1942,25 @@
         <div id="credListPane">
           <div id="credAlertaWrap"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-            <button onclick="toggleCredInfo()" style="display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;padding:0;font-size:12.5px;font-weight:600;color:#33363F">
-              Como usar uma credencial dentro de um robô
-              <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;border:1.5px solid #9CA0AC;color:#9CA0AC;font-size:10px;font-weight:700;flex-shrink:0">i</span>
-            </button>
-            <div style="display:flex;gap:8px">
-              <button class="btn-lic" onclick="abrirModalGoogle()" title="Conecta a conta Google da sua empresa (Drive e Sheets) aos Robôs, usando o app OAuth que vocês criam no Google Cloud de vocês">Conectar conta Google</button>
-              <button class="btn-lic btn-lic-add" onclick="abrirModalCredencial()">+ Nova Credencial</button>
-            </div>
-          </div>
-
-          <div id="credInfoBox" style="display:none;background:white;border:1px solid #ECEDF0;border-radius:14px;padding:18px 20px;margin-bottom:16px">
-            <div style="font-size:11px;color:#33363F;line-height:1.7">
-              Os campos cadastrados aqui (ex.: <code>login</code>, <code>senha</code>, <code>api_key</code> — o nome é livre) nunca precisam ser digitados diretamente no código do robô. Ao rodar pelo Agent HOC, o robô recebe automaticamente as credenciais de acesso (<code>HOC_ROBOT_KEY</code>) como variável de ambiente — o script só precisa <b>solicitar a credencial pelo nome</b>:
-            </div>
-            <pre style="background:#0B0B0F;color:#ECEDF0;border-radius:9px;padding:10px 12px;font-size:11px;overflow-x:auto;margin-top:8px;line-height:1.6">import os, requests
+            <div class="info-icon-wrap">
+              <button class="info-icon-btn" onclick="toggleInfoPopover('infoCredenciais',event)" title="Como usar uma credencial dentro de um robô">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16.5" x2="12" y2="11"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/></svg>
+              </button>
+              <div class="info-popover" id="infoCredenciais" style="display:none;width:760px;max-width:calc(100vw - 340px);min-width:520px">
+                <div style="font-weight:700;color:#0B0B0F;font-size:13px;margin-bottom:8px">Como usar uma credencial dentro de um robô</div>
+                <div style="border-top:1px solid #F1F2F5;margin:0 0 12px"></div>
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:22px;align-items:start">
+                  <div>
+                    <div style="margin-bottom:10px">Os campos cadastrados aqui (por exemplo <code>login</code>, <code>senha</code> ou <code>api_key</code>; o nome é livre) nunca precisam ser digitados no código do robô.</div>
+                    <div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Como funciona</div>
+                    <div style="margin-bottom:10px">Ao rodar pelo Agent HOC, o robô recebe a chave de acesso (<code>HOC_ROBOT_KEY</code>) como variável de ambiente. O script só precisa <strong>solicitar a credencial pelo nome</strong>.</div>
+                    <div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Observações</div>
+                    <div style="margin-bottom:3px">Troque <code>&lt;nome_da_credencial&gt;</code> pelo nome exato cadastrado na tabela abaixo.</div>
+                    <div>No framework OOP (<code>HocRobot</code>): <code>self.credencial('nome')</code>.</div>
+                  </div>
+                  <div>
+                    <div style="font-size:10px;font-weight:700;color:#9CA0AC;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Exemplo em Python</div>
+                    <pre style="background:#0B0B0F;color:#ECEDF0;border-radius:9px;padding:10px 12px;font-size:11px;white-space:pre-wrap;word-break:break-word;margin:0;line-height:1.55">import os, requests
 
 SERVER = os.environ.get('HOC_SERVER')
 HEADERS = {'x-robot-key': os.environ.get('HOC_ROBOT_KEY', '')}
@@ -1952,7 +1969,14 @@ r = requests.get(f"{SERVER}/api/credenciais/&lt;nome_da_credencial&gt;/valor", h
 campos = r.json().get('campos', {})
 login = campos.get('login', '')
 senha = campos.get('senha', '')</pre>
-            <div style="font-size:10px;color:#6B7080;margin-top:6px">Substitua <code>&lt;nome_da_credencial&gt;</code> pelo nome exato cadastrado na tabela abaixo. No framework OOP (<code>HocRobot</code>), o mesmo resultado sai com uma linha: <code>self.credencial('nome')</code>.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-lic btn-lic-outline" onclick="abrirModalGoogle()" title="Conecta a conta Google da sua empresa (Drive e Sheets) aos Robôs, usando o app OAuth que vocês criam no Google Cloud de vocês">Conectar conta Google</button>
+              <button class="btn-lic btn-lic-add" onclick="abrirModalCredencial()">+ Nova Credencial</button>
+            </div>
           </div>
 
           <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px">
@@ -1988,9 +2012,8 @@ senha = campos.get('senha', '')</pre>
             <button class="cal-nav-btn" onclick="calNavSemana(-1)">‹</button>
             <button class="cal-nav-btn cal-hoje-btn" onclick="calHoje()">Hoje</button>
             <button class="cal-nav-btn" onclick="calNavSemana(1)">›</button>
-            <span id="calPeriodo" class="cal-periodo-txt"></span>
-            <div style="flex:1"></div>
             <input type="date" id="calDataFiltro" class="cal-date-input" onchange="calIrParaData(this.value)" title="Ir para data">
+            <span id="calPeriodo" class="cal-periodo-txt"></span>
           </div>
           <div class="cal-wrapper">
             <div class="cal-body-scroll">
@@ -2005,9 +2028,9 @@ senha = campos.get('senha', '')</pre>
         <!-- ===== AMBIENTE (Máquinas) ===== -->
         <div class="robo-secao" id="robo-ambiente">
           <div class="tarefas-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">
-            <div class="stat-mini"><div class="stat-mini-val" id="mqOnlineCount" style="color:#00B37E">0</div><div class="stat-mini-lbl">Máquinas Online</div></div>
-            <div class="stat-mini"><div class="stat-mini-val" id="mqOfflineCount" style="color:#6B7080">0</div><div class="stat-mini-lbl">Máquinas Offline</div></div>
-            <div class="stat-mini"><div class="stat-mini-val" id="mqMaintenanceCount" style="color:#FFAE00">0</div><div class="stat-mini-lbl">Em Manutenção</div></div>
+            <div class="stat-mini"><div class="stat-mini-topo">Máquinas Online</div><div class="stat-mini-val" id="mqOnlineCount" style="color:#00B37E">0</div></div>
+            <div class="stat-mini"><div class="stat-mini-topo">Máquinas Offline</div><div class="stat-mini-val" id="mqOfflineCount" style="color:#6B7080">0</div></div>
+            <div class="stat-mini"><div class="stat-mini-topo">Em Manutenção</div><div class="stat-mini-val" id="mqMaintenanceCount" style="color:#FFAE00">0</div></div>
           </div>
 
           <!-- Filtros -->
@@ -2237,7 +2260,7 @@ senha = campos.get('senha', '')</pre>
 <div class="modal-overlay" id="modalGruposMaquina">
   <div class="modal" style="max-width:420px;padding:0">
     <div class="modal-header" style="padding:20px 24px;border-bottom:1px solid #ECEDF0;margin-bottom:0"><span class="modal-titulo">Gerenciar Grupos</span><button class="btn-fechar" onclick="fecharModal('modalGruposMaquina')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-    <div style="padding:20px 24px 0">
+    <div style="padding:20px 24px 24px">
       <label style="display:block;font-size:12px;font-weight:600;color:#4A4E5A;margin-bottom:6px">Novo Grupo</label>
       <div style="display:flex;gap:8px">
         <input type="text" class="form-control" id="mqNovoGrupoNome" placeholder="Ex: Comercial" style="flex:1;height:38px;padding:0 12px">
@@ -2245,7 +2268,6 @@ senha = campos.get('senha', '')</pre>
       </div>
       <div id="mqGruposList" style="margin-top:14px;max-height:250px;overflow-y:auto"></div>
     </div>
-    <div class="modal-footer" style="padding:16px 24px;border-top:1px solid #ECEDF0;margin-top:18px"><button class="btn-cancelar" onclick="fecharModal('modalGruposMaquina')" style="flex:none">Fechar</button></div>
   </div>
 </div>
 
@@ -2704,7 +2726,7 @@ senha = campos.get('senha', '')</pre>
 
   // ===== UTILS =====
   function fmtData(d) { if (!d) return '—'; return new Date(d + 'T12:00:00').toLocaleDateString('pt-BR'); }
-  function btnEdit(fn, id) { return `<button class="prc-btn-icon" onclick="${fn}('${id}')" title="Editar" style="margin-right:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>`; }
+  function btnEdit(fn, id) { return `<button class="prc-btn-icon" onclick="${fn}('${id}')" title="Editar" style="margin-right:4px;color:#0B0B0F"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>`; }
   function btnDel(fn, id) { return `<button class="prc-btn-icon perigo" onclick="${fn}('${id}')" title="Excluir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg></button>`; }
   function emptyState(msg) { return `<tr><td colspan="20" class="empty-state">${msg}</td></tr>`; }
 
@@ -4993,7 +5015,7 @@ senha = campos.get('senha', '')</pre>
     else if (s==='Concluído com Pendência' || s==='Pendente') cor = '#FFAE00';
     else if (s==='Erro') cor = '#FF2E4D';
     else if (s==='Em Andamento') cor = '#2F5CFF';
-    return `display:inline-block;box-sizing:border-box;height:24px;padding:6px 12px 0;line-height:11px;text-align:center;vertical-align:middle;font-size:11px;font-weight:700;border-radius:999px;background:white;box-shadow:inset 0 0 0 1.5px currentColor;color:${cor};white-space:nowrap;flex-shrink:0`;
+    return `display:inline-block;box-sizing:border-box;height:24px;padding:6px 12px 0;line-height:11px;text-align:center;vertical-align:middle;font-size:11px;font-weight:700;border-radius:999px;background:white;box-shadow:inset 0 0 0 1.5px currentColor;color:${cor};white-space:nowrap;flex-shrink:0;transform:rotate(0.001deg);`;
   }
   // Condicional e loop têm glifos que ocupam o viewBox inteiro e parecem maiores que os demais — reduz um pouco pra equilibrar.
   function _prcDotIcon(tipo) {
@@ -5370,7 +5392,7 @@ senha = campos.get('senha', '')</pre>
     const isDone = _ETAPA_DONE.includes(etapa.status);
     const hasStatus = _PRC_HAS_STATUS.has(tipo);
     // Botões de ação: cantos dos botões pequenos do sistema (7px, não pílula — pílula é das tags de status), sem borda e com tons mais fortes
-    const bs=(bg)=>`display:inline-block;box-sizing:border-box;height:24px;padding:6px 12px;line-height:11px;text-align:center;font-size:10.5px;font-weight:700;background:${bg.replace(/(\d+)%,white\)/,(m,n)=>Math.min(60,Math.round(n*2.4))+'%,white)').replace('#F6F7F9','#E3E5EA')};color:#0B0B0F;border:0;border-radius:7px;cursor:pointer;white-space:nowrap`;
+    const bs=(bg)=>`display:inline-block;box-sizing:border-box;height:24px;padding:6px 12px;line-height:11px;text-align:center;font-size:10.5px;font-weight:700;background:${bg.replace(/(\d+)%,white\)/,(m,n)=>Math.min(60,Math.round(n*2.4))+'%,white)').replace('#F6F7F9','#E3E5EA')};color:#0B0B0F;border:0;border-radius:7px;cursor:pointer;white-space:nowrap;transform:rotate(0.001deg);`;
     const isAuto = tipo==='mudar_var';
     // Calculadora: os status são "Condição atendida" (verde) e "Condição não atendida" (vermelho)
     const calcFeito = tipo==='calculo' && _ETAPA_DONE.includes(etapa.status);
@@ -9414,6 +9436,11 @@ senha = campos.get('senha', '')</pre>
     }).join('');
   }
 
+  // Tag de status no padrão do sistema: pílula branca com contorno e texto coloridos (texto centralizado por padding fixo)
+  function _stPill(cor, txt) {
+    return `<span style="display:inline-block;box-sizing:border-box;height:24px;padding:6px 12px 0;line-height:11px;text-align:center;vertical-align:middle;font-size:11px;font-weight:700;border-radius:999px;background:white;box-shadow:inset 0 0 0 1.5px currentColor;color:${cor};white-space:nowrap;transform:rotate(0.001deg);">${txt}</span>`;
+  }
+
   function filtrarExecucoesRobos() {
     _popularFiltroMaquinaExecs();
     const nome = (document.getElementById('execFiltroNome')?.value||'').toLowerCase();
@@ -9428,22 +9455,23 @@ senha = campos.get('senha', '')</pre>
     );
     const tbody = document.getElementById('execRobosBody');
     if(!tbody) return;
-    const STATUS_BADGE = {em_execucao:'background:var(--accent);color:white',concluido:'background:#00B37E;color:white',erro:'background:#FF2E4D;color:white',interrompido:'background:#FFAE00;color:white',nao_disparado:'background:#F1F2F5;color:#6B7080',na_fila:'background:#E0E7FF;color:#3730A3'};
+    const STATUS_COR = {em_execucao:'#2F5CFF',concluido:'#00B37E',erro:'#FF2E4D',interrompido:'#FFAE00',nao_disparado:'#6B7080',na_fila:'#6B7080'};
+    const GATILHO_LABEL = {manual:'Manual',schedule:'Schedule',webhook:'Webhook'};
     const STATUS_LABEL = {em_execucao:'Em execução',concluido:'Concluído',erro:'Erro',interrompido:'Interrompido',nao_disparado:'Não disparado',na_fila:'Na fila (Nuvem)'};
     if(lista.length===0) { tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:32px;color:#9CA0AC">Nenhuma execução encontrada.</td></tr>`; return; }
     tbody.innerHTML = lista.map(e=>{
-      const style = STATUS_BADGE[e.status]||'background:#F1F2F5;color:#6B7080';
+      const cor = STATUS_COR[e.status]||'#6B7080';
       const lbl = STATUS_LABEL[e.status]||e.status;
       const inicio = e.iniciadoEm ? new Date(e.iniciadoEm).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—';
       const dur = e.duracao ? (e.duracao<60?e.duracao+'s':Math.round(e.duracao/60)+'m') : '—';
       const maqNome = maquinasData.find(m=>m.machineId===e.maquina)?.nome || e.maquina || '—';
       return `<tr>
         <td style="font-size:12px;font-weight:600;color:#0B0B0F">${e.roboNome||'—'}</td>
-        <td><span style="padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;${style}">${lbl}</span></td>
-        <td style="font-size:11px;color:#6B7080">${maqNome}</td>
-        <td style="font-size:11px;color:#6B7080">${e.gatilho||'—'}</td>
-        <td style="font-size:11px;color:#6B7080">${inicio}</td>
-        <td style="font-size:11px;color:#6B7080">${dur}</td>
+        <td>${_stPill(cor, lbl)}</td>
+        <td style="font-size:12px;font-weight:400;color:#0B0B0F">${maqNome}</td>
+        <td style="font-size:12px;font-weight:400;color:#0B0B0F">${GATILHO_LABEL[e.gatilho]||e.gatilho||'—'}</td>
+        <td style="font-size:12px;font-weight:400;color:#0B0B0F">${inicio}</td>
+        <td style="font-size:12px;font-weight:400;color:#0B0B0F">${dur}</td>
         <td>
           <div style="display:inline-flex;gap:6px">
           ${e.status==='em_execucao'?`<button onclick="interromperExecRobo('${e._id}')" class="prc-btn-icon perigo" title="Parar"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>`:''}
@@ -9498,7 +9526,7 @@ senha = campos.get('senha', '')</pre>
           <span class="modal-titulo">Logs — ${_gesc(exec.roboNome||'Robô')}</span>
           <button class="btn-fechar" onclick="this.closest('.modal-overlay').remove()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
-        <div style="background:white;overflow-y:auto;padding:16px 20px;flex:1">${linhas}</div>
+        <div class="hoc-scroll" style="background:white;overflow-y:auto;flex:1;min-height:0;margin:8px 6px 14px 0;padding:8px 14px 8px 20px">${linhas}</div>
       </div>`;
       overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
       document.body.appendChild(overlay);
@@ -9562,9 +9590,8 @@ senha = campos.get('senha', '')</pre>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
               Executar
             </button>
-            ${r.origem === 'builder' && r.automacaoId ? `<button title="Editar o fluxo no Studio" onclick="event.stopPropagation();editarRoboNoStudio('${r._id}')" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;background:#F1F2F5;color:#33363F;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-              Editar
+            ${r.origem === 'builder' && r.automacaoId ? `<button title="Editar o fluxo no Studio" onclick="event.stopPropagation();editarRoboNoStudio('${r._id}')" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;background:#F1F2F5;color:#0B0B0F;border:none;border-radius:8px;cursor:pointer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
             </button>` : ''}
             <label class="hoc-switch" title="${ativo?'Ativo':'Inativo'}" onclick="event.stopPropagation()" style="margin-left:auto">
               <input type="checkbox" ${ativo?'checked':''} onchange="ativarInativarRobo('${r._id}',this.checked)">
@@ -9591,9 +9618,6 @@ senha = campos.get('senha', '')</pre>
 
     // Preenche cabeçalho
     document.getElementById('rdpTitulo').textContent = r.nome;
-    const tipoLabel = r.tipo === 'Interface' ? '🖥️ Interface' : '⚙️ Background';
-    const maqNome = maquinasData.find(m => m._id === r.maquinaId)?.nome || 'Qualquer máquina';
-    document.getElementById('rdpSubtitulo').textContent = `${tipoLabel} · ${maqNome}`;
 
     // Troca pro painel de detalhes (mesmo padrão inline do roboFormPane)
     document.getElementById('roboListPane').style.display = 'none';
@@ -10345,12 +10369,6 @@ senha = campos.get('senha', '')</pre>
     } catch(err) { console.error(err); }
   }
 
-  function toggleCredInfo() {
-    const box = document.getElementById('credInfoBox');
-    if (!box) return;
-    box.style.display = box.style.display === 'none' ? 'block' : 'none';
-  }
-
   function filtrarCredenciais() {
     const q = (document.getElementById('credFiltroNome')?.value||'').toLowerCase();
     const st = document.getElementById('credFiltroStatus')?.value||'';
@@ -10375,10 +10393,10 @@ senha = campos.get('senha', '')</pre>
     if (withStatus.length === 0) { tbody.innerHTML = emptyState('Nenhuma credencial cadastrada.'); return; }
     tbody.innerHTML = withStatus.map(c => {
       return `<tr>
-        <td><strong>${c.nome}</strong><div style="font-size:10px;color:#9CA0AC">${credEhGoogle(c) ? (c.campos.refresh_token && c.campos.client_id ? 'Conta Google conectada' : 'Conta Google — falta conectar') : (c.proprietario||'—')}</div></td>
+        <td><strong>${c.nome}</strong>${credEhGoogle(c) ? `<div style="font-size:10px;color:#9CA0AC">${c.campos.refresh_token && c.campos.client_id ? 'Conta Google conectada' : 'Conta Google — falta conectar'}</div>` : ''}</td>
         <td><span class="cred-status ${stCls[c._status]||'cst-valida'}">${c._status}</span></td>
         <td>${c.validade ? new Date(c.validade+'T12:00:00').toLocaleDateString('pt-BR') : 'Permanente'}</td>
-        <td>${credEhGoogle(c) ? `<div style="display:flex;align-items:center;justify-content:center;gap:6px"><button class="btn-lic" style="height:30px;padding:0 10px;font-size:11px;white-space:nowrap" onclick="abrirModalGoogle(${JSON.stringify(c.nome).replace(/"/g,'&quot;')})">${c.campos.refresh_token && c.campos.client_id ? 'Reconectar' : 'Conectar'}</button>${btnEdit('editarCredencial',c._id)}${btnDel('deletarCredencial',c._id)}</div>` : btnEdit('editarCredencial',c._id) + btnDel('deletarCredencial',c._id)}</td>
+        <td>${credEhGoogle(c) ? `<div style="display:flex;align-items:center;justify-content:center;gap:6px"><button class="btn-lic btn-lic-outline" style="height:30px;padding:0 10px;font-size:11px;white-space:nowrap" onclick="abrirModalGoogle(${JSON.stringify(c.nome).replace(/"/g,'&quot;')})">${c.campos.refresh_token && c.campos.client_id ? 'Reconectar' : 'Conectar'}</button>${btnEdit('editarCredencial',c._id)}${btnDel('deletarCredencial',c._id)}</div>` : btnEdit('editarCredencial',c._id) + btnDel('deletarCredencial',c._id)}</td>
       </tr>`;
     }).join('');
   }
@@ -10521,9 +10539,9 @@ senha = campos.get('senha', '')</pre>
 
   // ===== CALENDÁRIO =====
   let calWeekOffset = 0;
-  const CAL_HOUR_H  = 64;  // px por hora
-  const CAL_START   = 6;   // hora inicial exibida
-  const CAL_END     = 23;  // hora final exibida
+  const CAL_HOUR_H  = 44;  // px por hora
+  const CAL_START   = 0;   // hora inicial exibida (00:00)
+  const CAL_END     = 24;  // hora final exibida (até 23:59)
   const CAL_COLORS  = [
     {bg:'#ebf4ff',border:'#3b82f6',text:'#1e40af'},
     {bg:'#f0fdf4',border:'#22c55e',text:'#15803d'},
@@ -10592,7 +10610,26 @@ senha = campos.get('senha', '')</pre>
     return occ;
   }
 
+  // A rolagem fica só dentro do calendário: a altura dele ocupa o que sobra da janela (sem barra na página inteira)
+  function _calAjustarAltura() {
+    const sc = document.querySelector('#robo-calendario .cal-body-scroll');
+    if (!sc || sc.offsetParent === null) return;
+    const topo = sc.getBoundingClientRect().top;
+    let h = Math.max(260, window.innerHeight - topo - 24);
+    sc.style.maxHeight = h + 'px';
+    // se ainda sobrar rolagem na página (margens/padding abaixo do calendário), tira esse excesso da altura do calendário
+    const excesso = document.documentElement.scrollHeight - window.innerHeight;
+    if (excesso > 0) { h = Math.max(260, h - excesso); sc.style.maxHeight = h + 'px'; }
+    // na primeira abertura, rola o calendário para perto da hora atual (o dia vai de 00:00 a 23:59)
+    if (!window._calScrollFeito) {
+      window._calScrollFeito = true;
+      sc.scrollTop = Math.max(0, new Date().getHours() - 1) * CAL_HOUR_H;
+    }
+  }
+  window.addEventListener('resize', _calAjustarAltura);
+
   function renderCalendario() {
+    setTimeout(_calAjustarAltura, 0);
     const today = new Date(); today.setHours(0,0,0,0);
     const monday = calGetMonday(today);
     monday.setDate(monday.getDate() + calWeekOffset * 7);
@@ -10769,10 +10806,10 @@ senha = campos.get('senha', '')</pre>
     }
 
     const STATUS_CFG = {
-      online:      { bg:'#00B37E', label:'Online' },
-      offline:     { bg:'#9CA0AC', label:'Offline' },
-      busy:        { bg:'#FFAE00', label:'Ocupada' },
-      maintenance: { bg:'#6B7080', label:'Manutenção' },
+      online:      { cor:'#00B37E', label:'Online' },
+      offline:     { cor:'#6B7080', label:'Offline' },
+      busy:        { cor:'#FFAE00', label:'Ocupada' },
+      maintenance: { cor:'#2F5CFF', label:'Manutenção' },
     };
 
     el.innerHTML = `<div class="contatos-table-wrap" style="overflow-x:auto">
@@ -10799,7 +10836,7 @@ senha = campos.get('senha', '')</pre>
                 <div style="font-size:10px;color:#9CA0AC;font-family:monospace">${m.machineId||'—'}</div>
               </td>
               <td style="color:#33363F">${m.grupo?_gesc(m.grupo):`<span style="color:#9CA0AC">—</span>`}</td>
-              <td><span style="padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;background:${s.bg};color:white">${s.label}</span></td>
+              <td>${_stPill(s.cor, s.label)}</td>
               <td style="color:${pctCpu>80?'#FF2E4D':pctCpu>50?'#FFAE00':'#00B37E'};font-weight:700">${pctCpu}%</td>
               <td style="color:${pctRam>80?'#FF2E4D':pctRam>50?'#FFAE00':'var(--accent)'};font-weight:700">${pctRam}%</td>
               <td style="color:#6B7080">${hb}</td>
@@ -10811,8 +10848,8 @@ senha = campos.get('senha', '')</pre>
               </td>
               <td>
                 <div style="display:inline-flex;gap:6px">
-                  <button onclick="editarMaquina('${m._id}')" class="prc-btn-icon acento" title="Editar"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4z"/></svg></button>
-                  <button onclick="deletarMaquina('${m._id}')" class="prc-btn-icon perigo" title="Excluir"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg></button>
+                  <button onclick="editarMaquina('${m._id}')" class="prc-btn-icon" title="Editar" style="color:#0B0B0F"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+                  <button onclick="deletarMaquina('${m._id}')" class="prc-btn-icon perigo" title="Excluir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 0V4a2 2 0 012-2h0a2 2 0 012 2v2"/></svg></button>
                 </div>
               </td>
             </tr>`;
